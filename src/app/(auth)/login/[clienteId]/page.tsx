@@ -14,8 +14,8 @@ export default function LoginPage() {
   const clienteId = params.clienteId as string;
 
   const [formData, setFormData] = useState({
-    email: "admin@academia.com",
-    senha: "admin123",
+    email: "",
+    senha: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
