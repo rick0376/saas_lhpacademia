@@ -259,5 +259,6 @@ enum DiaSemana {
 enum Role {
   SUPERADMIN
   ADMIN
+   ALUNO 
   USER
 }

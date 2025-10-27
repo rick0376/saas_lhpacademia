@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import styles from "./styles.module.scss";
 import { Button } from "../ui/Button/Button";
 import { Modal } from "../ui/Modal/Modal";
@@ -18,6 +19,7 @@ interface Cliente {
 }
 
 export const ClienteTable = () => {
+  const router = useRouter();
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -161,6 +163,31 @@ export const ClienteTable = () => {
                 <td>{formatDate(cliente.createdAt)}</td>
                 <td>
                   <div className={styles.actions}>
+                    {/* ✅ BOTÃO CRIAR ALUNO - Vai para novo aluno com clienteId fixo */}
+                    <button
+                      onClick={() =>
+                        router.push(
+                          `/dashboard/alunos/novo?clienteId=${cliente.id}`
+                        )
+                      }
+                      className={styles.manageButton}
+                      title="Criar Aluno"
+                    >
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                      </svg>
+                    </button>
+
                     <Link
                       href={`/dashboard/clientes/${cliente.id}/editar`}
                       className={styles.editButton}

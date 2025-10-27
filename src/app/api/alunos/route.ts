@@ -118,7 +118,7 @@ export async function POST(req: Request) {
 
     let usuarioId = null;
 
-    // ✅ Se marcou para dar acesso ao app, criar usuário
+    // ✅ Se marcou para dar acesso ao app, criar usuário com role ALUNO
     if (darAcessoApp) {
       if (!email) {
         return NextResponse.json(
@@ -146,21 +146,21 @@ export async function POST(req: Request) {
         );
       }
 
-      // Criar usuário
+      // Criar usuário com role "ALUNO" ✅
       const senhaHash = await bcrypt.hash(senhaInicial, 10);
       const usuario = await prisma.usuario.create({
         data: {
           nome,
           email,
           senha: senhaHash,
-          role: "USER",
+          role: "ALUNO", // ✅ MUDOU de "USER" para "ALUNO"
           ativo: true,
           clienteId,
         },
       });
 
       usuarioId = usuario.id;
-      console.log("✅ Usuário criado para o aluno:", email);
+      console.log("✅ Usuário ALUNO criado:", email);
     }
 
     // ✅ Upload de foto (se houver)

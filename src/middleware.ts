@@ -10,33 +10,83 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  // Rotas públicas (não precisam de autenticação)
-  const publicRoutes = ["/", "/login"];
-  const isPublicRoute = publicRoutes.some((route) =>
-    pathname.startsWith(route)
-  );
+  // ✅ ROTAS PÚBLICAS (não precisam de autenticação)
+  const publicRoutes = [
+    "/",
+    "/login",
+    "/login-superadmin",
+    "/alunos/login", // Login do aluno é público
+  ];
+  const isPublicRoute = publicRoutes.some((route) => pathname === route);
 
-  // Se é rota pública, permitir acesso
   if (isPublicRoute) {
     return NextResponse.next();
   }
 
-  // Se não está autenticado e tenta acessar rota protegida, redirecionar para home
-  if (!token && pathname.startsWith("/dashboard")) {
-    return NextResponse.redirect(new URL("/", request.url));
-  }
+  // ✅ ROTAS DO ALUNO (/alunos/*)
+  if (pathname.startsWith("/alunos")) {
+    // Não está autenticado → redireciona para login do aluno
+    if (!token) {
+      return NextResponse.redirect(new URL("/alunos/login", request.url));
+    }
 
-  // Verificar permissões para rotas de admin
-  if (pathname.startsWith("/dashboard/permissoes")) {
-    if (token?.role !== "SUPERADMIN" && token?.role !== "ADMIN") {
+    // Está autenticado mas não é ALUNO → bloqueia
+    if (token.role !== "ALUNO") {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
+
+    // É ALUNO → permite acesso
+    return NextResponse.next();
   }
 
+  // ✅ ROTAS DO DASHBOARD (/dashboard/*)
+  if (pathname.startsWith("/dashboard")) {
+    // Não está autenticado → redireciona para home
+    if (!token) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+
+    // É ALUNO tentando acessar dashboard admin → bloqueia
+    if (token.role === "ALUNO") {
+      return NextResponse.redirect(new URL("/alunos/dashboard", request.url));
+    }
+
+    // ✅ ROTAS RESTRITAS PARA SUPERADMIN
+    const superAdminRoutes = [
+      "/dashboard/clientes",
+      "/dashboard/usuarios",
+      "/dashboard/permissoes",
+    ];
+
+    const isSuperAdminRoute = superAdminRoutes.some((route) =>
+      pathname.startsWith(route)
+    );
+
+    if (isSuperAdminRoute && token.role !== "SUPERADMIN") {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+
+    // ✅ ALUNO NÃO PODE ACESSAR:
+    // - Biblioteca de exercícios (todos podem ver)
+    // - Treinos de outros alunos
+    // - Usuários
+    const blockedForAluno = ["/dashboard/usuarios", "/dashboard/clientes"];
+
+    if (
+      token.role === "ALUNO" &&
+      blockedForAluno.some((route) => pathname.startsWith(route))
+    ) {
+      return NextResponse.redirect(new URL("/alunos/dashboard", request.url));
+    }
+
+    // ADMIN e SUPERADMIN → permite acesso
+    return NextResponse.next();
+  }
+
+  // Outras rotas → permite
   return NextResponse.next();
 }
 
-// Configurar quais rotas o middleware deve proteger
 export const config = {
   matcher: [
     /*

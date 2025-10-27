@@ -322,3 +322,21 @@
     flex-direction: column-reverse;
   }
 }
+
+.manageButton {
+  background: #3b82f6;
+  border: none;
+  border-radius: 6px;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  svg {
+    color: white;
+  }
+
+  &:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+  }
+}

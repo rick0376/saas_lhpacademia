@@ -1,3 +1,4 @@
+// src/app/(auth)/login-superadmin/page.tsx
 "use client";
 
 import { useState } from "react";
@@ -13,7 +14,6 @@ export default function LoginSuperAdminPage() {
   const [formData, setFormData] = useState({
     email: "admin@academia.com",
     senha: "admin123",
-    clienteId: "cliente-inicial-001",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -27,7 +27,6 @@ export default function LoginSuperAdminPage() {
       const result = await signIn("credentials", {
         email: formData.email,
         senha: formData.senha,
-        clienteId: formData.clienteId,
         redirect: false,
       });
 
@@ -66,16 +65,6 @@ export default function LoginSuperAdminPage() {
 
         <form onSubmit={handleSubmit} className={styles.form}>
           {error && <div className={styles.error}>{error}</div>}
-
-          <Input
-            label="ID do Cliente"
-            type="text"
-            name="clienteId"
-            placeholder="cliente-inicial-001"
-            value={formData.clienteId}
-            onChange={handleChange}
-            required
-          />
 
           <Input
             label="Email"

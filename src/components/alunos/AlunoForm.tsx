@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./styles.module.scss";
 import { Input } from "../ui/Input/Input";
@@ -8,6 +8,7 @@ import { Button } from "../ui/Button/Button";
 import { ImageUpload } from "../ui/ImageUpload/ImageUpload";
 
 interface AlunoFormProps {
+  clienteId?: string | null;
   initialData?: {
     id?: string;
     nome: string;
@@ -23,14 +24,15 @@ interface AlunoFormProps {
 }
 
 export const AlunoForm: React.FC<AlunoFormProps> = ({
+  clienteId,
   initialData,
   isEdit = false,
 }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [clientes, setClientes] = useState<any[]>([]);
 
-  // ✅ Estado separado para arquivo e preview
   const [fotoFile, setFotoFile] = useState<File | null>(null);
   const [fotoPreview, setFotoPreview] = useState<string>(
     initialData?.foto || ""
@@ -46,7 +48,26 @@ export const AlunoForm: React.FC<AlunoFormProps> = ({
     ativo: initialData?.ativo ?? true,
     darAcessoApp: false,
     senhaInicial: "",
+    clienteIdSelecionado: clienteId || "",
   });
+
+  useEffect(() => {
+    if (!clienteId && !isEdit) {
+      fetchClientes();
+    }
+  }, [clienteId, isEdit]);
+
+  const fetchClientes = async () => {
+    try {
+      const response = await fetch("/api/clientes");
+      if (response.ok) {
+        const data = await response.json();
+        setClientes(data.filter((c: any) => c.ativo));
+      }
+    } catch (error) {
+      console.error("Erro ao buscar clientes:", error);
+    }
+  };
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -66,7 +87,6 @@ export const AlunoForm: React.FC<AlunoFormProps> = ({
     }
   };
 
-  // ✅ Handler para foto (arquivo local)
   const handleFotoChange = (file: File | null, previewUrl: string) => {
     console.log("📸 Foto selecionada:", file ? file.name : "removida");
     setFotoFile(file);
@@ -80,11 +100,14 @@ export const AlunoForm: React.FC<AlunoFormProps> = ({
       newErrors.nome = "O nome deve ter no mínimo 3 caracteres";
     }
 
+    if (!clienteId && !formData.clienteIdSelecionado) {
+      newErrors.clienteIdSelecionado = "Selecione um cliente";
+    }
+
     if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = "Email inválido";
     }
 
-    // 🆕 Validar acesso ao app
     if (!isEdit && formData.darAcessoApp) {
       if (!formData.email) {
         newErrors.email = "Email é obrigatório para dar acesso ao app";
@@ -111,7 +134,6 @@ export const AlunoForm: React.FC<AlunoFormProps> = ({
       const url = isEdit ? `/api/alunos/${initialData?.id}` : "/api/alunos";
       const method = isEdit ? "PUT" : "POST";
 
-      // ✅ Usar FormData para enviar arquivo + dados
       const formDataToSend = new FormData();
       formDataToSend.append("nome", formData.nome);
       formDataToSend.append("email", formData.email || "");
@@ -121,7 +143,9 @@ export const AlunoForm: React.FC<AlunoFormProps> = ({
       formDataToSend.append("observacoes", formData.observacoes || "");
       formDataToSend.append("ativo", String(formData.ativo));
 
-      // 🆕 Adicionar dados de acesso ao app
+      const clienteIdFinal = clienteId || formData.clienteIdSelecionado;
+      formDataToSend.append("clienteId", clienteIdFinal);
+
       if (!isEdit) {
         formDataToSend.append("darAcessoApp", String(formData.darAcessoApp));
         if (formData.darAcessoApp) {
@@ -129,17 +153,11 @@ export const AlunoForm: React.FC<AlunoFormProps> = ({
         }
       }
 
-      // ✅ Adicionar arquivo de foto (se houver)
       if (fotoFile) {
         formDataToSend.append("foto", fotoFile);
-        console.log("📤 Enviando arquivo:", fotoFile.name);
       } else if (isEdit && initialData?.foto) {
-        // Se está editando e não mudou a foto, manter a URL existente
         formDataToSend.append("fotoExistente", initialData.foto);
-        console.log("📌 Mantendo foto existente:", initialData.foto);
       }
-
-      console.log("💾 Enviando dados para API...");
 
       const response = await fetch(url, {
         method,
@@ -166,6 +184,32 @@ export const AlunoForm: React.FC<AlunoFormProps> = ({
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
       <div className={styles.formGrid}>
+        {/* ✅ SELECT DE CLIENTE (só para SUPERADMIN) */}
+        {!clienteId && !isEdit && (
+          <div className={styles.selectWrapper}>
+            <label className={styles.label}>Cliente/Academia *</label>
+            <select
+              name="clienteIdSelecionado"
+              value={formData.clienteIdSelecionado}
+              onChange={handleChange}
+              className={styles.select}
+              required
+            >
+              <option value="">Selecione o cliente...</option>
+              {clientes.map((cliente) => (
+                <option key={cliente.id} value={cliente.id}>
+                  {cliente.nome}
+                </option>
+              ))}
+            </select>
+            {errors.clienteIdSelecionado && (
+              <span className={styles.error}>
+                {errors.clienteIdSelecionado}
+              </span>
+            )}
+          </div>
+        )}
+
         <Input
           label="Nome completo *"
           type="text"
@@ -224,7 +268,6 @@ export const AlunoForm: React.FC<AlunoFormProps> = ({
           </select>
         </div>
 
-        {/* ✅ ImageUpload agora trabalha com File */}
         <ImageUpload
           value={fotoPreview}
           onChange={handleFotoChange}
@@ -260,7 +303,6 @@ export const AlunoForm: React.FC<AlunoFormProps> = ({
           </p>
         </div>
 
-        {/* 🆕 ACESSO AO APP (APENAS NA CRIAÇÃO) */}
         {!isEdit && (
           <>
             <div className={styles.divider} />

@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { useEffect } from "react";
 import styles from "./styles.module.scss";
 import { Input } from "@/components/ui/Input/Input";
 import { Button } from "@/components/ui/Button/Button";
@@ -12,6 +14,7 @@ export default function LoginPage() {
   const router = useRouter();
   const params = useParams();
   const clienteId = params.clienteId as string;
+  const { data: session } = useSession();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -25,23 +28,20 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
 
-    // Debug: Log o que envia (veja no browser console)
-    const payload = {
-      email: formData.email.trim(),
-      password: formData.senha, // Mapeia senha para password
+    console.log("📤 Tentando fazer login com:", {
+      email: formData.email,
       clienteId,
-    };
-    console.log("📤 Payload para signIn:", payload);
+    });
 
     try {
       const result = await signIn("credentials", {
-        email: formData.email.trim(), // Trim para evitar espaços
-        password: formData.senha, // ✅ Fix: Envia como 'password' (não 'senha')
+        email: formData.email.trim(),
+        password: formData.senha,
         clienteId,
         redirect: false,
       });
 
-      console.log("📥 Result signIn:", result); // Debug resposta
+      console.log("📥 Result signIn:", result);
 
       if (result?.error) {
         setError(result.error || "Email ou senha inválidos");
@@ -49,13 +49,34 @@ export default function LoginPage() {
         return;
       }
 
-      router.push("/dashboard");
+      if (result?.ok) {
+        console.log("✅ Login bem-sucedido, aguardando session...");
+        // Não redireciona aqui, deixa o useEffect fazer isso
+      }
     } catch (err) {
       console.error("❌ Erro no login:", err);
       setError("Erro ao fazer login. Tente novamente.");
       setLoading(false);
     }
   };
+
+  // ✅ useEffect para redirecionar após login bem-sucedido
+  useEffect(() => {
+    if (session?.user) {
+      console.log("🔄 Session atualizada, role:", session.user.role);
+
+      if (session.user.role === "ALUNO") {
+        console.log("➡️ Redirecionando ALUNO para /alunos/dashboard");
+        router.push("/alunos/dashboard");
+      } else if (
+        session.user.role === "ADMIN" ||
+        session.user.role === "SUPERADMIN"
+      ) {
+        console.log("➡️ Redirecionando ADMIN para /dashboard");
+        router.push("/dashboard");
+      }
+    }
+  }, [session, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
