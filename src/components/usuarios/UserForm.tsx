@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import styles from "./styles.module.scss";
 import { Input } from "../ui/Input/Input";
 import { Button } from "../ui/Button/Button";
@@ -27,6 +28,7 @@ export const UserForm: React.FC<UserFormProps> = ({
   isEdit = false,
 }) => {
   const router = useRouter();
+  const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -50,7 +52,6 @@ export const UserForm: React.FC<UserFormProps> = ({
       [name]: type === "checkbox" ? checked : value,
     });
 
-    // Limpar erro do campo
     if (errors[name]) {
       setErrors({ ...errors, [name]: "" });
     }
@@ -59,18 +60,15 @@ export const UserForm: React.FC<UserFormProps> = ({
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
 
-    // Validar nome
     const nomeValidation = validateNome(formData.nome);
     if (!nomeValidation.valid) {
       newErrors.nome = nomeValidation.message || "";
     }
 
-    // Validar email
     if (!validateEmail(formData.email)) {
       newErrors.email = "Email inválido";
     }
 
-    // Validar senha (obrigatória apenas na criação)
     if (!isEdit) {
       const senhaValidation = validatePassword(formData.senha);
       if (!senhaValidation.valid) {
@@ -81,7 +79,6 @@ export const UserForm: React.FC<UserFormProps> = ({
         newErrors.confirmarSenha = "As senhas não coincidem";
       }
     } else if (formData.senha) {
-      // Se está editando e forneceu senha, validar
       const senhaValidation = validatePassword(formData.senha);
       if (!senhaValidation.valid) {
         newErrors.senha = senhaValidation.message || "";
@@ -116,7 +113,6 @@ export const UserForm: React.FC<UserFormProps> = ({
         ativo: formData.ativo,
       };
 
-      // Incluir senha apenas se fornecida
       if (formData.senha) {
         body.senha = formData.senha;
       }
@@ -141,6 +137,19 @@ export const UserForm: React.FC<UserFormProps> = ({
       setLoading(false);
     }
   };
+
+  // ✅ ADMIN só vê USER e ADMIN (não SUPERADMIN)
+  const roleOptions =
+    session?.user?.role === "ADMIN"
+      ? [
+          { value: "USER", label: "Usuário" },
+          { value: "ADMIN", label: "Admin" },
+        ]
+      : [
+          { value: "USER", label: "Usuário" },
+          { value: "ADMIN", label: "Admin" },
+          { value: "SUPERADMIN", label: "Super Admin" },
+        ];
 
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
@@ -199,9 +208,11 @@ export const UserForm: React.FC<UserFormProps> = ({
             onChange={handleChange}
             className={styles.select}
           >
-            <option value="USER">Usuário</option>
-            <option value="ADMIN">Admin</option>
-            <option value="SUPERADMIN">Super Admin</option>
+            {roleOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
           </select>
         </div>
 

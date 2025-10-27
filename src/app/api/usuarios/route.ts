@@ -13,14 +13,21 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
     }
 
+    // ✅ ALUNO não pode listar usuários
+    if (session.user.role === "ALUNO") {
+      return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
+    }
+
     const { searchParams } = new URL(request.url);
     const clienteId = searchParams.get("clienteId");
 
     const whereClause: any = {};
 
     if (session.user.role !== "SUPERADMIN") {
+      // ✅ ADMIN só vê usuários do seu cliente
       whereClause.clienteId = session.user.clienteId;
     } else if (clienteId) {
+      // ✅ SUPERADMIN pode filtrar por clienteId
       whereClause.clienteId = clienteId;
     }
 
@@ -63,6 +70,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
     }
 
+    // ✅ ALUNO não pode criar usuários
+    if (session.user.role === "ALUNO") {
+      return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
+    }
+
     const body = await request.json();
     const { nome, email, senha, role, clienteId, ativo } = body;
 
@@ -71,6 +83,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "Nome, email e senha são obrigatórios" },
         { status: 400 }
+      );
+    }
+
+    // ✅ ADMIN não pode criar SUPERADMIN
+    if (session.user.role === "ADMIN" && role === "SUPERADMIN") {
+      return NextResponse.json(
+        { error: "Você não tem permissão para criar SUPERADMIN" },
+        { status: 403 }
+      );
+    }
+
+    // ✅ ADMIN só pode criar ADMIN e USER (não SUPERADMIN)
+    if (session.user.role === "ADMIN" && !["USER", "ADMIN"].includes(role)) {
+      return NextResponse.json(
+        { error: "Perfil inválido para sua conta" },
+        { status: 403 }
       );
     }
 
@@ -89,9 +117,15 @@ export async function POST(request: NextRequest) {
     // Hash da senha
     const senhaHash = await hashPassword(senha);
 
-    // Definir ativo baseado no role do usuário logado
+    // ✅ Definir ativo baseado no role do usuário logado
     const usuarioAtivo =
       session.user.role === "SUPERADMIN" ? ativo ?? true : false;
+
+    // ✅ ADMIN usa seu próprio clienteId, SUPERADMIN pode escolher
+    const clienteIdFinal =
+      session.user.role === "ADMIN"
+        ? session.user.clienteId
+        : clienteId || session.user.clienteId;
 
     // Criar usuário
     const novoUsuario = await prisma.usuario.create({
@@ -100,7 +134,7 @@ export async function POST(request: NextRequest) {
         email,
         senha: senhaHash,
         role: role || "USER",
-        clienteId: clienteId || session.user.clienteId,
+        clienteId: clienteIdFinal,
         ativo: usuarioAtivo,
       },
       select: {
