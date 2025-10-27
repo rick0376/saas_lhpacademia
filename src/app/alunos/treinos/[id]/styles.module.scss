@@ -1,0 +1,418 @@
+.container {
+  min-height: 100vh;
+  background: #f8fafc;
+  padding: 2rem;
+  font-family: system-ui, -apple-system, sans-serif;
+  color: #1e293b;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+
+    .backLink {
+      display: flex;
+      align-items: center;
+      color: #1e40af;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.75rem 1.25rem;
+      border-radius: 0.5rem;
+      background: rgba(30, 64, 175, 0.08);
+      transition: all 0.2s ease;
+      border: 1px solid rgba(30, 64, 175, 0.1);
+
+      &:hover {
+        background: rgba(30, 64, 175, 0.15);
+        color: #1d4ed8;
+        transform: translateX(-2px);
+        box-shadow: 0 4px 12px rgba(30, 64, 175, 0.15);
+      }
+
+      svg {
+        margin-right: 0.5rem;
+      }
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0;
+      flex: 1;
+      text-align: center;
+      letter-spacing: -0.025em;
+    }
+  }
+
+  .treinoInfo {
+    max-width: 1200px;
+    margin: 0 auto 2.5rem;
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.08),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+
+    .treinoDesc {
+      font-size: 1.125rem;
+      color: #475569;
+      line-height: 1.6;
+      margin: 0;
+      font-style: italic;
+    }
+  }
+
+  .emptyState {
+    max-width: 1200px;
+    margin: 2rem auto;
+    text-align: center;
+    padding: 3rem 2rem;
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e2e8f0;
+
+    p {
+      margin-bottom: 1rem;
+      font-size: 1.125rem;
+      color: #475569;
+
+      &:first-of-type {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1e293b;
+      }
+    }
+
+    .emptySubtext {
+      font-size: 1rem;
+      color: #64748b;
+      margin-top: 0.5rem;
+    }
+  }
+
+  .tableContainer {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.08),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+  }
+
+  .table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+
+    .thead {
+      background: #f8fafc;
+
+      tr {
+        .th {
+          padding: 1.25rem 1.5rem;
+          text-align: left;
+          font-size: 0.85rem;
+          font-weight: 700;
+          color: #334155;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          border-bottom: 2px solid #e2e8f0;
+        }
+
+        .thDesc {
+          text-align: left;
+        }
+      }
+    }
+
+    .tbody {
+      tr {
+        transition: all 0.2s ease;
+        border-bottom: 1px solid #f1f5f9;
+
+        &:hover {
+          background: rgba(16, 185, 129, 0.04);
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        td {
+          padding: 1.5rem 1.5rem;
+          vertical-align: middle;
+
+          &.exName {
+            font-weight: 700;
+            color: #0f172a;
+            font-size: 1.05rem;
+
+            &.clickableEx {
+              cursor: pointer;
+              transition: color 0.2s ease;
+
+              &:hover {
+                color: #10b981;
+                text-decoration: underline;
+              }
+
+              &::after {
+                content: "📷";
+                font-size: 0.8rem;
+                margin-left: 0.5rem;
+                opacity: 0.6;
+              }
+            }
+          }
+
+          &.series,
+          &.reps,
+          &.descanso {
+            font-weight: 600;
+            color: #10b981;
+            text-align: center;
+            font-size: 0.95rem;
+          }
+
+          .exDesc {
+            max-width: 20rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: #64748b;
+            font-size: 0.9rem;
+          }
+        }
+      }
+    }
+  }
+
+  .footer {
+    max-width: 1200px;
+    margin: 2.5rem auto 0;
+    text-align: center;
+    color: #64748b;
+    font-size: 0.95rem;
+    padding: 1.25rem;
+    background: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e2e8f0;
+  }
+
+  .modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+  }
+
+  .modalContent {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+    width: 600px;
+    background: white;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    animation: modalFadeIn 0.3s ease;
+
+    .modalClose {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      color: #64748b;
+      cursor: pointer;
+      z-index: 1001;
+      padding: 0.5rem;
+      border-radius: 50%;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.1);
+        color: #ef4444;
+        transform: scale(1.1);
+      }
+
+      svg {
+        stroke: currentColor;
+      }
+    }
+
+    .modalImageContainer {
+      position: relative;
+      width: 100%;
+      height: 400px;
+      background: #f8fafc;
+
+      .modalImage {
+        object-fit: contain;
+        border-radius: 0.5rem;
+      }
+    }
+
+    .modalTitle {
+      padding: 1rem 1.5rem;
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #0f172a;
+      text-align: center;
+      background: #f8fafc;
+      border-top: 1px solid #e2e8f0;
+    }
+  }
+
+  @keyframes modalFadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .loading,
+  .error {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #f8fafc;
+    padding: 2rem;
+
+    .spinner {
+      width: 3rem;
+      height: 3rem;
+      border: 4px solid #e2e8f0;
+      border-top: 4px solid #3b82f6;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 1.5rem;
+    }
+
+    p {
+      font-size: 1.2rem;
+      color: #475569;
+      margin: 0;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .errorText {
+      color: #dc2626;
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+      font-size: 1.15rem;
+    }
+
+    .retryButton {
+      padding: 0.875rem 1.75rem;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 1rem;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+
+      &:hover {
+        background: #2563eb;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+      }
+    }
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .container {
+      .header {
+        flex-direction: column;
+        gap: 1.5rem;
+        text-align: center;
+
+        h1 {
+          font-size: 2.125rem;
+        }
+      }
+
+      .treinoInfo {
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+
+        .treinoDesc {
+          font-size: 1rem;
+        }
+      }
+
+      .tableContainer {
+        .table {
+          .thead tr .th,
+          .tbody tr td {
+            padding: 1rem 0.75rem;
+            font-size: 0.8rem;
+          }
+
+          .tbody tr td.exDesc {
+            max-width: 12rem;
+          }
+        }
+      }
+
+      .footer {
+        font-size: 0.9rem;
+        padding: 1rem;
+      }
+
+      .modalContent {
+        width: 95vw;
+        height: 95vh;
+        border-radius: 0.75rem;
+
+        .modalImageContainer {
+          height: 60vh;
+        }
+
+        .modalTitle {
+          font-size: 1.1rem;
+          padding: 0.75rem 1rem;
+        }
+      }
+    }
+  }
+}

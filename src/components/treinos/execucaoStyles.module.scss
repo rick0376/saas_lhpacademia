@@ -1,0 +1,344 @@
+.container {
+  background: white;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: var(--shadow);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  gap: 20px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--dark-color);
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--gray-color);
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--border-color);
+  border-top-color: var(--primary-color);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.emptyIcon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--dark-color);
+  margin-bottom: 8px;
+}
+
+.empty p {
+  color: var(--gray-color);
+  font-size: 14px;
+}
+
+.execucoesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.execucaoCard {
+  background: var(--light-color);
+  border-radius: 12px;
+  padding: 20px;
+  border: 2px solid var(--border-color);
+  transition: var(--transition);
+
+  &:hover {
+    border-color: var(--success-color);
+    transform: translateY(-2px);
+  }
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.data {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--dark-color);
+  display: block;
+  margin-bottom: 8px;
+}
+
+.completoBadge {
+  display: inline-block;
+  padding: 4px 10px;
+  background-color: #d1fae5;
+  color: #065f46;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.deleteButton {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background-color: white;
+  color: var(--danger-color);
+  cursor: pointer;
+  transition: var(--transition);
+
+  &:hover {
+    background-color: var(--danger-color);
+    color: white;
+  }
+}
+
+.exerciciosCount {
+  font-size: 14px;
+  color: var(--gray-color);
+  margin-bottom: 12px;
+}
+
+.viewButton {
+  width: 100%;
+  padding: 10px;
+  background-color: white;
+  border: 2px solid var(--success-color);
+  border-radius: var(--border-radius);
+  color: var(--success-color);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+
+  &:hover {
+    background-color: var(--success-color);
+    color: white;
+  }
+}
+
+// Modal Styles
+.modalContent {
+  padding: 8px 0;
+}
+
+.exerciciosForm {
+  margin-bottom: 24px;
+}
+
+.formTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--dark-color);
+  margin-bottom: 16px;
+}
+
+.exercicioItem {
+  margin-bottom: 20px;
+  padding: 16px;
+  background-color: var(--light-color);
+  border-radius: 8px;
+}
+
+.exercicioNome {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--dark-color);
+  margin-bottom: 12px;
+}
+
+.exercicioInputs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.inputSmall {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-size: 14px;
+  transition: var(--transition);
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary-color);
+  }
+}
+
+.observacoesField,
+.checkboxField {
+  margin-bottom: 20px;
+
+  label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--dark-color);
+    margin-bottom: 8px;
+    display: block;
+  }
+}
+
+.checkboxField label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+
+  input {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--primary-color);
+  }
+}
+
+.textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary-color);
+  }
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+// Details Modal
+.detailsContent {
+  padding: 8px 0;
+}
+
+.detailsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.detailsDate {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--dark-color);
+}
+
+.exerciciosList {
+  margin-bottom: 20px;
+
+  h4 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--dark-color);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+}
+
+.exercicioDetail {
+  padding: 12px;
+  background-color: var(--light-color);
+  border-radius: 8px;
+  margin-bottom: 8px;
+
+  strong {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--dark-color);
+  }
+}
+
+.exercicioInfo {
+  font-size: 14px;
+  color: var(--gray-color);
+
+  span {
+    margin-right: 8px;
+  }
+}
+
+.observacoesBox {
+  padding: 16px;
+  background-color: var(--light-color);
+  border-radius: 8px;
+
+  strong {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--primary-color);
+  }
+
+  p {
+    color: var(--text-color);
+    line-height: 1.6;
+    margin: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .execucoesGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .exercicioInputs {
+    grid-template-columns: 1fr;
+  }
+}

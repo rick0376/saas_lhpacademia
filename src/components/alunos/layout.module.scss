@@ -1,0 +1,473 @@
+.wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8fafc;
+  color: #1e293b;
+  font-family: "Inter", sans-serif;
+}
+
+/*.main {
+  flex: 1;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.5rem;
+  }
+}
+*/
+// Header
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: #ffffff;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  border-bottom: 1px solid #e2e8f0;
+
+  .headerContent {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+    gap: 1rem;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: stretch;
+      padding: 1rem;
+      gap: 0.5rem;
+    }
+
+    @media (max-width: 480px) {
+      padding: 0.75rem;
+    }
+  }
+}
+
+// Logo Area
+.logoArea {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #1e293b;
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    color: #0070f3;
+  }
+
+  .logoContainer {
+    display: flex;
+    align-items: center;
+    margin-right: 0.75rem;
+
+    .logoIcon {
+      color: #0070f3;
+    }
+  }
+
+  .titleContainer {
+    .title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #0070f3;
+    }
+
+    .subtitle {
+      font-size: 0.875rem;
+      color: #64748b;
+      font-weight: 400;
+    }
+  }
+
+  @media (max-width: 768px) {
+    justify-content: center;
+
+    .titleContainer {
+      .title {
+        font-size: 1.125rem;
+      }
+
+      .subtitle {
+        font-size: 0.75rem;
+      }
+    }
+  }
+}
+
+// Breadcrumb
+.breadcrumbNav {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  max-width: 30%;
+
+  .breadcrumbItem {
+    display: flex;
+    align-items: center;
+    font-size: 0.875rem;
+    color: #64748b;
+
+    .breadcrumbLink {
+      text-decoration: none;
+      color: #0070f3;
+      transition: all 0.2s ease-in-out;
+
+      &:hover {
+        color: #6366f1;
+        text-decoration: underline;
+      }
+    }
+
+    .breadcrumbSeparator {
+      margin: 0 0.5rem;
+      color: #64748b;
+      font-weight: bold;
+    }
+  }
+
+  .breadcrumbDefault {
+    font-size: 0.875rem;
+    color: #1e293b;
+    font-weight: 500;
+  }
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+// Top Nav (links no header)
+.topNav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+  justify-content: center;
+  max-width: 40%;
+
+  .navLink {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    color: #1e293b;
+    border-radius: 8px;
+    transition: all 0.2s ease-in-out;
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+
+    .navIcon {
+      flex-shrink: 0;
+    }
+
+    .navLabel {
+      // Hide label em mobile se necessário
+    }
+
+    &:hover {
+      background-color: #f1f5f9;
+      color: #0070f3;
+    }
+  }
+
+  .navLinkActive {
+    background-color: #0070f3;
+    color: #ffffff;
+
+    &:hover {
+      background-color: #0062cc;
+    }
+
+    .navIcon,
+    .navLabel {
+      color: #ffffff;
+    }
+  }
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+// Footer
+.footer {
+  background-color: #ffffff;
+  border-top: 1px solid #e2e8f0;
+  padding: 1rem 0;
+  text-align: center;
+
+  .footerContent {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    font-size: 0.875rem;
+    color: #64748b;
+
+    .dot {
+      width: 4px;
+      height: 4px;
+      background-color: #64748b;
+      border-radius: 50%;
+    }
+
+    .footerMuted {
+      color: #64748b;
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.75rem 0;
+
+    .footerContent {
+      flex-direction: column;
+      gap: 0.25rem;
+      padding: 0 1rem;
+    }
+  }
+}
+
+// Modal de Logout
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgb(0 0 0 / 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.2s ease-out;
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+.modal {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 2rem;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.1);
+  text-align: center;
+  animation: slideUp 0.2s ease-out;
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .modalIcon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 1rem;
+    background-color: #fee2e2;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ef4444;
+  }
+
+  .modalTitle {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #1e293b;
+  }
+
+  .modalText {
+    color: #64748b;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+  }
+
+  .modalActions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+
+    .ghostBtn,
+    .dangerBtn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      border: none;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      font-size: 0.875rem;
+    }
+
+    .ghostBtn {
+      background-color: transparent;
+      color: #0070f3;
+      border: 1px solid #0070f3;
+
+      &:hover {
+        background-color: #0070f3;
+        color: #ffffff;
+      }
+    }
+
+    .dangerBtn {
+      background-color: #ef4444;
+      color: #ffffff;
+
+      &:hover {
+        background-color: #dc2626;
+      }
+    }
+  }
+}
+// ============================================================
+// BOTÃO DE MENU
+// ============================================================
+.menuButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #6554ff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #5558e3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(101, 84, 255, 0.3);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  @media (max-width: 480px) {
+    padding: 8px 12px;
+  }
+}
+
+.menuButtonText {
+  @media (max-width: 480px) {
+    display: none;
+  }
+}
+
+// Dropdown Menu (como no original, absoluto)
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  right: 0; // Alinha à direita do button para não overflow
+  margin-top: 0.5rem;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.1);
+  min-width: 200px;
+  z-index: 200;
+  animation: slideDown 0.2s ease-out;
+  border: 1px solid #e2e8f0;
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (max-width: 768px) {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 180px;
+  }
+}
+
+// Dropdown Nav e Links
+.dropdownNav {
+  list-style: none;
+  padding: 0.5rem 0;
+}
+
+.dropdownLink {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  text-decoration: none;
+  color: #1e293b;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  white-space: nowrap;
+
+  .dropdownIcon {
+    flex-shrink: 0;
+    color: #64748b;
+  }
+
+  .dropdownLabel {
+    color: #1e293b;
+  }
+
+  &:hover {
+    background-color: #f1f5f9;
+    color: #0070f3;
+
+    .dropdownIcon,
+    .dropdownLabel {
+      color: #0070f3;
+    }
+  }
+}
+
+.dropdownLinkActive {
+  background-color: #0070f3;
+  color: #ffffff;
+
+  &:hover {
+    background-color: #0062cc;
+  }
+
+  .dropdownIcon,
+  .dropdownLabel {
+    color: #ffffff;
+  }
+}

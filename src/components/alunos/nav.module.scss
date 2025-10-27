@@ -1,0 +1,148 @@
+// ============================================================
+// NAVEGAÇÃO DO HEADER
+// ============================================================
+.rightArea {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+// ============================================================
+// BOTÃO DE MENU
+// ============================================================
+.menuButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #6554ff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #5558e3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(101, 84, 255, 0.3);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  @media (max-width: 480px) {
+    padding: 8px 12px;
+  }
+}
+
+.menuButtonText {
+  @media (max-width: 480px) {
+    display: none;
+  }
+}
+
+// ============================================================
+// USER AREA
+// ============================================================
+.userChip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  background-color: #f8fafc;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+.userAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6554ff, #5558e3);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.userName {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  line-height: 1;
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.userRole {
+  font-size: 11px;
+  font-weight: 500;
+  color: #64748b;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+// ============================================================
+// ACTIONS
+// ============================================================
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+.actionBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background-color: transparent;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+
+  &:hover {
+    background-color: #f8fafc;
+    border-color: #6554ff;
+    color: #6554ff;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.logoutBtn {
+  &:hover {
+    border-color: #ef4444;
+    color: #ef4444;
+  }
+}

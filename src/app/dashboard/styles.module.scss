@@ -1,0 +1,115 @@
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.welcome {
+  margin-bottom: 48px;
+}
+
+.title {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--dark-color);
+  margin-bottom: 12px;
+}
+
+.subtitle {
+  font-size: 18px;
+  color: var(--gray-color);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+  border: 2px solid transparent;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--card-color);
+    transform: scaleX(0);
+    transition: var(--transition);
+  }
+
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--card-color);
+
+    &::before {
+      transform: scaleX(1);
+    }
+
+    .cardArrow {
+      transform: translateX(8px);
+    }
+  }
+}
+
+.cardIcon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.cardTitle {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--dark-color);
+  margin-bottom: 8px;
+}
+
+.cardDescription {
+  font-size: 14px;
+  color: var(--gray-color);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.cardArrow {
+  font-size: 24px;
+  color: var(--card-color);
+  transition: var(--transition);
+  display: inline-block;
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 28px;
+  }
+
+  .subtitle {
+    font-size: 16px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+// ... (mantenha estilos anteriores)
+
+.menuSection {
+  margin-top: 48px;
+}
+
+.sectionTitle {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--dark-color);
+  margin-bottom: 24px;
+}

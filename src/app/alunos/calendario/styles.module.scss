@@ -1,0 +1,318 @@
+.container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 0.5rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+    color: #475569;
+    margin-bottom: 2rem;
+  }
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+
+    h1 {
+      font-size: 1.5rem;
+    }
+
+    .subtitle {
+      font-size: 0.875rem;
+    }
+  }
+}
+
+// Loading e Error
+.loading,
+.error {
+  text-align: center;
+  padding: 3rem 1rem;
+  font-size: 1.125rem;
+  color: #64748b;
+}
+
+.error {
+  color: #ef4444;
+  background-color: #fef2f2;
+  border-radius: 12px;
+  padding: 2rem;
+}
+
+// Empty State
+.empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px 0 rgb(102 126 234 / 0.3);
+  margin-bottom: 2rem;
+  color: #ffffff;
+
+  .emptyIcon {
+    font-size: 5rem;
+    margin-bottom: 1rem;
+    filter: drop-shadow(0 4px 6px rgb(0 0 0 / 0.2));
+  }
+
+  p {
+    color: #ffffff;
+    font-size: 1rem;
+    margin: 0.5rem 0;
+
+    &:first-of-type {
+      font-weight: 700;
+      font-size: 1.25rem;
+      text-shadow: 0 2px 4px rgb(0 0 0 / 0.2);
+    }
+  }
+}
+
+// Grid de Calendário
+.calendarioGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+// Card de Dia (com cores diferentes por tipo)
+.diaCard {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px 0 rgb(0 0 0 / 0.08);
+  transition: all 0.3s ease-in-out;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+  }
+
+  &.comTreino {
+    border: 2px solid transparent;
+    background-image: linear-gradient(#ffffff, #ffffff),
+      linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+
+    &::before {
+      opacity: 1;
+      //background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+      //background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    &:hover {
+      box-shadow: 0 12px 24px 0 rgb(102 126 234 / 0.25);
+      transform: translateY(-4px);
+    }
+  }
+
+  &.semTreino {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border: 2px solid #e2e8f0;
+
+    &:hover {
+      box-shadow: 0 8px 16px 0 rgb(0 0 0 / 0.1);
+      transform: translateY(-2px);
+    }
+  }
+
+  .diaHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #f1f5f9;
+
+    h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0;
+    }
+
+    .badge {
+      //background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      background: linear-gradient(135deg, #55f155 0%, #f79606 100%);
+      color: #ffffff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.35rem 0.65rem;
+      border-radius: 20px;
+      min-width: 28px;
+      text-align: center;
+      box-shadow: 0 4px 8px 0 rgb(245 87 108 / 0.3);
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 1.25rem;
+    min-height: 180px;
+  }
+}
+
+// Lista de Treinos
+.treinosLista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.treinoItem {
+  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  border-radius: 12px;
+  padding: 1.25rem;
+  text-decoration: none;
+  transition: all 0.3s ease-in-out;
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.4),
+      transparent
+    );
+    transition: left 0.5s ease-in-out;
+  }
+
+  &:hover {
+    border-color: #f5576c;
+    box-shadow: 0 8px 20px 0 rgb(245 87 108 / 0.3);
+    transform: translateX(8px) scale(1.02);
+
+    &::before {
+      left: 100%;
+    }
+  }
+
+  .treinoNome {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #881337;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 1px 2px rgb(255 255 255 / 0.5);
+  }
+
+  .treinoObjetivo {
+    font-size: 0.875rem;
+    color: #9f1239;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+
+  .treinoHorario {
+    font-size: 0.875rem;
+    color: #831843;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-weight: 600;
+  }
+}
+
+// Descanso (mais colorido)
+.descanso {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 0.75rem;
+
+  .descansoIcon {
+    font-size: 3rem;
+    filter: grayscale(50%) drop-shadow(0 2px 4px rgb(0 0 0 / 0.1));
+  }
+
+  .descansoTexto {
+    font-size: 1rem;
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+}
+
+// Back Link (mais vibrante)
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 6px 16px 0 rgb(102 126 234 / 0.4);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.5s ease-in-out, height 0.5s ease-in-out;
+  }
+
+  &:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    box-shadow: 0 10px 24px 0 rgb(102 126 234 / 0.5);
+    transform: translateX(-6px) scale(1.05);
+
+    &::before {
+      width: 300px;
+      height: 300px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    justify-content: center;
+  }
+}

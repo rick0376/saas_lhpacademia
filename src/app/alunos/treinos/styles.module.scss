@@ -1,0 +1,369 @@
+.container {
+  min-height: 100vh;
+  background: #f8fafc;
+  padding: 2rem;
+  font-family: system-ui, -apple-system, sans-serif;
+  color: #1e293b;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2.5rem;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+
+    .backLink {
+      display: flex;
+      align-items: center;
+      color: #1e40af;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.75rem 1.25rem;
+      border-radius: 0.5rem;
+      background: rgba(30, 64, 175, 0.08);
+      transition: all 0.2s ease;
+      border: 1px solid rgba(30, 64, 175, 0.1);
+
+      &:hover {
+        background: rgba(30, 64, 175, 0.15);
+        color: #1d4ed8;
+        transform: translateX(-2px);
+        box-shadow: 0 4px 12px rgba(30, 64, 175, 0.15);
+      }
+
+      svg {
+        margin-right: 0.5rem;
+      }
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0;
+      flex: 1;
+      text-align: center;
+      letter-spacing: -0.025em;
+    }
+  }
+
+  .emptyState {
+    text-align: center;
+    padding: 4rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.08),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+
+    p {
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+      color: #475569;
+
+      &:first-of-type {
+        font-size: 1.375rem;
+        font-weight: 700;
+        color: #1e293b;
+      }
+    }
+
+    .emptySubtext {
+      font-size: 1.05rem;
+      color: #64748b;
+      margin-top: 0.75rem;
+    }
+  }
+
+  .tableContainer {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.08),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+  }
+
+  .table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+
+    .thead {
+      background: #f8fafc;
+
+      tr {
+        .th {
+          padding: 1.25rem 1.5rem;
+          text-align: left;
+          font-size: 0.85rem;
+          font-weight: 700;
+          color: #334155;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          border-bottom: 2px solid #e2e8f0;
+        }
+
+        .thActions {
+          text-align: right;
+          padding-right: 1.5rem; // Alinha perfeitamente com td.actions
+        }
+      }
+    }
+
+    .tbody {
+      tr {
+        transition: all 0.2s ease;
+        border-bottom: 1px solid #f1f5f9;
+
+        &:hover {
+          background: rgba(59, 130, 246, 0.04);
+          box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        td {
+          padding: 1.5rem 1.5rem;
+          vertical-align: middle;
+
+          &.name {
+            font-weight: 700;
+            color: #0f172a;
+            font-size: 1.05rem;
+          }
+
+          .description {
+            max-width: 18rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: #64748b;
+            font-size: 0.95rem;
+          }
+
+          &.status {
+            span {
+              display: inline-flex;
+              align-items: center;
+              padding: 0.625rem 1.25rem;
+              font-size: 0.85rem;
+              font-weight: 700;
+              border-radius: 50px;
+              position: relative;
+              transition: all 0.25s ease;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+              min-width: 80px;
+              justify-content: center;
+
+              &::before {
+                content: "";
+                width: 0.75rem;
+                height: 0.75rem;
+                border-radius: 50%;
+                margin-right: 0.75rem;
+                flex-shrink: 0;
+                box-shadow: 0 0 0 2px white;
+              }
+
+              &.statusAtivo {
+                background: #10b981;
+                color: white;
+                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+
+                &::before {
+                  background: #22c55e; // Ponto verde visível para ativo
+                }
+
+                &:hover {
+                  background: #059669;
+                  transform: scale(1.05) translateY(-1px);
+                  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+                }
+              }
+
+              &.statusInativo {
+                background: #ef4444;
+                color: white;
+                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+
+                &::before {
+                  background: #f87171; // Ponto vermelho para inativo
+                }
+
+                &:hover {
+                  background: #dc2626;
+                  transform: scale(1.05) translateY(-1px);
+                  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+                }
+              }
+            }
+          }
+
+          .date {
+            color: #64748b;
+            font-size: 0.95rem;
+            font-weight: 500;
+          }
+
+          &.actions {
+            text-align: right;
+            padding-right: 1.5rem; // Alinha com thActions
+
+            .viewButton {
+              color: #1e40af;
+              text-decoration: none;
+              font-weight: 700;
+              font-size: 0.95rem;
+              padding: 0.625rem 1.25rem;
+              border-radius: 0.5rem;
+              background: rgba(30, 64, 175, 0.08);
+              transition: all 0.25s ease;
+              display: inline-block;
+              border: 1px solid rgba(30, 64, 175, 0.1);
+
+              &:hover {
+                color: white;
+                background: #3b82f6;
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(59, 130, 246, 0.25);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .footer {
+    max-width: 1200px;
+    margin: 2.5rem auto 0;
+    text-align: center;
+    color: #64748b;
+    font-size: 0.95rem;
+    padding: 1.25rem;
+    background: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e2e8f0;
+  }
+}
+
+// Loading/Error states
+.loading,
+.error {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+  padding: 2rem;
+
+  .spinner {
+    width: 3rem;
+    height: 3rem;
+    border: 4px solid #e2e8f0;
+    border-top: 4px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-bottom: 1.5rem;
+  }
+
+  p {
+    font-size: 1.2rem;
+    color: #475569;
+    margin: 0;
+    text-align: center;
+    font-weight: 500;
+  }
+
+  .errorText {
+    color: #dc2626;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    font-size: 1.15rem;
+  }
+
+  .retryButton {
+    padding: 0.875rem 1.75rem;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 1rem;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+
+    &:hover {
+      background: #2563eb;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+    }
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Mobile responsivity
+@media (max-width: 768px) {
+  .container {
+    .header {
+      flex-direction: column;
+      gap: 1.5rem;
+      text-align: center;
+
+      h1 {
+        font-size: 2.125rem;
+      }
+    }
+
+    .tableContainer {
+      .table {
+        .thead tr .th,
+        .tbody tr td {
+          padding: 1rem 1rem;
+          font-size: 0.8rem;
+        }
+
+        .tbody tr td.description {
+          max-width: 10rem;
+        }
+
+        .tbody tr td.actions {
+          padding-right: 1rem;
+        }
+
+        .tbody tr td.status span {
+          padding: 0.5rem 0.875rem;
+          min-width: 70px;
+          font-size: 0.75rem;
+        }
+      }
+    }
+
+    .footer {
+      font-size: 0.9rem;
+      padding: 1rem;
+    }
+  }
+}
