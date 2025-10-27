@@ -25,7 +25,6 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // ✅ Estado separado para arquivo e preview
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string>(
     initialData?.logo || ""
@@ -33,6 +32,8 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({
 
   const [formData, setFormData] = useState({
     nome: initialData?.nome || "",
+    login: "", // ✅ LOGIN
+    senha: "", // ✅ SENHA
     ativo: initialData?.ativo ?? true,
   });
 
@@ -50,7 +51,6 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({
     }
   };
 
-  // ✅ Handler para logo (arquivo local)
   const handleLogoChange = (file: File | null, previewUrl: string) => {
     console.log("📸 Logo selecionado:", file ? file.name : "removido");
     setLogoFile(file);
@@ -62,6 +62,16 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({
 
     if (!formData.nome || formData.nome.trim().length < 3) {
       newErrors.nome = "O nome deve ter no mínimo 3 caracteres";
+    }
+
+    // ✅ VALIDAR LOGIN E SENHA (só ao criar)
+    if (!isEdit) {
+      if (!formData.login || formData.login.trim().length < 3) {
+        newErrors.login = "Login deve ter no mínimo 3 caracteres";
+      }
+      if (!formData.senha || formData.senha.length < 6) {
+        newErrors.senha = "Senha deve ter no mínimo 6 caracteres";
+      }
     }
 
     setErrors(newErrors);
@@ -81,22 +91,21 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({
       const url = isEdit ? `/api/clientes/${initialData?.id}` : "/api/clientes";
       const method = isEdit ? "PUT" : "POST";
 
-      // ✅ Usar FormData para enviar arquivo + dados
       const formDataToSend = new FormData();
       formDataToSend.append("nome", formData.nome);
       formDataToSend.append("ativo", String(formData.ativo));
 
-      // ✅ Adicionar arquivo de logo (se houver)
-      if (logoFile) {
-        formDataToSend.append("logo", logoFile);
-        console.log("📤 Enviando arquivo:", logoFile.name);
-      } else if (isEdit && initialData?.logo) {
-        // Se está editando e não mudou o logo, manter a URL existente
-        formDataToSend.append("logoExistente", initialData.logo);
-        console.log("📌 Mantendo logo existente:", initialData.logo);
+      // ✅ ADICIONAR LOGIN E SENHA (só ao criar)
+      if (!isEdit) {
+        formDataToSend.append("login", formData.login);
+        formDataToSend.append("senha", formData.senha);
       }
 
-      console.log("💾 Enviando dados para API...");
+      if (logoFile) {
+        formDataToSend.append("logo", logoFile);
+      } else if (isEdit && initialData?.logo) {
+        formDataToSend.append("logoExistente", initialData.logo);
+      }
 
       const response = await fetch(url, {
         method,
@@ -110,6 +119,13 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({
 
       const resultado = await response.json();
       console.log("✅ Cliente salvo com sucesso:", resultado);
+
+      // ✅ EXIBIR DADOS DE LOGIN
+      if (resultado.admin) {
+        alert(
+          `✅ Cliente criado com sucesso!\n\n📧 Login: ${resultado.admin.login}\n🔑 Senha: ${resultado.admin.senha}\n\n⚠️ Anote essas informações!`
+        );
+      }
 
       router.push("/dashboard/clientes");
       router.refresh();
@@ -134,7 +150,32 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({
           required
         />
 
-        {/* ✅ ImageUpload agora trabalha com File */}
+        {/* ✅ LOGIN E SENHA (só aparece ao criar) */}
+        {!isEdit && (
+          <>
+            <Input
+              label="Login do Administrador *"
+              type="text"
+              name="login"
+              placeholder="admin"
+              value={formData.login}
+              onChange={handleChange}
+              error={errors.login}
+              required
+            />
+            <Input
+              label="Senha do Administrador *"
+              type="password"
+              name="senha"
+              placeholder="Mínimo 6 caracteres"
+              value={formData.senha}
+              onChange={handleChange}
+              error={errors.senha}
+              required
+            />
+          </>
+        )}
+
         <ImageUpload
           value={logoPreview}
           onChange={handleLogoChange}

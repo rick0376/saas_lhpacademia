@@ -19,11 +19,14 @@ export const authOptions: NextAuthOptions = {
         clienteId: { label: "Cliente ID", type: "text", required: false },
       },
       async authorize(credentials) {
-        console.log("🔍 Credenciais recebidas:", credentials); // Debug completo (veja email/password no terminal)
+        console.log("🔍 Credenciais recebidas:", credentials);
 
-        if (!credentials?.email || !credentials?.password) {
+        // ✅ ACEITA TANTO 'password' QUANTO 'senha'
+        const senha = credentials?.password || (credentials as any)?.senha;
+
+        if (!credentials?.email || !senha) {
           console.log("❌ Credenciais incompletas (email/password ausentes)");
-          throw new Error("Email e senha são obrigatórios"); // Throw para mensagem no frontend
+          throw new Error("Email e senha são obrigatórios");
         }
 
         try {
@@ -48,7 +51,7 @@ export const authOptions: NextAuthOptions = {
             throw new Error("Usuário não encontrado ou inativo");
           }
 
-          // Valida clienteId só se enviado E role !== ADMIN/SUPERADMIN (admins acessam tudo)
+          // Valida clienteId só se enviado E role !== ADMIN/SUPERADMIN
           const clienteId = credentials.clienteId as string | undefined;
           if (
             clienteId &&
@@ -72,10 +75,8 @@ export const authOptions: NextAuthOptions = {
             usuario.role
           );
 
-          const senhaValida = await compare(
-            credentials.password,
-            usuario.senha
-          );
+          // ✅ USA A SENHA CORRETA
+          const senhaValida = await compare(senha, usuario.senha);
 
           if (!senhaValida) {
             console.log("❌ Senha incorreta para:", credentials.email);
@@ -89,21 +90,20 @@ export const authOptions: NextAuthOptions = {
             usuario.role
           );
 
-          // Return com basics + custom props (as any para TS ignorar extras)
           const user = {
-            id: usuario.id!, // Non-null assertion (id sempre presente)
+            id: usuario.id,
             name: usuario.nome,
             email: usuario.email,
             role: usuario.role,
             clienteId: usuario.clienteId,
             cliente: usuario.cliente?.nome,
-            aluno: usuario.aluno, // TS ignora 'aluno' com as any
-          } as any; // Assertion para custom props sem erro 2339
+            aluno: usuario.aluno,
+          } as any;
 
           return user;
         } catch (error) {
           console.error("❌ Erro na autenticação:", error);
-          throw new Error("Erro interno na autenticação"); // Throw para frontend
+          throw error;
         }
       },
     }),
@@ -113,9 +113,9 @@ export const authOptions: NextAuthOptions = {
       if (user && user.id) {
         token.id = user.id;
         token.role = user.role;
-        (token as any).clienteId = user.clienteId; // as any para custom
+        (token as any).clienteId = user.clienteId;
         (token as any).cliente = user.cliente;
-        (token as any).aluno = user.aluno; // Resolve erro principal
+        (token as any).aluno = user.aluno;
       }
       return token;
     },
@@ -123,7 +123,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user && token && token.id) {
         session.user.id = token.id;
         session.user.role = token.role;
-        (session.user as any).clienteId = token.clienteId; // Consistente
+        (session.user as any).clienteId = token.clienteId;
         (session.user as any).cliente = token.cliente;
         (session.user as any).aluno = token.aluno;
       }

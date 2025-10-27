@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { uploadToCloudinary } from "@/lib/uploadToCloudinary";
+import bcrypt from "bcryptjs";
 
 // GET - Listar todos os clientes
 export async function GET(request: NextRequest) {
@@ -55,39 +56,43 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // ✅ Receber FormData (arquivo + campos)
     const formData = await request.formData();
-
     const nome = formData.get("nome") as string;
+    const login = formData.get("login") as string; // ✅ LOGIN
+    const senha = formData.get("senha") as string; // ✅ SENHA
     const ativo = formData.get("ativo") === "true";
     const logoFile = formData.get("logo") as File | null;
 
-    console.log("📥 Recebendo dados do cliente:", {
-      nome,
-      ativo,
-      temArquivo: !!logoFile,
-      nomeArquivo: logoFile?.name || null,
+    if (!nome || !login || !senha) {
+      return NextResponse.json(
+        { error: "Nome, login e senha são obrigatórios" },
+        { status: 400 }
+      );
+    }
+
+    // ✅ Gerar email único a partir do login
+    const email = `${login}@cliente.local`;
+
+    // Valida se login já existe
+    const loginExistente = await prisma.usuario.findUnique({
+      where: { email },
     });
 
-    if (!nome) {
+    if (loginExistente) {
       return NextResponse.json(
-        { error: "Nome é obrigatório" },
+        { error: "Login já cadastrado" },
         { status: 400 }
       );
     }
 
     let logoUrl: string | null = null;
 
-    // ✅ SE TEM ARQUIVO, FAZER UPLOAD PRO CLOUDINARY
     if (logoFile) {
-      console.log("📤 Fazendo upload do logo para Cloudinary...");
-
       const arrayBuffer = await logoFile.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
 
       try {
         logoUrl = await uploadToCloudinary(buffer, "saas_academia/clientes");
-        console.log("✅ Logo enviado para Cloudinary:", logoUrl);
       } catch (uploadError) {
         console.error("❌ Erro ao fazer upload:", uploadError);
         return NextResponse.json(
@@ -97,24 +102,45 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // ✅ SALVAR NO BANCO DE DADOS
-    console.log("💾 Salvando no banco de dados...");
-
+    // ✅ CRIAR CLIENTE
     const novoCliente = await prisma.cliente.create({
       data: {
         nome,
-        logo: logoUrl, // ✅ URL do Cloudinary ou null
+        logo: logoUrl,
         ativo,
       },
     });
 
-    console.log("✅ Cliente criado com sucesso:", {
-      id: novoCliente.id,
-      nome: novoCliente.nome,
-      logoSalvo: novoCliente.logo ? "SIM ✅" : "NÃO ❌",
+    // ✅ CRIAR USUÁRIO ADMIN COM LOGIN E SENHA
+    const hashedPassword = await bcrypt.hash(senha, 10);
+
+    await prisma.usuario.create({
+      data: {
+        nome: "Administrador",
+        email: email, // email único gerado
+        senha: hashedPassword,
+        clienteId: novoCliente.id,
+        role: "ADMIN",
+        ativo: true,
+      },
     });
 
-    return NextResponse.json(novoCliente, { status: 201 });
+    console.log("✅ Cliente e Admin criados:", {
+      clienteId: novoCliente.id,
+      login: login,
+    });
+
+    return NextResponse.json(
+      {
+        cliente: novoCliente,
+        admin: {
+          login: login,
+          senha: senha, // Retorna a senha em texto para exibir
+        },
+        mensagem: `✅ Cliente criado! Login: ${login} | Senha: ${senha}`,
+      },
+      { status: 201 }
+    );
   } catch (error) {
     console.error("❌ Erro ao criar cliente:", error);
     return NextResponse.json(
