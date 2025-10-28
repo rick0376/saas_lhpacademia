@@ -14,6 +14,7 @@ interface Exercício {
   nome: string;
   series: number;
   reps: string;
+  carga?: string; // ✅ ADICIONADO
   descanso: string;
   descricao?: string;
   fotoExecucao?: string;
@@ -63,7 +64,6 @@ export default function TreinoDetalhesPage() {
     setError("");
 
     const url = `/api/alunos/treinos/${treinoId}/exercicios?alunoId=${alunoId}`;
-    console.log("🔍 Page: Fetching URL:", url);
 
     try {
       const response = await fetch(url, {
@@ -71,18 +71,14 @@ export default function TreinoDetalhesPage() {
         cache: "no-store",
       });
 
-      console.log("🔍 Page: Response status:", response.status);
-
       if (!response.ok) {
         const errText = await response.text();
-        console.log("❌ Page: Error body:", errText);
         throw new Error(`Erro: ${response.status} - ${errText}`);
       }
 
       const data: TreinoDetalhes = await response.json();
       setDetalhes(data);
     } catch (err: any) {
-      console.error("❌ Page: Fetch error:", err);
       setError(err.message || "Erro ao carregar");
     } finally {
       setLoading(false);
@@ -159,49 +155,110 @@ export default function TreinoDetalhesPage() {
             </p>
           </div>
         ) : (
-          <div className={styles.tableContainer}>
-            <table className={styles.table}>
-              <thead className={styles.thead}>
-                <tr>
-                  <th className={styles.th}>Exercício</th>
-                  <th className={styles.th}>Séries</th>
-                  <th className={styles.th}>Repetições</th>
-                  <th className={styles.th}>Descanso</th>
-                  <th className={styles.thDesc}>Descrição</th>
-                </tr>
-              </thead>
-              <tbody className={styles.tbody}>
-                {detalhes.exercicios.map((ex) => (
-                  <tr key={ex.id} className={styles.tr}>
-                    <td
-                      className={`${styles.exName} ${
-                        ex.fotoExecucao ? styles.clickableEx : ""
+          <>
+            {/* ✅ TABELA DESKTOP */}
+            <div className={styles.tableWrapper}>
+              <div className={styles.tableContainer}>
+                <table className={styles.table}>
+                  <thead className={styles.thead}>
+                    <tr>
+                      <th className={styles.th}>Exercício</th>
+                      <th className={styles.th}>Séries</th>
+                      <th className={styles.th}>Repetições</th>
+                      <th className={styles.th}>Carga</th>
+                      <th className={styles.th}>Descanso</th>
+                      <th className={styles.th}>Observações</th>
+                    </tr>
+                  </thead>
+                  <tbody className={styles.tbody}>
+                    {detalhes.exercicios.map((ex, index) => (
+                      <tr key={ex.id} className={styles.tr}>
+                        <td
+                          className={`${styles.exName} ${
+                            ex.fotoExecucao ? styles.clickableEx : ""
+                          }`}
+                          onClick={() => openModal(ex)}
+                          title={
+                            ex.fotoExecucao
+                              ? "Clique para ver foto de execução"
+                              : ""
+                          }
+                        >
+                          <span className={styles.exNumber}>{index + 1}.</span>
+                          {ex.nome}
+                        </td>
+                        <td className={styles.series}>{ex.series}x</td>
+                        <td className={styles.reps}>{ex.reps}</td>
+                        <td className={styles.carga}>{ex.carga || "Livre"}</td>
+                        <td className={styles.descanso}>{ex.descanso}</td>
+                        <td className={styles.exDesc}>
+                          <div className={styles.descScrollable}>
+                            {ex.descricao || "—"}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* ✅ CARDS MOBILE */}
+            <div className={styles.cardsContainer}>
+              {detalhes.exercicios.map((ex, index) => (
+                <div key={ex.id} className={styles.exercicioCard}>
+                  <div className={styles.cardHeader}>
+                    <span className={styles.cardNumber}>{index + 1}</span>
+                    <h3
+                      className={`${styles.cardTitle} ${
+                        ex.fotoExecucao ? styles.clickable : ""
                       }`}
                       onClick={() => openModal(ex)}
-                      title={
-                        ex.fotoExecucao
-                          ? "Clique para ver foto de execução"
-                          : ""
-                      }
                     >
                       {ex.nome}
-                    </td>
-                    <td className={styles.series}>{ex.series}</td>
-                    <td className={styles.reps}>{ex.reps}</td>
-                    <td className={styles.descanso}>{ex.descanso}</td>
-                    <td className={styles.exDesc} title={ex.descricao}>
-                      {ex.descricao || "N/A"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                      {ex.fotoExecucao && (
+                        <span className={styles.photoIcon}>📷</span>
+                      )}
+                    </h3>
+                  </div>
+
+                  <div className={styles.cardGrid}>
+                    <div className={styles.cardItem}>
+                      <span className={styles.cardLabel}>Séries</span>
+                      <span className={styles.cardValue}>{ex.series}x</span>
+                    </div>
+                    <div className={styles.cardItem}>
+                      <span className={styles.cardLabel}>Repetições</span>
+                      <span className={styles.cardValue}>{ex.reps}</span>
+                    </div>
+                    <div className={styles.cardItem}>
+                      <span className={styles.cardLabel}>Carga</span>
+                      <span className={styles.cardValue}>
+                        {ex.carga || "Livre"}
+                      </span>
+                    </div>
+                    <div className={styles.cardItem}>
+                      <span className={styles.cardLabel}>Descanso</span>
+                      <span className={styles.cardValue}>{ex.descanso}</span>
+                    </div>
+                  </div>
+
+                  {ex.descricao && (
+                    <div className={styles.cardObs}>
+                      <span className={styles.obsLabel}>Observações:</span>
+                      <p className={styles.obsText}>{ex.descricao}</p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </>
         )}
 
         {detalhes.exercicios.length > 0 && (
           <div className={styles.footer}>
-            Este treino contém {detalhes.exercicios.length} exercício(s).
+            <strong>{detalhes.exercicios.length}</strong> exercício(s) • Bom
+            treino! 💪
           </div>
         )}
 
