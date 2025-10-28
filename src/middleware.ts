@@ -56,6 +56,7 @@ export async function middleware(request: NextRequest) {
     }
 
     // ✅ /dashboard/usuarios permite SUPERADMIN e ADMIN
+    // Testando o commit
 
     // ADMIN e SUPERADMIN → permite acesso
     return NextResponse.next();
