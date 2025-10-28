@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 // GET - Listar execuções do treino
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> } // ✅ Promise
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -15,7 +15,6 @@ export async function GET(
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
     }
 
-    // ✅ Await params
     const { id } = await params;
 
     const execucoes = await prisma.execucaoTreino.findMany({
@@ -39,7 +38,7 @@ export async function GET(
 // POST - Registrar execução de treino
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> } // ✅ Promise
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -49,15 +48,36 @@ export async function POST(
     }
 
     const body = await request.json();
-    const { observacoes, completo, exercicios } = body;
+    const { observacoes, completo, exercicios, intensidade, alunoId } = body; // ✅ ADICIONADO
 
-    // ✅ Await params
     const { id } = await params;
+
+    // ✅ Valida intensidade
+    const intensidadesValidas = ["LEVE", "MODERADO", "PESADO", "MUITO_PESADO"];
+    if (!intensidade || !intensidadesValidas.includes(intensidade)) {
+      return NextResponse.json(
+        {
+          error:
+            "Intensidade inválida. Use: LEVE, MODERADO, PESADO ou MUITO_PESADO",
+        },
+        { status: 400 }
+      );
+    }
+
+    // ✅ Valida alunoId
+    if (!alunoId) {
+      return NextResponse.json(
+        { error: "alunoId é obrigatório" },
+        { status: 400 }
+      );
+    }
 
     // Criar execução do treino
     const execucao = await prisma.execucaoTreino.create({
       data: {
         treinoId: id,
+        alunoId, // ✅ ADICIONADO
+        intensidade, // ✅ ADICIONADO
         observacoes: observacoes || null,
         completo: completo ?? false,
         exercicios: {

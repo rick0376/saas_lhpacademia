@@ -15,8 +15,8 @@ model Cliente {
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
   usuarios   Usuario[]
-  alunos     Aluno[] // ✅ NOVO
-  exercicios Exercicio[] // ✅ NOVO
+  alunos     Aluno[]
+  exercicios Exercicio[]
 
   @@map("clientes")
 }
@@ -78,6 +78,7 @@ model Aluno {
   medidas    Medida[]
   treinos    Treino[]
   avaliacoes Avaliacao[]
+  execucoes  ExecucaoTreino[] // ✅ NOVO
 
   @@map("alunos")
 }
@@ -111,10 +112,10 @@ model Avaliacao {
   id          String   @id @default(cuid())
   alunoId     String
   aluno       Aluno    @relation(fields: [alunoId], references: [id], onDelete: Cascade)
-  tipo        String? // "Inicial", "Mensal", "Trimestral"
+  tipo        String?
   resultado   String?
   observacoes String?
-  arquivo     String? // URL do arquivo PDF
+  arquivo     String?
   data        DateTime @default(now())
   createdAt   DateTime @default(now())
 
@@ -127,9 +128,9 @@ model Exercicio {
   nome          String
   grupoMuscular GrupoMuscular
   descricao     String?
-  video         String? // URL do vídeo
-  imagem        String? // URL da imagem
-  equipamento   String? // "Livre", "Máquina", "Cabo", etc
+  video         String?
+  imagem        String?
+  equipamento   String?
   clienteId     String
   cliente       Cliente       @relation(fields: [clienteId], references: [id], onDelete: Cascade)
   createdAt     DateTime      @default(now())
@@ -144,11 +145,11 @@ model Exercicio {
 // Treinos (Fichas)
 model Treino {
   id          String    @id @default(cuid())
-  nome        String // "Treino A", "Treino B", etc
+  nome        String
   descricao   String?
   alunoId     String
   aluno       Aluno     @relation(fields: [alunoId], references: [id], onDelete: Cascade)
-  objetivo    String? // "Hipertrofia", "Emagrecimento", "Condicionamento"
+  objetivo    String?
   observacoes String?
   ativo       Boolean   @default(true)
   dataInicio  DateTime  @default(now())
@@ -171,11 +172,11 @@ model TreinoExercicio {
   treino      Treino    @relation(fields: [treinoId], references: [id], onDelete: Cascade)
   exercicioId String
   exercicio   Exercicio @relation(fields: [exercicioId], references: [id], onDelete: Cascade)
-  ordem       Int // Ordem de execução
-  series      Int // Número de séries
-  repeticoes  String // "10-12", "15", "Até a falha"
-  carga       String? // "20kg", "Peso corporal"
-  descanso    String? // "60s", "90s"
+  ordem       Int
+  series      Int
+  repeticoes  String
+  carga       String?
+  descanso    String?
   observacoes String?
   createdAt   DateTime  @default(now())
 
@@ -188,27 +189,33 @@ model Cronograma {
   treinoId   String
   treino     Treino    @relation(fields: [treinoId], references: [id], onDelete: Cascade)
   diaSemana  DiaSemana
-  horaInicio String? // "08:00"
-  horaFim    String? // "09:00"
+  horaInicio String?
+  horaFim    String?
   createdAt  DateTime  @default(now())
 
   @@unique([treinoId, diaSemana])
   @@map("cronogramas")
 }
 
-// Execução de Treino (Histórico)
+// Execução de Treino (Histórico) - ✅ ATUALIZADO
 model ExecucaoTreino {
   id          String   @id @default(cuid())
   treinoId    String
   treino      Treino   @relation(fields: [treinoId], references: [id], onDelete: Cascade)
+  alunoId     String // ✅ NOVO
+  aluno       Aluno    @relation(fields: [alunoId], references: [id], onDelete: Cascade) // ✅ NOVO
+  intensidade String // ✅ NOVO: "LEVE", "MODERADO", "PESADO", "MUITO_PESADO"
   data        DateTime @default(now())
-  observacoes String?
+  observacoes String?  @db.Text // ✅ ATUALIZADO
   completo    Boolean  @default(false)
   createdAt   DateTime @default(now())
 
   // Relacionamentos
   exercicios ExecucaoExercicio[]
 
+  @@index([treinoId]) // ✅ NOVO
+  @@index([alunoId]) // ✅ NOVO
+  @@index([data]) // ✅ NOVO
   @@map("execucoes_treino")
 }
 
@@ -259,6 +266,6 @@ enum DiaSemana {
 enum Role {
   SUPERADMIN
   ADMIN
-   ALUNO 
+  ALUNO
   USER
 }

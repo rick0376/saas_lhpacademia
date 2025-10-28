@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import styles from "./execucaoStyles.module.scss";
 import { Button } from "../ui/Button/Button";
 import { Modal } from "../ui/Modal/Modal";
+import { Toast } from "../ui/Toast/Toast";
 
 interface ExecucaoExercicio {
   exercicioNome: string;
@@ -19,6 +20,7 @@ interface Execucao {
   data: string;
   observacoes?: string;
   completo: boolean;
+  intensidade?: string;
   exercicios: ExecucaoExercicio[];
 }
 
@@ -41,9 +43,21 @@ export const ExecucaoSection: React.FC<ExecucaoSectionProps> = ({
   }>({ isOpen: false });
   const [loadingSubmit, setLoadingSubmit] = useState(false);
 
+  // ✅ ESTADO DO TOAST
+  const [toast, setToast] = useState<{
+    show: boolean;
+    message: string;
+    type: "success" | "error" | "info" | "warning";
+  }>({
+    show: false,
+    message: "",
+    type: "success",
+  });
+
   const [novaExecucao, setNovaExecucao] = useState({
     observacoes: "",
     completo: true,
+    intensidade: "",
     exercicios: treinoExercicios.map((te) => ({
       exercicioNome: te.exercicio.nome,
       series: te.series,
@@ -71,24 +85,48 @@ export const ExecucaoSection: React.FC<ExecucaoSectionProps> = ({
   };
 
   const handleRegistrar = async () => {
+    // Validação
+    if (!novaExecucao.intensidade) {
+      setToast({
+        show: true,
+        message: "⚠️ Selecione a intensidade do treino!",
+        type: "warning",
+      });
+      return;
+    }
+
     setLoadingSubmit(true);
 
     try {
+      // Buscar aluno ID do treino
+      const treinoResponse = await fetch(`/api/treinos/${treinoId}`);
+      if (!treinoResponse.ok) throw new Error("Erro ao buscar dados do treino");
+      const treinoData = await treinoResponse.json();
+
       const response = await fetch(`/api/treinos/${treinoId}/execucoes`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(novaExecucao),
+        body: JSON.stringify({
+          ...novaExecucao,
+          alunoId: treinoData.alunoId,
+        }),
       });
 
-      if (!response.ok) throw new Error("Erro ao registrar execução");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Erro ao registrar execução");
+      }
 
       fetchExecucoes();
-      router.refresh(); // ✅ ADICIONE ESTA LINHA
+      router.refresh();
 
       setModalRegistrar(false);
+
+      // Reset do formulário
       setNovaExecucao({
         observacoes: "",
         completo: true,
+        intensidade: "",
         exercicios: treinoExercicios.map((te) => ({
           exercicioNome: te.exercicio.nome,
           series: te.series,
@@ -97,8 +135,20 @@ export const ExecucaoSection: React.FC<ExecucaoSectionProps> = ({
           observacoes: "",
         })),
       });
-    } catch (error) {
-      alert("Erro ao registrar execução");
+
+      // ✅ TOAST DE SUCESSO
+      setToast({
+        show: true,
+        message: "✅ Execução registrada com sucesso!",
+        type: "success",
+      });
+    } catch (error: any) {
+      // ✅ TOAST DE ERRO
+      setToast({
+        show: true,
+        message: "❌ " + error.message,
+        type: "error",
+      });
     } finally {
       setLoadingSubmit(false);
     }
@@ -115,9 +165,21 @@ export const ExecucaoSection: React.FC<ExecucaoSectionProps> = ({
       if (!response.ok) throw new Error("Erro ao excluir execução");
 
       fetchExecucoes();
-      router.refresh(); // ✅ ADICIONE ESTA LINHA
+      router.refresh();
+
+      // ✅ TOAST DE SUCESSO
+      setToast({
+        show: true,
+        message: "🗑️ Execução excluída com sucesso!",
+        type: "success",
+      });
     } catch (error) {
-      alert("Erro ao excluir execução");
+      // ✅ TOAST DE ERRO
+      setToast({
+        show: true,
+        message: "❌ Erro ao excluir execução",
+        type: "error",
+      });
     }
   };
 
@@ -136,6 +198,16 @@ export const ExecucaoSection: React.FC<ExecucaoSectionProps> = ({
       hour: "2-digit",
       minute: "2-digit",
     });
+  };
+
+  const getIntensidadeLabel = (intensidade: string) => {
+    const labels: Record<string, { emoji: string; text: string }> = {
+      LEVE: { emoji: "🟢", text: "Leve" },
+      MODERADO: { emoji: "🟡", text: "Moderado" },
+      PESADO: { emoji: "🟠", text: "Pesado" },
+      MUITO_PESADO: { emoji: "🔴", text: "Muito Pesado" },
+    };
+    return labels[intensidade] || { emoji: "", text: intensidade };
   };
 
   if (loading) {
@@ -169,38 +241,51 @@ export const ExecucaoSection: React.FC<ExecucaoSectionProps> = ({
         </div>
       ) : (
         <div className={styles.execucoesGrid}>
-          {execucoes.map((execucao) => (
-            <div key={execucao.id} className={styles.execucaoCard}>
-              <div className={styles.cardHeader}>
-                <div>
-                  <span className={styles.data}>
-                    📅 {formatDate(execucao.data)}
-                  </span>
-                  {execucao.completo && (
-                    <span className={styles.completoBadge}>✓ Completo</span>
-                  )}
+          {execucoes.map((execucao) => {
+            const intensidadeInfo = execucao.intensidade
+              ? getIntensidadeLabel(execucao.intensidade)
+              : null;
+
+            return (
+              <div key={execucao.id} className={styles.execucaoCard}>
+                <div className={styles.cardHeader}>
+                  <div>
+                    <span className={styles.data}>
+                      📅 {formatDate(execucao.data)}
+                    </span>
+                    {execucao.completo && (
+                      <span className={styles.completoBadge}>✓ Completo</span>
+                    )}
+                    {intensidadeInfo && (
+                      <span className={styles.intensidadeBadge}>
+                        {intensidadeInfo.emoji} {intensidadeInfo.text}
+                      </span>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => handleDeleteExecucao(execucao.id)}
+                    className={styles.deleteButton}
+                    title="Excluir"
+                  >
+                    🗑️
+                  </button>
                 </div>
+
+                <div className={styles.exerciciosCount}>
+                  {execucao.exercicios.length} exercícios realizados
+                </div>
+
                 <button
-                  onClick={() => handleDeleteExecucao(execucao.id)}
-                  className={styles.deleteButton}
-                  title="Excluir"
+                  onClick={() =>
+                    setModalVerExecucao({ isOpen: true, execucao })
+                  }
+                  className={styles.viewButton}
                 >
-                  🗑️
+                  Ver detalhes →
                 </button>
               </div>
-
-              <div className={styles.exerciciosCount}>
-                {execucao.exercicios.length} exercícios realizados
-              </div>
-
-              <button
-                onClick={() => setModalVerExecucao({ isOpen: true, execucao })}
-                className={styles.viewButton}
-              >
-                Ver detalhes →
-              </button>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -212,6 +297,64 @@ export const ExecucaoSection: React.FC<ExecucaoSectionProps> = ({
         size="large"
       >
         <div className={styles.modalContent}>
+          {/* ✅ CAMPO DE INTENSIDADE */}
+          <div className={styles.intensidadeField}>
+            <label className={styles.fieldLabel}>
+              Como foi a intensidade do treino? *
+            </label>
+            <div className={styles.intensidadeButtons}>
+              <button
+                type="button"
+                className={`${styles.intensidadeBtn} ${
+                  novaExecucao.intensidade === "LEVE" ? styles.selected : ""
+                }`}
+                onClick={() =>
+                  setNovaExecucao({ ...novaExecucao, intensidade: "LEVE" })
+                }
+              >
+                🟢 Leve
+              </button>
+              <button
+                type="button"
+                className={`${styles.intensidadeBtn} ${
+                  novaExecucao.intensidade === "MODERADO" ? styles.selected : ""
+                }`}
+                onClick={() =>
+                  setNovaExecucao({ ...novaExecucao, intensidade: "MODERADO" })
+                }
+              >
+                🟡 Moderado
+              </button>
+              <button
+                type="button"
+                className={`${styles.intensidadeBtn} ${
+                  novaExecucao.intensidade === "PESADO" ? styles.selected : ""
+                }`}
+                onClick={() =>
+                  setNovaExecucao({ ...novaExecucao, intensidade: "PESADO" })
+                }
+              >
+                🟠 Pesado
+              </button>
+              <button
+                type="button"
+                className={`${styles.intensidadeBtn} ${
+                  novaExecucao.intensidade === "MUITO_PESADO"
+                    ? styles.selected
+                    : ""
+                }`}
+                onClick={() =>
+                  setNovaExecucao({
+                    ...novaExecucao,
+                    intensidade: "MUITO_PESADO",
+                  })
+                }
+              >
+                🔴 Muito Pesado
+              </button>
+            </div>
+          </div>
+
           <div className={styles.exerciciosForm}>
             <h3 className={styles.formTitle}>Exercícios Realizados</h3>
             {novaExecucao.exercicios.map((exercicio, index) => (
@@ -292,7 +435,10 @@ export const ExecucaoSection: React.FC<ExecucaoSectionProps> = ({
             <Button variant="outline" onClick={() => setModalRegistrar(false)}>
               Cancelar
             </Button>
-            <Button onClick={handleRegistrar} disabled={loadingSubmit}>
+            <Button
+              onClick={handleRegistrar}
+              disabled={loadingSubmit || !novaExecucao.intensidade}
+            >
               {loadingSubmit ? "Registrando..." : "Registrar"}
             </Button>
           </div>
@@ -314,6 +460,18 @@ export const ExecucaoSection: React.FC<ExecucaoSectionProps> = ({
               </span>
               {modalVerExecucao.execucao.completo && (
                 <span className={styles.completoBadge}>✓ Completo</span>
+              )}
+              {modalVerExecucao.execucao.intensidade && (
+                <span className={styles.intensidadeBadge}>
+                  {
+                    getIntensidadeLabel(modalVerExecucao.execucao.intensidade)
+                      .emoji
+                  }{" "}
+                  {
+                    getIntensidadeLabel(modalVerExecucao.execucao.intensidade)
+                      .text
+                  }
+                </span>
               )}
             </div>
 
@@ -341,6 +499,15 @@ export const ExecucaoSection: React.FC<ExecucaoSectionProps> = ({
           </div>
         )}
       </Modal>
+
+      {/* ✅ TOAST DE NOTIFICAÇÃO */}
+      {toast.show && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast({ ...toast, show: false })}
+        />
+      )}
     </div>
   );
 };

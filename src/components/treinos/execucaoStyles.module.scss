@@ -115,6 +115,18 @@
   border-radius: 12px;
   font-size: 12px;
   font-weight: 600;
+  margin-right: 6px;
+}
+
+// ✅ BADGE DE INTENSIDADE
+.intensidadeBadge {
+  display: inline-block;
+  padding: 4px 10px;
+  background-color: #fef3c7;
+  color: #92400e;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .deleteButton {
@@ -159,6 +171,62 @@
 // Modal Styles
 .modalContent {
   padding: 8px 0;
+}
+
+// ✅ CAMPO DE INTENSIDADE
+.intensidadeField {
+  margin-bottom: 24px;
+  padding: 20px;
+  background-color: var(--light-color);
+  border-radius: 12px;
+  border: 2px solid var(--border-color);
+}
+
+.fieldLabel {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--dark-color);
+  margin-bottom: 12px;
+  display: block;
+}
+
+.intensidadeButtons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.intensidadeBtn {
+  padding: 14px 12px;
+  background-color: white;
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--dark-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  &:hover {
+    border-color: var(--primary-color);
+    background-color: rgba(59, 130, 246, 0.05);
+    transform: translateY(-2px);
+  }
+
+  &.selected {
+    border-color: var(--primary-color);
+    background-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  }
 }
 
 .exerciciosForm {
@@ -265,6 +333,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
   margin-bottom: 20px;
   padding-bottom: 16px;
   border-bottom: 1px solid var(--border-color);
@@ -340,5 +410,9 @@
 
   .exercicioInputs {
     grid-template-columns: 1fr;
+  }
+
+  .intensidadeButtons {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
