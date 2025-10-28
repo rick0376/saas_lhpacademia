@@ -5,22 +5,14 @@ import { prisma } from "@/lib/prisma";
 import { AlunoForm } from "@/components/alunos/AlunoForm";
 import styles from "./styles.module.scss";
 
-interface SearchParams {
-  clienteId?: string;
-}
-
-interface Props {
-  searchParams: Promise<SearchParams>;
-}
-
-export default async function NovoAlunoPage({ searchParams }: Props) {
+export default async function NovoAlunoPage(props: any) {
   const session = await getServerSession(authOptions);
 
   if (!session) {
     redirect("/");
   }
 
-  const params = await searchParams;
+  const params = await props.searchParams;
 
   let clienteId: string | null = null;
   let clienteNome: string | null = null;
