@@ -9,6 +9,9 @@
     padding: 1rem;
   }
 
+  // ========================================
+  // HEADER
+  // ========================================
   .header {
     display: flex;
     align-items: center;
@@ -17,6 +20,12 @@
     max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 1.5rem;
+      text-align: center;
+    }
 
     .backLink {
       display: flex;
@@ -51,9 +60,16 @@
       flex: 1;
       text-align: center;
       letter-spacing: -0.025em;
+
+      @media (max-width: 768px) {
+        font-size: 2rem;
+      }
     }
   }
 
+  // ========================================
+  // EMPTY STATE
+  // ========================================
   .emptyState {
     text-align: center;
     padding: 4rem 2rem;
@@ -61,8 +77,7 @@
     margin: 0 auto;
     background: white;
     border-radius: 1rem;
-    box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.08),
-      0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.8);
 
     p {
@@ -84,15 +99,21 @@
     }
   }
 
+  // ========================================
+  // TABELA
+  // ========================================
   .tableContainer {
     max-width: 1200px;
     margin: 0 auto;
     background: white;
     border-radius: 1rem;
-    box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.08),
-      0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.08);
     overflow: hidden;
     border: 1px solid #e2e8f0;
+
+    @media (max-width: 768px) {
+      overflow-x: auto;
+    }
   }
 
   .table {
@@ -100,6 +121,9 @@
     border-collapse: separate;
     border-spacing: 0;
 
+    // ========================================
+    // CABEÇALHO DA TABELA
+    // ========================================
     .thead {
       background: #f8fafc;
 
@@ -113,15 +137,29 @@
           text-transform: uppercase;
           letter-spacing: 0.05em;
           border-bottom: 2px solid #e2e8f0;
+
+          @media (max-width: 768px) {
+            padding: 1rem 0.75rem;
+            font-size: 0.75rem;
+          }
+        }
+
+        // 🔥 OCULTA "Data de Início" EM MOBILE
+        .thDataInicio {
+          @media (max-width: 768px) {
+            display: none;
+          }
         }
 
         .thActions {
-          text-align: right;
-          padding-right: 1.5rem; // Alinha perfeitamente com td.actions
+          text-align: center;
         }
       }
     }
 
+    // ========================================
+    // CORPO DA TABELA
+    // ========================================
     .tbody {
       tr {
         transition: all 0.2s ease;
@@ -129,7 +167,6 @@
 
         &:hover {
           background: rgba(59, 130, 246, 0.04);
-          box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.05);
         }
 
         &:last-child {
@@ -140,12 +177,23 @@
           padding: 1.5rem 1.5rem;
           vertical-align: middle;
 
+          @media (max-width: 768px) {
+            padding: 1rem 0.75rem;
+            font-size: 0.85rem;
+          }
+
+          // Nome do Treino
           &.name {
             font-weight: 700;
             color: #0f172a;
             font-size: 1.05rem;
+
+            @media (max-width: 768px) {
+              font-size: 0.95rem;
+            }
           }
 
+          // Objetivo
           .description {
             max-width: 18rem;
             overflow: hidden;
@@ -153,8 +201,14 @@
             white-space: nowrap;
             color: #64748b;
             font-size: 0.95rem;
+
+            @media (max-width: 768px) {
+              max-width: 8rem;
+              font-size: 0.8rem;
+            }
           }
 
+          // Status
           &.status {
             span {
               display: inline-flex;
@@ -163,11 +217,16 @@
               font-size: 0.85rem;
               font-weight: 700;
               border-radius: 50px;
-              position: relative;
               transition: all 0.25s ease;
               box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
               min-width: 80px;
               justify-content: center;
+
+              @media (max-width: 768px) {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.75rem;
+                min-width: 70px;
+              }
 
               &::before {
                 content: "";
@@ -175,22 +234,20 @@
                 height: 0.75rem;
                 border-radius: 50%;
                 margin-right: 0.75rem;
-                flex-shrink: 0;
                 box-shadow: 0 0 0 2px white;
               }
 
               &.statusAtivo {
                 background: #10b981;
                 color: white;
-                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 
                 &::before {
-                  background: #22c55e; // Ponto verde visível para ativo
+                  background: #22c55e;
                 }
 
                 &:hover {
                   background: #059669;
-                  transform: scale(1.05) translateY(-1px);
+                  transform: scale(1.05);
                   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
                 }
               }
@@ -198,30 +255,34 @@
               &.statusInativo {
                 background: #ef4444;
                 color: white;
-                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 
                 &::before {
-                  background: #f87171; // Ponto vermelho para inativo
+                  background: #f87171;
                 }
 
                 &:hover {
                   background: #dc2626;
-                  transform: scale(1.05) translateY(-1px);
+                  transform: scale(1.05);
                   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
                 }
               }
             }
           }
 
-          .date {
+          // 🔥 OCULTA "Data de Início" EM MOBILE
+          &.dataInicio {
             color: #64748b;
             font-size: 0.95rem;
             font-weight: 500;
+
+            @media (max-width: 768px) {
+              display: none;
+            }
           }
 
+          // ✅ AÇÕES (sempre visível)
           &.actions {
             text-align: right;
-            padding-right: 1.5rem; // Alinha com thActions
 
             .viewButton {
               color: #1e40af;
@@ -234,6 +295,11 @@
               transition: all 0.25s ease;
               display: inline-block;
               border: 1px solid rgba(30, 64, 175, 0.1);
+
+              @media (max-width: 768px) {
+                padding: 0.5rem 0.875rem;
+                font-size: 0.85rem;
+              }
 
               &:hover {
                 color: white;
@@ -248,6 +314,9 @@
     }
   }
 
+  // ========================================
+  // FOOTER
+  // ========================================
   .footer {
     max-width: 1200px;
     margin: 2.5rem auto 0;
@@ -262,7 +331,9 @@
   }
 }
 
-// Loading/Error states
+// ========================================
+// LOADING E ERROR
+// ========================================
 .loading,
 .error {
   min-height: 100vh;
@@ -295,7 +366,6 @@
     color: #dc2626;
     margin-bottom: 1.5rem;
     font-weight: 600;
-    font-size: 1.15rem;
   }
 
   .retryButton {
@@ -306,7 +376,6 @@
     border-radius: 0.5rem;
     cursor: pointer;
     font-weight: 700;
-    font-size: 1rem;
     transition: all 0.25s ease;
     box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
 
@@ -321,49 +390,5 @@
 @keyframes spin {
   to {
     transform: rotate(360deg);
-  }
-}
-
-// Mobile responsivity
-@media (max-width: 768px) {
-  .container {
-    .header {
-      flex-direction: column;
-      gap: 1.5rem;
-      text-align: center;
-
-      h1 {
-        font-size: 2.125rem;
-      }
-    }
-
-    .tableContainer {
-      .table {
-        .thead tr .th,
-        .tbody tr td {
-          padding: 1rem 1rem;
-          font-size: 0.8rem;
-        }
-
-        .tbody tr td.description {
-          max-width: 10rem;
-        }
-
-        .tbody tr td.actions {
-          padding-right: 1rem;
-        }
-
-        .tbody tr td.status span {
-          padding: 0.5rem 0.875rem;
-          min-width: 70px;
-          font-size: 0.75rem;
-        }
-      }
-    }
-
-    .footer {
-      font-size: 0.9rem;
-      padding: 1rem;
-    }
   }
 }

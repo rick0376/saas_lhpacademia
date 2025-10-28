@@ -109,18 +109,25 @@ export default function TreinosPage() {
               <thead className={styles.thead}>
                 <tr>
                   <th className={styles.th}>Nome</th>
-                  <th className={styles.th}>Descrição</th>
+                  <th className={styles.th}>Objetivo</th>
                   <th className={styles.th}>Status</th>
-                  <th className={styles.th}>Iniciado em</th>
-                  <th className={styles.thActions}>Ações</th>
+                  <th className={`${styles.th} ${styles.thDataInicio}`}>
+                    Data de Início
+                  </th>
+                  <th className={`${styles.th} ${styles.thActions}`}>Ações</th>
                 </tr>
               </thead>
               <tbody className={styles.tbody}>
                 {treinos.map((treino) => (
-                  <tr key={treino.id} className={styles.tr}>
+                  <tr key={treino.id}>
                     <td className={styles.name}>{treino.nome}</td>
-                    <td className={styles.description} title={treino.descricao}>
-                      {treino.descricao || "Sem descrição"}
+                    <td>
+                      <span
+                        className={styles.description}
+                        title={treino.descricao}
+                      >
+                        {treino.descricao || "Sem descrição"}
+                      </span>
                     </td>
                     <td className={styles.status}>
                       <span
@@ -133,7 +140,7 @@ export default function TreinosPage() {
                         {treino.ativo ? "Ativo" : "Inativo"}
                       </span>
                     </td>
-                    <td className={styles.date}>
+                    <td className={styles.dataInicio}>
                       {new Date(treino.dataInicio).toLocaleDateString("pt-BR")}
                     </td>
                     <td className={styles.actions}>
