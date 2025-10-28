@@ -18,7 +18,7 @@ export default async function NovoAlunoPage({
     redirect("/");
   }
 
-  // ✅ AWAIT searchParams
+  // ✅ AWAIT searchParamss
   const params = await searchParams;
 
   let clienteId: string | null = null;
