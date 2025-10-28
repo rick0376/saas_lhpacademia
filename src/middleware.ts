@@ -56,7 +56,6 @@ export async function middleware(request: NextRequest) {
     }
 
     // ✅ /dashboard/usuarios permite SUPERADMIN e ADMIN
-    // (removido da lista de rotas restritas)
 
     // ADMIN e SUPERADMIN → permite acesso
     return NextResponse.next();
