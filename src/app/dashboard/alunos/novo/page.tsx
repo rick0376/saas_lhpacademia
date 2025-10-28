@@ -5,21 +5,14 @@ import { prisma } from "@/lib/prisma";
 import { AlunoForm } from "@/components/alunos/AlunoForm";
 import styles from "./styles.module.scss";
 
-export default async function NovoAlunoPage({
-  searchParams,
-}: {
-  searchParams: Promise<{
-    clienteId?: string;
-  }>;
-}) {
+export default async function NovoAlunoPage(props: any) {
   const session = await getServerSession(authOptions);
 
   if (!session) {
     redirect("/");
   }
 
-  // ✅ AWAIT searchParamss
-  const params = await searchParams;
+  const params = await props.searchParams;
 
   let clienteId: string | null = null;
   let clienteNome: string | null = null;
@@ -39,21 +32,19 @@ export default async function NovoAlunoPage({
   }
 
   return (
-    <>
-      <main className={styles.main}>
-        <div className={styles.container}>
-          <div className={styles.header}>
-            <h1 className={styles.title}>
-              {clienteNome ? `Novo Aluno - ${clienteNome}` : "Novo Aluno"}
-            </h1>
-            <p className={styles.subtitle}>
-              Preencha os dados abaixo para cadastrar um novo aluno
-            </p>
-          </div>
-
-          <AlunoForm clienteId={clienteId} />
+    <main className={styles.main}>
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <h1 className={styles.title}>
+            {clienteNome ? `Novo Aluno - ${clienteNome}` : "Novo Aluno"}
+          </h1>
+          <p className={styles.subtitle}>
+            Preencha os dados abaixo para cadastrar um novo aluno
+          </p>
         </div>
-      </main>
-    </>
+
+        <AlunoForm clienteId={clienteId} />
+      </div>
+    </main>
   );
 }
