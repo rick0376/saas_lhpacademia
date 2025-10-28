@@ -6,9 +6,9 @@ import { AlunoForm } from "@/components/alunos/AlunoForm";
 import styles from "./styles.module.scss";
 
 interface PageProps {
-  searchParams: {
+  searchParams: Promise<{
     clienteId?: string;
-  };
+  }>;
 }
 
 export default async function NovoAlunoPage({ searchParams }: PageProps) {
@@ -18,11 +18,15 @@ export default async function NovoAlunoPage({ searchParams }: PageProps) {
     redirect("/");
   }
 
+  // ✅ AWAIT searchParams
+  const params = await searchParams;
+
   let clienteId: string | null = null;
   let clienteNome: string | null = null;
 
-  if (searchParams.clienteId) {
-    clienteId = searchParams.clienteId;
+  // ✅ USE params ao invés de searchParams
+  if (params.clienteId) {
+    clienteId = params.clienteId;
   } else if (session.user.role !== "SUPERADMIN" && session.user.clienteId) {
     clienteId = session.user.clienteId;
   }
