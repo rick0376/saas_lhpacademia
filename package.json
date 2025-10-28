@@ -4,8 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "[ \"$SKIP_TYPE_CHECK\" = \"true\" ] && echo 'Skipping type check' || echo 'Type checking enabled' && next build",
     "start": "next start",
+    "lint": "next lint",
     "postinstall": "prisma generate"
   },
   "prisma": {
