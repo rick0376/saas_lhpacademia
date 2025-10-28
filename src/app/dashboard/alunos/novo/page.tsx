@@ -5,13 +5,13 @@ import { prisma } from "@/lib/prisma";
 import { AlunoForm } from "@/components/alunos/AlunoForm";
 import styles from "./styles.module.scss";
 
-interface PageProps {
+export default async function NovoAlunoPage({
+  searchParams,
+}: {
   searchParams: Promise<{
     clienteId?: string;
   }>;
-}
-
-export default async function NovoAlunoPage({ searchParams }: PageProps) {
+}) {
   const session = await getServerSession(authOptions);
 
   if (!session) {
@@ -24,7 +24,6 @@ export default async function NovoAlunoPage({ searchParams }: PageProps) {
   let clienteId: string | null = null;
   let clienteNome: string | null = null;
 
-  // ✅ USE params ao invés de searchParams
   if (params.clienteId) {
     clienteId = params.clienteId;
   } else if (session.user.role !== "SUPERADMIN" && session.user.clienteId) {
