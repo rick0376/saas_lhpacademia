@@ -82,9 +82,7 @@ export const AlunoLayout: React.FC<Props> = ({ children }) => {
   ];
 
   const brandTitle = "PCW - Treino";
-  //const brandSub = "Portal do Aluno";
 
-  // Breadcrumb para PCW
   const getBreadcrumb = () => {
     const parts = pathname.split("/").filter(Boolean);
     if (parts[0] === "aluno" && parts.length > 1) {
@@ -108,7 +106,7 @@ export const AlunoLayout: React.FC<Props> = ({ children }) => {
   const Header = (
     <header className={styles.header}>
       <div className={styles.headerContent}>
-        {/* Logo (inline como ajustado) */}
+        {/* Logo */}
         <Link
           href={isAuthed ? "/alunos/dashboard" : "/alunos/login"}
           className={styles.logoArea}
@@ -118,11 +116,10 @@ export const AlunoLayout: React.FC<Props> = ({ children }) => {
           </div>
           <div className={styles.titleContainer}>
             <span className={styles.title}>{brandTitle}</span>
-            {/*<span className={styles.subtitle}>{brandSub}</span>*/}
           </div>
         </Link>
 
-        {/* Dropdown Menu (condicional, com navLinks) */}
+        {/* Dropdown Menu */}
         {menuOpen && (
           <div className={styles.dropdownMenu} ref={menuRef}>
             <nav className={styles.dropdownNav}>
@@ -133,12 +130,45 @@ export const AlunoLayout: React.FC<Props> = ({ children }) => {
                   className={`${styles.dropdownLink} ${
                     isActive(item.href) ? styles.dropdownLinkActive : ""
                   }`}
-                  onClick={() => setMenuOpen(false)} // Fecha ao clicar
+                  onClick={() => setMenuOpen(false)}
                 >
                   <span className={styles.dropdownIcon}>{item.icon}</span>
                   <span className={styles.dropdownLabel}>{item.label}</span>
                 </Link>
               ))}
+
+              {/* ✅ DIVIDER */}
+              <div className={styles.dropdownDivider}></div>
+
+              {/* ✅ CONFIGURAÇÕES NO MENU MOBILE */}
+              <Link
+                href="/alunos/configuracoes"
+                className={`${styles.dropdownLink} ${
+                  isActive("/alunos/configuracoes")
+                    ? styles.dropdownLinkActive
+                    : ""
+                }`}
+                onClick={() => setMenuOpen(false)}
+              >
+                <span className={styles.dropdownIcon}>
+                  <Settings size={18} />
+                </span>
+                <span className={styles.dropdownLabel}>Configurações</span>
+              </Link>
+
+              {/* ✅ LOGOUT NO MENU MOBILE */}
+              <button
+                className={`${styles.dropdownLink} ${styles.dropdownLogout}`}
+                onClick={() => {
+                  setMenuOpen(false);
+                  openLogout();
+                }}
+              >
+                <span className={styles.dropdownIcon}>
+                  <LogOut size={18} />
+                </span>
+                <span className={styles.dropdownLabel}>Sair</span>
+              </button>
             </nav>
           </div>
         )}
@@ -180,7 +210,7 @@ export const AlunoLayout: React.FC<Props> = ({ children }) => {
                   <LogOut size={18} />
                 </button>
               </div>
-              {/* Menu Button (trigger do dropdown) */}
+              {/* Menu Button */}
               <button
                 className={styles.menuButton}
                 onClick={toggleMenu}

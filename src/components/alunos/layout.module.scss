@@ -471,3 +471,33 @@
     color: #ffffff;
   }
 }
+// ✅ DIVIDER NO MENU
+.dropdownDivider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(148, 163, 184, 0.3) 50%,
+    transparent 100%
+  );
+  margin: 0.5rem 0;
+}
+
+// ✅ BOTÃO DE LOGOUT NO MENU (estilo de botão, não link)
+.dropdownLogout {
+  width: 100%;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  color: #ef4444 !important;
+
+  &:hover {
+    background: #fef2f2 !important;
+    border-left-color: #ef4444 !important;
+  }
+
+  .dropdownIcon {
+    color: #ef4444;
+  }
+}
