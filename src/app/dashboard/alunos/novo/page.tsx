@@ -5,38 +5,20 @@ import { prisma } from "@/lib/prisma";
 import { AlunoForm } from "@/components/alunos/AlunoForm";
 import styles from "./styles.module.scss";
 
-interface SearchParams {
-  clienteId?: string;
-}
-
-interface Props {
-  searchParams: Promise<SearchParams>;
-}
-
-export default async function NovoAlunoPage({ searchParams }: Props) {
+export default async function NovoAluno(props: any) {
   const session = await getServerSession(authOptions);
+  if (!session) redirect("/");
 
-  if (!session) {
-    redirect("/");
-  }
+  const sp = await props.searchParams;
+  const cid = sp?.clienteId || session.user.clienteId || null;
 
-  const params = await searchParams;
-
-  let clienteId: string | null = null;
-  let clienteNome: string | null = null;
-
-  if (params.clienteId) {
-    clienteId = params.clienteId;
-  } else if (session.user.role !== "SUPERADMIN" && session.user.clienteId) {
-    clienteId = session.user.clienteId;
-  }
-
-  if (clienteId) {
-    const cliente = await prisma.cliente.findUnique({
-      where: { id: clienteId },
+  let cnome = null;
+  if (cid) {
+    const c = await prisma.cliente.findUnique({
+      where: { id: cid },
       select: { nome: true },
     });
-    clienteNome = cliente?.nome || null;
+    cnome = c?.nome || null;
   }
 
   return (
@@ -44,14 +26,10 @@ export default async function NovoAlunoPage({ searchParams }: Props) {
       <div className={styles.container}>
         <div className={styles.header}>
           <h1 className={styles.title}>
-            {clienteNome ? `Novo Aluno - ${clienteNome}` : "Novo Aluno"}
+            {cnome ? `Novo Aluno - ${cnome}` : "Novo Aluno"}
           </h1>
-          <p className={styles.subtitle}>
-            Preencha os dados abaixo para cadastrar um novo aluno
-          </p>
         </div>
-
-        <AlunoForm clienteId={clienteId} />
+        <AlunoForm clienteId={cid} />
       </div>
     </main>
   );
