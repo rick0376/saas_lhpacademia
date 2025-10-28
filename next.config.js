@@ -2,6 +2,7 @@
 const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
+    tsconfigPath: "./tsconfig.json",
   },
   eslint: {
     ignoreDuringBuilds: true,
@@ -17,6 +18,7 @@ const nextConfig = {
   },
   experimental: {
     appDir: true,
+    typedRoutes: false,
   },
 };
 
