@@ -16,7 +16,6 @@ import {
   Trash2,
   AlertTriangle,
   Play,
-  Square,
 } from "lucide-react";
 import styles from "./styles.module.scss";
 
@@ -81,7 +80,6 @@ export default function TreinoDetalhesPage() {
     }
   );
 
-  // ✅ NOVO - Controle de séries restantes por exercício
   const [seriesRestantes, setSeriesRestantes] = useState<
     Record<string, number>
   >(() => {
@@ -92,7 +90,6 @@ export default function TreinoDetalhesPage() {
     return {};
   });
 
-  // ✅ NOVO - Cronômetro de execução de série
   const [cronometroExecucao, setCronometroExecucao] = useState<{
     exercicioId: string | null;
     tempo: number;
@@ -100,6 +97,13 @@ export default function TreinoDetalhesPage() {
 
   const [cronometroAtivo, setCronometroAtivo] = useState<string | null>(null);
   const [tempoRestante, setTempoRestante] = useState<number>(0);
+
+  // ✅ NOVO - Modal de cronômetro em destaque
+  const [showCronometroModal, setShowCronometroModal] = useState(false);
+  const [cronometroModalType, setCronometroModalType] = useState<
+    "execucao" | "descanso"
+  >("execucao");
+  const [exercicioAtivo, setExercicioAtivo] = useState<Exercício | null>(null);
 
   const [showRegistroModal, setShowRegistroModal] = useState(false);
   const [intensidade, setIntensidade] = useState("");
@@ -136,7 +140,6 @@ export default function TreinoDetalhesPage() {
 
   const [execucoes, setExecucoes] = useState<Execucao[]>([]);
 
-  // ✅ Inicializa séries restantes quando carrega detalhes
   useEffect(() => {
     if (detalhes && Object.keys(seriesRestantes).length === 0) {
       const initialSeries: Record<string, number> = {};
@@ -147,7 +150,6 @@ export default function TreinoDetalhesPage() {
     }
   }, [detalhes]);
 
-  // ✅ Salva séries restantes no localStorage
   useEffect(() => {
     if (
       typeof window !== "undefined" &&
@@ -161,7 +163,6 @@ export default function TreinoDetalhesPage() {
     }
   }, [seriesRestantes, id]);
 
-  // ✅ Cronômetro de execução
   useEffect(() => {
     if (!cronometroExecucao.exercicioId) return;
 
@@ -195,6 +196,9 @@ export default function TreinoDetalhesPage() {
         setShowEditModal(false);
         setShowVerDetalhesModal(false);
         setShowConfirmModal(false);
+        if (showCronometroModal) {
+          fecharCronometroModal();
+        }
       }
     };
     if (
@@ -202,7 +206,8 @@ export default function TreinoDetalhesPage() {
       showRegistroModal ||
       showEditModal ||
       showVerDetalhesModal ||
-      showConfirmModal
+      showConfirmModal ||
+      showCronometroModal
     ) {
       document.addEventListener("keydown", handleEsc);
     }
@@ -213,6 +218,7 @@ export default function TreinoDetalhesPage() {
     showEditModal,
     showVerDetalhesModal,
     showConfirmModal,
+    showCronometroModal,
   ]);
 
   useEffect(() => {
@@ -344,12 +350,24 @@ export default function TreinoDetalhesPage() {
     });
   };
 
-  // ✅ NOVO - Iniciar cronômetro de execução
-  const iniciarCronometroExecucao = (exercicioId: string) => {
+  // ✅ NOVO - Iniciar cronômetro de execução (para descanso se estiver ativo)
+  const iniciarCronometroExecucao = (
+    exercicioId: string,
+    exercicio: Exercício
+  ) => {
+    if (cronometroAtivo) {
+      setCronometroAtivo(null);
+      setTempoRestante(0);
+    }
+
     setCronometroExecucao({
       exercicioId,
       tempo: 0,
     });
+
+    setExercicioAtivo(exercicio);
+    setCronometroModalType("execucao");
+    setShowCronometroModal(true);
   };
 
   // ✅ NOVO - Cancelar execução
@@ -358,6 +376,8 @@ export default function TreinoDetalhesPage() {
       exercicioId: null,
       tempo: 0,
     });
+    setShowCronometroModal(false);
+    setExercicioAtivo(null);
   };
 
   // ✅ NOVO - Concluir série
@@ -365,28 +385,28 @@ export default function TreinoDetalhesPage() {
     const restantes = seriesRestantes[exercicioId];
 
     if (restantes > 1) {
-      // Diminui série
       setSeriesRestantes((prev) => ({
         ...prev,
         [exercicioId]: restantes - 1,
       }));
 
-      // Para cronômetro de execução
       setCronometroExecucao({
         exercicioId: null,
         tempo: 0,
       });
 
-      // Inicia descanso automaticamente
       const segundos = parseTempoDescanso(exercicio.descanso);
       if (segundos > 0) {
         setCronometroAtivo(exercicioId);
         setTempoRestante(segundos);
+        setExercicioAtivo(exercicio);
+        setCronometroModalType("descanso");
+      } else {
+        setShowCronometroModal(false);
       }
 
       showToast(`✅ Série concluída! ${restantes - 1}x restantes`, "success");
     } else {
-      // Última série - marca como concluído
       setSeriesRestantes((prev) => ({
         ...prev,
         [exercicioId]: 0,
@@ -397,12 +417,31 @@ export default function TreinoDetalhesPage() {
         tempo: 0,
       });
 
+      setShowCronometroModal(false);
       toggleExercicioConcluido(exercicioId);
       showToast(`🎉 Exercício ${exercicio.nome} completo!`, "success");
     }
   };
 
-  // ✅ NOVO - Resetar séries de um exercício
+  // ✅ NOVO - Pular descanso e iniciar próxima série
+  const pularDescanso = () => {
+    if (!exercicioAtivo) return;
+
+    setCronometroAtivo(null);
+    setTempoRestante(0);
+
+    iniciarCronometroExecucao(exercicioAtivo.id, exercicioAtivo);
+  };
+
+  // ✅ NOVO - Fechar modal de cronômetro
+  const fecharCronometroModal = () => {
+    setShowCronometroModal(false);
+    setCronometroExecucao({ exercicioId: null, tempo: 0 });
+    setCronometroAtivo(null);
+    setTempoRestante(0);
+    setExercicioAtivo(null);
+  };
+
   const resetarSeries = (exercicioId: string, seriesOriginais: number) => {
     setSeriesRestantes((prev) => ({
       ...prev,
@@ -847,7 +886,6 @@ export default function TreinoDetalhesPage() {
                     </div>
 
                     <div className={styles.cardGrid}>
-                      {/* ✅ NOVO - Card de Séries com Cronômetro */}
                       <div
                         className={`${styles.cardItem} ${styles.cardItemSeries}`}
                       >
@@ -881,7 +919,9 @@ export default function TreinoDetalhesPage() {
                             </span>
                             <button
                               className={styles.btnIniciarSerie}
-                              onClick={() => iniciarCronometroExecucao(ex.id)}
+                              onClick={() =>
+                                iniciarCronometroExecucao(ex.id, ex)
+                              }
                               title="Iniciar série"
                             >
                               <Play size={14} />
@@ -897,9 +937,22 @@ export default function TreinoDetalhesPage() {
                             )}
                           </div>
                         ) : (
-                          <span className={styles.serieCompleta}>
-                            ✓ Completo
-                          </span>
+                          <div className={styles.serieCompleta}>
+                            <span className={styles.serieCompletaText}>
+                              ✓ Completo
+                            </span>
+                            <button
+                              className={styles.btnDesfazer}
+                              onClick={() => {
+                                resetarSeries(ex.id, ex.series);
+                                toggleExercicioConcluido(ex.id);
+                                showToast("↩️ Exercício desmarcado!", "info");
+                              }}
+                              title="Desfazer"
+                            >
+                              ↩️
+                            </button>
+                          </div>
                         )}
                       </div>
 
@@ -954,7 +1007,6 @@ export default function TreinoDetalhesPage() {
           </>
         )}
 
-        {/* RESTO DOS MODAIS E HISTÓRICO CONTINUAM IGUAIS... */}
         {execucoes.length > 0 && (
           <div className={styles.historicoContainer}>
             <h2 className={styles.historicoTitle}>📊 Histórico de Execuções</h2>
@@ -1030,8 +1082,439 @@ export default function TreinoDetalhesPage() {
           </div>
         )}
 
-        {/* TODOS OS MODAIS (foto, registro, editar, detalhes, confirmar, toast) continuam iguais */}
-        {/* ... (código dos modais omitido para brevidade) */}
+        {/* ✅ MODAL DE CRONÔMETRO EM DESTAQUE */}
+        {showCronometroModal && exercicioAtivo && (
+          <div className={styles.cronometroModalOverlay}>
+            <div className={styles.cronometroModalContent}>
+              <button
+                className={styles.cronometroModalClose}
+                onClick={fecharCronometroModal}
+              >
+                <X size={24} />
+              </button>
+
+              <div className={styles.cronometroModalHeader}>
+                <h3>{exercicioAtivo.nome}</h3>
+                <span className={styles.cronometroModalTipo}>
+                  {cronometroModalType === "execucao"
+                    ? "⏱️ Executando Série"
+                    : "😮‍💨 Descanso"}
+                </span>
+              </div>
+
+              <div
+                className={`${styles.cronometroModalTimer} ${
+                  cronometroModalType === "execucao"
+                    ? styles.timerExecucao
+                    : styles.timerDescanso
+                }`}
+              >
+                {cronometroModalType === "execucao"
+                  ? formatarTempo(cronometroExecucao.tempo)
+                  : formatarTempo(tempoRestante)}
+              </div>
+
+              {cronometroModalType === "execucao" ? (
+                <>
+                  <div className={styles.cronometroModalInfo}>
+                    <span>
+                      Séries restantes:{" "}
+                      <strong>{seriesRestantes[exercicioAtivo.id]}x</strong>
+                    </span>
+                    <span>
+                      Repetições: <strong>{exercicioAtivo.reps}</strong>
+                    </span>
+                    {exercicioAtivo.carga && (
+                      <span>
+                        Carga: <strong>{exercicioAtivo.carga}</strong>
+                      </span>
+                    )}
+                  </div>
+
+                  <div className={styles.cronometroModalActions}>
+                    <button
+                      className={styles.btnModalCancelar}
+                      onClick={cancelarExecucao}
+                    >
+                      ✕ Cancelar
+                    </button>
+                    <button
+                      className={styles.btnModalConcluir}
+                      onClick={() =>
+                        concluirSerie(exercicioAtivo.id, exercicioAtivo)
+                      }
+                    >
+                      ✓ Concluir Série
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className={styles.cronometroModalInfo}>
+                    <span>
+                      Próxima série:{" "}
+                      <strong>{seriesRestantes[exercicioAtivo.id]}x</strong>
+                    </span>
+                  </div>
+
+                  <div className={styles.cronometroModalActions}>
+                    <button
+                      className={styles.btnModalPular}
+                      onClick={pularDescanso}
+                    >
+                      ⏭️ Pular Descanso
+                    </button>
+                    <button
+                      className={styles.btnModalFechar}
+                      onClick={fecharCronometroModal}
+                    >
+                      ⏸️ Pausar Treino
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* MODAL - FOTO DO EXERCÍCIO */}
+        {selectedEx && selectedEx.fotoExecucao && (
+          <div className={styles.modalOverlay} onClick={closeModal}>
+            <div
+              className={styles.modalContent}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button className={styles.modalClose} onClick={closeModal}>
+                <X size={24} />
+              </button>
+              <div className={styles.modalImageContainer}>
+                <Image
+                  src={selectedEx.fotoExecucao}
+                  alt={`Execução de ${selectedEx.nome}`}
+                  fill
+                  className={styles.modalImage}
+                  sizes="(max-width: 768px) 90vw, 80vw"
+                />
+              </div>
+              <p className={styles.modalTitle}>{selectedEx.nome}</p>
+            </div>
+          </div>
+        )}
+
+        {/* MODAL - REGISTRAR EXECUÇÃO */}
+        {showRegistroModal && (
+          <div className={styles.modalOverlay} onClick={closeRegistroModal}>
+            <div
+              className={styles.registroModal}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                className={styles.modalClose}
+                onClick={closeRegistroModal}
+              >
+                <X size={24} />
+              </button>
+
+              <h2 className={styles.registroTitle}>
+                ✅ Registrar Execução do Treino
+              </h2>
+
+              <div className={styles.registroForm}>
+                <label className={styles.formLabel}>Data e Hora *</label>
+                <input
+                  type="datetime-local"
+                  className={styles.formInput}
+                  value={dataExecucao}
+                  onChange={(e) => setDataExecucao(e.target.value)}
+                />
+
+                <label className={styles.formLabel}>
+                  Como foi a intensidade do treino? *
+                </label>
+                <div className={styles.intensidadeGrid}>
+                  {["LEVE", "MODERADO", "PESADO", "MUITO_PESADO"].map(
+                    (nivel) => {
+                      const { emoji, text } = getIntensidadeLabel(nivel);
+                      return (
+                        <button
+                          key={nivel}
+                          type="button"
+                          className={`${styles.intensidadeBtn} ${
+                            intensidade === nivel ? styles.selected : ""
+                          }`}
+                          onClick={() => setIntensidade(nivel)}
+                        >
+                          <span className={styles.intensidadeEmoji}>
+                            {emoji}
+                          </span>
+                          <span className={styles.intensidadeText}>{text}</span>
+                        </button>
+                      );
+                    }
+                  )}
+                </div>
+
+                <label className={styles.formLabel}>
+                  Observações (opcional)
+                </label>
+                <textarea
+                  className={styles.formTextarea}
+                  placeholder="Como você se sentiu durante o treino? Alguma dificuldade?"
+                  value={observacoes}
+                  onChange={(e) => setObservacoes(e.target.value)}
+                  rows={4}
+                />
+
+                <div className={styles.registroActions}>
+                  <button
+                    type="button"
+                    className={styles.btnCancelar}
+                    onClick={closeRegistroModal}
+                    disabled={salvando}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.btnSalvar}
+                    onClick={handleRegistrarExecucao}
+                    disabled={salvando || !intensidade}
+                  >
+                    {salvando ? "Salvando..." : "Registrar Treino"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* MODAL - EDITAR EXECUÇÃO */}
+        {showEditModal && execucaoEditando && (
+          <div className={styles.modalOverlay} onClick={closeEditModal}>
+            <div
+              className={styles.registroModal}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button className={styles.modalClose} onClick={closeEditModal}>
+                <X size={24} />
+              </button>
+
+              <h2 className={styles.registroTitle}>✏️ Editar Execução</h2>
+
+              <div className={styles.registroForm}>
+                <label className={styles.formLabel}>Data e Hora *</label>
+                <input
+                  type="datetime-local"
+                  className={styles.formInput}
+                  value={editData}
+                  onChange={(e) => setEditData(e.target.value)}
+                />
+
+                <label className={styles.formLabel}>Intensidade *</label>
+                <div className={styles.intensidadeGrid}>
+                  {["LEVE", "MODERADO", "PESADO", "MUITO_PESADO"].map(
+                    (nivel) => {
+                      const { emoji, text } = getIntensidadeLabel(nivel);
+                      return (
+                        <button
+                          key={nivel}
+                          type="button"
+                          className={`${styles.intensidadeBtn} ${
+                            editIntensidade === nivel ? styles.selected : ""
+                          }`}
+                          onClick={() => setEditIntensidade(nivel)}
+                        >
+                          <span className={styles.intensidadeEmoji}>
+                            {emoji}
+                          </span>
+                          <span className={styles.intensidadeText}>{text}</span>
+                        </button>
+                      );
+                    }
+                  )}
+                </div>
+
+                <label className={styles.formLabel}>
+                  Exercícios Realizados
+                </label>
+                <div className={styles.editExerciciosList}>
+                  {detalhes?.exercicios.map((ex, index) => {
+                    const isSelecionado = editExerciciosSelecionados.has(ex.id);
+                    return (
+                      <div
+                        key={ex.id}
+                        className={`${styles.editExercicioItem} ${
+                          isSelecionado ? styles.selecionado : ""
+                        }`}
+                        onClick={() => toggleEditExercicio(ex.id)}
+                      >
+                        <div className={styles.editExercicioCheck}>
+                          {isSelecionado ? (
+                            <Check size={18} className={styles.checkIcon} />
+                          ) : (
+                            <div className={styles.checkboxEmpty} />
+                          )}
+                        </div>
+                        <div className={styles.editExercicioInfo}>
+                          <span className={styles.editExercicioNum}>
+                            {index + 1}
+                          </span>
+                          <span className={styles.editExercicioNome}>
+                            {ex.nome}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <label className={styles.formLabel}>Observações</label>
+                <textarea
+                  className={styles.formTextarea}
+                  placeholder="Como você se sentiu durante o treino?"
+                  value={editObservacoes}
+                  onChange={(e) => setEditObservacoes(e.target.value)}
+                  rows={4}
+                />
+
+                <div className={styles.registroActions}>
+                  <button
+                    type="button"
+                    className={styles.btnCancelar}
+                    onClick={closeEditModal}
+                    disabled={salvandoEdit}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.btnSalvar}
+                    onClick={handleEditarExecucao}
+                    disabled={salvandoEdit || !editIntensidade}
+                  >
+                    {salvandoEdit ? "Salvando..." : "Salvar Alterações"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* MODAL - VER DETALHES DA EXECUÇÃO */}
+        {showVerDetalhesModal && execucaoDetalhes && (
+          <div className={styles.modalOverlay} onClick={closeVerDetalhesModal}>
+            <div
+              className={styles.detalhesModal}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className={styles.detalhesModalHeader}>
+                <h2 className={styles.registroTitle}>
+                  📋 Detalhes da Execução
+                </h2>
+                <button
+                  className={styles.modalCloseDetalhes}
+                  onClick={closeVerDetalhesModal}
+                >
+                  <X size={24} />
+                </button>
+              </div>
+
+              <div className={styles.detalhesContent}>
+                <div className={styles.detalhesHeader}>
+                  <span className={styles.detalhesData}>
+                    📅{" "}
+                    {new Date(execucaoDetalhes.data).toLocaleDateString(
+                      "pt-BR",
+                      {
+                        day: "2-digit",
+                        month: "long",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      }
+                    )}
+                  </span>
+                  <div className={styles.detalhesBadges}>
+                    {execucaoDetalhes.completo && (
+                      <span className={styles.completoBadge}>✓ Completo</span>
+                    )}
+                    <span className={styles.intensidadeBadge}>
+                      {getIntensidadeLabel(execucaoDetalhes.intensidade).emoji}{" "}
+                      {getIntensidadeLabel(execucaoDetalhes.intensidade).text}
+                    </span>
+                  </div>
+                </div>
+
+                <div className={styles.detalhesExercicios}>
+                  <h3>Exercícios Realizados:</h3>
+                  <div className={styles.exerciciosDetalhes}>
+                    {execucaoDetalhes.exercicios &&
+                    execucaoDetalhes.exercicios.length > 0 ? (
+                      execucaoDetalhes.exercicios.map((ex, index) => (
+                        <div key={ex.id} className={styles.exercicioDetalhe}>
+                          <span className={styles.exercicioNumero}>
+                            {index + 1}
+                          </span>
+                          <div className={styles.exercicioInfo}>
+                            <strong>{ex.exercicioNome}</strong>
+                            <span>
+                              {ex.series}x{ex.repeticoes}{" "}
+                              {ex.carga && `• ${ex.carga}`}
+                            </span>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className={styles.semExercicios}>
+                        Nenhum exercício específico foi registrado.
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {execucaoDetalhes.observacoes && (
+                  <div className={styles.detalhesObs}>
+                    <h4>Observações:</h4>
+                    <p>{execucaoDetalhes.observacoes}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* MODAL DE CONFIRMAÇÃO */}
+        {showConfirmModal && (
+          <div
+            className={styles.modalOverlay}
+            onClick={() => setShowConfirmModal(false)}
+          >
+            <div
+              className={styles.confirmModal}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className={styles.confirmIcon}>
+                <AlertTriangle size={48} />
+              </div>
+              <h3 className={styles.confirmTitle}>Confirmar Exclusão</h3>
+              <p className={styles.confirmMessage}>{confirmMessage}</p>
+              <div className={styles.confirmActions}>
+                <button
+                  className={styles.confirmBtnCancel}
+                  onClick={() => setShowConfirmModal(false)}
+                >
+                  Cancelar
+                </button>
+                <button
+                  className={styles.confirmBtnConfirm}
+                  onClick={handleConfirm}
+                >
+                  Confirmar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {toast.show && (
           <div className={`${styles.toast} ${styles[toast.type]}`}>
