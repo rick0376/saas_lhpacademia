@@ -95,7 +95,6 @@ export default function TreinoDetalhesPage() {
   const [editObservacoes, setEditObservacoes] = useState("");
   const [editData, setEditData] = useState("");
   const [salvandoEdit, setSalvandoEdit] = useState(false);
-  // ✅ NOVO - Estado para exercícios sendo editados
   const [editExerciciosSelecionados, setEditExerciciosSelecionados] = useState<
     Set<string>
   >(new Set());
@@ -220,15 +219,21 @@ export default function TreinoDetalhesPage() {
     }
   };
 
+  // ✅ CORRIGIDO - Force no-cache
   const fetchExecucoes = async (treinoId: string) => {
     try {
       const response = await fetch(`/api/alunos/treinos/${treinoId}/execucao`, {
         credentials: "include",
         cache: "no-store",
+        headers: {
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+        },
       });
 
       if (response.ok) {
         const data = await response.json();
+        console.log("📥 Execuções atualizadas:", data);
         setExecucoes(data);
       }
     } catch (err) {
@@ -269,7 +274,6 @@ export default function TreinoDetalhesPage() {
     });
   };
 
-  // ✅ NOVO - Toggle para edição
   const toggleEditExercicio = (exercicioId: string) => {
     setEditExerciciosSelecionados((prev) => {
       const newSet = new Set(prev);
@@ -413,8 +417,8 @@ export default function TreinoDetalhesPage() {
     }
   };
 
-  // ✅ ATUALIZADO - Carrega exercícios executados
-  const openEditModal = (execucao: Execucao) => {
+  // ✅ CORRIGIDO - Busca dados frescos da API
+  const openEditModal = async (execucao: Execucao) => {
     setExecucaoEditando(execucao);
     setEditIntensidade(execucao.intensidade);
     setEditObservacoes(execucao.observacoes || "");
@@ -427,31 +431,66 @@ export default function TreinoDetalhesPage() {
     const minutes = String(dataObj.getMinutes()).padStart(2, "0");
     setEditData(`${year}-${month}-${day}T${hours}:${minutes}`);
 
-    // ✅ Carrega exercícios executados
-    if (execucao.exercicios && execucao.exercicios.length > 0) {
-      const nomesExecutados = execucao.exercicios.map((e) => e.exercicioNome);
-      const idsExecutados =
-        detalhes?.exercicios
-          .filter((ex) => nomesExecutados.includes(ex.nome))
-          .map((ex) => ex.id) || [];
-      setEditExerciciosSelecionados(new Set(idsExecutados));
-    } else {
+    // ✅ BUSCA DADOS FRESCOS DA API SEMPRE
+    try {
+      const response = await fetch(`/api/alunos/treinos/${id}/execucao`, {
+        credentials: "include",
+        cache: "no-store",
+        headers: {
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+        },
+      });
+
+      if (response.ok) {
+        const todasExecucoes = await response.json();
+        const execucaoAtualizada = todasExecucoes.find(
+          (e: Execucao) => e.id === execucao.id
+        );
+
+        if (
+          execucaoAtualizada?.exercicios &&
+          execucaoAtualizada.exercicios.length > 0
+        ) {
+          const nomesExecutados = execucaoAtualizada.exercicios.map(
+            (e: ExercicioExecutado) => e.exercicioNome
+          );
+          const idsExecutados =
+            detalhes?.exercicios
+              .filter((ex) => nomesExecutados.includes(ex.nome))
+              .map((ex) => ex.id) || [];
+
+          console.log("✅ Exercícios marcados da API:", idsExecutados);
+          setEditExerciciosSelecionados(new Set(idsExecutados));
+        } else {
+          console.log("✅ Nenhum exercício marcado");
+          setEditExerciciosSelecionados(new Set());
+        }
+      }
+    } catch (error) {
+      console.error("❌ Erro ao buscar dados:", error);
       setEditExerciciosSelecionados(new Set());
     }
 
+    // ✅ Aguarda um frame antes de abrir
+    await new Promise((resolve) => setTimeout(resolve, 50));
     setShowEditModal(true);
   };
 
+  // ✅ CORRIGIDO - Limpa com delay
   const closeEditModal = () => {
     setShowEditModal(false);
-    setExecucaoEditando(null);
-    setEditIntensidade("");
-    setEditObservacoes("");
-    setEditData("");
-    setEditExerciciosSelecionados(new Set()); // ✅ Limpa
+
+    setTimeout(() => {
+      setExecucaoEditando(null);
+      setEditIntensidade("");
+      setEditObservacoes("");
+      setEditData("");
+      setEditExerciciosSelecionados(new Set());
+    }, 300);
   };
 
-  // ✅ ATUALIZADO - Envia exercícios atualizados
+  // ✅ CORRIGIDO - Aguarda reload
   const handleEditarExecucao = async () => {
     if (!editIntensidade) {
       showToast("⚠️ Selecione a intensidade do treino!", "warning");
@@ -474,7 +513,7 @@ export default function TreinoDetalhesPage() {
           intensidade: editIntensidade,
           observacoes: editObservacoes || null,
           data: editData,
-          exerciciosRealizadosIds: Array.from(editExerciciosSelecionados), // ✅ ENVIA EXERCÍCIOS
+          exerciciosRealizadosIds: Array.from(editExerciciosSelecionados),
         }),
       });
 
@@ -482,9 +521,11 @@ export default function TreinoDetalhesPage() {
         throw new Error("Erro ao editar execução");
       }
 
+      // ✅ AGUARDA RECARREGAR
       await fetchExecucoes(id);
-      closeEditModal();
+      await new Promise((resolve) => setTimeout(resolve, 200));
 
+      closeEditModal();
       showToast("✅ Execução editada com sucesso!", "success");
     } catch (err: any) {
       showToast("❌ Erro ao editar: " + err.message, "error");
@@ -917,7 +958,7 @@ export default function TreinoDetalhesPage() {
           </div>
         )}
 
-        {/* ✅ MODAL - EDITAR COM LISTA DE EXERCÍCIOS */}
+        {/* MODAL - EDITAR */}
         {showEditModal && execucaoEditando && (
           <div className={styles.modalOverlay} onClick={closeEditModal}>
             <div
@@ -963,7 +1004,6 @@ export default function TreinoDetalhesPage() {
                   )}
                 </div>
 
-                {/* ✅ LISTA DE EXERCÍCIOS PARA EDITAR */}
                 <label className={styles.formLabel}>
                   Exercícios Realizados
                 </label>

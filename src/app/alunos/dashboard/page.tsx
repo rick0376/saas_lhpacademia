@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { Aluno } from "@/types";
 import { AlunoLayout } from "@/components/alunos/AlunoLayout";
 import styles from "./styles.module.scss";
+import { Toast } from "@/components/ui/Toast/Toast";
+
 import {
   User,
   Heart,
@@ -13,15 +15,21 @@ import {
   Dumbbell,
   Calendar,
   CheckCircle,
-  Clock,
   TrendingUp,
+  ChevronDown,
+  ChevronUp,
+  Edit,
 } from "lucide-react";
+import { Modal } from "@/components/ui/Modal/Modal";
+import { Button } from "@/components/ui/Button/Button";
 
+// ✅ INTERFACES COMPLETAS
 interface ExecucaoTreino {
   id: string;
   data: Date;
-  duracao: number | null;
+  intensidade: string;
   observacoes: string | null;
+  completo: boolean;
   treino: {
     id: string;
     nome: string;
@@ -30,10 +38,10 @@ interface ExecucaoTreino {
   exerciciosCompletados: number;
   exercicios: Array<{
     nome: string;
-    grupoMuscular: string;
     series: number;
     repeticoes: string;
     carga: string | null;
+    observacoes: string | null;
   }>;
 }
 
@@ -50,7 +58,7 @@ interface AlunoData {
   proximoTreino?: {
     data: string;
   } | null;
-  ultimasExecucoes?: ExecucaoTreino[]; // ✅ NOVO
+  ultimasExecucoes?: ExecucaoTreino[];
   name?: string;
 }
 
@@ -72,67 +80,75 @@ export default function AlunoDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    console.log("useEffect mount/trigger:", { status, hasSession: !!session });
+  // ✅ Estados para expansão e edição
+  const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
+  const [editingExecucao, setEditingExecucao] = useState<ExecucaoTreino | null>(
+    null
+  );
+  const [modalEditOpen, setModalEditOpen] = useState(false);
+  const [treinoExerciciosDisponiveis, setTreinoExerciciosDisponiveis] =
+    useState<any[]>([]);
+  const [loadingTreino, setLoadingTreino] = useState(false);
 
+  // ✅ NOVO - Toast
+  const [toast, setToast] = useState<{
+    show: boolean;
+    message: string;
+    type: "success" | "error" | "info" | "warning";
+  }>({
+    show: false,
+    message: "",
+    type: "success",
+  });
+
+  // ✅ NOVO - Função para mostrar toast
+  const showToast = (
+    message: string,
+    type: "success" | "error" | "info" | "warning" = "success"
+  ) => {
+    setToast({ show: true, message, type });
+  };
+
+  useEffect(() => {
     if (status === "loading") {
-      console.log("Session loading - show loading");
       setLoading(true);
       return;
     }
 
     if (!session) {
-      console.log("No session - redirect to login");
       router.push("/alunos/login");
       return;
     }
 
     const user = session?.user as CustomUser;
     const alunoId = user?.aluno?.id;
-    console.log("Session user/alunoId:", { userId: user?.id, alunoId });
 
     if (!alunoId) {
-      console.log("No alunoId - set error state");
       setError("Usuário sem dados de aluno");
       setLoading(false);
       return;
     }
 
-    console.log("Starting fetch for alunoId:", alunoId);
     fetchAlunoData(alunoId);
-  }, [status, session?.user?.id]);
+  }, [status, session, router]);
 
   const fetchAlunoData = async (alunoId: string) => {
-    console.log("fetchAlunoData called with:", alunoId);
     setLoading(true);
     setError("");
 
     try {
       const url = `/api/alunos/dashboard?alunoId=${alunoId}`;
-      console.log("Fetching URL:", url);
-
       const response = await fetch(url, {
         method: "GET",
         credentials: "include",
         cache: "no-store",
       });
 
-      console.log("API Response:", {
-        ok: response.ok,
-        status: response.status,
-      });
-
       if (!response.ok) {
-        console.error(
-          "API Error details:",
-          response.status,
-          response.statusText
-        );
         throw new Error(`Erro ao carregar dados: ${response.status}`);
       }
 
       const data = await response.json();
-      console.log("API Data received (raw):", data);
 
       if (!data) {
         throw new Error("Resposta vazia da API");
@@ -147,29 +163,19 @@ export default function AlunoDashboard() {
         ultimaMedida: data.ultimaMedida || null,
         avaliacoes: data.avaliacoes || 0,
         proximoTreino: data.proximoTreino || null,
-        ultimasExecucoes: data.ultimasExecucoes || [], // ✅ NOVO
+        ultimasExecucoes: data.ultimasExecucoes || [],
       };
 
-      console.log("Adjusted data for set:", adjustedData);
-
       setAlunoData(adjustedData);
-      console.log("setAlunoData called with:", adjustedData.nome);
     } catch (err: any) {
       const msg = err.message || "Erro ao carregar seus dados";
       setError(msg);
-      console.error("Fetch error full:", err);
     } finally {
       setLoading(false);
-      console.log(
-        "fetch finally: loading=false, error=",
-        !!error,
-        "alunoData=",
-        !!alunoData
-      );
     }
   };
 
-  // ✅ NOVO - Formatadores de data
+  // ✅ FORMATADORES
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat("pt-BR", {
       day: "2-digit",
@@ -200,24 +206,134 @@ export default function AlunoDashboard() {
     return formatDate(execDate);
   };
 
-  const formatDuracao = (minutos: number | null) => {
-    if (!minutos) return "Não registrado";
-    if (minutos < 60) return `${minutos}min`;
-    const horas = Math.floor(minutos / 60);
-    const mins = minutos % 60;
-    return `${horas}h${mins > 0 ? ` ${mins}min` : ""}`;
+  const getIntensidadeLabel = (intensidade: string) => {
+    const labels: Record<string, { label: string; color: string }> = {
+      LEVE: { label: "Leve", color: "#10b981" },
+      MODERADO: { label: "Moderado", color: "#3b82f6" },
+      PESADO: { label: "Pesado", color: "#f59e0b" },
+      MUITO_PESADO: { label: "Muito Pesado", color: "#ef4444" },
+    };
+    return labels[intensidade] || { label: intensidade, color: "#6b7280" };
   };
 
-  console.log("Render cycle:", {
-    status,
-    loading,
-    error,
-    hasAlunoData: !!alunoData,
-    dataNome: alunoData?.nome,
-  });
+  // ✅ HANDLERS
+  const toggleExpand = (id: string) => {
+    setExpandedCards((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
 
+  // ✅ Abrir modal de edição
+  const handleOpenEdit = async (execucao: ExecucaoTreino) => {
+    setEditingExecucao(execucao);
+    setModalEditOpen(true);
+
+    // Busca os exercícios disponíveis do treino
+    setLoadingTreino(true);
+    try {
+      const response = await fetch(`/api/treinos/${execucao.treino.id}`);
+      if (response.ok) {
+        const treino = await response.json();
+        setTreinoExerciciosDisponiveis(treino.exercicios || []);
+      }
+    } catch (error) {
+      console.error("Erro ao carregar treino:", error);
+    } finally {
+      setLoadingTreino(false);
+    }
+  };
+
+  // ✅ Adicionar exercício
+  const handleAddExercicio = (exercicio: any) => {
+    if (!editingExecucao) return;
+
+    const novoExercicio = {
+      nome: exercicio.exercicio.nome,
+      series: exercicio.series,
+      repeticoes: exercicio.repeticoes,
+      carga: exercicio.carga || null,
+      observacoes: null,
+    };
+
+    setEditingExecucao({
+      ...editingExecucao,
+      exercicios: [...editingExecucao.exercicios, novoExercicio],
+      exerciciosCompletados: editingExecucao.exercicios.length + 1,
+    });
+  };
+
+  // ✅ Remover exercício
+  const handleRemoveExercicio = (index: number) => {
+    if (!editingExecucao) return;
+
+    const novosExercicios = editingExecucao.exercicios.filter(
+      (_, i) => i !== index
+    );
+
+    setEditingExecucao({
+      ...editingExecucao,
+      exercicios: novosExercicios,
+      exerciciosCompletados: novosExercicios.length,
+    });
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingExecucao) return;
+
+    try {
+      const response = await fetch(
+        `/api/alunos/execucoes/${editingExecucao.id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            intensidade: editingExecucao.intensidade,
+            observacoes: editingExecucao.observacoes,
+            completo: editingExecucao.completo,
+            data: editingExecucao.data,
+            exercicios: editingExecucao.exercicios,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        setModalEditOpen(false);
+        setEditingExecucao(null);
+        setTreinoExerciciosDisponiveis([]);
+
+        setToast({
+          show: true,
+          message: "✅ Treino atualizado com sucesso!",
+          type: "success",
+        });
+
+        const user = session?.user as CustomUser;
+        const alunoId = user?.aluno?.id;
+        if (alunoId) {
+          await fetchAlunoData(alunoId);
+        }
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Erro ao salvar");
+      }
+    } catch (error: any) {
+      console.error("Erro ao salvar:", error);
+      setToast({
+        show: true,
+        message: `❌ ${error.message || "Erro ao salvar alterações"}`,
+        type: "error",
+      });
+    }
+  };
+
+  // ✅ RENDERS CONDICIONAIS
   if (status === "loading" || loading) {
-    console.log("Rendering LOADING (session or fetch)");
     return (
       <div className={styles.loadingContainer}>
         <div className={styles.spinner} />
@@ -227,7 +343,6 @@ export default function AlunoDashboard() {
   }
 
   if (error) {
-    console.log("Rendering ERROR:", error);
     return (
       <div className={styles.errorContainer}>
         <p className="text-red-500 mb-4">{error}</p>
@@ -246,7 +361,6 @@ export default function AlunoDashboard() {
   }
 
   if (!alunoData) {
-    console.log("Rendering EMPTY");
     return (
       <AlunoLayout>
         <div className={styles.emptyContainer}>
@@ -261,7 +375,7 @@ export default function AlunoDashboard() {
     );
   }
 
-  console.log("Rendering FULL DASHBOARD");
+  // ✅ RENDER PRINCIPAL
   return (
     <AlunoLayout>
       <div className={styles.container}>
@@ -363,60 +477,457 @@ export default function AlunoDashboard() {
           </div>
         </div>
 
-        {/* ✅ NOVO - Seção de Histórico de Treinos */}
+        {/* ✅ HISTÓRICO COM EXPANSÃO */}
         {alunoData.ultimasExecucoes &&
           alunoData.ultimasExecucoes.length > 0 && (
             <div className={styles.historicoSection}>
               <div className={styles.historicoHeader}>
                 <h2 className={styles.historicoTitle}>
                   <CheckCircle size={24} />
-                  Últimos Treinos Realizados
+                  Histórico de Treinos
                 </h2>
                 <span className={styles.historicoBadge}>
-                  {alunoData.ultimasExecucoes.length} treinos
+                  {alunoData.ultimasExecucoes.length} treinos realizados
                 </span>
               </div>
 
               <div className={styles.historicoGrid}>
-                {alunoData.ultimasExecucoes.map((execucao) => (
-                  <div key={execucao.id} className={styles.historicoCard}>
-                    <div className={styles.historicoCardHeader}>
-                      <div className={styles.historicoCardTitle}>
-                        <TrendingUp size={18} />
-                        <h3>{execucao.treino.nome}</h3>
-                      </div>
-                      <span className={styles.historicoCardDate}>
-                        {getRelativeDate(execucao.data)}
-                      </span>
-                    </div>
+                {alunoData.ultimasExecucoes.map((execucao) => {
+                  const intensidade = getIntensidadeLabel(execucao.intensidade);
+                  const isExpanded = expandedCards.has(execucao.id);
 
-                    <div className={styles.historicoCardBody}>
+                  return (
+                    <div key={execucao.id} className={styles.historicoCard}>
+                      {/* Header */}
+                      <div className={styles.historicoCardHeader}>
+                        <div className={styles.historicoCardTitleArea}>
+                          <div className={styles.historicoCardTitle}>
+                            <TrendingUp size={20} />
+                            <h3>{execucao.treino.nome}</h3>
+                          </div>
+                          {execucao.treino.objetivo && (
+                            <span className={styles.treinoObjetivo}>
+                              🎯 {execucao.treino.objetivo}
+                            </span>
+                          )}
+                        </div>
+                        <span className={styles.historicoCardDate}>
+                          {formatDateTime(execucao.data)}
+                        </span>
+                      </div>
+
+                      {/* Info Badges */}
                       <div className={styles.historicoCardInfo}>
-                        <Clock size={16} />
-                        <span>{formatDuracao(execucao.duracao)}</span>
+                        <div className={styles.infoBadge}>
+                          <TrendingUp size={16} />
+                          <span
+                            style={{
+                              color: intensidade.color,
+                              fontWeight: 700,
+                            }}
+                          >
+                            {intensidade.label}
+                          </span>
+                        </div>
+                        <div className={styles.infoBadge}>
+                          <Dumbbell size={16} />
+                          <span>
+                            {execucao.exerciciosCompletados} exercícios
+                          </span>
+                        </div>
+                        {execucao.completo && (
+                          <div
+                            className={styles.infoBadge}
+                            style={{ borderColor: "#10b981" }}
+                          >
+                            <CheckCircle size={16} color="#10b981" />
+                            <span style={{ color: "#10b981", fontWeight: 600 }}>
+                              Completo
+                            </span>
+                          </div>
+                        )}
                       </div>
-                      <div className={styles.historicoCardInfo}>
-                        <Dumbbell size={16} />
-                        <span>{execucao.exerciciosCompletados} exercícios</span>
+
+                      {/* ✅ Lista de Exercícios (Colapsável) */}
+                      {isExpanded && execucao.exercicios.length > 0 && (
+                        <div className={styles.exerciciosLista}>
+                          <h4 className={styles.exerciciosListaTitulo}>
+                            Exercícios Realizados:
+                          </h4>
+                          <div className={styles.exerciciosGrid}>
+                            {execucao.exercicios.map((ex, index) => (
+                              <div key={index} className={styles.exercicioItem}>
+                                <div className={styles.exercicioOrdem}>
+                                  {index + 1}
+                                </div>
+                                <div className={styles.exercicioContent}>
+                                  <div className={styles.exercicioNome}>
+                                    {ex.nome}
+                                  </div>
+                                  <div className={styles.exercicioDetalhes}>
+                                    <span className={styles.detalheItem}>
+                                      <strong>Séries:</strong> {ex.series}
+                                    </span>
+                                    <span className={styles.detalheSeparator}>
+                                      •
+                                    </span>
+                                    <span className={styles.detalheItem}>
+                                      <strong>Reps:</strong> {ex.repeticoes}
+                                    </span>
+                                    {ex.carga && (
+                                      <>
+                                        <span
+                                          className={styles.detalheSeparator}
+                                        >
+                                          •
+                                        </span>
+                                        <span className={styles.detalheItem}>
+                                          <strong>Carga:</strong> {ex.carga}
+                                        </span>
+                                      </>
+                                    )}
+                                  </div>
+                                  {ex.observacoes && (
+                                    <div className={styles.exercicioObs}>
+                                      💭 {ex.observacoes}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Observações Gerais */}
+                      {execucao.observacoes && (
+                        <div className={styles.historicoCardObs}>
+                          <strong>Observações do treino:</strong>
+                          <p>{execucao.observacoes}</p>
+                        </div>
+                      )}
+
+                      {/* ✅ Botões de Ação */}
+                      <div className={styles.historicoCardActions}>
+                        <button
+                          className={styles.actionButton}
+                          onClick={() => toggleExpand(execucao.id)}
+                        >
+                          {isExpanded ? (
+                            <>
+                              <ChevronUp size={18} />
+                              Ocultar Exercícios
+                            </>
+                          ) : (
+                            <>
+                              <ChevronDown size={18} />
+                              Ver Exercícios ({execucao.exerciciosCompletados})
+                            </>
+                          )}
+                        </button>
+
+                        <button
+                          className={styles.editButtonAction}
+                          onClick={() => handleOpenEdit(execucao)}
+                        >
+                          <Edit size={18} />
+                          Editar
+                        </button>
+                      </div>
+
+                      {/* Footer */}
+                      <div className={styles.historicoCardFooter}>
+                        <span className={styles.historicoCardTime}>
+                          {getRelativeDate(execucao.data)}
+                        </span>
                       </div>
                     </div>
-
-                    {execucao.observacoes && (
-                      <div className={styles.historicoCardObs}>
-                        💭 {execucao.observacoes}
-                      </div>
-                    )}
-
-                    <div className={styles.historicoCardFooter}>
-                      <span className={styles.historicoCardTime}>
-                        {formatDateTime(execucao.data)}
-                      </span>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}
+
+        {/* ✅ Modal de Edição */}
+        <Modal
+          isOpen={modalEditOpen}
+          onClose={() => {
+            setModalEditOpen(false);
+            setEditingExecucao(null);
+            setTreinoExerciciosDisponiveis([]);
+          }}
+          title="Editar Execução do Treino"
+          size="large"
+        >
+          {editingExecucao && (
+            <div className={styles.modalContent}>
+              {/* Header da Modal */}
+              <div className={styles.modalHeaderEdit}>
+                <div className={styles.modalHeaderInfo}>
+                  <TrendingUp size={24} className={styles.modalHeaderIcon} />
+                  <div>
+                    <h3>{editingExecucao.treino.nome}</h3>
+                    <p>{formatDateTime(editingExecucao.data)}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* ✅ NOVO - Campo de Data */}
+              <div className={styles.modalFieldEdit}>
+                <label className={styles.modalLabel}>
+                  <Calendar size={16} />
+                  Data e Hora da Execução
+                </label>
+                <input
+                  type="datetime-local"
+                  value={new Date(editingExecucao.data)
+                    .toISOString()
+                    .slice(0, 16)}
+                  onChange={(e) =>
+                    setEditingExecucao({
+                      ...editingExecucao,
+                      data: new Date(e.target.value),
+                    })
+                  }
+                  className={styles.inputDateTime}
+                />
+              </div>
+
+              <div className={styles.modalBodyEdit}>
+                {/* ✅ Seletor Visual de Intensidade */}
+                <div className={styles.modalFieldEdit}>
+                  <label className={styles.modalLabel}>
+                    Intensidade do Treino
+                  </label>
+                  <div className={styles.intensidadeSelector}>
+                    {[
+                      {
+                        value: "LEVE",
+                        label: "Leve",
+                        icon: "😊",
+                        color: "#10b981",
+                      },
+                      {
+                        value: "MODERADO",
+                        label: "Moderado",
+                        icon: "💪",
+                        color: "#3b82f6",
+                      },
+                      {
+                        value: "PESADO",
+                        label: "Pesado",
+                        icon: "🔥",
+                        color: "#f59e0b",
+                      },
+                      {
+                        value: "MUITO_PESADO",
+                        label: "Muito Pesado",
+                        icon: "⚡",
+                        color: "#ef4444",
+                      },
+                    ].map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        className={`${styles.intensidadeOption} ${
+                          editingExecucao.intensidade === option.value
+                            ? styles.intensidadeOptionActive
+                            : ""
+                        }`}
+                        style={{
+                          borderColor:
+                            editingExecucao.intensidade === option.value
+                              ? option.color
+                              : "#e2e8f0",
+                          backgroundColor:
+                            editingExecucao.intensidade === option.value
+                              ? `${option.color}15`
+                              : "white",
+                        }}
+                        onClick={() =>
+                          setEditingExecucao({
+                            ...editingExecucao,
+                            intensidade: option.value,
+                          })
+                        }
+                      >
+                        <span className={styles.intensidadeIcon}>
+                          {option.icon}
+                        </span>
+                        <span
+                          className={styles.intensidadeLabel}
+                          style={{
+                            color:
+                              editingExecucao.intensidade === option.value
+                                ? option.color
+                                : "#64748b",
+                          }}
+                        >
+                          {option.label}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Observações */}
+                <div className={styles.modalFieldEdit}>
+                  <label className={styles.modalLabel}>Observações</label>
+                  <textarea
+                    value={editingExecucao.observacoes || ""}
+                    onChange={(e) =>
+                      setEditingExecucao({
+                        ...editingExecucao,
+                        observacoes: e.target.value,
+                      })
+                    }
+                    className={styles.textareaEdit}
+                    rows={3}
+                    placeholder="Como foi o treino? Alguma observação importante..."
+                  />
+                </div>
+
+                {/* Checkbox Completo */}
+                <div className={styles.modalFieldEdit}>
+                  <label className={styles.checkboxLabelEdit}>
+                    <input
+                      type="checkbox"
+                      checked={editingExecucao.completo}
+                      onChange={(e) =>
+                        setEditingExecucao({
+                          ...editingExecucao,
+                          completo: e.target.checked,
+                        })
+                      }
+                    />
+                    <CheckCircle size={20} />
+                    <span>Treino completo</span>
+                  </label>
+                </div>
+
+                {/* ✅ Lista de Exercícios Realizados (Removíveis) */}
+                <div className={styles.exerciciosEditSection}>
+                  <div className={styles.exerciciosEditHeader}>
+                    <h4>
+                      <Dumbbell size={20} />
+                      Exercícios Realizados ({editingExecucao.exercicios.length}
+                      )
+                    </h4>
+                  </div>
+
+                  {editingExecucao.exercicios.length === 0 ? (
+                    <div className={styles.exerciciosEmpty}>
+                      <p>Nenhum exercício realizado</p>
+                    </div>
+                  ) : (
+                    <div className={styles.exerciciosEditList}>
+                      {editingExecucao.exercicios.map((ex, index) => (
+                        <div key={index} className={styles.exercicioEditCard}>
+                          <div className={styles.exercicioEditOrdem}>
+                            {index + 1}
+                          </div>
+                          <div className={styles.exercicioEditContent}>
+                            <div className={styles.exercicioEditNome}>
+                              {ex.nome}
+                            </div>
+                            <div className={styles.exercicioEditDetalhes}>
+                              {ex.series}x{ex.repeticoes}
+                              {ex.carga && ` - ${ex.carga}`}
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            className={styles.exercicioRemoveBtn}
+                            onClick={() => handleRemoveExercicio(index)}
+                            title="Remover exercício"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* ✅ Adicionar Exercícios do Treino */}
+                <div className={styles.exerciciosAddSection}>
+                  <div className={styles.exerciciosAddHeader}>
+                    <h4>➕ Adicionar Exercícios</h4>
+                    <p>Exercícios disponíveis no treino original</p>
+                  </div>
+
+                  {loadingTreino ? (
+                    <div className={styles.exerciciosLoading}>
+                      <div className={styles.spinner} />
+                      <span>Carregando exercícios...</span>
+                    </div>
+                  ) : treinoExerciciosDisponiveis.length === 0 ? (
+                    <div className={styles.exerciciosEmpty}>
+                      <p>Nenhum exercício disponível</p>
+                    </div>
+                  ) : (
+                    <div className={styles.exerciciosAddList}>
+                      {treinoExerciciosDisponiveis
+                        .filter(
+                          (te) =>
+                            !editingExecucao.exercicios.some(
+                              (e) => e.nome === te.exercicio.nome
+                            )
+                        )
+                        .map((te) => (
+                          <button
+                            key={te.id}
+                            type="button"
+                            className={styles.exercicioAddCard}
+                            onClick={() => handleAddExercicio(te)}
+                          >
+                            <div className={styles.exercicioAddIcon}>+</div>
+                            <div className={styles.exercicioAddContent}>
+                              <div className={styles.exercicioAddNome}>
+                                {te.exercicio.nome}
+                              </div>
+                              <div className={styles.exercicioAddDetalhes}>
+                                {te.series}x{te.repeticoes}
+                                {te.carga && ` - ${te.carga}`}
+                              </div>
+                            </div>
+                          </button>
+                        ))}
+
+                      {treinoExerciciosDisponiveis.every((te) =>
+                        editingExecucao.exercicios.some(
+                          (e) => e.nome === te.exercicio.nome
+                        )
+                      ) && (
+                        <div className={styles.exerciciosEmpty}>
+                          <p>✅ Todos os exercícios já foram adicionados</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className={styles.modalActionsEdit}>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setModalEditOpen(false);
+                    setEditingExecucao(null);
+                    setTreinoExerciciosDisponiveis([]);
+                  }}
+                >
+                  Cancelar
+                </Button>
+                <Button onClick={handleSaveEdit}>
+                  <CheckCircle size={18} />
+                  Salvar Alterações
+                </Button>
+              </div>
+            </div>
+          )}
+        </Modal>
 
         {/* Footer */}
         <div className={styles.footer}>
@@ -424,6 +935,14 @@ export default function AlunoDashboard() {
             💪 Continue evoluindo! Seu personal está com você.
           </p>
         </div>
+
+        {toast.show && (
+          <Toast
+            message={toast.message}
+            type={toast.type}
+            onClose={() => setToast({ ...toast, show: false })}
+          />
+        )}
       </div>
     </AlunoLayout>
   );

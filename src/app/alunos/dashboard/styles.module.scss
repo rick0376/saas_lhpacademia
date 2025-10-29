@@ -184,35 +184,8 @@
   font-style: italic;
 }
 
-// Mobile
-@media (max-width: 768px) {
-  .container {
-    padding: 0.5rem;
-  }
-
-  .header {
-    padding: 1rem;
-    margin-bottom: 1rem;
-  }
-
-  .userInfo {
-    flex-direction: column;
-    text-align: center;
-    gap: 0.5rem;
-  }
-
-  .cardsGrid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-
-  .card {
-    padding: 1rem;
-  }
-}
-
 // ========================================
-// SEÇÃO DE HISTÓRICO DE TREINOS
+// SEÇÃO DE HISTÓRICO DE TREINOS - COMPLETO
 // ========================================
 
 .historicoSection {
@@ -227,7 +200,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
   padding-bottom: 1rem;
   border-bottom: 2px solid #e2e8f0;
 }
@@ -257,14 +230,14 @@
 
 .historicoGrid {
   display: grid;
-  gap: 1.25rem;
+  gap: 1.5rem;
 }
 
 .historicoCard {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  background: linear-gradient(135deg, #fafbfc 0%, #f3f4f6 100%);
   border: 2px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 1.25rem;
+  border-radius: 16px;
+  padding: 1.5rem;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -274,7 +247,7 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 4px;
+    width: 5px;
     height: 100%;
     background: linear-gradient(180deg, #6366f1, #10b981);
     opacity: 0;
@@ -283,8 +256,8 @@
 
   &:hover {
     border-color: #6366f1;
-    box-shadow: 0 10px 25px -3px rgba(99, 102, 241, 0.2);
-    transform: translateY(-2px);
+    box-shadow: 0 12px 30px -5px rgba(99, 102, 241, 0.25);
+    transform: translateY(-3px);
 
     &::before {
       opacity: 1;
@@ -292,19 +265,24 @@
   }
 }
 
+// Header do Card
 .historicoCardHeader {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
   gap: 1rem;
+}
+
+.historicoCardTitleArea {
+  flex: 1;
 }
 
 .historicoCardTitle {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  flex: 1;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
 
   svg {
     color: #6366f1;
@@ -313,41 +291,55 @@
 
   h3 {
     margin: 0;
-    font-size: 1.125rem;
+    font-size: 1.375rem;
     font-weight: 700;
     color: #1e293b;
     line-height: 1.3;
   }
 }
 
+.treinoObjetivo {
+  display: inline-block;
+  font-size: 0.875rem;
+  color: #6366f1;
+  font-weight: 600;
+  background: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
 .historicoCardDate {
   background: white;
   color: #6366f1;
-  padding: 0.375rem 0.75rem;
-  border-radius: 8px;
-  font-size: 0.75rem;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  font-size: 0.875rem;
   font-weight: 600;
-  border: 1px solid #e2e8f0;
+  border: 2px solid #e2e8f0;
   white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.historicoCardBody {
+// Info Badges
+.historicoCardInfo {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
 }
 
-.historicoCardInfo {
+.infoBadge {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   background: white;
-  padding: 0.5rem 0.875rem;
-  border-radius: 8px;
+  padding: 0.625rem 1rem;
+  border-radius: 10px;
   font-size: 0.875rem;
   color: #475569;
-  border: 1px solid #e2e8f0;
+  border: 2px solid #e2e8f0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 
   svg {
     color: #6366f1;
@@ -359,44 +351,479 @@
   }
 }
 
-.intensidadeBadge {
-  font-weight: 700 !important;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-size: 0.75rem;
+// Lista de Exercícios
+.exerciciosLista {
+  background: white;
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  border: 2px solid #e2e8f0;
+  animation: slideDown 0.3s ease;
 }
 
-.historicoCardObs {
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.exerciciosListaTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &::before {
+    content: "📋";
+    font-size: 1.125rem;
+  }
+}
+
+.exerciciosGrid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.exercicioItem {
+  display: flex;
+  gap: 1rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  padding: 1rem;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #6366f1;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+    transform: translateX(4px);
+  }
+}
+
+.exercicioOrdem {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+  box-shadow: 0 4px 8px rgba(99, 102, 241, 0.3);
+}
+
+.exercicioContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.exercicioNome {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.exercicioDetalhes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.detalheItem {
+  strong {
+    color: #475569;
+    font-weight: 600;
+  }
+}
+
+.detalheSeparator {
+  color: #cbd5e1;
+  font-weight: 700;
+}
+
+.exercicioObs {
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.75rem;
   background: white;
   border-left: 3px solid #6366f1;
-  padding: 0.75rem;
   border-radius: 6px;
-  font-size: 0.875rem;
-  color: #475569;
-  line-height: 1.5;
-  margin-bottom: 0.75rem;
+  font-size: 0.8125rem;
+  color: #64748b;
   font-style: italic;
+  line-height: 1.5;
 }
 
+// Observações Gerais
+.historicoCardObs {
+  background: white;
+  border: 2px solid #fbbf24;
+  border-left-width: 4px;
+  padding: 1rem;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+
+  strong {
+    display: block;
+    color: #f59e0b;
+    font-weight: 700;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  p {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+}
+
+// ✅ NOVO - Botões de Ação
+.historicoCardActions {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding-top: 1rem;
+  border-top: 2px solid #e2e8f0;
+}
+
+.actionButton {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: white;
+  border: none;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(99, 102, 241, 0.2);
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    background: linear-gradient(135deg, #4f46e5, #4338ca);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.editButtonAction {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border: none;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    background: linear-gradient(135deg, #059669, #047857);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// Footer
 .historicoCardFooter {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 0.75rem;
-  border-top: 1px solid #e2e8f0;
 }
 
 .historicoCardTime {
-  font-size: 0.75rem;
-  color: #94a3b8;
-  font-weight: 500;
+  font-size: 0.875rem;
+  color: #6366f1;
+  font-weight: 600;
+  background: white;
+  padding: 0.375rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
 }
 
 // ========================================
-// RESPONSIVIDADE HISTÓRICO
+// MODAL DE EDIÇÃO
+// ========================================
+
+.modalContent {
+  padding: 0.5rem 0;
+}
+
+.modalHeader {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e2e8f0;
+
+  h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1e293b;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #64748b;
+  }
+}
+
+.modalBody {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.modalField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1e293b;
+  }
+}
+
+.select,
+.textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  background: white;
+
+  &:hover {
+    border-color: #cbd5e1;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  }
+}
+
+.select {
+  cursor: pointer;
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 100px;
+
+  &::placeholder {
+    color: #94a3b8;
+  }
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.75rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: #f1f5f9;
+  }
+
+  input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+  }
+
+  span {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1e293b;
+  }
+}
+// ✅ Input DateTime
+.inputDateTime {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 0.9375rem;
+  font-family: inherit;
+  font-weight: 600;
+  color: #1e293b;
+  background: white;
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  &:hover {
+    border-color: #cbd5e1;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+  }
+
+  // Remove setas do input number em alguns navegadores
+  &::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    filter: invert(0.5);
+    transition: filter 0.2s ease;
+
+    &:hover {
+      filter: invert(0.3);
+    }
+  }
+}
+
+// Ajuste no label com ícone
+.modalLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #1e293b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+
+  svg {
+    color: #6366f1;
+  }
+}
+// Lista de exercícios no modal
+.exerciciosEditList {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 1rem;
+  border: 2px solid #e2e8f0;
+
+  h4 {
+    margin: 0 0 1rem 0;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #1e293b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}
+
+.exercicioEditItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: white;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  border: 1px solid #e2e8f0;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.exercicioEditNome {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1e293b;
+  flex: 1;
+}
+
+.exercicioEditInfo {
+  font-size: 0.8125rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid #e2e8f0;
+  margin-top: 1rem;
+}
+
+// ========================================
+// RESPONSIVIDADE
 // ========================================
 
 @media (max-width: 768px) {
+  .container {
+    padding: 0.5rem;
+  }
+
+  .header {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .userInfo {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+
+  .cardsGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .card {
+    padding: 1rem;
+  }
+
   .historicoSection {
     padding: 1.5rem;
     margin-bottom: 1rem;
@@ -413,7 +840,7 @@
   }
 
   .historicoCard {
-    padding: 1rem;
+    padding: 1.25rem;
   }
 
   .historicoCardHeader {
@@ -425,22 +852,566 @@
     align-self: flex-start;
   }
 
-  .historicoCardBody {
+  .historicoCardInfo {
+    flex-direction: column;
+    width: 100%;
+
+    .infoBadge {
+      width: 100%;
+    }
+  }
+
+  .historicoCardActions {
+    flex-direction: column;
+
+    .actionButton,
+    .editButtonAction {
+      width: 100%;
+    }
+  }
+
+  .exerciciosLista {
+    padding: 1rem;
+  }
+
+  .exercicioItem {
     flex-direction: column;
     gap: 0.75rem;
   }
 
-  .historicoCardInfo {
-    width: 100%;
+  .exercicioOrdem {
+    align-self: flex-start;
+  }
+
+  .exercicioDetalhes {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.375rem;
+
+    .detalheSeparator {
+      display: none;
+    }
+  }
+
+  .exercicioEditItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
   }
 }
 
 @media (max-width: 480px) {
   .historicoCardTitle h3 {
-    font-size: 1rem;
+    font-size: 1.125rem;
   }
 
-  .historicoCardInfo {
+  .exercicioNome {
+    font-size: 0.9375rem;
+  }
+
+  .exercicioDetalhes {
     font-size: 0.8125rem;
+  }
+}
+
+// ========================================
+// MODAL DE EDIÇÃO MELHORADA
+// ========================================
+
+.modalHeaderEdit {
+  margin-bottom: 1.5rem;
+  padding: 1.25rem;
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.modalHeaderInfo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.modalHeaderIcon {
+  color: white;
+  flex-shrink: 0;
+}
+
+.modalHeaderEdit h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: white;
+}
+
+.modalHeaderEdit p {
+  margin: 0.25rem 0 0 0;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.modalBodyEdit {
+  display: grid;
+  gap: 1.5rem;
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: 0.5rem;
+}
+
+.modalFieldEdit {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.modalLabel {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #1e293b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+// ✅ Seletor Visual de Intensidade
+.intensidadeSelector {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+}
+
+.intensidadeOption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  border: 3px solid #e2e8f0;
+  border-radius: 12px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.1),
+      rgba(255, 255, 255, 0)
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+
+    &::before {
+      opacity: 1;
+    }
+  }
+
+  &:active {
+    transform: translateY(-2px);
+  }
+}
+
+.intensidadeOptionActive {
+  border-width: 3px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  transform: scale(1.05);
+
+  &:hover {
+    transform: scale(1.05) translateY(-4px);
+  }
+}
+
+.intensidadeIcon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.intensidadeLabel {
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: color 0.3s ease;
+}
+
+// ✅ Textarea Melhorado
+.textareaEdit {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  background: white;
+  resize: vertical;
+  min-height: 80px;
+
+  &:hover {
+    border-color: #cbd5e1;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+  }
+
+  &::placeholder {
+    color: #94a3b8;
+    font-style: italic;
+  }
+}
+
+// ✅ Checkbox com Ícone
+.checkboxLabelEdit {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  padding: 1rem 1.25rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    border-color: #10b981;
+    transform: translateX(4px);
+  }
+
+  input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: #10b981;
+  }
+
+  svg {
+    color: #10b981;
+    flex-shrink: 0;
+  }
+
+  span {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #1e293b;
+  }
+}
+
+// ✅ Seção de Exercícios Realizados
+.exerciciosEditSection {
+  background: linear-gradient(135deg, #fafbfc 0%, #f3f4f6 100%);
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.exerciciosEditHeader {
+  margin-bottom: 1rem;
+
+  h4 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    svg {
+      color: #6366f1;
+    }
+  }
+}
+
+.exerciciosEmpty {
+  text-align: center;
+  padding: 2rem;
+  color: #94a3b8;
+  font-style: italic;
+
+  p {
+    margin: 0;
+    font-size: 0.875rem;
+  }
+}
+
+.exerciciosEditList {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.exercicioEditCard {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #6366f1;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+    transform: translateX(4px);
+  }
+}
+
+.exercicioEditOrdem {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+  box-shadow: 0 4px 8px rgba(99, 102, 241, 0.3);
+}
+
+.exercicioEditContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.exercicioEditNome {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 0.25rem;
+  line-height: 1.4;
+}
+
+.exercicioEditDetalhes {
+  font-size: 0.8125rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.exercicioRemoveBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+
+  &:hover {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    transform: scale(1.1) rotate(90deg);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5);
+  }
+
+  &:active {
+    transform: scale(0.95) rotate(90deg);
+  }
+}
+
+// ✅ Seção de Adicionar Exercícios
+.exerciciosAddSection {
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  border: 2px solid #10b981;
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.exerciciosAddHeader {
+  margin-bottom: 1rem;
+
+  h4 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #065f46;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: #047857;
+  }
+}
+
+.exerciciosLoading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  gap: 1rem;
+
+  span {
+    font-size: 0.875rem;
+    color: #64748b;
+  }
+}
+
+.exerciciosAddList {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.exercicioAddCard {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: white;
+  border: 2px dashed #10b981;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  width: 100%;
+
+  &:hover {
+    border-style: solid;
+    border-color: #059669;
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+    transform: translateX(4px);
+  }
+
+  &:active {
+    transform: scale(0.98) translateX(4px);
+  }
+}
+
+.exercicioAddIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+  transition: transform 0.2s ease;
+
+  .exercicioAddCard:hover & {
+    transform: rotate(90deg);
+  }
+}
+
+.exercicioAddContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.exercicioAddNome {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #065f46;
+  margin-bottom: 0.25rem;
+  line-height: 1.4;
+}
+
+.exercicioAddDetalhes {
+  font-size: 0.8125rem;
+  color: #047857;
+  font-weight: 500;
+}
+
+// ✅ Modal Actions
+.modalActionsEdit {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid #e2e8f0;
+  margin-top: 1rem;
+}
+
+// ========================================
+// RESPONSIVIDADE MODAL
+// ========================================
+
+@media (max-width: 768px) {
+  .modalBodyEdit {
+    max-height: 60vh;
+  }
+
+  .intensidadeSelector {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .exercicioEditCard {
+    flex-wrap: wrap;
+  }
+
+  .exercicioEditContent {
+    flex: 1 1 100%;
+  }
+
+  .exercicioRemoveBtn {
+    margin-left: auto;
+  }
+
+  .modalActionsEdit {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .modalHeaderEdit {
+    padding: 1rem;
+  }
+
+  .modalHeaderEdit h3 {
+    font-size: 1.125rem;
+  }
+
+  .intensidadeSelector {
+    grid-template-columns: 1fr;
+  }
+
+  .intensidadeOption {
+    padding: 0.875rem;
+  }
+
+  .intensidadeIcon {
+    font-size: 1.5rem;
+  }
+
+  .exerciciosAddHeader h4 {
+    font-size: 0.9375rem;
   }
 }
