@@ -419,6 +419,16 @@ export default function TreinoDetalhesPage() {
 
   // ✅ CORRIGIDO - Busca dados frescos da API
   const openEditModal = async (execucao: Execucao) => {
+    // ✅ LIMPA TUDO ANTES
+    setEditExerciciosSelecionados(new Set());
+    setExecucaoEditando(null);
+    setEditIntensidade("");
+    setEditObservacoes("");
+    setEditData("");
+
+    // ✅ AGUARDA LIMPEZA
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
     setExecucaoEditando(execucao);
     setEditIntensidade(execucao.intensidade);
     setEditObservacoes(execucao.observacoes || "");
@@ -431,39 +441,60 @@ export default function TreinoDetalhesPage() {
     const minutes = String(dataObj.getMinutes()).padStart(2, "0");
     setEditData(`${year}-${month}-${day}T${hours}:${minutes}`);
 
-    // ✅ BUSCA DADOS FRESCOS DA API SEMPRE
+    // ✅ FORCE REFETCH
     try {
-      const response = await fetch(`/api/alunos/treinos/${id}/execucao`, {
-        credentials: "include",
-        cache: "no-store",
-        headers: {
-          "Cache-Control": "no-cache",
-          Pragma: "no-cache",
-        },
-      });
+      const timestamp = Date.now(); // ✅ CACHE BUSTER
+      const response = await fetch(
+        `/api/alunos/treinos/${id}/execucao?t=${timestamp}`,
+        {
+          credentials: "include",
+          cache: "no-store",
+          headers: {
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            Pragma: "no-cache",
+            Expires: "0",
+          },
+        }
+      );
 
       if (response.ok) {
         const todasExecucoes = await response.json();
+        console.log("🔍 TODAS execuções da API:", todasExecucoes);
+
         const execucaoAtualizada = todasExecucoes.find(
           (e: Execucao) => e.id === execucao.id
         );
+
+        console.log("🔍 Execução específica encontrada:", execucaoAtualizada);
 
         if (
           execucaoAtualizada?.exercicios &&
           execucaoAtualizada.exercicios.length > 0
         ) {
+          console.log(
+            "🔍 Exercícios na execução da API:",
+            execucaoAtualizada.exercicios
+          );
+
           const nomesExecutados = execucaoAtualizada.exercicios.map(
             (e: ExercicioExecutado) => e.exercicioNome
           );
+
+          console.log("🔍 Nomes dos exercícios:", nomesExecutados);
+
           const idsExecutados =
             detalhes?.exercicios
-              .filter((ex) => nomesExecutados.includes(ex.nome))
+              .filter((ex) => {
+                const match = nomesExecutados.includes(ex.nome);
+                console.log(`  ${ex.nome} - Match: ${match ? "✅" : "❌"}`);
+                return match;
+              })
               .map((ex) => ex.id) || [];
 
-          console.log("✅ Exercícios marcados da API:", idsExecutados);
+          console.log("✅ IDs FINAIS para marcar:", idsExecutados);
           setEditExerciciosSelecionados(new Set(idsExecutados));
         } else {
-          console.log("✅ Nenhum exercício marcado");
+          console.log("✅ Nenhum exercício na execução");
           setEditExerciciosSelecionados(new Set());
         }
       }
@@ -472,8 +503,7 @@ export default function TreinoDetalhesPage() {
       setEditExerciciosSelecionados(new Set());
     }
 
-    // ✅ Aguarda um frame antes de abrir
-    await new Promise((resolve) => setTimeout(resolve, 50));
+    await new Promise((resolve) => setTimeout(resolve, 100));
     setShowEditModal(true);
   };
 
