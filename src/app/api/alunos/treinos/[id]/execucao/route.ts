@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 // POST - Criar nova execução COM exercícios realizados
 export async function POST(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> } // ✅ MUDOU
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -16,9 +16,8 @@ export async function POST(
     }
 
     const alunoId = (session.user as any).aluno.id;
-    const { id: treinoId } = await params; // ✅ AWAIT PARAMS
+    const { id: treinoId } = await params;
 
-    // Valida se o treino existe e pertence ao aluno
     const treino = await prisma.treino.findFirst({
       where: {
         id: treinoId,
@@ -46,8 +45,6 @@ export async function POST(
     const body = await req.json();
     const { intensidade, observacoes, data, exerciciosRealizadosIds } = body;
 
-    console.log("📋 IDs recebidos:", exerciciosRealizadosIds); // ✅ DEBUG
-
     const intensidadesValidas = ["LEVE", "MODERADO", "PESADO", "MUITO_PESADO"];
     if (!intensidade || !intensidadesValidas.includes(intensidade)) {
       return NextResponse.json(
@@ -57,17 +54,14 @@ export async function POST(
     }
 
     const dataExecucao = data ? new Date(data) : new Date();
-
     const totalExercicios = treino.exercicios.length;
     const exerciciosRealizados = exerciciosRealizadosIds || [];
     const completo = exerciciosRealizados.length === totalExercicios;
 
-    // ✅ FILTRA POR ID DO EXERCÍCIO (não do TreinoExercicio)
-    const exerciciosParaSalvar = treino.exercicios.filter(
-      (te) => exerciciosRealizados.includes(te.id) // ✅ USA te.id (TreinoExercicio.id)
+    // ✅ FILTRAR POR ID DO TREINOEXERCICIO
+    const exerciciosParaSalvar = treino.exercicios.filter((te) =>
+      exerciciosRealizados.includes(te.id)
     );
-
-    console.log("✅ Exercícios a salvar:", exerciciosParaSalvar.length); // ✅ DEBUG
 
     const execucao = await prisma.execucaoTreino.create({
       data: {
@@ -79,6 +73,7 @@ export async function POST(
         data: dataExecucao,
         exercicios: {
           create: exerciciosParaSalvar.map((te) => ({
+            treinoExercicioId: te.id, // ✅ SALVA O ID
             exercicioNome: te.exercicio.nome,
             series: te.series,
             repeticoes: te.repeticoes,
@@ -119,7 +114,7 @@ export async function POST(
 // GET - Buscar histórico
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> } // ✅ MUDOU
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -129,7 +124,7 @@ export async function GET(
     }
 
     const alunoId = (session.user as any).aluno.id;
-    const { id: treinoId } = await params; // ✅ AWAIT PARAMS
+    const { id: treinoId } = await params;
 
     const execucoes = await prisma.execucaoTreino.findMany({
       where: {
@@ -153,6 +148,7 @@ export async function GET(
         exercicios: {
           select: {
             id: true,
+            treinoExercicioId: true, // ✅ RETORNA O ID
             exercicioNome: true,
             series: true,
             repeticoes: true,
@@ -183,7 +179,7 @@ export async function GET(
   }
 }
 
-// PUT - Editar execução E exercícios realizados (OTIMIZADO)
+// PUT - Editar execução
 export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -237,7 +233,7 @@ export async function PUT(
       );
     }
 
-    // ✅ SE NÃO ENVIOU exerciciosRealizadosIds, atualiza só os campos básicos
+    // ✅ SE NÃO ENVIOU exerciciosRealizadosIds, atualiza só campos básicos
     if (exerciciosRealizadosIds === undefined) {
       const execucaoAtualizada = await prisma.execucaoTreino.update({
         where: { id: execucaoId },
@@ -293,14 +289,11 @@ export async function PUT(
       exerciciosRealizadosIds.includes(te.id)
     );
 
-    // ✅ USA TRANSACTION PARA SER MAIS RÁPIDO
     const execucaoAtualizada = await prisma.$transaction(async (tx) => {
-      // Deleta exercícios antigos
       await tx.execucaoExercicio.deleteMany({
         where: { execucaoTreinoId: execucaoId },
       });
 
-      // Atualiza execução e cria novos exercícios
       return await tx.execucaoTreino.update({
         where: { id: execucaoId },
         data: {
@@ -310,6 +303,7 @@ export async function PUT(
           completo,
           exercicios: {
             create: exerciciosParaSalvar.map((te) => ({
+              treinoExercicioId: te.id, // ✅ SALVA O ID
               exercicioNome: te.exercicio.nome,
               series: te.series,
               repeticoes: te.repeticoes,
@@ -324,7 +318,17 @@ export async function PUT(
               exercicios: true,
             },
           },
-          exercicios: true,
+          exercicios: {
+            select: {
+              id: true,
+              treinoExercicioId: true, // ✅ RETORNA O ID
+              exercicioNome: true,
+              series: true,
+              repeticoes: true,
+              carga: true,
+              observacoes: true,
+            },
+          },
         },
       });
     });

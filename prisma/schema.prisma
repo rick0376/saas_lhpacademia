@@ -224,6 +224,7 @@ model ExecucaoExercicio {
   id               String         @id @default(cuid())
   execucaoTreinoId String
   execucaoTreino   ExecucaoTreino @relation(fields: [execucaoTreinoId], references: [id], onDelete: Cascade)
+  treinoExercicioId String?        // ✅ NOVO - Referência ao TreinoExercicio
   exercicioNome    String
   series           Int
   repeticoes       String

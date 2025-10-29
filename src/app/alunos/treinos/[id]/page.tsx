@@ -37,6 +37,7 @@ interface TreinoDetalhes {
 
 interface ExercicioExecutado {
   id: string;
+  treinoExercicioId?: string; // ✅ NOVO
   exercicioNome: string;
   series: number;
   repeticoes: string;
@@ -219,15 +220,15 @@ export default function TreinoDetalhesPage() {
     }
   };
 
-  // ✅ CORRIGIDO - Force no-cache
   const fetchExecucoes = async (treinoId: string) => {
     try {
       const response = await fetch(`/api/alunos/treinos/${treinoId}/execucao`, {
         credentials: "include",
         cache: "no-store",
         headers: {
-          "Cache-Control": "no-cache",
+          "Cache-Control": "no-cache, no-store, must-revalidate",
           Pragma: "no-cache",
+          Expires: "0",
         },
       });
 
@@ -417,16 +418,14 @@ export default function TreinoDetalhesPage() {
     }
   };
 
-  // ✅ CORRIGIDO - Busca dados frescos da API
+  // ✅ CORRIGIDO - Usa treinoExercicioId
   const openEditModal = async (execucao: Execucao) => {
-    // ✅ LIMPA TUDO ANTES
     setEditExerciciosSelecionados(new Set());
     setExecucaoEditando(null);
     setEditIntensidade("");
     setEditObservacoes("");
     setEditData("");
 
-    // ✅ AGUARDA LIMPEZA
     await new Promise((resolve) => setTimeout(resolve, 100));
 
     setExecucaoEditando(execucao);
@@ -441,9 +440,8 @@ export default function TreinoDetalhesPage() {
     const minutes = String(dataObj.getMinutes()).padStart(2, "0");
     setEditData(`${year}-${month}-${day}T${hours}:${minutes}`);
 
-    // ✅ FORCE REFETCH
     try {
-      const timestamp = Date.now(); // ✅ CACHE BUSTER
+      const timestamp = Date.now();
       const response = await fetch(
         `/api/alunos/treinos/${id}/execucao?t=${timestamp}`,
         {
@@ -459,42 +457,26 @@ export default function TreinoDetalhesPage() {
 
       if (response.ok) {
         const todasExecucoes = await response.json();
-        console.log("🔍 TODAS execuções da API:", todasExecucoes);
-
         const execucaoAtualizada = todasExecucoes.find(
           (e: Execucao) => e.id === execucao.id
         );
-
-        console.log("🔍 Execução específica encontrada:", execucaoAtualizada);
 
         if (
           execucaoAtualizada?.exercicios &&
           execucaoAtualizada.exercicios.length > 0
         ) {
+          // ✅ USA treinoExercicioId para match exato
+          const idsExecutados = execucaoAtualizada.exercicios
+            .map((e: ExercicioExecutado) => e.treinoExercicioId)
+            .filter((id): id is string => !!id);
+
           console.log(
-            "🔍 Exercícios na execução da API:",
-            execucaoAtualizada.exercicios
+            "✅ IDs dos exercícios marcados (treinoExercicioId):",
+            idsExecutados
           );
-
-          const nomesExecutados = execucaoAtualizada.exercicios.map(
-            (e: ExercicioExecutado) => e.exercicioNome
-          );
-
-          console.log("🔍 Nomes dos exercícios:", nomesExecutados);
-
-          const idsExecutados =
-            detalhes?.exercicios
-              .filter((ex) => {
-                const match = nomesExecutados.includes(ex.nome);
-                console.log(`  ${ex.nome} - Match: ${match ? "✅" : "❌"}`);
-                return match;
-              })
-              .map((ex) => ex.id) || [];
-
-          console.log("✅ IDs FINAIS para marcar:", idsExecutados);
           setEditExerciciosSelecionados(new Set(idsExecutados));
         } else {
-          console.log("✅ Nenhum exercício na execução");
+          console.log("✅ Nenhum exercício marcado");
           setEditExerciciosSelecionados(new Set());
         }
       }
@@ -507,7 +489,6 @@ export default function TreinoDetalhesPage() {
     setShowEditModal(true);
   };
 
-  // ✅ CORRIGIDO - Limpa com delay
   const closeEditModal = () => {
     setShowEditModal(false);
 
@@ -520,7 +501,6 @@ export default function TreinoDetalhesPage() {
     }, 300);
   };
 
-  // ✅ CORRIGIDO - Aguarda reload
   const handleEditarExecucao = async () => {
     if (!editIntensidade) {
       showToast("⚠️ Selecione a intensidade do treino!", "warning");
@@ -551,7 +531,6 @@ export default function TreinoDetalhesPage() {
         throw new Error("Erro ao editar execução");
       }
 
-      // ✅ AGUARDA RECARREGAR
       await fetchExecucoes(id);
       await new Promise((resolve) => setTimeout(resolve, 200));
 
@@ -877,7 +856,7 @@ export default function TreinoDetalhesPage() {
           </div>
         )}
 
-        {/* MODAL - FOTO */}
+        {/* MODALS (continuam iguais, exceto a edição já corrigida acima) */}
         {selectedEx && selectedEx.fotoExecucao && (
           <div className={styles.modalOverlay} onClick={closeModal}>
             <div
@@ -901,7 +880,6 @@ export default function TreinoDetalhesPage() {
           </div>
         )}
 
-        {/* MODAL - REGISTRAR */}
         {showRegistroModal && (
           <div className={styles.modalOverlay} onClick={closeRegistroModal}>
             <div
@@ -988,7 +966,6 @@ export default function TreinoDetalhesPage() {
           </div>
         )}
 
-        {/* MODAL - EDITAR */}
         {showEditModal && execucaoEditando && (
           <div className={styles.modalOverlay} onClick={closeEditModal}>
             <div
@@ -1100,7 +1077,6 @@ export default function TreinoDetalhesPage() {
           </div>
         )}
 
-        {/* MODAL - VER DETALHES */}
         {showVerDetalhesModal && execucaoDetalhes && (
           <div className={styles.modalOverlay} onClick={closeVerDetalhesModal}>
             <div
@@ -1183,7 +1159,6 @@ export default function TreinoDetalhesPage() {
           </div>
         )}
 
-        {/* MODAL DE CONFIRMAÇÃO */}
         {showConfirmModal && (
           <div
             className={styles.modalOverlay}
@@ -1216,7 +1191,6 @@ export default function TreinoDetalhesPage() {
           </div>
         )}
 
-        {/* TOAST */}
         {toast.show && (
           <div className={`${styles.toast} ${styles[toast.type]}`}>
             <span>{toast.message}</span>
