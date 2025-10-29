@@ -239,7 +239,7 @@ export default function TreinoDetalhesPage() {
     const timer = setInterval(() => {
       setTempoRestante((prev) => {
         if (prev <= 1) {
-          playNotificationSound();
+          playDescansoFimSound();
           return 0;
         }
         return prev - 1;
@@ -405,6 +405,7 @@ export default function TreinoDetalhesPage() {
         setShowCronometroModal(false);
       }
 
+      playSerieConcluida(); // ✅ Som de série concluída
       showToast(`✅ Série concluída! ${restantes - 1}x restantes`, "success");
     } else {
       setSeriesRestantes((prev) => ({
@@ -419,6 +420,7 @@ export default function TreinoDetalhesPage() {
 
       setShowCronometroModal(false);
       toggleExercicioConcluido(exercicioId);
+      playExercicioCompleto(); // ✅ Som de exercício completo
       showToast(`🎉 Exercício ${exercicio.nome} completo!`, "success");
     }
   };
@@ -488,31 +490,142 @@ export default function TreinoDetalhesPage() {
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const playNotificationSound = () => {
+  // ✅ Estado para controlar sons
+  const [soundEnabled, setSoundEnabled] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("sound_enabled");
+      return saved !== null ? saved === "true" : true;
+    }
+    return true;
+  });
+
+  // ✅ Salva preferência de som
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("sound_enabled", String(soundEnabled));
+    }
+  }, [soundEnabled]);
+
+  // ✅ Função de vibração
+  const vibrate = (pattern: number | number[]) => {
+    if (typeof window !== "undefined" && "vibrate" in navigator) {
+      navigator.vibrate(pattern);
+    }
+  };
+
+  // ✅ Som de descanso acabado (mais alto e repetido)
+  const playDescansoFimSound = () => {
+    if (!soundEnabled) return;
+
     try {
       const audioContext = new (window.AudioContext ||
         (window as any).webkitAudioContext)();
+
+      // Toca 3 beeps curtos
+      for (let i = 0; i < 3; i++) {
+        setTimeout(() => {
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+
+          oscillator.frequency.value = 1000; // Mais agudo
+          oscillator.type = "square"; // Som mais "duro"
+
+          gainNode.gain.setValueAtTime(0.4, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(
+            0.01,
+            audioContext.currentTime + 0.2
+          );
+
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.2);
+        }, i * 250);
+      }
+
+      // Vibração: 3 pulsos curtos
+      vibrate([100, 100, 100, 100, 100]);
+    } catch (e) {
+      console.log("Não foi possível reproduzir som");
+    }
+  };
+
+  // ✅ Som de série concluída (positivo)
+  const playSerieConcluida = () => {
+    if (!soundEnabled) return;
+
+    try {
+      const audioContext = new (window.AudioContext ||
+        (window as any).webkitAudioContext)();
+
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
 
       oscillator.connect(gainNode);
       gainNode.connect(audioContext.destination);
 
-      oscillator.frequency.value = 800;
+      oscillator.frequency.value = 600;
       oscillator.type = "sine";
 
       gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
       gainNode.gain.exponentialRampToValueAtTime(
         0.01,
-        audioContext.currentTime + 0.5
+        audioContext.currentTime + 0.4
       );
 
       oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + 0.5);
+      oscillator.stop(audioContext.currentTime + 0.4);
+
+      // Vibração curta
+      vibrate(100);
     } catch (e) {
       console.log("Não foi possível reproduzir som");
     }
   };
+
+  // ✅ Som de exercício completo (parabéns!)
+  const playExercicioCompleto = () => {
+    if (!soundEnabled) return;
+
+    try {
+      const audioContext = new (window.AudioContext ||
+        (window as any).webkitAudioContext)();
+
+      // Sequência de notas ascendentes (como fanfarra)
+      const notas = [523, 659, 784]; // Dó, Mi, Sol
+
+      notas.forEach((freq, i) => {
+        setTimeout(() => {
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+
+          oscillator.frequency.value = freq;
+          oscillator.type = "triangle";
+
+          gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(
+            0.01,
+            audioContext.currentTime + 0.3
+          );
+
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.3);
+        }, i * 150);
+      });
+
+      // Vibração: padrão de comemoração
+      vibrate([100, 50, 100, 50, 200]);
+    } catch (e) {
+      console.log("Não foi possível reproduzir som");
+    }
+  };
+
+  // ✅ Som padrão (mantém pra compatibilidade)
+  const playNotificationSound = playDescansoFimSound;
 
   const getDataTimeLocalFormat = () => {
     const now = new Date();
@@ -806,6 +919,13 @@ export default function TreinoDetalhesPage() {
               : "Voltar à Lista de Treinos"}
           </Link>
           <h1>{detalhes.nome}</h1>
+          <button
+            className={styles.soundToggle}
+            onClick={() => setSoundEnabled(!soundEnabled)}
+            title={soundEnabled ? "Desativar sons" : "Ativar sons"}
+          >
+            {soundEnabled ? "🔊" : "🔇"}
+          </button>
         </div>
 
         <div className={styles.treinoInfo}>
@@ -938,9 +1058,11 @@ export default function TreinoDetalhesPage() {
                           </div>
                         ) : (
                           <div className={styles.serieCompleta}>
-                            <span className={styles.serieCompletaText}>
-                              ✓ Completo
-                            </span>
+                            <div className={styles.serieCompletaInfo}>
+                              <span className={styles.serieCompletaText}>
+                                ✓ Completo
+                              </span>
+                            </div>
                             <button
                               className={styles.btnDesfazer}
                               onClick={() => {
@@ -948,9 +1070,12 @@ export default function TreinoDetalhesPage() {
                                 toggleExercicioConcluido(ex.id);
                                 showToast("↩️ Exercício desmarcado!", "info");
                               }}
-                              title="Desfazer"
+                              title="Desfazer conclusão"
                             >
-                              ↩️
+                              <span className={styles.btnDesfazerIcon}>↩️</span>
+                              <span className={styles.btnDesfazerText}>
+                                Desfazer
+                              </span>
                             </button>
                           </div>
                         )}
@@ -1162,7 +1287,7 @@ export default function TreinoDetalhesPage() {
                       className={styles.btnModalPular}
                       onClick={pularDescanso}
                     >
-                      ⏭️ Pular Descanso
+                      💪 Iniciar Série
                     </button>
                     <button
                       className={styles.btnModalFechar}
