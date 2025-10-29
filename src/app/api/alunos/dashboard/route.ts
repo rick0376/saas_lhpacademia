@@ -1,16 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth"; // Ajuste path se need
+import { authOptions } from "@/lib/auth";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
   try {
-    // Auth check (cast any para bypass TS; aluno populado no callback auth.ts)
     const session = await getServerSession(authOptions);
     if (!session?.user || !(session.user as any)?.aluno?.id) {
-      // ✅ Fix: as any no access aluno.id
       console.log("Unauthorized access to dashboard API");
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -18,7 +16,6 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const alunoId = searchParams.get("alunoId");
     if (!alunoId || alunoId !== (session.user as any).aluno.id) {
-      // ✅ Fix: as any no security check
       return NextResponse.json(
         { error: "Missing or invalid alunoId" },
         { status: 400 }
@@ -32,19 +29,20 @@ export async function GET(request: NextRequest) {
       alunoId
     );
 
-    // Query full em transaction (intacta; ajuste fields se Prisma TS erro)
+    // ✅ Query corrigida baseada no schema
     const [
       aluno,
       treinosCount,
       ultimaMedida,
-      avaliacoesCount /*, proximoTreino */,
+      avaliacoesCount,
+      ultimasExecucoes,
     ] = await prisma.$transaction([
       // 1. Basic aluno data
       prisma.aluno.findUnique({
         where: { id: alunoId },
         select: {
           id: true,
-          nome: true, // ✅ Confirme field 'nome' no schema Aluno
+          nome: true,
           foto: true,
           objetivo: true,
         },
@@ -52,25 +50,39 @@ export async function GET(request: NextRequest) {
       // 2. Treinos count
       prisma.treino.count({
         where: {
-          alunoId: alunoId, // ✅ Assuma FK String; se relation: { aluno: { id: alunoId } }
-          // ativo: true,  // Comente se field não existe
+          alunoId: alunoId,
         },
       }),
       // 3. Última medida
       prisma.medida.findFirst({
-        where: { alunoId: alunoId }, // ✅ Assuma FK
-        orderBy: { data: "desc" }, // ✅ Assuma field 'data'; mude se 'createdAt'
+        where: { alunoId: alunoId },
+        orderBy: { data: "desc" },
         select: {
           peso: true,
-          // data: true,  // Comente se erro TS
         },
       }),
       // 4. Avaliações count
       prisma.avaliacao.count({
-        where: { alunoId: alunoId }, // ✅ Assuma FK
+        where: { alunoId: alunoId },
       }),
-      // 5. Comentado (sem erro TS agora)
-      // prisma.cronograma.findFirst({ ... }),
+      // ✅ 5. CORRIGIDO - Últimas execuções com include correto
+      prisma.execucaoTreino.findMany({
+        where: {
+          alunoId: alunoId,
+        },
+        include: {
+          treino: {
+            select: {
+              id: true,
+              nome: true,
+              objetivo: true,
+            },
+          },
+          exercicios: true, // ✅ Sem nested include (exercicioNome já vem como string)
+        },
+        orderBy: { data: "desc" },
+        take: 10,
+      }),
     ]);
 
     if (!aluno) {
@@ -78,16 +90,38 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Aluno not found" }, { status: 404 });
     }
 
-    // Shape data (intacta)
+    // ✅ Formata as execuções baseado no schema real
+    const execucoesFormatadas = ultimasExecucoes.map((exec) => ({
+      id: exec.id,
+      data: exec.data,
+      intensidade: exec.intensidade, // ✅ Usa intensidade em vez de duracao
+      observacoes: exec.observacoes,
+      completo: exec.completo,
+      treino: {
+        id: exec.treino.id,
+        nome: exec.treino.nome,
+        objetivo: exec.treino.objetivo,
+      },
+      exerciciosCompletados: exec.exercicios.length,
+      exercicios: exec.exercicios.map((e) => ({
+        nome: e.exercicioNome, // ✅ Campo correto do schema
+        series: e.series,
+        repeticoes: e.repeticoes,
+        carga: e.carga,
+        observacoes: e.observacoes,
+      })),
+    }));
+
     const data = {
       id: aluno.id,
-      nome: aluno.nome, // ✅ "Henrique"
+      nome: aluno.nome,
       foto: aluno.foto,
       objetivo: aluno.objetivo,
-      treinosAtivos: treinosCount, // ✅ >0 se treinos
+      treinosAtivos: treinosCount,
       ultimaMedida: ultimaMedida ? { peso: ultimaMedida.peso } : null,
       avaliacoes: avaliacoesCount,
-      proximoTreino: null, // Temp
+      proximoTreino: null,
+      ultimasExecucoes: execucoesFormatadas,
     };
 
     console.log(
@@ -95,8 +129,8 @@ export async function GET(request: NextRequest) {
       aluno.nome,
       "- Treinos:",
       data.treinosAtivos,
-      "- Avaliações:",
-      data.avaliacoes
+      "- Execuções:",
+      execucoesFormatadas.length
     );
 
     return NextResponse.json(data);
