@@ -5,7 +5,14 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AlunoLayout } from "@/components/alunos/AlunoLayout";
-import { ArrowLeft } from "lucide-react";
+import {
+  ArrowLeft,
+  Calendar,
+  Dumbbell,
+  TrendingUp,
+  CheckCircle,
+  XCircle,
+} from "lucide-react";
 import styles from "./styles.module.scss";
 
 interface Treino {
@@ -93,74 +100,84 @@ export default function TreinosPage() {
             <ArrowLeft size={20} />
             Voltar ao Dashboard
           </Link>
-          <h1>Meus Treinos</h1>
+          <div className={styles.headerContent}>
+            <h1>💪 Meus Treinos</h1>
+            <p className={styles.subtitle}>
+              {treinos.length > 0
+                ? `${treinos.length} treino${
+                    treinos.length > 1 ? "s" : ""
+                  } ativo${treinos.length > 1 ? "s" : ""}`
+                : "Nenhum treino ativo"}
+            </p>
+          </div>
         </div>
 
         {treinos.length === 0 ? (
           <div className={styles.emptyState}>
+            <div className={styles.emptyIcon}>
+              <Dumbbell size={64} />
+            </div>
+            <h2>Nenhum treino disponível</h2>
             <p>Aguarde seu treinador atribuir treinos ativos.</p>
             <p className={styles.emptySubtext}>
               Entre em contato se precisar de atualizações.
             </p>
           </div>
         ) : (
-          <div className={styles.tableContainer}>
-            <table className={styles.table}>
-              <thead className={styles.thead}>
-                <tr>
-                  <th className={styles.th}>Nome</th>
-                  <th className={styles.th}>Objetivo</th>
-                  <th className={styles.th}>Status</th>
-                  <th className={`${styles.th} ${styles.thDataInicio}`}>
-                    Data de Início
-                  </th>
-                  <th className={`${styles.th} ${styles.thActions}`}>Ações</th>
-                </tr>
-              </thead>
-              <tbody className={styles.tbody}>
-                {treinos.map((treino) => (
-                  <tr key={treino.id}>
-                    <td className={styles.name}>{treino.nome}</td>
-                    <td>
-                      <span
-                        className={styles.description}
-                        title={treino.descricao}
-                      >
-                        {treino.descricao || "Sem descrição"}
+          <div className={styles.cardsGrid}>
+            {treinos.map((treino) => (
+              <div key={treino.id} className={styles.treinoCard}>
+                <div className={styles.cardHeader}>
+                  <div className={styles.cardIcon}>
+                    <TrendingUp size={24} />
+                  </div>
+                  <div className={styles.cardStatus}>
+                    {treino.ativo ? (
+                      <span className={styles.statusAtivo}>
+                        <CheckCircle size={16} />
+                        Ativo
                       </span>
-                    </td>
-                    <td className={styles.status}>
-                      <span
-                        className={
-                          treino.ativo
-                            ? styles.statusAtivo
-                            : styles.statusInativo
-                        }
-                      >
-                        {treino.ativo ? "Ativo" : "Inativo"}
+                    ) : (
+                      <span className={styles.statusInativo}>
+                        <XCircle size={16} />
+                        Inativo
                       </span>
-                    </td>
-                    <td className={styles.dataInicio}>
-                      {new Date(treino.dataInicio).toLocaleDateString("pt-BR")}
-                    </td>
-                    <td className={styles.actions}>
-                      <Link
-                        href={`/alunos/treinos/${treino.id}`}
-                        className={styles.viewButton}
-                      >
-                        Ver Detalhes
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+                    )}
+                  </div>
+                </div>
 
-        {treinos.length > 0 && (
-          <div className={styles.footer}>
-            Mostrando {treinos.length} treino(s) ativo(s).
+                <h3 className={styles.cardTitle}>{treino.nome}</h3>
+
+                <p className={styles.cardDescription}>
+                  {treino.descricao || "Sem descrição disponível"}
+                </p>
+
+                <div className={styles.cardFooter}>
+                  <div className={styles.cardDate}>
+                    <Calendar size={16} />
+                    <span>
+                      Início:{" "}
+                      {new Date(treino.dataInicio).toLocaleDateString("pt-BR", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </span>
+                  </div>
+
+                  <Link
+                    href={`/alunos/treinos/${treino.id}`}
+                    className={styles.cardButton}
+                  >
+                    Ver Treino
+                    <ArrowLeft
+                      size={16}
+                      style={{ transform: "rotate(180deg)" }}
+                    />
+                  </Link>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>

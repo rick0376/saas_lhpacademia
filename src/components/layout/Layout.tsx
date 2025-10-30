@@ -202,7 +202,7 @@ export const Layout: React.FC<Props> = ({ children }) => {
     ].filter((g) => g.items.length > 0);
   }, [can.personal, can.manageUsers, can.superOnly, can.aluno]); // Adicionado can.aluno
 
-  const brandTitle = can.aluno ? "PCW - Meu Treino" : "Academia Pro"; // Incremento: Título PCW para aluno
+  const brandTitle = can.aluno ? "LHP - Meu Treino" : "Academia Pro"; // Incremento: Título PCW para aluno
   const brandSub = can.aluno ? "Portal do Aluno" : "Sistema de Gestão";
 
   // Breadcrumb simples no header (incremento para navegação clara no PCW)

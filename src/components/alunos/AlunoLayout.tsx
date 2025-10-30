@@ -81,7 +81,7 @@ export const AlunoLayout: React.FC<Props> = ({ children }) => {
     },
   ];
 
-  const brandTitle = "PCW - Treino";
+  const brandTitle = "LHP - Treino";
 
   const getBreadcrumb = () => {
     const parts = pathname.split("/").filter(Boolean);
