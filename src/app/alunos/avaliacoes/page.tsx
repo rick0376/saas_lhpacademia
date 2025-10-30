@@ -217,89 +217,206 @@ export default function AvaliacoesPage() {
             </button>
           </div>
         ) : (
-          <div className={styles.tableWrapper}>
-            <h2>Lista de Avaliações</h2>
-            <div className={styles.tableScroll}>
-              <table className={styles.table}>
-                <thead className={styles.tableHead}>
-                  <tr>
-                    <th>Tipo</th>
-                    <th>Data</th>
-                    <th>Peso (kg)</th>
-                    <th>Altura (cm)</th>
-                    <th>IMC</th>
-                    <th>% Gordura</th>
-                    <th>VO2 Max (ml/kg/min)</th>
-                    <th>Flexões</th>
-                    <th>Prancha (s)</th>
-                    <th>Dobras (mm média)</th>
-                    <th>Resultado</th>
-                    <th>Observações</th>
-                    <th>Arquivo PDF</th>
-                  </tr>
-                </thead>
-                <tbody className={styles.tableBody}>
-                  {avaliacoes.map((av) => (
-                    <tr key={av.id}>
-                      <td data-label="Tipo">{av.tipo || "N/A"}</td>
-                      <td data-label="Data">{formatarData(av.data)}</td>
-                      <td data-label="Peso">{formatarMedida(av.peso, "kg")}</td>
-                      <td data-label="Altura">
+          <>
+            {/* Tabela para Desktop */}
+            <div className={styles.tableWrapper}>
+              <h2>Lista de Avaliações</h2>
+              <div className={styles.tableScroll}>
+                <table className={styles.table}>
+                  <thead className={styles.tableHead}>
+                    <tr>
+                      <th>Tipo</th>
+                      <th>Data</th>
+                      <th>Peso (kg)</th>
+                      <th>Altura (cm)</th>
+                      <th>IMC</th>
+                      <th>% Gordura</th>
+                      <th>VO2 Max (ml/kg/min)</th>
+                      <th>Flexões</th>
+                      <th>Prancha (s)</th>
+                      <th>Dobras (mm média)</th>
+                      <th>Resultado</th>
+                      <th>Observações</th>
+                      <th>Arquivo PDF</th>
+                    </tr>
+                  </thead>
+                  <tbody className={styles.tableBody}>
+                    {avaliacoes.map((av) => (
+                      <tr key={av.id}>
+                        <td data-label="Tipo">{av.tipo || "N/A"}</td>
+                        <td data-label="Data">{formatarData(av.data)}</td>
+                        <td data-label="Peso">
+                          {formatarMedida(av.peso, "kg")}
+                        </td>
+                        <td data-label="Altura">
+                          {formatarMedida(av.altura, "cm")}
+                        </td>
+                        <td data-label="IMC">{formatarMedida(av.imc, "")}</td>
+                        <td data-label="% Gordura">
+                          {formatarMedida(av.percentualGordura, "%")}
+                        </td>
+                        <td data-label="VO2 Max">
+                          {formatarMedida(av.vo2Max, "")}
+                        </td>
+                        <td data-label="Flexões">
+                          {av.repeticoesFlexoes
+                            ? `${av.repeticoesFlexoes} reps`
+                            : "N/A"}
+                        </td>
+                        <td data-label="Prancha">
+                          {formatarMedida(av.pranchaTempo, "s")}
+                        </td>
+                        <td data-label="Dobras">
+                          {resumirDobrasCutaneas(av.dobrasCutaneas)}
+                        </td>
+                        <td data-label="Resultado">{av.resultado || "N/A"}</td>
+                        <td
+                          className={styles.observacoes}
+                          data-label="Observações"
+                          title={av.observacoes || "N/A"}
+                        >
+                          {av.observacoes ? (
+                            <div className={styles.observacoesContent}>
+                              {av.observacoes.length > 100
+                                ? `${av.observacoes.substring(0, 100)}...`
+                                : av.observacoes}
+                            </div>
+                          ) : (
+                            "N/A"
+                          )}
+                        </td>
+                        <td data-label="Arquivo PDF">
+                          {av.arquivo ? (
+                            <button
+                              onClick={() => baixarArquivo(av)}
+                              className={styles.pdfLink}
+                              title="Baixar PDF"
+                            >
+                              <Download size={16} /> Ver PDF
+                            </button>
+                          ) : (
+                            "N/A"
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Cards para Mobile */}
+            <div className={styles.mobileCardsWrapper}>
+              <h2>Lista de Avaliações</h2>
+              {avaliacoes.map((av) => (
+                <div key={av.id} className={styles.evaluationCard}>
+                  <div className={styles.cardHeader}>
+                    <span className={styles.tipo}>{av.tipo || "N/A"}</span>
+                    <span className={styles.data}>{formatarData(av.data)}</span>
+                  </div>
+                  <div className={styles.cardBody}>
+                    <div className={styles.keyValue}>
+                      <span className={styles.key}>Peso</span>
+                      <span className={styles.value}>
+                        {formatarMedida(av.peso, "kg")}
+                      </span>
+                    </div>
+                    <div className={styles.keyValue}>
+                      <span className={styles.key}>Altura</span>
+                      <span className={styles.value}>
                         {formatarMedida(av.altura, "cm")}
-                      </td>
-                      <td data-label="IMC">{formatarMedida(av.imc, "")}</td>
-                      <td data-label="% Gordura">
+                      </span>
+                    </div>
+                    <div className={styles.keyValue}>
+                      <span className={styles.key}>IMC</span>
+                      <span className={styles.value}>
+                        {formatarMedida(av.imc, "")}
+                      </span>
+                    </div>
+                    <div className={styles.keyValue}>
+                      <span className={styles.key}>% Gordura</span>
+                      <span className={styles.value}>
                         {formatarMedida(av.percentualGordura, "%")}
-                      </td>
-                      <td data-label="VO2 Max">
-                        {formatarMedida(av.vo2Max, "")}
-                      </td>
-                      <td data-label="Flexões">
+                      </span>
+                    </div>
+                    <div className={styles.keyValue}>
+                      <span className={styles.key}>VO2 Max</span>
+                      <span className={styles.value}>
+                        {formatarMedida(av.vo2Max, "ml/kg/min")}
+                      </span>
+                    </div>
+                    <div className={styles.keyValue}>
+                      <span className={styles.key}>Flexões</span>
+                      <span className={styles.value}>
                         {av.repeticoesFlexoes
                           ? `${av.repeticoesFlexoes} reps`
                           : "N/A"}
-                      </td>
-                      <td data-label="Prancha">
+                      </span>
+                    </div>
+                    <div className={styles.keyValue}>
+                      <span className={styles.key}>Prancha</span>
+                      <span className={styles.value}>
                         {formatarMedida(av.pranchaTempo, "s")}
-                      </td>
-                      <td data-label="Dobras">
+                      </span>
+                    </div>
+                    <div className={styles.keyValue}>
+                      <span className={styles.key}>Dobras</span>
+                      <span className={styles.value}>
                         {resumirDobrasCutaneas(av.dobrasCutaneas)}
-                      </td>
-                      <td data-label="Resultado">{av.resultado || "N/A"}</td>
-                      <td
-                        className={styles.observacoes}
-                        data-label="Observações"
-                        title={av.observacoes || "N/A"}
+                      </span>
+                    </div>
+                    <div className={styles.keyValue}>
+                      <span className={styles.key}>Resultado</span>
+                      <span className={styles.value}>
+                        {av.resultado || "N/A"}
+                      </span>
+                    </div>
+                    <div className={styles.keyValue + " " + styles.observacoes}>
+                      <span className={styles.key}>Observações</span>
+                      <span className={styles.value}>
+                        {av.observacoes || "N/A"}
+                      </span>
+                    </div>
+                    {av.fumante && (
+                      <div className={`${styles.keyValue} ${styles.warning}`}>
+                        <span className={styles.key}>Fumante</span>
+                        <span className={styles.value}>Sim</span>
+                      </div>
+                    )}
+                    {av.diabetes && (
+                      <div className={`${styles.keyValue} ${styles.warning}`}>
+                        <span className={styles.key}>Diabetes</span>
+                        <span className={styles.value}>Sim</span>
+                      </div>
+                    )}
+                    {av.doencasArticulares && (
+                      <div className={`${styles.keyValue} ${styles.warning}`}>
+                        <span className={styles.key}>Doenças Articulares</span>
+                        <span className={styles.value}>Sim</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className={styles.cardFooter}>
+                    <span className={styles.resumo}>
+                      {av.resultado || "Avaliação completa"}
+                    </span>
+                    {av.arquivo ? (
+                      <button
+                        onClick={() => baixarArquivo(av)}
+                        className={styles.pdfLink}
+                        title="Baixar PDF"
                       >
-                        {av.observacoes ? (
-                          <div className={styles.observacoesContent}>
-                            {av.observacoes.length > 100
-                              ? `${av.observacoes.substring(0, 100)}...`
-                              : av.observacoes}
-                          </div>
-                        ) : (
-                          "N/A"
-                        )}
-                      </td>
-                      <td data-label="Arquivo PDF">
-                        {av.arquivo ? (
-                          <button
-                            onClick={() => baixarArquivo(av)}
-                            className={styles.pdfLink}
-                            title="Baixar PDF"
-                          >
-                            <Download size={16} /> Ver PDF
-                          </button>
-                        ) : (
-                          "N/A"
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                        <Download size={16} /> PDF
+                      </button>
+                    ) : (
+                      <span className={styles.resumo}>Sem PDF</span>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
-            {/* Resumo das Avaliações (Opcional: Cards com métricas chave da mais recente) */}
+
+            {/* Resumo da Última Avaliação (Visível em Desktop e Mobile) */}
             {avaliacoes.length > 0 && (
               <div className={styles.summarySection}>
                 <h3>Resumo da Última Avaliação</h3>
@@ -330,47 +447,15 @@ export default function AvaliacoesPage() {
                   {avaliacoes[0].diabetes && (
                     <div className={styles.cardWarning}>⚠️ Diabetes: Sim</div>
                   )}
+                  {avaliacoes[0].doencasArticulares && (
+                    <div className={styles.cardWarning}>
+                      ⚠️ Doenças Articulares: Sim
+                    </div>
+                  )}
                 </div>
               </div>
             )}
-
-            {avaliacoes.map((av) => (
-              <div key={av.id} className="evaluationCard">
-                <div className="cardHeader">
-                  <span className="tipo">{av.tipo}</span>
-                  <span className="data">
-                    {new Date(av.data).toLocaleDateString()}
-                  </span>
-                </div>
-                <div className="cardBody">
-                  <div className="keyValue">
-                    <span className="key">Peso</span>
-                    <span className="value">{av.peso}kg</span>
-                  </div>
-                  {/* Repita pra IMC, VO2, etc. */}
-                  {av.doencasArticulares && (
-                    <div className="keyValue warning">
-                      <span className="key">Atenção Articular</span>
-                      <span className="value">Sim</span>
-                    </div>
-                  )}
-                  {/* Dobras: JSON.stringify resumido ou parse */}
-                  <div className="keyValue observacoes">
-                    <span className="key">Observações</span>
-                    <span className="value">{av.observacoes}</span>
-                  </div>
-                </div>
-                <div className="cardFooter">
-                  <span className="resumo">{av.resultado}</span>
-                  {av.arquivo && (
-                    <a href={av.arquivo} className="pdfLink" download>
-                      Baixar PDF
-                    </a>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
+          </>
         )}
         <Link href="/alunos/dashboard" className={styles.backLink}>
           <ArrowLeft size={20} />
