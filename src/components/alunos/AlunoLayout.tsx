@@ -197,7 +197,7 @@ export const AlunoLayout: React.FC<Props> = ({ children }) => {
               <div className={nav.actions}>
                 <Link
                   href="/alunos/configuracoes"
-                  className={nav.actionBtn}
+                  className={`${nav.actionBtn} ${nav.settingsBtn}`}
                   title="Configurações"
                 >
                   <Settings size={18} />
@@ -210,6 +210,7 @@ export const AlunoLayout: React.FC<Props> = ({ children }) => {
                   <LogOut size={18} />
                 </button>
               </div>
+
               {/* Menu Button */}
               <button
                 className={styles.menuButton}

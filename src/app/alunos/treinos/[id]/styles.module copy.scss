@@ -1,6 +1,6 @@
 .container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #06b6d4 0%, #0284c7 50%, #0369a1 100%);
+  background: #f8fafc;
   padding: 2rem;
   font-family: system-ui, -apple-system, sans-serif;
   color: #1e293b;
@@ -30,23 +30,21 @@
     .backLink {
       display: flex;
       align-items: center;
-      color: white;
+      color: #1e40af;
       text-decoration: none;
       font-weight: 600;
       font-size: 1rem;
       padding: 0.75rem 1.25rem;
-      border-radius: 0.75rem;
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-radius: 0.5rem;
+      background: rgba(30, 64, 175, 0.08);
+      transition: all 0.2s ease;
+      border: 1px solid rgba(30, 64, 175, 0.1);
 
       &:hover {
-        background: rgba(255, 255, 255, 0.25);
-        color: white;
+        background: rgba(30, 64, 175, 0.15);
+        color: #1d4ed8;
         transform: translateX(-2px);
-        border-color: rgba(255, 255, 255, 0.5);
+        box-shadow: 0 4px 12px rgba(30, 64, 175, 0.15);
       }
 
       svg {
@@ -62,12 +60,11 @@
     h1 {
       font-size: 2.5rem;
       font-weight: 800;
-      color: white;
+      color: #0f172a;
       margin: 0;
       flex: 1;
       text-align: center;
       letter-spacing: -0.025em;
-      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 
       @media (max-width: 768px) {
         font-size: 1.75rem;
@@ -81,10 +78,10 @@
   .treinoInfo {
     max-width: 1200px;
     margin: 0 auto 2rem;
-    background: linear-gradient(135deg, #714797, #5d2691);
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     border-radius: 1rem;
     padding: 1.5rem;
-    box-shadow: 0 10px 25px -3px rgba(113, 71, 151, 0.3);
+    box-shadow: 0 10px 25px -3px rgba(16, 185, 129, 0.3);
 
     .treinoDesc {
       font-size: 1.125rem;
@@ -129,7 +126,7 @@
   .progressPercent {
     font-size: 1.25rem;
     font-weight: 800;
-    color: #714797;
+    color: #10b981;
   }
 
   .progressBar {
@@ -143,10 +140,10 @@
 
   .progressFill {
     height: 100%;
-    background: linear-gradient(90deg, #714797, #5d2691);
+    background: linear-gradient(90deg, #10b981 0%, #059669 100%);
     border-radius: 999px;
     transition: width 0.5s ease;
-    box-shadow: 0 0 10px rgba(113, 71, 151, 0.5);
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
   }
 
   // ========================================
@@ -202,26 +199,26 @@
 
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(113, 71, 151, 0.15);
-      border-color: #714797;
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.15);
+      border-color: #10b981;
     }
 
     &.concluido {
-      background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
-      border-color: #714797;
+      background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+      border-color: #10b981;
       opacity: 0.85;
 
       .cardNumber {
-        background: linear-gradient(135deg, #5d2691, #4c1d95);
+        background: linear-gradient(135deg, #059669, #047857);
       }
 
       .cardTitle {
         text-decoration: line-through;
-        color: #5d2691;
+        color: #059669;
       }
 
       .cardValue {
-        color: #5d2691 !important;
+        color: #059669 !important;
       }
     }
 
@@ -244,11 +241,11 @@
 
       &:hover {
         transform: scale(1.1);
-        box-shadow: 0 4px 12px rgba(113, 71, 151, 0.3);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
       }
 
       .checkIcon {
-        color: #714797;
+        color: #10b981;
       }
 
       .checkboxEmpty {
@@ -260,7 +257,7 @@
       }
 
       &:hover .checkboxEmpty {
-        border-color: #714797;
+        border-color: #10b981;
       }
     }
 
@@ -277,7 +274,7 @@
         justify-content: center;
         min-width: 2.5rem;
         height: 2.5rem;
-        background: linear-gradient(135deg, #714797, #5d2691);
+        background: linear-gradient(135deg, #10b981, #059669);
         color: white;
         border-radius: 50%;
         font-size: 1.1rem;
@@ -295,7 +292,7 @@
 
         &.clickable {
           cursor: pointer;
-          color: #714797;
+          color: #10b981;
           display: flex;
           align-items: center;
           gap: 0.5rem;
@@ -338,13 +335,14 @@
           display: block;
           font-size: 1.25rem;
           font-weight: 700;
-          color: #714797;
+          color: #10b981;
         }
 
         &:nth-child(3) .cardValue {
           color: #f59e0b;
         }
 
+        // ✅ NOVO - Card de Séries com controles
         &.cardItemSeries {
           .serieExecutando {
             display: flex;
@@ -382,11 +380,11 @@
               }
 
               .btnConcluir {
-                background: linear-gradient(135deg, #714797, #5d2691);
+                background: linear-gradient(135deg, #10b981, #059669);
                 color: white;
 
                 &:hover {
-                  box-shadow: 0 4px 12px rgba(113, 71, 151, 0.4);
+                  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
                 }
               }
 
@@ -410,14 +408,14 @@
             .serieRestante {
               font-size: 1.5rem;
               font-weight: 800;
-              color: #0284c7;
+              color: #3b82f6;
             }
 
             .btnIniciarSerie {
               width: 2rem;
               height: 2rem;
               border: none;
-              background: linear-gradient(135deg, #0284c7, #0369a1);
+              background: linear-gradient(135deg, #3b82f6, #2563eb);
               color: white;
               border-radius: 50%;
               cursor: pointer;
@@ -428,7 +426,7 @@
 
               &:hover {
                 transform: scale(1.15);
-                box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4);
+                box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
               }
 
               svg {
@@ -438,24 +436,32 @@
             }
 
             .btnResetSerie {
-              width: 2.25rem;
-              height: 2.25rem;
-              border: 2px solid #f59e0b;
-              background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+              width: 2.25rem; // ✅ Aumentado
+              height: 2.25rem; // ✅ Aumentado
+              border: 2px solid #f59e0b; // ✅ Borda definida
+              background: linear-gradient(
+                135deg,
+                #fef3c7 0%,
+                #fde68a 100%
+              ); // ✅ Gradiente
               border-radius: 50%;
               cursor: pointer;
               display: flex;
               align-items: center;
               justify-content: center;
-              font-size: 1.1rem;
+              font-size: 1.1rem; // ✅ Emoji maior
               transition: all 0.2s ease;
-              box-shadow: 0 2px 6px rgba(245, 158, 11, 0.2);
+              box-shadow: 0 2px 6px rgba(245, 158, 11, 0.2); // ✅ Sombra
 
               &:hover {
-                background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+                background: linear-gradient(
+                  135deg,
+                  #f59e0b 0%,
+                  #d97706 100%
+                ); // ✅ Laranja vibrante
                 border-color: #d97706;
-                transform: scale(1.15);
-                box-shadow: 0 4px 10px rgba(245, 158, 11, 0.4);
+                transform: scale(1.15); // ✅ Efeito maior
+                box-shadow: 0 4px 10px rgba(245, 158, 11, 0.4); // ✅ Sombra maior
               }
 
               &:active {
@@ -467,7 +473,7 @@
           .serieCompleta {
             font-size: 1.25rem;
             font-weight: 700;
-            color: #714797;
+            color: #10b981;
           }
         }
 
@@ -476,12 +482,12 @@
 
           &:hover {
             background: #eff6ff;
-            border-color: #0284c7;
+            border-color: #3b82f6;
             transform: scale(1.02);
           }
 
           .cardValue {
-            color: #0284c7;
+            color: #3b82f6;
 
             &.cronometroAtivo {
               font-size: 1.5rem;
@@ -535,11 +541,11 @@
     right: 2rem;
     width: 4rem;
     height: 4rem;
-    background: linear-gradient(135deg, #714797, #5d2691);
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     color: white;
     border: none;
     border-radius: 50%;
-    box-shadow: 0 8px 25px rgba(113, 71, 151, 0.4);
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -550,7 +556,7 @@
 
     &:hover {
       transform: scale(1.1) translateY(-2px);
-      box-shadow: 0 12px 35px rgba(113, 71, 151, 0.5);
+      box-shadow: 0 12px 35px rgba(16, 185, 129, 0.5);
     }
 
     &:active {
@@ -568,16 +574,18 @@
   @keyframes pulse {
     0%,
     100% {
-      box-shadow: 0 8px 25px rgba(113, 71, 151, 0.4);
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
     }
     50% {
-      box-shadow: 0 8px 35px rgba(113, 71, 151, 0.6);
+      box-shadow: 0 8px 35px rgba(16, 185, 129, 0.6);
     }
   }
 
   // ========================================
-  // MODAIS, HISTÓRICO
+  // MODAIS, HISTÓRICO E RESTO
+  // (Continua exatamente igual ao seu código...)
   // ========================================
+
   .registroModal {
     position: relative;
     max-width: 90vw;
@@ -602,9 +610,9 @@
     margin: 0;
     font-size: 1.5rem;
     font-weight: 800;
-    color: white;
-    background: linear-gradient(135deg, #714797, #5d2691);
-    border-bottom: 2px solid #5d2691;
+    color: #0f172a;
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border-bottom: 2px solid #bbf7d0;
     flex-shrink: 0;
 
     @media (max-width: 768px) {
@@ -690,8 +698,8 @@
 
     &:focus {
       outline: none;
-      border-color: #714797;
-      box-shadow: 0 0 0 3px rgba(113, 71, 151, 0.1);
+      border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
     }
   }
 
@@ -719,15 +727,15 @@
     gap: 0.5rem;
 
     &:hover {
-      border-color: #714797;
-      background: rgba(113, 71, 151, 0.05);
+      border-color: #10b981;
+      background: rgba(16, 185, 129, 0.05);
       transform: translateY(-2px);
     }
 
     &.selected {
-      border-color: #714797;
-      background: linear-gradient(135deg, #714797, #5d2691);
-      box-shadow: 0 4px 15px rgba(113, 71, 151, 0.3);
+      border-color: #10b981;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
 
       .intensidadeEmoji {
         transform: scale(1.2);
@@ -773,8 +781,8 @@
 
     &:focus {
       outline: none;
-      border-color: #714797;
-      box-shadow: 0 0 0 3px rgba(113, 71, 151, 0.1);
+      border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
     }
 
     &::placeholder {
@@ -826,13 +834,13 @@
   }
 
   .btnSalvar {
-    background: linear-gradient(135deg, #714797, #5d2691);
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     color: white;
-    box-shadow: 0 4px 14px rgba(113, 71, 151, 0.3);
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
 
     &:hover:not(:disabled) {
       transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(113, 71, 151, 0.4);
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
     }
 
     &:active:not(:disabled) {
@@ -841,7 +849,7 @@
   }
 
   // ========================================
-  // HISTÓRICO
+  // HISTÓRICO - LAYOUT DO DASHBOARD
   // ========================================
   .historicoContainer {
     max-width: 1200px;
@@ -888,12 +896,13 @@
     transition: all 0.2s ease;
 
     &:hover {
-      border-color: #714797;
+      border-color: #10b981;
       transform: translateY(-2px);
-      box-shadow: 0 4px 15px rgba(113, 71, 151, 0.15);
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.15);
     }
   }
 
+  // ✅ CABEÇALHO DO CARD
   .cardHeaderTop {
     display: flex;
     justify-content: space-between;
@@ -910,6 +919,7 @@
     flex: 1;
   }
 
+  // ✅ BOTÕES DE AÇÃO
   .cardActions {
     display: flex;
     gap: 0.5rem;
@@ -935,11 +945,11 @@
   }
 
   .cardEditBtn {
-    background: #e9d5ff;
-    color: #714797;
+    background: #dbeafe;
+    color: #1e40af;
 
     &:hover {
-      background: #714797;
+      background: #3b82f6;
       color: white;
       transform: scale(1.1);
     }
@@ -956,6 +966,7 @@
     }
   }
 
+  // ✅ BADGES
   .cardBadges {
     display: flex;
     gap: 0.5rem;
@@ -966,8 +977,8 @@
   .completoBadge {
     display: inline-block;
     padding: 4px 10px;
-    background-color: #e9d5ff;
-    color: #5d2691;
+    background-color: #d1fae5;
+    color: #065f46;
     border-radius: 12px;
     font-size: 12px;
     font-weight: 600;
@@ -983,6 +994,7 @@
     font-weight: 600;
   }
 
+  // ✅ OBSERVAÇÕES NO CARD
   .cardObs {
     font-size: 0.9rem;
     color: #64748b;
@@ -991,180 +1003,180 @@
     border-top: 1px solid #e2e8f0;
     margin-top: 0.75rem;
   }
-}
-// ========================================
-// FOOTER
-// ========================================
-.footer {
-  max-width: 1200px;
-  margin: 2rem auto 0;
-  text-align: center;
-  color: #64748b;
-  font-size: 1rem;
-  padding: 1.25rem;
-  background: white;
-  border-radius: 0.75rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e2e8f0;
 
-  strong {
-    color: #714797;
-    font-size: 1.25rem;
-  }
+  // ========================================
+  // FOOTER
+  // ========================================
+  .footer {
+    max-width: 1200px;
+    margin: 2rem auto 0;
+    text-align: center;
+    color: #64748b;
+    font-size: 1rem;
+    padding: 1.25rem;
+    background: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e2e8f0;
 
-  @media (max-width: 768px) {
-    margin-bottom: 5rem;
-  }
-}
-
-// ========================================
-// MODAL DE IMAGEM
-// ========================================
-.modalOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.85);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  backdrop-filter: blur(8px);
-  animation: fadeIn 0.2s ease;
-}
-
-.modalContent {
-  position: relative;
-  max-width: 90vw;
-  max-height: 90vh;
-  width: 700px;
-  background: white;
-  border-radius: 1rem;
-  overflow: hidden;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
-  animation: modalFadeIn 0.3s ease;
-
-  .modalImageContainer {
-    position: relative;
-    width: 100%;
-    height: 500px;
-    background: #0f172a;
+    strong {
+      color: #10b981;
+      font-size: 1.25rem;
+    }
 
     @media (max-width: 768px) {
-      height: 60vh;
-    }
-
-    .modalImage {
-      object-fit: contain;
+      margin-bottom: 5rem;
     }
   }
 
-  .modalTitle {
-    padding: 1.25rem 1.5rem;
-    margin: 0;
-    font-size: 1.25rem;
-    font-weight: 700;
-    text-align: center;
-    background: linear-gradient(135deg, #714797, #5d2691);
-    color: white;
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes modalFadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9) translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-@keyframes modalSlideUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-// ========================================
-// LOADING E ERROR
-// ========================================
-.loading,
-.error {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #06b6d4 0%, #0284c7 50%, #0369a1 100%);
-  padding: 2rem;
-
-  .spinner {
-    width: 3.5rem;
-    height: 3.5rem;
-    border: 5px solid rgba(255, 255, 255, 0.3);
-    border-top: 5px solid white;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+  // ========================================
+  // MODAL DE IMAGEM
+  // ========================================
+  .modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(8px);
+    animation: fadeIn 0.2s ease;
   }
 
-  p {
-    font-size: 1.2rem;
-    color: white;
-    margin: 0;
-    text-align: center;
-    font-weight: 500;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-  }
-
-  .errorText {
-    color: #fee2e2;
-    margin-bottom: 1.5rem;
-    font-weight: 600;
-    font-size: 1.15rem;
-  }
-
-  .retryButton {
-    padding: 0.875rem 1.75rem;
+  .modalContent {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+    width: 700px;
     background: white;
-    color: #714797;
-    border: none;
-    border-radius: 0.75rem;
-    cursor: pointer;
-    font-weight: 700;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+    animation: modalFadeIn 0.3s ease;
 
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    .modalImageContainer {
+      position: relative;
+      width: 100%;
+      height: 500px;
+      background: #0f172a;
+
+      @media (max-width: 768px) {
+        height: 60vh;
+      }
+
+      .modalImage {
+        object-fit: contain;
+      }
+    }
+
+    .modalTitle {
+      padding: 1.25rem 1.5rem;
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 700;
+      text-align: center;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
     }
   }
-}
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes modalFadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9) translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  @keyframes modalSlideUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  // ========================================
+  // LOADING E ERROR
+  // ========================================
+  .loading,
+  .error {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #f8fafc;
+    padding: 2rem;
+
+    .spinner {
+      width: 3.5rem;
+      height: 3.5rem;
+      border: 5px solid #e2e8f0;
+      border-top: 5px solid #10b981;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 1.5rem;
+    }
+
+    p {
+      font-size: 1.2rem;
+      color: #475569;
+      margin: 0;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .errorText {
+      color: #dc2626;
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+      font-size: 1.15rem;
+    }
+
+    .retryButton {
+      padding: 0.875rem 1.75rem;
+      background: #10b981;
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 1rem;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+
+      &:hover {
+        background: #059669;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+      }
+    }
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
 }
 
@@ -1179,8 +1191,8 @@
   width: 100%;
   padding: 0.75rem;
   background: white;
-  border: 2px solid #714797;
-  color: #714797;
+  border: 2px solid #10b981;
+  color: #10b981;
   border-radius: 0.5rem;
   font-weight: 700;
   font-size: 0.9rem;
@@ -1189,10 +1201,10 @@
   margin-top: 0.75rem;
 
   &:hover {
-    background: #714797;
+    background: #10b981;
     color: white;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(113, 71, 151, 0.3);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
   }
 }
 
@@ -1259,7 +1271,7 @@
   justify-content: center;
   width: 2rem;
   height: 2rem;
-  background: linear-gradient(135deg, #714797, #5d2691);
+  background: linear-gradient(135deg, #10b981, #059669);
   color: white;
   border-radius: 50%;
   font-size: 0.9rem;
@@ -1303,7 +1315,6 @@
     font-size: 0.95rem;
   }
 }
-
 // ========================================
 // TOAST
 // ========================================
@@ -1334,22 +1345,22 @@
   }
 
   &.success {
-    background: linear-gradient(135deg, #714797, #5d2691);
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     color: white;
   }
 
   &.error {
-    background: linear-gradient(135deg, #ef4444, #dc2626);
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
     color: white;
   }
 
   &.warning {
-    background: linear-gradient(135deg, #f59e0b, #d97706);
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
     color: white;
   }
 
   &.info {
-    background: linear-gradient(135deg, #0284c7, #0369a1);
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
     color: white;
   }
 
@@ -1424,7 +1435,7 @@
   width: 80px;
   height: 80px;
   margin: 0 auto 1.5rem;
-  background: linear-gradient(135deg, #fef3c7, #fde047);
+  background: linear-gradient(135deg, #fef3c7 0%, #fde047 100%);
   border-radius: 50%;
   color: #d97706;
 
@@ -1499,7 +1510,7 @@
 }
 
 .confirmBtnConfirm {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
   color: white;
   box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3);
 
@@ -1514,7 +1525,7 @@
 }
 
 // ========================================
-// MODAL DETALHES
+// MODAL DETALHES COM SCROLL (se não tiver ainda)
 // ========================================
 .detalhesModal {
   position: relative;
@@ -1537,7 +1548,7 @@
 
 .detalhesModalHeader {
   position: relative;
-  background: linear-gradient(135deg, #714797, #5d2691);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   padding: 1.75rem 1.5rem;
   flex-shrink: 0;
 
@@ -1615,6 +1626,132 @@
   }
 }
 
+.detalhesHeader {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.detalhesData {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 1rem;
+  text-transform: capitalize;
+}
+
+.detalhesBadges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.detalhesExercicios {
+  margin-bottom: 2rem;
+
+  h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 1rem;
+  }
+}
+
+.exerciciosDetalhes {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.exercicioDetalhe {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 0.5rem;
+  border: 1px solid #e2e8f0;
+}
+
+.exercicioNumero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border-radius: 50%;
+  font-size: 0.9rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.exercicioInfo {
+  flex: 1;
+
+  strong {
+    display: block;
+    color: #0f172a;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+  }
+
+  span {
+    color: #64748b;
+    font-size: 0.9rem;
+  }
+}
+
+.detalhesObs {
+  background: #fefce8;
+  border: 1px solid #fde047;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+
+  h4 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #854d0e;
+    margin: 0 0 0.75rem 0;
+  }
+
+  p {
+    margin: 0;
+    color: #713f12;
+    line-height: 1.6;
+    font-size: 0.95rem;
+  }
+}
+
+.cardCount {
+  font-size: 0.9rem;
+  color: #475569;
+  font-weight: 600;
+  margin: 0.75rem 0;
+}
+
+.cardViewBtn {
+  width: 100%;
+  padding: 0.75rem;
+  background: white;
+  border: 2px solid #10b981;
+  color: #10b981;
+  border-radius: 0.5rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 0.75rem;
+
+  &:hover {
+    background: #10b981;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  }
+}
 // ✅ LISTA DE EXERCÍCIOS NO MODAL DE EDIÇÃO
 .editExerciciosList {
   max-height: 250px;
@@ -1659,11 +1796,11 @@
   }
 
   &.selecionado {
-    background: linear-gradient(135deg, #e9d5ff, #d8b4fe);
-    border-color: #714797;
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    border-color: #10b981;
 
     .editExercicioNome {
-      color: #5d2691;
+      color: #059669;
       font-weight: 600;
     }
   }
@@ -1678,7 +1815,7 @@
   flex-shrink: 0;
 
   .checkIcon {
-    color: #714797;
+    color: #10b981;
   }
 
   .checkboxEmpty {
@@ -1702,7 +1839,7 @@
   justify-content: center;
   min-width: 1.75rem;
   height: 1.75rem;
-  background: linear-gradient(135deg, #714797, #5d2691);
+  background: linear-gradient(135deg, #10b981, #059669);
   color: white;
   border-radius: 50%;
   font-size: 0.85rem;
@@ -1715,7 +1852,6 @@
   color: #334155;
   font-weight: 500;
 }
-
 // ✅ MODAL DE CRONÔMETRO EM DESTAQUE
 .cronometroModalOverlay {
   position: fixed;
@@ -1734,7 +1870,7 @@
 
 .cronometroModalContent {
   position: relative;
-  background: linear-gradient(135deg, #1e293b, #0f172a);
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
   border-radius: 2rem;
   padding: 3rem 2rem;
   max-width: 500px;
@@ -1808,13 +1944,13 @@
   }
 
   &.timerExecucao {
-    color: #0284c7;
-    text-shadow: 0 0 30px rgba(2, 132, 199, 0.5);
+    color: #3b82f6;
+    text-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
   }
 
   &.timerDescanso {
-    color: #714797;
-    text-shadow: 0 0 30px rgba(113, 71, 151, 0.5);
+    color: #10b981;
+    text-shadow: 0 0 30px rgba(16, 185, 129, 0.5);
   }
 }
 
@@ -1886,22 +2022,22 @@
 }
 
 .btnModalConcluir {
-  background: linear-gradient(135deg, #714797, #5d2691);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
-  box-shadow: 0 4px 14px rgba(113, 71, 151, 0.3);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
 
   &:hover {
-    box-shadow: 0 8px 25px rgba(113, 71, 151, 0.5);
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5);
   }
 }
 
 .btnModalPular {
-  background: linear-gradient(135deg, #0284c7, #0369a1);
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   color: white;
-  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3);
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
 
   &:hover {
-    box-shadow: 0 8px 25px rgba(2, 132, 199, 0.5);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5);
   }
 }
 
@@ -1916,7 +2052,7 @@
   }
 }
 
-// ✅ SÉRIE COMPLETA
+// ✅ SÉRIE COMPLETA - LAYOUT MELHORADO
 .serieCompleta {
   display: flex;
   flex-direction: column;
@@ -1933,14 +2069,14 @@
   .serieCompletaText {
     font-size: 1.25rem;
     font-weight: 700;
-    color: #714797;
+    color: #10b981;
   }
 
   .btnDesfazer {
     width: 100%;
     padding: 0.75rem 1rem;
     border: 2px solid #f59e0b;
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
     border-radius: 0.75rem;
     cursor: pointer;
     display: flex;
@@ -1951,7 +2087,7 @@
     box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
 
     &:hover {
-      background: linear-gradient(135deg, #f59e0b, #d97706);
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
       border-color: #d97706;
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
@@ -1984,7 +2120,7 @@
   width: 3.5rem;
   height: 3.5rem;
   border: 2px solid #e2e8f0;
-  background: linear-gradient(135deg, #ffffff, #f8fafc);
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   border-radius: 1rem;
   cursor: pointer;
   display: flex;
@@ -1996,11 +2132,12 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 
   &:hover {
-    background: linear-gradient(135deg, #714797, #5d2691);
-    border-color: #714797;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-color: #10b981;
     transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(113, 71, 151, 0.3);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 
+    // Emoji fica branco no hover
     filter: brightness(0) invert(1);
   }
 

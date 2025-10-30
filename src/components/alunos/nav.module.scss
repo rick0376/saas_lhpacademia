@@ -1,33 +1,44 @@
-// ============================================================
-// NAVEGAÇÃO DO HEADER
-// ============================================================
+// ========================================
+// NAVEGAÇÃO DO HEADER - MODERNIZADA
+// ========================================
 .rightArea {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-// ============================================================
-// BOTÃO DE MENU
-// ============================================================
+// ========================================
+// BOTÃO DE MENU - ROXO VIBRANTE
+// ========================================
 .menuButton {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
-  background-color: #6554ff;
+  padding: 10px 18px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0.1)
+  );
+  backdrop-filter: blur(10px);
   color: white;
-  border: none;
-  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 
   &:hover {
-    background-color: #5558e3;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.3),
+      rgba(255, 255, 255, 0.2)
+    );
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(101, 84, 255, 0.3);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    border-color: rgba(255, 255, 255, 0.5);
   }
 
   &:active {
@@ -35,7 +46,7 @@
   }
 
   @media (max-width: 480px) {
-    padding: 8px 12px;
+    padding: 10px 14px;
   }
 }
 
@@ -45,94 +56,149 @@
   }
 }
 
-// ============================================================
-// USER AREA
-// ============================================================
+// ========================================
+// USER CHIP - ROXO VIBRANTE
+// ========================================
 .userChip {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 6px 12px;
-  background-color: #f8fafc;
-  border-radius: 10px;
-  border: 1px solid #e2e8f0;
+  gap: 12px;
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  }
 
   @media (max-width: 768px) {
     display: none;
   }
 }
 
+// ========================================
+// USER AVATAR - ROXO COM INICIAIS BRANCAS
+// ========================================
 .userAvatar {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #6554ff, #5558e3);
-  color: white;
+  background: linear-gradient(135deg, #714797, #5d2691);
+  color: white !important;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 800;
   flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(113, 71, 151, 0.4);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .userChip:hover & {
+    transform: scale(1.1) rotate(5deg);
+
+    &::before {
+      opacity: 1;
+    }
+  }
 }
 
 .userInfo {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
 }
 
 .userName {
   font-size: 14px;
-  font-weight: 600;
-  color: #0f172a;
+  font-weight: 700;
+  color: white;
   line-height: 1;
   max-width: 150px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .userRole {
   font-size: 11px;
-  font-weight: 500;
-  color: #64748b;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
   line-height: 1;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.75px;
 }
 
-// ============================================================
-// ACTIONS
-// ============================================================
+// ========================================
+// ACTIONS - CONTAINER DOS BOTÕES
+// ========================================
 .actions {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 
   @media (max-width: 768px) {
     display: none;
   }
 }
 
+// ========================================
+// ACTION BUTTON BASE - ROXO/SETTINGS
+// ========================================
 .actionBtn {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  background-color: transparent;
-  border: 1px solid #e2e8f0;
-  color: #64748b;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #714797, #5d2691);
+  border: 2px solid #714797;
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   text-decoration: none;
+  box-shadow: 0 6px 20px rgba(113, 71, 151, 0.2);
+  font-weight: 700;
+
+  svg {
+    transition: all 0.3s ease;
+    color: white !important;
+  }
 
   &:hover {
-    background-color: #f8fafc;
-    border-color: #6554ff;
-    color: #6554ff;
+    background: linear-gradient(135deg, #5d2691, #5a0f9b);
+    border-color: #5a0f9b;
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 28px rgba(113, 71, 151, 0.3);
+    color: white;
+
+    svg {
+      transform: scale(1.15);
+      color: white !important;
+    }
   }
 
   &:active {
@@ -140,9 +206,33 @@
   }
 }
 
+// ========================================
+// LOGOUT BUTTON - VERMELHO
+// ========================================
 .logoutBtn {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  border-color: #ef4444;
+  color: white;
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.2);
+
+  svg {
+    color: white !important;
+  }
+
   &:hover {
-    border-color: #ef4444;
-    color: #ef4444;
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    border-color: #b91c1c;
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 28px rgba(239, 68, 68, 0.3);
+    color: white;
+
+    svg {
+      color: white !important;
+      transform: scale(1.15);
+    }
+  }
+
+  &:active {
+    transform: scale(0.95);
   }
 }

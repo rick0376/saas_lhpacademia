@@ -2,51 +2,78 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #f8fafc;
+  background: linear-gradient(135deg, #714797 0%, #5d2691 50%, #5a0f9b 100%);
   color: #1e293b;
-  font-family: "Inter", sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  position: relative;
+
+  // Efeito de partículas no fundo
+  &::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(
+        circle at 20% 50%,
+        rgba(255, 255, 255, 0.1) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 80% 80%,
+        rgba(255, 255, 255, 0.08) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 40% 20%,
+        rgba(255, 255, 255, 0.06) 0%,
+        transparent 50%
+      );
+    pointer-events: none;
+    z-index: 0;
+  }
 }
 
-/*.main {
-  flex: 1;
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
-
-  @media (max-width: 768px) {
-    padding: 1rem;
-  }
-
-  @media (max-width: 480px) {
-    padding: 0.5rem;
-  }
-}
-*/
-// Header
+// ========================================
+// HEADER - GLASSMORPHISM
+// ========================================
 .header {
   position: sticky;
   top: 0;
   z-index: 100;
-  background-color: #ffffff;
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  border-bottom: 1px solid #e2e8f0;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  animation: slideDown 0.5s ease;
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 
   .headerContent {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 1rem 2rem;
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
     width: 100%;
     gap: 1rem;
+    position: relative;
+    z-index: 1;
 
     @media (max-width: 768px) {
-      flex-direction: column;
-      align-items: stretch;
       padding: 1rem;
-      gap: 0.5rem;
+      gap: 0.75rem;
     }
 
     @media (max-width: 480px) {
@@ -55,44 +82,76 @@
   }
 }
 
-// Logo Area
+// ========================================
+// LOGO AREA - MODERNIZADO
+// ========================================
 .logoArea {
   display: flex;
   align-items: center;
   text-decoration: none;
-  color: #1e293b;
-  transition: all 0.2s ease-in-out;
+  color: white;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  padding: 0.5rem;
+  border-radius: 12px;
 
   &:hover {
-    color: #0070f3;
+    transform: translateX(4px);
+
+    .logoIcon {
+      transform: rotate(10deg) scale(1.1);
+    }
+
+    .title {
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+    }
   }
 
   .logoContainer {
     display: flex;
     align-items: center;
-    margin-right: 0.75rem;
+    margin-right: 1rem;
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.2),
+      rgba(255, 255, 255, 0.1)
+    );
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 
     .logoIcon {
-      color: #0070f3;
+      color: white;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+      transition: all 0.3s ease;
     }
   }
 
   .titleContainer {
     .title {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: #0070f3;
+      font-size: 1.375rem;
+      font-weight: 800;
+      color: white;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      letter-spacing: -0.02em;
+      transition: all 0.3s ease;
     }
 
     .subtitle {
       font-size: 0.875rem;
-      color: #64748b;
-      font-weight: 400;
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 500;
     }
   }
 
   @media (max-width: 768px) {
-    justify-content: center;
+    .logoContainer {
+      width: 40px;
+      height: 40px;
+    }
 
     .titleContainer {
       .title {
@@ -106,7 +165,9 @@
   }
 }
 
-// Breadcrumb
+// ========================================
+// BREADCRUMB
+// ========================================
 .breadcrumbNav {
   display: flex;
   align-items: center;
@@ -117,30 +178,32 @@
     display: flex;
     align-items: center;
     font-size: 0.875rem;
-    color: #64748b;
+    color: rgba(255, 255, 255, 0.8);
 
     .breadcrumbLink {
       text-decoration: none;
-      color: #0070f3;
-      transition: all 0.2s ease-in-out;
+      color: white;
+      transition: all 0.2s ease;
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
 
       &:hover {
-        color: #6366f1;
-        text-decoration: underline;
+        background: rgba(255, 255, 255, 0.1);
+        text-decoration: none;
       }
     }
 
     .breadcrumbSeparator {
       margin: 0 0.5rem;
-      color: #64748b;
+      color: rgba(255, 255, 255, 0.6);
       font-weight: bold;
     }
   }
 
   .breadcrumbDefault {
     font-size: 0.875rem;
-    color: #1e293b;
-    font-weight: 500;
+    color: white;
+    font-weight: 600;
   }
 
   @media (max-width: 768px) {
@@ -148,113 +211,279 @@
   }
 }
 
-// Top Nav (links no header)
-.topNav {
+// ========================================
+// MENU BUTTON - ROXO VIBRANTE
+// ========================================
+.menuButton {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  flex: 1;
-  justify-content: center;
-  max-width: 40%;
+  gap: 8px;
+  padding: 10px 18px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0.1)
+  );
+  backdrop-filter: blur(10px);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 
-  .navLink {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    text-decoration: none;
-    color: #1e293b;
-    border-radius: 8px;
-    transition: all 0.2s ease-in-out;
-    font-size: 0.875rem;
-    font-weight: 500;
-    white-space: nowrap;
-
-    .navIcon {
-      flex-shrink: 0;
-    }
-
-    .navLabel {
-      // Hide label em mobile se necessário
-    }
-
-    &:hover {
-      background-color: #f1f5f9;
-      color: #0070f3;
-    }
+  &:hover {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.3),
+      rgba(255, 255, 255, 0.2)
+    );
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    border-color: rgba(255, 255, 255, 0.5);
   }
 
-  .navLinkActive {
-    background-color: #0070f3;
-    color: #ffffff;
-
-    &:hover {
-      background-color: #0062cc;
-    }
-
-    .navIcon,
-    .navLabel {
-      color: #ffffff;
-    }
+  &:active {
+    transform: scale(0.98);
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 480px) {
+    padding: 10px 14px;
+  }
+}
+
+.menuButtonText {
+  @media (max-width: 480px) {
     display: none;
   }
 }
 
-// Footer
+// ========================================
+// DROPDOWN MENU - MODERNO
+// ========================================
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.75rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  min-width: 240px;
+  z-index: 200;
+  animation: dropdownSlideDown 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  overflow: hidden;
+
+  @keyframes dropdownSlideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-15px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @media (max-width: 768px) {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 200px;
+  }
+}
+
+// ========================================
+// DROPDOWN NAV E LINKS
+// ========================================
+.dropdownNav {
+  list-style: none;
+  padding: 0.75rem 0;
+}
+
+.dropdownLink {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.875rem 1.25rem;
+  text-decoration: none;
+  color: #1e293b;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(135deg, #714797, #5d2691);
+    transform: scaleY(0);
+    transition: transform 0.2s ease;
+  }
+
+  .dropdownIcon {
+    flex-shrink: 0;
+    color: #64748b;
+    transition: all 0.2s ease;
+  }
+
+  .dropdownLabel {
+    color: #1e293b;
+    transition: all 0.2s ease;
+  }
+
+  &:hover {
+    background: linear-gradient(
+      90deg,
+      rgba(113, 71, 151, 0.08) 0%,
+      transparent 100%
+    );
+    color: #714797;
+
+    &::before {
+      transform: scaleY(1);
+    }
+
+    .dropdownIcon,
+    .dropdownLabel {
+      color: #714797;
+      transform: translateX(4px);
+    }
+  }
+}
+
+.dropdownLinkActive {
+  background: linear-gradient(135deg, #714797, #5d2691);
+  color: white;
+
+  &::before {
+    transform: scaleY(1);
+    background: white;
+  }
+
+  &:hover {
+    background: linear-gradient(135deg, #5d2691, #5a0f9b);
+  }
+
+  .dropdownIcon,
+  .dropdownLabel {
+    color: white;
+  }
+}
+
+// ========================================
+// DIVIDER
+// ========================================
+.dropdownDivider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(148, 163, 184, 0.3) 50%,
+    transparent 100%
+  );
+  margin: 0.5rem 1rem;
+}
+
+// ========================================
+// BOTÃO DE LOGOUT NO MENU
+// ========================================
+.dropdownLogout {
+  width: 100%;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  color: #ef4444 !important;
+
+  &:hover {
+    background: linear-gradient(
+      90deg,
+      rgba(239, 68, 68, 0.08) 0%,
+      transparent 100%
+    ) !important;
+  }
+
+  &::before {
+    background: #ef4444 !important;
+  }
+
+  .dropdownIcon,
+  .dropdownLabel {
+    color: #ef4444 !important;
+  }
+}
+
+// ========================================
+// FOOTER - MODERNO
+// ========================================
 .footer {
-  background-color: #ffffff;
-  border-top: 1px solid #e2e8f0;
-  padding: 1rem 0;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 1.5rem 0;
   text-align: center;
+  position: relative;
+  z-index: 1;
 
   .footerContent {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    max-width: 1200px;
+    gap: 0.75rem;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 0 2rem;
-    font-size: 0.875rem;
-    color: #64748b;
+    font-size: 0.9375rem;
+    color: white;
+    font-weight: 500;
 
     .dot {
-      width: 4px;
-      height: 4px;
-      background-color: #64748b;
+      width: 5px;
+      height: 5px;
+      background-color: rgba(255, 255, 255, 0.6);
       border-radius: 50%;
     }
 
     .footerMuted {
-      color: #64748b;
+      color: rgba(255, 255, 255, 0.8);
     }
   }
 
   @media (max-width: 768px) {
-    padding: 0.75rem 0;
+    padding: 1rem 0;
 
     .footerContent {
       flex-direction: column;
-      gap: 0.25rem;
+      gap: 0.5rem;
       padding: 0 1rem;
+      font-size: 0.875rem;
     }
   }
 }
 
-// Modal de Logout
+// ========================================
+// MODAL DE LOGOUT - MODERNO
+// ========================================
 .modalOverlay {
   position: fixed;
   inset: 0;
-  background-color: rgb(0 0 0 / 0.5);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  backdrop-filter: blur(4px);
-  animation: fadeIn 0.2s ease-out;
+  backdrop-filter: blur(8px);
+  animation: fadeIn 0.3s ease;
 
   @keyframes fadeIn {
     from {
@@ -267,49 +496,51 @@
 }
 
 .modal {
-  background-color: #ffffff;
-  border-radius: 8px;
-  padding: 2rem;
-  max-width: 400px;
+  background: white;
+  border-radius: 24px;
+  padding: 2.5rem;
+  max-width: 440px;
   width: 90%;
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.1);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   text-align: center;
-  animation: slideUp 0.2s ease-out;
+  animation: modalSlideUp 0.3s ease;
 
-  @keyframes slideUp {
+  @keyframes modalSlideUp {
     from {
-      transform: translateY(20px);
+      transform: translateY(30px) scale(0.95);
       opacity: 0;
     }
     to {
-      transform: translateY(0);
+      transform: translateY(0) scale(1);
       opacity: 1;
     }
   }
 
   .modalIcon {
-    width: 60px;
-    height: 60px;
-    margin: 0 auto 1rem;
-    background-color: #fee2e2;
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 1.5rem;
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     color: #ef4444;
+    box-shadow: 0 8px 24px rgba(239, 68, 68, 0.2);
   }
 
   .modalTitle {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 0.75rem;
     color: #1e293b;
   }
 
   .modalText {
     color: #64748b;
-    margin-bottom: 1.5rem;
-    line-height: 1.5;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+    font-size: 1rem;
   }
 
   .modalActions {
@@ -319,185 +550,47 @@
 
     .ghostBtn,
     .dangerBtn {
-      padding: 0.75rem 1.5rem;
-      border-radius: 8px;
+      padding: 0.875rem 2rem;
+      border-radius: 12px;
       border: none;
-      font-weight: 500;
+      font-weight: 700;
       cursor: pointer;
-      transition: all 0.2s ease-in-out;
-      font-size: 0.875rem;
+      transition: all 0.3s ease;
+      font-size: 0.9375rem;
     }
 
     .ghostBtn {
-      background-color: transparent;
-      color: #0070f3;
-      border: 1px solid #0070f3;
+      background: transparent;
+      color: #714797;
+      border: 2px solid #714797;
 
       &:hover {
-        background-color: #0070f3;
-        color: #ffffff;
+        background: #714797;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(113, 71, 151, 0.3);
       }
     }
 
     .dangerBtn {
-      background-color: #ef4444;
-      color: #ffffff;
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 
       &:hover {
-        background-color: #dc2626;
+        background: linear-gradient(135deg, #dc2626, #b91c1c);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
       }
     }
-  }
-}
-// ============================================================
-// BOTÃO DE MENU
-// ============================================================
-.menuButton {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background-color: #6554ff;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
 
-  &:hover {
-    background-color: #5558e3;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(101, 84, 255, 0.3);
-  }
+    @media (max-width: 480px) {
+      flex-direction: column;
 
-  &:active {
-    transform: scale(0.98);
-  }
-
-  @media (max-width: 480px) {
-    padding: 8px 12px;
-  }
-}
-
-.menuButtonText {
-  @media (max-width: 480px) {
-    display: none;
-  }
-}
-
-// Dropdown Menu (como no original, absoluto)
-.dropdownMenu {
-  position: absolute;
-  top: 100%;
-  right: 0; // Alinha à direita do button para não overflow
-  margin-top: 0.5rem;
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.1);
-  min-width: 200px;
-  z-index: 200;
-  animation: slideDown 0.2s ease-out;
-  border: 1px solid #e2e8f0;
-
-  @keyframes slideDown {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
+      .ghostBtn,
+      .dangerBtn {
+        width: 100%;
+      }
     }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @media (max-width: 768px) {
-    right: auto;
-    left: 50%;
-    transform: translateX(-50%);
-    min-width: 180px;
-  }
-}
-
-// Dropdown Nav e Links
-.dropdownNav {
-  list-style: none;
-  padding: 0.5rem 0;
-}
-
-.dropdownLink {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  text-decoration: none;
-  color: #1e293b;
-  font-size: 0.875rem;
-  font-weight: 500;
-  transition: all 0.2s ease-in-out;
-  white-space: nowrap;
-
-  .dropdownIcon {
-    flex-shrink: 0;
-    color: #64748b;
-  }
-
-  .dropdownLabel {
-    color: #1e293b;
-  }
-
-  &:hover {
-    background-color: #f1f5f9;
-    color: #0070f3;
-
-    .dropdownIcon,
-    .dropdownLabel {
-      color: #0070f3;
-    }
-  }
-}
-
-.dropdownLinkActive {
-  background-color: #0070f3;
-  color: #ffffff;
-
-  &:hover {
-    background-color: #0062cc;
-  }
-
-  .dropdownIcon,
-  .dropdownLabel {
-    color: #ffffff;
-  }
-}
-// ✅ DIVIDER NO MENU
-.dropdownDivider {
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(148, 163, 184, 0.3) 50%,
-    transparent 100%
-  );
-  margin: 0.5rem 0;
-}
-
-// ✅ BOTÃO DE LOGOUT NO MENU (estilo de botão, não link)
-.dropdownLogout {
-  width: 100%;
-  background: none;
-  border: none;
-  text-align: left;
-  cursor: pointer;
-  color: #ef4444 !important;
-
-  &:hover {
-    background: #fef2f2 !important;
-    border-left-color: #ef4444 !important;
-  }
-
-  .dropdownIcon {
-    color: #ef4444;
   }
 }
