@@ -21,25 +21,17 @@ interface TreinoDetalhes {
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> } // ✅ Promise
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params; // ✅ Await aqui
+  const { id } = await params;
   const alunoId = req.nextUrl.searchParams.get("alunoId");
 
   if (!alunoId) {
     return NextResponse.json({ error: "alunoId ausente" }, { status: 400 });
   }
 
-  /* --- (opcional) verificação de sessão; descomente quando next-auth estiver estável ---
-  const session = await getServerSession(authOptions);
-  if (!session?.user || (session.user as any).aluno?.id !== alunoId) {
-    return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
-  }
-  ------------------------------------------------------------------------------- */
-
-  // consulta única pelo ID; depois valida se o treino pertence ao aluno
   const treino = await prisma.treino.findUnique({
-    where: { id }, // ✅ Usa id ao invés de params.id
+    where: { id },
     select: {
       nome: true,
       descricao: true,
@@ -75,8 +67,10 @@ export async function GET(
       nome: ex.exercicio.nome,
       series: ex.series,
       reps: ex.repeticoes,
+      carga: ex.carga ?? undefined, // ✅ NOVO
       descanso: ex.descanso ?? "N/A",
-      descricao: ex.exercicio.descricao ?? ex.observacoes ?? "Sem descrição.",
+      descricao: ex.exercicio.descricao, // ✅ CORRIGIDO - Só da biblioteca
+      observacao: ex.observacoes ?? undefined, // ✅ NOVO - Observações DO TREINO
       fotoExecucao: ex.exercicio.imagem ?? undefined,
     })),
   };

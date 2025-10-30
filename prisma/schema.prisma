@@ -109,18 +109,50 @@ model Medida {
 
 // Avaliações físicas
 model Avaliacao {
-  id          String   @id @default(cuid())
-  alunoId     String
-  aluno       Aluno    @relation(fields: [alunoId], references: [id], onDelete: Cascade)
-  tipo        String?
-  resultado   String?
-  observacoes String?
-  arquivo     String?
-  data        DateTime @default(now())
-  createdAt   DateTime @default(now())
+  id                      String   @id @default(cuid())
+  alunoId                 String
+  aluno                   Aluno    @relation(fields: [alunoId], references: [id], onDelete: Cascade)
+  tipo                    String?  // Ex.: "Inicial", "Trimestral", "Mensal", "Anual"
+  resultado               String?  // Resumo dos resultados (mantido)
+  observacoes             String?  // Notas adicionais (mantido)
+  arquivo                 String?  // URL ou path do PDF (mantido)
+  data                    DateTime @default(now()) // Data da avaliação (mantido)
+  createdAt               DateTime @default(now()) // Mantido
+  updatedAt               DateTime @updatedAt // Novo: para rastrear atualizações
+
+  // Anamnese (Entrevista Inicial)
+  historicoMedico         String?  // Histórico médico geral e familiar
+  objetivos               String?  // Objetivos do aluno (ex.: emagrecimento, hipertrofia)
+  praticaAnterior         String?  // Experiência prévia com exercícios
+  fumante                 Boolean  @default(false) // Risco: tabagismo
+  diabetes                Boolean  @default(false) // Risco: diabetes
+  doencasArticulares      Boolean  @default(false) // Risco: problemas articulares
+  cirurgias               String?  // Cirurgias, lesões ou condições especiais
+
+  // Antropométrica (Medidas Corporais)
+  peso                    Float?   // Peso em kg
+  altura                  Float?   // Altura em cm
+  imc                     Float?   // IMC calculado (peso / (altura/100)^2)
+  percentualGordura       Float?   // % de gordura corporal (via bioimpedância ou dobras)
+  circunferenciaCintura   Float?   // Circunferência da cintura em cm
+  circunferenciaQuadril   Float?   // Circunferência do quadril em cm
+  dobrasCutaneas          Json?    // Objeto JSON: { subescapular: Float, triceps: Float, peitoral: Float, axilar: Float, suprailiaca: Float, abdominal: Float, femural: Float } (em mm, método de 7 pontos)
+
+  // Cardiorespiratória
+  vo2Max                  Float?   // VO2 máximo em ml/kg/min (capacidade aeróbica)
+  testeCooper             Float?   // Distância percorrida no teste de Cooper em metros
+
+  // Muscular (Força e Resistência)
+  forcaSupino             Float?   // Carga no supino em kg (exemplo de força superior)
+  repeticoesFlexoes       Int?     // Número de flexões de braço
+  pranchaTempo            Int?     // Tempo mantido na prancha em segundos (core)
+
+  // Flexibilidade
+  testeSentarEsticar      Float?   // Distância no teste sentar e esticar em cm (flexibilidade lombar)
 
   @@map("avaliacoes")
 }
+
 
 // Exercícios (Biblioteca)
 model Exercicio {

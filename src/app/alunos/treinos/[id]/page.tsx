@@ -28,6 +28,7 @@ interface Exercício {
   carga?: string;
   descanso: string;
   descricao?: string;
+  observacao?: string;
   fotoExecucao?: string;
 }
 
@@ -140,6 +141,8 @@ export default function TreinoDetalhesPage() {
   });
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showConfirmCancelSerie, setShowConfirmCancelSerie] = useState(false);
+  const [showCongratulacoes, setShowCongratulacoes] = useState(false);
   const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null);
   const [confirmMessage, setConfirmMessage] = useState("");
 
@@ -217,6 +220,12 @@ export default function TreinoDetalhesPage() {
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
+        // ✅ Se tem modal de confirmação de cancelamento, fecha só ela
+        if (showConfirmCancelSerie) {
+          setShowConfirmCancelSerie(false);
+          return;
+        }
+
         setSelectedEx(null);
         setShowRegistroModal(false);
         setShowEditModal(false);
@@ -228,6 +237,7 @@ export default function TreinoDetalhesPage() {
         }
       }
     };
+
     if (
       selectedEx ||
       showRegistroModal ||
@@ -235,10 +245,12 @@ export default function TreinoDetalhesPage() {
       showVerDetalhesModal ||
       showConfirmModal ||
       showInstrucoesModal ||
-      showCronometroModal
+      showCronometroModal ||
+      showConfirmCancelSerie // ✅ ADICIONA ISSO
     ) {
       document.addEventListener("keydown", handleEsc);
     }
+
     return () => document.removeEventListener("keydown", handleEsc);
   }, [
     selectedEx,
@@ -248,6 +260,7 @@ export default function TreinoDetalhesPage() {
     showConfirmModal,
     showInstrucoesModal,
     showCronometroModal,
+    showConfirmCancelSerie, // ✅ ADICIONA ISSO TAMBÉM
   ]);
 
   useEffect(() => {
@@ -405,12 +418,18 @@ export default function TreinoDetalhesPage() {
   };
 
   const cancelarExecucao = () => {
+    setShowConfirmCancelSerie(true);
+  };
+
+  const confirmarCancelamento = () => {
     setCronometroExecucao({
       exercicioId: null,
       tempo: 0,
     });
     setShowCronometroModal(false);
     setExercicioAtivo(null);
+    setShowConfirmCancelSerie(false);
+    showToast("❌ Série cancelada", "warning");
   };
 
   const concluirSerie = (exercicioId: string, exercicio: Exercício) => {
@@ -433,6 +452,7 @@ export default function TreinoDetalhesPage() {
         setTempoRestante(segundos);
         setExercicioAtivo(exercicio);
         setCronometroModalType("descanso");
+        setShowCronometroModal(true); // ✅ ADICIONA ISSO!
       } else {
         setShowCronometroModal(false);
       }
@@ -454,6 +474,14 @@ export default function TreinoDetalhesPage() {
       toggleExercicioConcluido(exercicioId);
       playExercicioCompleto();
       showToast(`🎉 Exercício ${exercicio.nome} completo!`, "success");
+
+      // ✅ VERIFICA SE TODOS OS EXERCÍCIOS FORAM COMPLETADOS
+      const totalExercicios = detalhes?.exercicios.length || 0;
+      const exerciciosCompletos = exerciciosConcluidos.size + 1;
+
+      if (exerciciosCompletos === totalExercicios) {
+        setShowCongratulacoes(true);
+      }
     }
   };
 
@@ -498,7 +526,7 @@ export default function TreinoDetalhesPage() {
 
   const parseTempoDescanso = (tempo: string): number => {
     const match = tempo.match(
-      /(\\d+)\\s*(s|seg|segundo|segundos|m|min|minuto|minutos)?/i
+      /(\d+)\s*(s|seg|segundo|segundos|m|min|minuto|minutos)?/i // ✅ CORRETO
     );
     if (!match) return 0;
 
@@ -1129,10 +1157,11 @@ export default function TreinoDetalhesPage() {
                       </div>
                     </div>
 
-                    {ex.descricao && (
+                    {/* ✅ MOSTRA A OBSERVAÇÃO DO TREINO (NÃO DA BIBLIOTECA) */}
+                    {ex.observacao && (
                       <div className={styles.cardObs}>
                         <span className={styles.obsLabel}>Observações:</span>
-                        <p className={styles.obsText}>{ex.descricao}</p>
+                        <p className={styles.obsText}>{ex.observacao}</p>
                       </div>
                     )}
                   </div>
@@ -1326,7 +1355,8 @@ export default function TreinoDetalhesPage() {
                   <div className={styles.cronometroModalActions}>
                     <button
                       className={styles.btnModalCancelar}
-                      onClick={cancelarExecucao}
+                      onClick={() => setShowConfirmCancelSerie(true)}
+                      title="Cancelar série"
                     >
                       ✕ Cancelar
                     </button>
@@ -1707,7 +1737,69 @@ export default function TreinoDetalhesPage() {
             </div>
           </div>
         )}
+        {/* MODAL - CONFIRMAÇÃO DE CANCELAMENTO DE SÉRIE */}
+        {showConfirmCancelSerie && (
+          <div
+            className={styles.modalOverlay}
+            onClick={() => setShowConfirmCancelSerie(false)}
+          >
+            <div
+              className={styles.confirmModal}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className={styles.confirmIcon}>
+                <AlertTriangle size={48} />
+              </div>
+              <h3 className={styles.confirmTitle}>Cancelar Série?</h3>
+              <p className={styles.confirmMessage}>
+                Tem certeza que deseja cancelar a série iniciada? O tempo será
+                perdido.
+              </p>
+              <div className={styles.confirmActions}>
+                <button
+                  className={styles.confirmBtnCancel}
+                  onClick={() => setShowConfirmCancelSerie(false)}
+                >
+                  Voltar
+                </button>
+                <button
+                  className={styles.confirmBtnConfirm}
+                  onClick={confirmarCancelamento}
+                >
+                  Sim, Cancelar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
+        {/* MODAL - CONGRATULAÇÕES - TREINO COMPLETO */}
+        {showCongratulacoes && (
+          <div className={styles.modalOverlay}>
+            <div
+              className={styles.congratulacoesModal}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className={styles.congratulacoesIcon}>🎉</div>
+              <h2 className={styles.congratulacoesTitle}>Parabéns!</h2>
+              <p className={styles.congratulacoesSubtitle}>
+                Você completou todos os exercícios do treino!
+              </p>
+              <p className={styles.congratulacoesText}>
+                🏆 Ótimo trabalho! Continue assim para atingir seus objetivos.
+              </p>
+              <button
+                className={styles.congratulacoesBtn}
+                onClick={() => {
+                  setShowCongratulacoes(false);
+                  openRegistroModal();
+                }}
+              >
+                Registrar Treino
+              </button>
+            </div>
+          </div>
+        )}
         {toast.show && (
           <div className={`${styles.toast} ${styles[toast.type]}`}>
             <span>{toast.message}</span>

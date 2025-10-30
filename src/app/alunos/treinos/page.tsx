@@ -55,7 +55,22 @@ export default function TreinosPage() {
       if (!response.ok) throw new Error(`Erro: ${response.status}`);
 
       const data: Treino[] = await response.json();
-      setTreinos(data);
+
+      // ✅ NOVO - Ordena em ordem alfabética pelo nome
+      const treinosOrdenados = data.sort((a, b) => {
+        return a.nome.localeCompare(b.nome, "pt-BR");
+      });
+
+      /*
+      // ✅ NOVO - Ordena em ordem crescente pela data de início
+      const treinosOrdenados = data.sort((a, b) => {
+        return (
+          new Date(a.dataInicio).getTime() - new Date(b.dataInicio).getTime()
+        );
+      });
+      */
+
+      setTreinos(treinosOrdenados);
     } catch (err: any) {
       setError(err.message || "Erro ao carregar treinos");
     } finally {

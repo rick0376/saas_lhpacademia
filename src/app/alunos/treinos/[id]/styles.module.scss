@@ -1030,7 +1030,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 10001;
   backdrop-filter: blur(8px);
   animation: fadeIn 0.2s ease;
 }
@@ -1410,7 +1410,7 @@
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
   animation: modalSlideUp 0.3s ease;
   text-align: center;
-
+  z-index: 10000;
   @media (max-width: 768px) {
     width: 90vw;
     padding: 1.5rem;
@@ -1727,7 +1727,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10000;
+  z-index: 9999;
   animation: fadeIn 0.3s ease;
   backdrop-filter: blur(10px);
 }
@@ -2243,4 +2243,82 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 0.375rem;
+}
+
+// ✅ MODAL DE CONGRATULAÇÕES
+.congratulacoesModal {
+  position: relative;
+  max-width: 90vw;
+  width: 500px;
+  background: white;
+  border-radius: 1.5rem;
+  padding: 3rem 2rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+  animation: modalSlideUp 0.3s ease;
+  text-align: center;
+  z-index: 10000;
+
+  @media (max-width: 768px) {
+    width: 90vw;
+    padding: 2rem 1.5rem;
+  }
+}
+
+.congratulacoesIcon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+  animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.congratulacoesTitle {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #714797;
+  margin: 0 0 0.75rem 0;
+}
+
+.congratulacoesSubtitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 1.5rem 0;
+}
+
+.congratulacoesText {
+  font-size: 1rem;
+  color: #475569;
+  line-height: 1.6;
+  margin: 0 0 2rem 0;
+}
+
+.congratulacoesBtn {
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #714797, #5d2691);
+  color: white;
+  border: none;
+  border-radius: 0.75rem;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 14px rgba(113, 71, 151, 0.3);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(113, 71, 151, 0.4);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
 }

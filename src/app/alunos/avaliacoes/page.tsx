@@ -1,52 +1,166 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { AlunoLayout } from "@/components/alunos/AlunoLayout";
+import { ArrowLeft, RefreshCw, Download } from "lucide-react";
 import styles from "./styles.module.scss";
+
+interface DobrasCutaneas {
+  subescapular?: number | null;
+  triceps?: number | null;
+  peitoral?: number | null;
+  axilar?: number | null;
+  suprailiaca?: number | null;
+  abdominal?: number | null;
+  femural?: number | null;
+}
 
 interface Avaliacao {
   id: string;
+  alunoId: string;
   tipo: string | null;
   resultado: string | null;
   observacoes: string | null;
   arquivo: string | null;
-  data: string;
+  data: Date; // Data da avaliação (ISO string ou Date)
+  createdAt: Date;
+  updatedAt: Date | null;
+
+  // Anamnese
+  historicoMedico: string | null;
+  objetivos: string | null;
+  praticaAnterior: string | null;
+  fumante: boolean;
+  diabetes: boolean;
+  doencasArticulares: boolean;
+  cirurgias: string | null;
+
+  // Antropometria
+  peso: number | null;
+  altura: number | null;
+  imc: number | null;
+  percentualGordura: number | null;
+  circunferenciaCintura: number | null;
+  circunferenciaQuadril: number | null;
+  dobrasCutaneas: DobrasCutaneas | null;
+
+  // Cardiorrespiratória
+  vo2Max: number | null;
+  testeCooper: number | null;
+
+  // Muscular
+  forcaSupino: number | null;
+  repeticoesFlexoes: number | null;
+  pranchaTempo: number | null;
+
+  // Flexibilidade
+  testeSentarEsticar: number | null;
 }
 
 export default function AvaliacoesPage() {
+  const { data: session } = useSession();
   const [avaliacoes, setAvaliacoes] = useState<Avaliacao[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [reloading, setReloading] = useState(false);
+
+  const fetchAvaliacoes = async (alunoId: string) => {
+    try {
+      console.log("🔍 Buscando avaliações para alunoId:", alunoId);
+      const res = await fetch(`/api/alunos/avaliacoes?alunoId=${alunoId}`, {
+        cache: "no-store",
+      });
+      if (!res.ok) throw new Error(`Erro HTTP: ${res.status}`);
+      const data = await res.json();
+      // Converte strings de data para Date se necessário (API retorna ISO strings)
+      const avaliacoesComDatas = data.map((av: Avaliacao) => ({
+        ...av,
+        data: new Date(av.data),
+        createdAt: new Date(av.createdAt),
+        updatedAt: av.updatedAt ? new Date(av.updatedAt) : null,
+      }));
+      setAvaliacoes(avaliacoesComDatas as Avaliacao[]);
+      setError(null);
+      console.log("✅ Avaliações carregadas:", avaliacoesComDatas.length);
+    } catch (err: any) {
+      console.error("❌ Erro fetch:", err.message);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+      setReloading(false);
+    }
+  };
+
+  const recarregarAvaliacoes = async () => {
+    if (!session?.user) return;
+    setReloading(true);
+    const alunoId = (session.user as any).aluno?.id;
+    if (alunoId) await fetchAvaliacoes(alunoId);
+  };
 
   useEffect(() => {
-    const fetchAvaliacoes = async () => {
-      try {
-        const alunoId =
-          localStorage.getItem("alunoId") || "cmh3lm26h00030gfcuq1chm08"; // Original: localStorage ou hardcoded
-        console.log("🔍 Page: Buscando avaliações para alunoId:", alunoId);
-        const res = await fetch(`/api/alunos/avaliacoes?alunoId=${alunoId}`);
-        if (!res.ok) {
-          throw new Error(`Erro HTTP: ${res.status} - ${res.statusText}`);
-        }
-        const data = await res.json();
-        setAvaliacoes(data); // Array real (ou [])
-        console.log("✅ Page: Avaliações carregadas:", data.length);
-      } catch (err: any) {
-        console.error("❌ Page Erro fetch:", err.message);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAvaliacoes(); // Roda imediatamente no mount
-  }, []); // Dependência vazia: roda só uma vez
+    if (!session?.user) return;
+    const alunoId = (session.user as any).aluno?.id;
+    if (!alunoId) {
+      setError("ID do aluno não encontrado na sessão.");
+      setLoading(false);
+      return;
+    }
+    fetchAvaliacoes(alunoId);
+    // Auto-refresh a cada 10 segundos (aumentado de 8s para evitar spam)
+    const interval = setInterval(() => fetchAvaliacoes(alunoId), 10000);
+    return () => clearInterval(interval);
+  }, [session]);
+
+  const formatarData = (data: Date): string =>
+    data.toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+  const formatarMedida = (valor: number | null, unidade: string): string => {
+    return valor ? `${valor.toFixed(1)} ${unidade}` : "N/A";
+  };
+
+  const resumirDobrasCutaneas = (dobras: DobrasCutaneas | null): string => {
+    if (
+      !dobras ||
+      Object.values(dobras).every((v) => v === null || v === undefined)
+    )
+      return "N/A";
+    const medias = Object.values(dobras).filter(
+      (v): v is number => v !== null && v !== undefined
+    );
+    if (medias.length === 0) return "N/A";
+    const media = medias.reduce((a, b) => a + b, 0) / medias.length;
+    return `${media.toFixed(1)} mm (média)`;
+  };
+
+  const baixarArquivo = (avaliacao: Avaliacao) => {
+    if (!avaliacao.arquivo) return;
+    const link = document.createElement("a");
+    link.href = avaliacao.arquivo;
+    link.download = `avaliacao_${avaliacao.tipo || "fisica"}_${formatarData(
+      avaliacao.data
+    ).replace(/\//g, "-")}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   if (loading) {
     return (
       <AlunoLayout>
         <div className={styles.container}>
-          <div className={styles.loading}>Carregando avaliações...</div>
+          <div className={styles.loadingContainer}>
+            <div className={styles.spinner}></div>
+            <p>Carregando avaliações...</p>
+          </div>
         </div>
       </AlunoLayout>
     );
@@ -56,9 +170,18 @@ export default function AvaliacoesPage() {
     return (
       <AlunoLayout>
         <div className={styles.container}>
-          <div className={styles.error}>Erro ao carregar: {error}</div>
+          <div className={styles.errorContainer}>
+            <p>❌ Erro ao carregar: {error}</p>
+            <button
+              onClick={recarregarAvaliacoes}
+              className={styles.retryButton}
+            >
+              Tentar Novamente
+            </button>
+          </div>
           <Link href="/alunos/dashboard" className={styles.backLink}>
-            ← Voltar ao Dashboard
+            <ArrowLeft size={20} />
+            Voltar ao Dashboard
           </Link>
         </div>
       </AlunoLayout>
@@ -68,64 +191,190 @@ export default function AvaliacoesPage() {
   return (
     <AlunoLayout>
       <div className={styles.container}>
-        <h1>Avaliações Físicas</h1>
+        <div className={styles.header}>
+          <h1>📊 Avaliações Físicas</h1>
+          <button
+            onClick={recarregarAvaliacoes}
+            disabled={reloading}
+            className={styles.refreshBtn}
+            title="Recarregar avaliações"
+          >
+            <RefreshCw size={20} className={reloading ? styles.spinning : ""} />
+            {reloading ? "Atualizando..." : "Atualizar"}
+          </button>
+        </div>
+
         {avaliacoes.length === 0 ? (
-          <div className={styles.empty}>
-            <p>Nenhuma avaliação cadastrada ainda.</p>
-            <p>Aguarde o treinador agendar a próxima!</p>
+          <div className={styles.emptyContainer}>
+            <div className={styles.emptyIcon}>📋</div>
+            <h2>Nenhuma Avaliação Encontrada</h2>
+            <p>Aguarde o treinador cadastrar sua primeira avaliação física!</p>
+            <button
+              onClick={recarregarAvaliacoes}
+              className={styles.emptyButton}
+            >
+              Verificar Novamente
+            </button>
           </div>
         ) : (
           <div className={styles.tableWrapper}>
-            <table>
-              <thead>
-                <tr>
-                  <th>Tipo</th>
-                  <th>Data</th>
-                  <th>Resultado</th>
-                  <th>Observações</th>
-                  <th>Arquivo PDF</th>
-                </tr>
-              </thead>
-              <tbody>
-                {avaliacoes.map((av) => (
-                  <tr key={av.id}>
-                    <td data-label="Tipo">{av.tipo || "N/A"}</td>
-                    <td data-label="Data">
-                      {new Date(av.data).toLocaleDateString("pt-BR", {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric",
-                      })}
-                    </td>
-                    <td data-label="Resultado">{av.resultado || "N/A"}</td>
-                    <td
-                      className={styles.observacoes}
-                      data-label="Observações"
-                      title={av.observacoes || "N/A"}
-                    >
-                      {av.observacoes || "N/A"}
-                    </td>
-                    <td data-label="Arquivo PDF">
-                      {av.arquivo ? (
-                        <a
-                          href={av.arquivo}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          Ver PDF
-                        </a>
-                      ) : (
-                        "N/A"
-                      )}
-                    </td>
+            <h2>Lista de Avaliações</h2>
+            <div className={styles.tableScroll}>
+              <table className={styles.table}>
+                <thead className={styles.tableHead}>
+                  <tr>
+                    <th>Tipo</th>
+                    <th>Data</th>
+                    <th>Peso (kg)</th>
+                    <th>Altura (cm)</th>
+                    <th>IMC</th>
+                    <th>% Gordura</th>
+                    <th>VO2 Max (ml/kg/min)</th>
+                    <th>Flexões</th>
+                    <th>Prancha (s)</th>
+                    <th>Dobras (mm média)</th>
+                    <th>Resultado</th>
+                    <th>Observações</th>
+                    <th>Arquivo PDF</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className={styles.tableBody}>
+                  {avaliacoes.map((av) => (
+                    <tr key={av.id}>
+                      <td data-label="Tipo">{av.tipo || "N/A"}</td>
+                      <td data-label="Data">{formatarData(av.data)}</td>
+                      <td data-label="Peso">{formatarMedida(av.peso, "kg")}</td>
+                      <td data-label="Altura">
+                        {formatarMedida(av.altura, "cm")}
+                      </td>
+                      <td data-label="IMC">{formatarMedida(av.imc, "")}</td>
+                      <td data-label="% Gordura">
+                        {formatarMedida(av.percentualGordura, "%")}
+                      </td>
+                      <td data-label="VO2 Max">
+                        {formatarMedida(av.vo2Max, "")}
+                      </td>
+                      <td data-label="Flexões">
+                        {av.repeticoesFlexoes
+                          ? `${av.repeticoesFlexoes} reps`
+                          : "N/A"}
+                      </td>
+                      <td data-label="Prancha">
+                        {formatarMedida(av.pranchaTempo, "s")}
+                      </td>
+                      <td data-label="Dobras">
+                        {resumirDobrasCutaneas(av.dobrasCutaneas)}
+                      </td>
+                      <td data-label="Resultado">{av.resultado || "N/A"}</td>
+                      <td
+                        className={styles.observacoes}
+                        data-label="Observações"
+                        title={av.observacoes || "N/A"}
+                      >
+                        {av.observacoes ? (
+                          <div className={styles.observacoesContent}>
+                            {av.observacoes.length > 100
+                              ? `${av.observacoes.substring(0, 100)}...`
+                              : av.observacoes}
+                          </div>
+                        ) : (
+                          "N/A"
+                        )}
+                      </td>
+                      <td data-label="Arquivo PDF">
+                        {av.arquivo ? (
+                          <button
+                            onClick={() => baixarArquivo(av)}
+                            className={styles.pdfLink}
+                            title="Baixar PDF"
+                          >
+                            <Download size={16} /> Ver PDF
+                          </button>
+                        ) : (
+                          "N/A"
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {/* Resumo das Avaliações (Opcional: Cards com métricas chave da mais recente) */}
+            {avaliacoes.length > 0 && (
+              <div className={styles.summarySection}>
+                <h3>Resumo da Última Avaliação</h3>
+                <div className={styles.summaryCards}>
+                  <div className={styles.card}>
+                    <strong>Peso:</strong>{" "}
+                    {formatarMedida(avaliacoes[0].peso, "kg")}
+                  </div>
+                  <div className={styles.card}>
+                    <strong>IMC:</strong>{" "}
+                    {formatarMedida(avaliacoes[0].imc, "")}
+                  </div>
+                  <div className={styles.card}>
+                    <strong>% Gordura:</strong>{" "}
+                    {formatarMedida(avaliacoes[0].percentualGordura, "%")}
+                  </div>
+                  <div className={styles.card}>
+                    <strong>VO2 Max:</strong>{" "}
+                    {formatarMedida(avaliacoes[0].vo2Max, "ml/kg/min")}
+                  </div>
+                  <div className={styles.card}>
+                    <strong>Objetivos:</strong>{" "}
+                    {avaliacoes[0].objetivos || "N/A"}
+                  </div>
+                  {avaliacoes[0].fumante && (
+                    <div className={styles.cardWarning}>⚠️ Fumante: Sim</div>
+                  )}
+                  {avaliacoes[0].diabetes && (
+                    <div className={styles.cardWarning}>⚠️ Diabetes: Sim</div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {avaliacoes.map((av) => (
+              <div key={av.id} className="evaluationCard">
+                <div className="cardHeader">
+                  <span className="tipo">{av.tipo}</span>
+                  <span className="data">
+                    {new Date(av.data).toLocaleDateString()}
+                  </span>
+                </div>
+                <div className="cardBody">
+                  <div className="keyValue">
+                    <span className="key">Peso</span>
+                    <span className="value">{av.peso}kg</span>
+                  </div>
+                  {/* Repita pra IMC, VO2, etc. */}
+                  {av.doencasArticulares && (
+                    <div className="keyValue warning">
+                      <span className="key">Atenção Articular</span>
+                      <span className="value">Sim</span>
+                    </div>
+                  )}
+                  {/* Dobras: JSON.stringify resumido ou parse */}
+                  <div className="keyValue observacoes">
+                    <span className="key">Observações</span>
+                    <span className="value">{av.observacoes}</span>
+                  </div>
+                </div>
+                <div className="cardFooter">
+                  <span className="resumo">{av.resultado}</span>
+                  {av.arquivo && (
+                    <a href={av.arquivo} className="pdfLink" download>
+                      Baixar PDF
+                    </a>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
         )}
         <Link href="/alunos/dashboard" className={styles.backLink}>
-          ← Voltar ao Dashboard
+          <ArrowLeft size={20} />
+          Voltar ao Dashboard
         </Link>
       </div>
     </AlunoLayout>
