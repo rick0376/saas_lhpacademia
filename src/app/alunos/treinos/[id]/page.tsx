@@ -1723,3 +1723,4 @@ export default function TreinoDetalhesPage() {
     </AlunoLayout>
   );
 }
+//testando o deploy
