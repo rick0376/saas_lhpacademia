@@ -16,7 +16,6 @@ import {
   Trash2,
   AlertTriangle,
   Play,
-  Info,
 } from "lucide-react";
 import styles from "./styles.module.scss";
 
@@ -67,11 +66,6 @@ export default function TreinoDetalhesPage() {
   const [error, setError] = useState("");
   const [selectedEx, setSelectedEx] = useState<Exercício | null>(null);
 
-  // ✅ NOVO - Modal de instruções do exercício
-  const [showInstrucoesModal, setShowInstrucoesModal] = useState(false);
-  const [exercicioInstrucoes, setExercicioInstrucoes] =
-    useState<Exercício | null>(null);
-
   const id = params.id as string;
   const alunoId = (session?.user as any)?.aluno?.id;
   const from = searchParams.get("from");
@@ -104,6 +98,7 @@ export default function TreinoDetalhesPage() {
   const [cronometroAtivo, setCronometroAtivo] = useState<string | null>(null);
   const [tempoRestante, setTempoRestante] = useState<number>(0);
 
+  // ✅ NOVO - Modal de cronômetro em destaque
   const [showCronometroModal, setShowCronometroModal] = useState(false);
   const [cronometroModalType, setCronometroModalType] = useState<
     "execucao" | "descanso"
@@ -144,27 +139,6 @@ export default function TreinoDetalhesPage() {
   const [confirmMessage, setConfirmMessage] = useState("");
 
   const [execucoes, setExecucoes] = useState<Execucao[]>([]);
-
-  // ✅ NOVO - Estado para controlar sons
-  const [soundEnabled, setSoundEnabled] = useState(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("sound_enabled");
-      return saved !== null ? saved === "true" : true;
-    }
-    return true;
-  });
-
-  // ✅ NOVO - Função para abrir modal de instruções
-  const openInstrucoesModal = (exercicio: Exercício) => {
-    setExercicioInstrucoes(exercicio);
-    setShowInstrucoesModal(true);
-  };
-
-  // ✅ NOVO - Função para fechar modal de instruções
-  const closeInstrucoesModal = () => {
-    setShowInstrucoesModal(false);
-    setExercicioInstrucoes(null);
-  };
 
   useEffect(() => {
     if (detalhes && Object.keys(seriesRestantes).length === 0) {
@@ -222,7 +196,6 @@ export default function TreinoDetalhesPage() {
         setShowEditModal(false);
         setShowVerDetalhesModal(false);
         setShowConfirmModal(false);
-        closeInstrucoesModal();
         if (showCronometroModal) {
           fecharCronometroModal();
         }
@@ -234,7 +207,6 @@ export default function TreinoDetalhesPage() {
       showEditModal ||
       showVerDetalhesModal ||
       showConfirmModal ||
-      showInstrucoesModal ||
       showCronometroModal
     ) {
       document.addEventListener("keydown", handleEsc);
@@ -246,7 +218,6 @@ export default function TreinoDetalhesPage() {
     showEditModal,
     showVerDetalhesModal,
     showConfirmModal,
-    showInstrucoesModal,
     showCronometroModal,
   ]);
 
@@ -286,12 +257,6 @@ export default function TreinoDetalhesPage() {
       return () => clearTimeout(timer);
     }
   }, [toast.show]);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("sound_enabled", String(soundEnabled));
-    }
-  }, [soundEnabled]);
 
   const fetchDetalhes = async (treinoId: string, alunoId: string) => {
     setLoading(true);
@@ -385,6 +350,7 @@ export default function TreinoDetalhesPage() {
     });
   };
 
+  // ✅ NOVO - Iniciar cronômetro de execução (para descanso se estiver ativo)
   const iniciarCronometroExecucao = (
     exercicioId: string,
     exercicio: Exercício
@@ -404,6 +370,7 @@ export default function TreinoDetalhesPage() {
     setShowCronometroModal(true);
   };
 
+  // ✅ NOVO - Cancelar execução
   const cancelarExecucao = () => {
     setCronometroExecucao({
       exercicioId: null,
@@ -413,6 +380,7 @@ export default function TreinoDetalhesPage() {
     setExercicioAtivo(null);
   };
 
+  // ✅ NOVO - Concluir série
   const concluirSerie = (exercicioId: string, exercicio: Exercício) => {
     const restantes = seriesRestantes[exercicioId];
 
@@ -437,7 +405,7 @@ export default function TreinoDetalhesPage() {
         setShowCronometroModal(false);
       }
 
-      playSerieConcluida();
+      playSerieConcluida(); // ✅ Som de série concluída
       showToast(`✅ Série concluída! ${restantes - 1}x restantes`, "success");
     } else {
       setSeriesRestantes((prev) => ({
@@ -452,11 +420,12 @@ export default function TreinoDetalhesPage() {
 
       setShowCronometroModal(false);
       toggleExercicioConcluido(exercicioId);
-      playExercicioCompleto();
+      playExercicioCompleto(); // ✅ Som de exercício completo
       showToast(`🎉 Exercício ${exercicio.nome} completo!`, "success");
     }
   };
 
+  // ✅ NOVO - Pular descanso e iniciar próxima série
   const pularDescanso = () => {
     if (!exercicioAtivo) return;
 
@@ -466,6 +435,7 @@ export default function TreinoDetalhesPage() {
     iniciarCronometroExecucao(exercicioAtivo.id, exercicioAtivo);
   };
 
+  // ✅ NOVO - Fechar modal de cronômetro
   const fecharCronometroModal = () => {
     setShowCronometroModal(false);
     setCronometroExecucao({ exercicioId: null, tempo: 0 });
@@ -498,7 +468,7 @@ export default function TreinoDetalhesPage() {
 
   const parseTempoDescanso = (tempo: string): number => {
     const match = tempo.match(
-      /(\\d+)\\s*(s|seg|segundo|segundos|m|min|minuto|minutos)?/i
+      /(\d+)\s*(s|seg|segundo|segundos|m|min|minuto|minutos)?/i
     );
     if (!match) return 0;
 
@@ -520,12 +490,30 @@ export default function TreinoDetalhesPage() {
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
+  // ✅ Estado para controlar sons
+  const [soundEnabled, setSoundEnabled] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("sound_enabled");
+      return saved !== null ? saved === "true" : true;
+    }
+    return true;
+  });
+
+  // ✅ Salva preferência de som
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("sound_enabled", String(soundEnabled));
+    }
+  }, [soundEnabled]);
+
+  // ✅ Função de vibração
   const vibrate = (pattern: number | number[]) => {
     if (typeof window !== "undefined" && "vibrate" in navigator) {
       navigator.vibrate(pattern);
     }
   };
 
+  // ✅ Som de descanso acabado (mais alto e repetido)
   const playDescansoFimSound = () => {
     if (!soundEnabled) return;
 
@@ -533,6 +521,7 @@ export default function TreinoDetalhesPage() {
       const audioContext = new (window.AudioContext ||
         (window as any).webkitAudioContext)();
 
+      // Toca 3 beeps curtos
       for (let i = 0; i < 3; i++) {
         setTimeout(() => {
           const oscillator = audioContext.createOscillator();
@@ -541,8 +530,8 @@ export default function TreinoDetalhesPage() {
           oscillator.connect(gainNode);
           gainNode.connect(audioContext.destination);
 
-          oscillator.frequency.value = 1000;
-          oscillator.type = "square";
+          oscillator.frequency.value = 1000; // Mais agudo
+          oscillator.type = "square"; // Som mais "duro"
 
           gainNode.gain.setValueAtTime(0.4, audioContext.currentTime);
           gainNode.gain.exponentialRampToValueAtTime(
@@ -555,12 +544,14 @@ export default function TreinoDetalhesPage() {
         }, i * 250);
       }
 
+      // Vibração: 3 pulsos curtos
       vibrate([100, 100, 100, 100, 100]);
     } catch (e) {
       console.log("Não foi possível reproduzir som");
     }
   };
 
+  // ✅ Som de série concluída (positivo)
   const playSerieConcluida = () => {
     if (!soundEnabled) return;
 
@@ -586,12 +577,14 @@ export default function TreinoDetalhesPage() {
       oscillator.start(audioContext.currentTime);
       oscillator.stop(audioContext.currentTime + 0.4);
 
+      // Vibração curta
       vibrate(100);
     } catch (e) {
       console.log("Não foi possível reproduzir som");
     }
   };
 
+  // ✅ Som de exercício completo (parabéns!)
   const playExercicioCompleto = () => {
     if (!soundEnabled) return;
 
@@ -599,7 +592,8 @@ export default function TreinoDetalhesPage() {
       const audioContext = new (window.AudioContext ||
         (window as any).webkitAudioContext)();
 
-      const notas = [523, 659, 784];
+      // Sequência de notas ascendentes (como fanfarra)
+      const notas = [523, 659, 784]; // Dó, Mi, Sol
 
       notas.forEach((freq, i) => {
         setTimeout(() => {
@@ -623,12 +617,14 @@ export default function TreinoDetalhesPage() {
         }, i * 150);
       });
 
+      // Vibração: padrão de comemoração
       vibrate([100, 50, 100, 50, 200]);
     } catch (e) {
       console.log("Não foi possível reproduzir som");
     }
   };
 
+  // ✅ Som padrão (mantém pra compatibilidade)
   const playNotificationSound = playDescansoFimSound;
 
   const getDataTimeLocalFormat = () => {
@@ -1085,24 +1081,10 @@ export default function TreinoDetalhesPage() {
                         )}
                       </div>
 
-                      {/* ✅ NOVO - REPETIÇÕES COM ÍCONE DE INFORMAÇÃO */}
                       <div className={styles.cardItem}>
-                        <span className={styles.cardLabel}>
-                          Repetições
-                          {ex.descricao && (
-                            <button
-                              className={styles.infoIconBtn}
-                              onClick={() => openInstrucoesModal(ex)}
-                              title="Ver instruções do exercício"
-                              aria-label="Instruções"
-                            >
-                              <Info size={16} />
-                            </button>
-                          )}
-                        </span>
+                        <span className={styles.cardLabel}>Repetições</span>
                         <span className={styles.cardValue}>{ex.reps}</span>
                       </div>
-
                       <div className={styles.cardItem}>
                         <span className={styles.cardLabel}>Carga</span>
                         <span className={styles.cardValue}>
@@ -1225,56 +1207,7 @@ export default function TreinoDetalhesPage() {
           </div>
         )}
 
-        {/* ✅ NOVO MODAL - INSTRUÇÕES DO EXERCÍCIO */}
-        {showInstrucoesModal && exercicioInstrucoes && (
-          <div className={styles.modalOverlay} onClick={closeInstrucoesModal}>
-            <div
-              className={styles.instrucoesModal}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                className={styles.modalClose}
-                onClick={closeInstrucoesModal}
-              >
-                <X size={24} />
-              </button>
-
-              <div className={styles.instrucoesModalHeader}>
-                <h2 className={styles.instrucoesTitle}>
-                  📖 {exercicioInstrucoes.nome}
-                </h2>
-              </div>
-
-              <div className={styles.instrucoesContent}>
-                <div className={styles.instrucoesSection}>
-                  {exercicioInstrucoes.descricao ? (
-                    <div
-                      className={styles.instrucoesText}
-                      style={{ whiteSpace: "pre-line" }}
-                    >
-                      {exercicioInstrucoes.descricao}
-                    </div>
-                  ) : (
-                    <p className={styles.instrucoesText}>
-                      Sem instruções disponíveis.
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div className={styles.instrucoesFooter}>
-                <button
-                  className={styles.instrucoesCloseBtn}
-                  onClick={closeInstrucoesModal}
-                >
-                  Entendido
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* MODAL - CRONÔMETRO EM DESTAQUE */}
+        {/* ✅ MODAL DE CRONÔMETRO EM DESTAQUE */}
         {showCronometroModal && exercicioAtivo && (
           <div className={styles.cronometroModalOverlay}>
             <div className={styles.cronometroModalContent}>

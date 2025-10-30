@@ -2014,3 +2014,233 @@
     font-size: 1.5rem;
   }
 }
+// ✅ NOVO - MODAL DE INSTRUÇÕES DO EXERCÍCIO
+.instrucoesModal {
+  position: relative;
+  max-width: 90vw;
+  width: 600px;
+  max-height: 90vh;
+  background: white;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+  animation: modalSlideUp 0.3s ease;
+  display: flex;
+  flex-direction: column;
+
+  @media (max-width: 768px) {
+    width: 95vw;
+    max-height: 85vh;
+  }
+}
+
+.instrucoesModalHeader {
+  position: relative;
+  background: linear-gradient(135deg, #714797, #5d2691);
+  padding: 1.75rem 1.5rem;
+  flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    padding: 1.5rem 1rem;
+  }
+}
+
+.instrucoesTitle {
+  padding: 0;
+  background: none;
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: white;
+}
+
+.instrucoesContent {
+  padding: 2rem 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+
+  @media (max-width: 768px) {
+    padding: 1.5rem 1rem;
+  }
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+
+    &:hover {
+      background: #94a3b8;
+    }
+  }
+}
+
+.instrucoesSection {
+  margin-bottom: 2rem;
+
+  h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 1rem 0;
+  }
+
+  p {
+    font-size: 0.95rem;
+    color: #475569;
+    line-height: 1.6;
+    margin: 0;
+    text-align: justify;
+  }
+}
+
+.instrucoesInfo {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 1rem;
+  border: 2px solid #e2e8f0;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.infoItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.infoLabel {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.infoValue {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #714797;
+}
+
+.instrucoesImage {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 2px solid #e2e8f0;
+
+  .instrucoesImageLabel {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 1rem 0;
+  }
+}
+
+.instrucoesImg {
+  width: 100%;
+  height: auto;
+  border-radius: 1rem;
+  box-shadow: 0 4px 15px rgba(113, 71, 151, 0.15);
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 25px rgba(113, 71, 151, 0.25);
+  }
+}
+
+.instrucoesFooter {
+  padding: 1.5rem;
+  border-top: 2px solid #e2e8f0;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  background: #f8fafc;
+  flex-shrink: 0;
+}
+
+.instrucoesCloseBtn {
+  padding: 0.875rem 2rem;
+  background: linear-gradient(135deg, #714797, #5d2691);
+  color: white;
+  border: none;
+  border-radius: 0.75rem;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(113, 71, 151, 0.3);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(113, 71, 151, 0.4);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// ✅ NOVO - BOTÃO DE INFO AO LADO DO LABEL
+.infoIconBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-left: 0.5rem;
+  background: rgba(113, 71, 151, 0.15);
+  border: 2px solid #714797;
+  color: #714797;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+
+  &:hover {
+    background: linear-gradient(135deg, #714797, #5d2691);
+    color: white;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(113, 71, 151, 0.3);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+// ✅ ADICIONAR AO .cardLabel PARA ALINHAR CORRETAMENTE
+.cardLabel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.375rem;
+}
