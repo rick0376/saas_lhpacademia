@@ -1,0 +1,661 @@
+// app/alunos/configuracoes/styles.module.scss
+// Usando paleta padrão: Azul fundo, Roxo botões, Verde ações, Branco cards
+
+// ========================================
+// CONTAINER PRINCIPAL
+// ========================================
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #06b6d4 0%, #0284c7 50%, #0369a1 100%);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  position: relative;
+
+  // Efeito de partículas
+  &::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(
+        circle at 20% 50%,
+        rgba(255, 255, 255, 0.1) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 80% 80%,
+        rgba(255, 255, 255, 0.08) 0%,
+        transparent 50%
+      );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+}
+
+// ========================================
+// HEADER - GLASSMORPHISM
+// ========================================
+.header {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 24px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  animation: slideDown 0.5s ease;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.5rem;
+    gap: 1rem;
+  }
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.headerIcon {
+  color: white;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 800;
+  color: white;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.subtitle {
+  margin: 0.5rem 0 0 0;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ========================================
+// BACK LINK - ROXO
+// ========================================
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #714797, #5d2691); // ✅ ROXO
+  color: white;
+  text-decoration: none;
+  border-radius: 12px;
+  font-weight: 700;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(113, 71, 151, 0.3);
+  white-space: nowrap;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(113, 71, 151, 0.4);
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+// ========================================
+// TABS NAVIGATION
+// ========================================
+.tabsNav {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 0.5rem;
+  overflow-x: auto;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+
+  @media (max-width: 768px) {
+    gap: 0.5rem;
+  }
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+  }
+
+  &.tabActive {
+    background: linear-gradient(135deg, #714797, #5d2691); // ✅ ROXO ATIVO
+    color: white;
+    box-shadow: 0 4px 12px rgba(113, 71, 151, 0.3);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+
+    span {
+      font-size: 0.85rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+
+    span {
+      display: none;
+    }
+  }
+}
+
+// ========================================
+// CONTENT AREA
+// ========================================
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+// ========================================
+// SECTION: DADOS PESSOAIS
+// ========================================
+.section {
+  background: white;
+  border-radius: 16px;
+  border: 2px solid #e2e8f0;
+  box-shadow: 0 2px 12px rgba(113, 71, 151, 0.08);
+  padding: 2rem;
+  animation: fadeInUp 0.6s ease;
+
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  gap: 1rem;
+
+  h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    svg {
+      color: #714797; // ✅ ROXO
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+
+    h2 {
+      font-size: 1.25rem;
+    }
+  }
+}
+
+// ========================================
+// ACTION BUTTONS
+// ========================================
+.editButton,
+.saveButton,
+.cancelButton,
+.logoutButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.editButton {
+  background: linear-gradient(135deg, #714797, #5d2691); // ✅ ROXO
+  color: white;
+  box-shadow: 0 4px 12px rgba(113, 71, 151, 0.3);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(113, 71, 151, 0.4);
+  }
+}
+
+.actionButtons {
+  display: flex;
+  gap: 1rem;
+
+  @media (max-width: 480px) {
+    width: 100%;
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+.saveButton {
+  background: linear-gradient(135deg, #10b981, #059669); // ✅ VERDE
+  color: white;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.cancelButton {
+  background: #e2e8f0;
+  color: #0f172a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+  &:hover {
+    background: #cbd5e1;
+    transform: translateY(-1px);
+  }
+}
+
+// ========================================
+// FORM GRID
+// ========================================
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 2rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+// ========================================
+// PHOTO SECTION
+// ========================================
+.photoSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.photoWrapper {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.photo {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #714797; // ✅ ROXO
+  box-shadow: 0 4px 16px rgba(113, 71, 151, 0.2);
+}
+
+.photoUploadBtn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #10b981, #059669); // ✅ VERDE
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+  }
+}
+
+.photoHelp {
+  font-size: 0.85rem;
+  color: #64748b;
+  text-align: center;
+  margin: 0;
+}
+
+// ========================================
+// FORM FIELDS
+// ========================================
+.formFields {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  &.fullWidth {
+    grid-column: 1 / -1;
+  }
+}
+
+.label {
+  font-weight: 600;
+  color: #0f172a;
+  font-size: 0.95rem;
+}
+
+.input,
+.textarea {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #714797; // ✅ ROXO
+    box-shadow: 0 0 0 3px rgba(113, 71, 151, 0.1);
+  }
+
+  &:hover {
+    border-color: #cbd5e1;
+  }
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+// ========================================
+// VIEW MODE (Não editável)
+// ========================================
+.viewValue {
+  padding: 0.75rem 1rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  border-left: 3px solid #714797; // ✅ ROXO
+  color: #0f172a;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.helperText {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin: 0;
+  margin-top: 0.25rem;
+  font-style: italic;
+}
+
+// ========================================
+// COMING SOON SECTIONS
+// ========================================
+.comingSection {
+  background: white;
+  border-radius: 16px;
+  border: 2px dashed #e2e8f0;
+  padding: 2rem;
+  position: relative;
+  opacity: 0.7;
+
+  h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.25rem;
+    color: #0f172a;
+  }
+
+  p {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.95rem;
+  }
+}
+
+.comingSoonBadge {
+  position: absolute;
+  top: -12px;
+  right: 1rem;
+  background: linear-gradient(135deg, #714797, #5d2691); // ✅ ROXO
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+}
+
+// ========================================
+// LOGOUT SECTION
+// ========================================
+.logoutSection {
+  background: rgba(239, 68, 68, 0.1);
+  border: 2px solid #fecaca;
+  border-radius: 16px;
+  padding: 2rem;
+
+  h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.25rem;
+    color: #dc2626;
+  }
+
+  p {
+    margin: 0 0 1.5rem 0;
+    color: #7f1d1d;
+    font-size: 0.95rem;
+  }
+}
+
+.logoutButton {
+  background: #ef4444; // ✅ VERMELHO
+  color: white;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+
+  &:hover {
+    background: #dc2626;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+  }
+}
+
+// ========================================
+// LOADING & ERROR
+// ========================================
+.loadingContainer,
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 24px;
+  padding: 3rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.spinner {
+  width: 60px;
+  height: 60px;
+  border: 5px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 2rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.errorContainer {
+  background: rgba(254, 226, 226, 0.2);
+  border: 1px solid rgba(254, 226, 226, 0.5);
+}
+
+.errorContainer p {
+  color: #fecaca;
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 2rem 0;
+}
+
+.retryButton {
+  background: linear-gradient(135deg, #714797, #5d2691); // ✅ ROXO
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(113, 71, 151, 0.3);
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(113, 71, 151, 0.4);
+  }
+}
+
+// ========================================
+// RESPONSIVIDADE
+// ========================================
+@media (max-width: 768px) {
+  .section {
+    padding: 1.5rem;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .actionButtons {
+    width: 100%;
+
+    button {
+      flex: 1;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0.5rem;
+  }
+
+  .header {
+    padding: 1rem;
+    gap: 0.5rem;
+
+    h1 {
+      font-size: 1.5rem;
+    }
+  }
+
+  .section {
+    padding: 1rem;
+  }
+
+  .tabsNav {
+    padding: 0.25rem;
+  }
+
+  .tab {
+    padding: 0.5rem 0.75rem;
+  }
+}

@@ -1,9 +1,8 @@
+// app/api/alunos/dashboard/route.ts (COMPLETO E OTIMIZADO)
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
   try {
@@ -29,13 +28,16 @@ export async function GET(request: NextRequest) {
       alunoId
     );
 
-    // ✅ Query corrigida baseada no schema
+    // ========================================
+    // ✅ OTIMIZAÇÃO: UMA TRANSACTION COM TUDO
+    // ========================================
     const [
       aluno,
       treinosCount,
       ultimaMedida,
       avaliacoesCount,
       ultimasExecucoes,
+      proximoTreino,
     ] = await prisma.$transaction([
       // 1. Basic aluno data
       prisma.aluno.findUnique({
@@ -47,12 +49,15 @@ export async function GET(request: NextRequest) {
           objetivo: true,
         },
       }),
-      // 2. Treinos count
+
+      // 2. Treinos count (apenas ativos)
       prisma.treino.count({
         where: {
           alunoId: alunoId,
+          ativo: true,
         },
       }),
+
       // 3. Última medida
       prisma.medida.findFirst({
         where: { alunoId: alunoId },
@@ -61,11 +66,13 @@ export async function GET(request: NextRequest) {
           peso: true,
         },
       }),
+
       // 4. Avaliações count
       prisma.avaliacao.count({
         where: { alunoId: alunoId },
       }),
-      // ✅ 5. CORRIGIDO - Últimas execuções com include correto
+
+      // 5. Últimas execuções com exercícios
       prisma.execucaoTreino.findMany({
         where: {
           alunoId: alunoId,
@@ -78,10 +85,34 @@ export async function GET(request: NextRequest) {
               objetivo: true,
             },
           },
-          exercicios: true, // ✅ Sem nested include (exercicioNome já vem como string)
+          exercicios: true,
         },
         orderBy: { data: "desc" },
         take: 10,
+      }),
+
+      // 6. Próximo treino agendado (NOVO)
+      prisma.cronograma.findFirst({
+        where: {
+          treino: {
+            alunoId: alunoId,
+            ativo: true,
+          },
+        },
+        select: {
+          diaSemana: true,
+          horaInicio: true,
+          horaFim: true,
+          treino: {
+            select: {
+              id: true,
+              nome: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
       }),
     ]);
 
@@ -94,7 +125,7 @@ export async function GET(request: NextRequest) {
     const execucoesFormatadas = ultimasExecucoes.map((exec) => ({
       id: exec.id,
       data: exec.data,
-      intensidade: exec.intensidade, // ✅ Usa intensidade em vez de duracao
+      intensidade: exec.intensidade,
       observacoes: exec.observacoes,
       completo: exec.completo,
       treino: {
@@ -104,13 +135,30 @@ export async function GET(request: NextRequest) {
       },
       exerciciosCompletados: exec.exercicios.length,
       exercicios: exec.exercicios.map((e) => ({
-        nome: e.exercicioNome, // ✅ Campo correto do schema
+        nome: e.exercicioNome,
         series: e.series,
         repeticoes: e.repeticoes,
         carga: e.carga,
         observacoes: e.observacoes,
       })),
     }));
+
+    // ✅ Formata próximo treino
+    const proximoTreinoFormatado = proximoTreino
+      ? {
+          data: `${proximoTreino.diaSemana}${
+            proximoTreino.horaInicio
+              ? ` - ${proximoTreino.horaInicio}${
+                  proximoTreino.horaFim ? ` a ${proximoTreino.horaFim}` : ""
+                }`
+              : ""
+          }`,
+          diaSemana: proximoTreino.diaSemana,
+          horaInicio: proximoTreino.horaInicio,
+          horaFim: proximoTreino.horaFim,
+          treino: proximoTreino.treino,
+        }
+      : null;
 
     const data = {
       id: aluno.id,
@@ -120,7 +168,7 @@ export async function GET(request: NextRequest) {
       treinosAtivos: treinosCount,
       ultimaMedida: ultimaMedida ? { peso: ultimaMedida.peso } : null,
       avaliacoes: avaliacoesCount,
-      proximoTreino: null,
+      proximoTreino: proximoTreinoFormatado,
       ultimasExecucoes: execucoesFormatadas,
     };
 
@@ -129,18 +177,22 @@ export async function GET(request: NextRequest) {
       aluno.nome,
       "- Treinos:",
       data.treinosAtivos,
+      "- Próximo Treino:",
+      proximoTreinoFormatado?.data || "Nenhum agendado",
       "- Execuções:",
       execucoesFormatadas.length
     );
 
-    return NextResponse.json(data);
+    return NextResponse.json(data, {
+      headers: {
+        "Cache-Control": "public, max-age=60",
+      },
+    });
   } catch (error) {
     console.error("API Error:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
