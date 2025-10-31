@@ -1291,6 +1291,21 @@ export default function TreinoDetalhesPage() {
                 </div>
               </div>
 
+              {/* ✅ FOTO EMBAIXO DAS INSTRUÇÕES */}
+              {exercicioInstrucoes.fotoExecucao && (
+                <div className={styles.instrucoesImageWrapper}>
+                  <img
+                    src={exercicioInstrucoes.fotoExecucao}
+                    alt={exercicioInstrucoes.nome}
+                    className={styles.instrucoesImage}
+                    onError={(e) => {
+                      e.currentTarget.src =
+                        "https://via.placeholder.com/300x200/714797/FFFFFF?text=💪";
+                    }}
+                  />
+                </div>
+              )}
+
               <div className={styles.instrucoesFooter}>
                 <button
                   className={styles.instrucoesCloseBtn}
