@@ -1,9 +1,9 @@
+// app/api/treinos/[id]/exercicios/reordenar/route.ts (CORRIGIDO COM DEBUG)
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-// PUT - Reordenar exercícios
 export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -19,60 +19,113 @@ export async function PUT(
     const body = await req.json();
     const { exercicioId, direcao } = body;
 
-    // Busca o exercício atual
-    const exercicioAtual = await prisma.treinoExercicio.findUnique({
-      where: { id: exercicioId },
+    console.log(
+      `🔄 [REORDENAR] Treino: ${treinoId}, Exercício: ${exercicioId}, Direção: ${direcao}`
+    );
+
+    // ✅ Busca todos os exercícios do treino
+    const todosExercicios = await prisma.treinoExercicio.findMany({
+      where: { treinoId },
+      orderBy: { ordem: "asc" },
     });
 
-    if (!exercicioAtual) {
+    console.log(`📊 Total de exercícios: ${todosExercicios.length}`);
+    console.log(
+      "📋 Ordens atuais:",
+      todosExercicios.map((e) => `${e.id.slice(0, 8)}:${e.ordem}`).join(", ")
+    );
+
+    if (todosExercicios.length === 0) {
       return NextResponse.json(
-        { error: "Exercício não encontrado" },
+        { error: "Nenhum exercício encontrado" },
         { status: 404 }
       );
     }
 
-    const ordemAtual = exercicioAtual.ordem;
-    const novaOrdem = direcao === "up" ? ordemAtual - 1 : ordemAtual + 1;
+    // ✅ Encontra o índice do exercício
+    const indexAtual = todosExercicios.findIndex((e) => e.id === exercicioId);
 
-    // Busca o exercício que está na posição de destino
-    const exercicioDestino = await prisma.treinoExercicio.findFirst({
-      where: {
-        treinoId,
-        ordem: novaOrdem,
-      },
-    });
+    console.log(`🎯 Índice do exercício: ${indexAtual}`);
 
-    if (!exercicioDestino) {
+    if (indexAtual === -1) {
+      console.error(`❌ Exercício ${exercicioId} NÃO ENCONTRADO!`);
+      return NextResponse.json(
+        { error: "Exercício não encontrado neste treino" },
+        { status: 404 }
+      );
+    }
+
+    // ✅ Calcula novo índice
+    let novoIndex = indexAtual;
+
+    if (direcao === "up" && indexAtual > 0) {
+      novoIndex = indexAtual - 1;
+    } else if (direcao === "down" && indexAtual < todosExercicios.length - 1) {
+      novoIndex = indexAtual + 1;
+    } else {
+      console.warn(
+        `⚠️ Não é possível mover ${direcao}: indexAtual=${indexAtual}, length=${todosExercicios.length}`
+      );
       return NextResponse.json(
         { error: "Não é possível mover nesta direção" },
         { status: 400 }
       );
     }
 
-    // Troca as ordens usando uma transação
+    // ✅ Pega os dois exercícios
+    const exercicioAtual = todosExercicios[indexAtual];
+    const exercicioDestino = todosExercicios[novoIndex];
+
+    console.log(
+      `🔀 Trocando: ${exercicioAtual.id.slice(0, 8)} (${
+        exercicioAtual.ordem
+      }) ↔ ${exercicioDestino.id.slice(0, 8)} (${exercicioDestino.ordem})`
+    );
+
+    // ✅ CORRIGIDO: Usar variáveis temporárias para não haver conflito
+    const ordemTemp = 9999; // Valor temporário alto
+
     await prisma.$transaction([
-      // Move o exercício de destino para ordem temporária
-      prisma.treinoExercicio.update({
-        where: { id: exercicioDestino.id },
-        data: { ordem: -1 },
-      }),
-      // Move o exercício atual para a nova ordem
+      // Passo 1: Mover atual para ordem temporária
       prisma.treinoExercicio.update({
         where: { id: exercicioAtual.id },
-        data: { ordem: novaOrdem },
+        data: { ordem: ordemTemp },
       }),
-      // Move o exercício de destino para a ordem antiga
+      // Passo 2: Mover destino para ordem do atual
       prisma.treinoExercicio.update({
         where: { id: exercicioDestino.id },
-        data: { ordem: ordemAtual },
+        data: { ordem: exercicioAtual.ordem },
+      }),
+      // Passo 3: Mover atual (que estava em temp) para ordem do destino
+      prisma.treinoExercicio.update({
+        where: { id: exercicioAtual.id },
+        data: { ordem: exercicioDestino.ordem },
       }),
     ]);
 
-    return NextResponse.json({ message: "Ordem atualizada" }, { status: 200 });
-  } catch (error) {
-    console.error("Erro ao reordenar:", error);
+    console.log("✅ Transaction completada");
+
+    // ✅ Retorna treino atualizado
+    const treinoAtualizado = await prisma.treino.findUnique({
+      where: { id: treinoId },
+      include: {
+        aluno: true,
+        exercicios: {
+          include: { exercicio: true },
+          orderBy: { ordem: "asc" },
+        },
+        cronogramas: { orderBy: { diaSemana: "asc" } },
+      },
+    });
+
+    console.log("✅ Reordenamento concluído com sucesso!");
+
+    return NextResponse.json(treinoAtualizado, { status: 200 });
+  } catch (error: any) {
+    console.error("❌ ERRO CRÍTICO:", error.message);
+    console.error("Stack:", error.stack);
     return NextResponse.json(
-      { error: "Erro ao reordenar exercícios" },
+      { error: "Erro ao reordenar exercícios: " + error.message },
       { status: 500 }
     );
   }

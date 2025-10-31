@@ -1,3 +1,4 @@
+// components/treinos/TreinoDetalhes.tsx (COMPLETO E CORRIGIDO)
 "use client";
 
 import { useState, useEffect } from "react";
@@ -52,11 +53,10 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
     series: 3,
     repeticoes: "10-12",
     carga: "",
-    descanso: 60, // ✅ MUDOU PARA NUMBER
+    descanso: 60,
     observacoes: "",
   });
 
-  // ✅ MUDOU - descanso agora é number
   const [exercicioEditando, setExercicioEditando] = useState<{
     id: string;
     series: number;
@@ -102,6 +102,47 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
     }
   };
 
+  // ✅ CORRIGIDO: Função de reordenação usa a rota correta
+  const handleReordenar = async (
+    exercicioId: string,
+    direcao: "up" | "down"
+  ) => {
+    try {
+      setLoading(true);
+
+      const response = await fetch(
+        `/api/treinos/${treino.id}/exercicios/reordenar`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            exercicioId,
+            direcao,
+          }),
+        }
+      );
+
+      if (!response.ok) throw new Error("Erro ao reordenar");
+
+      await refresh();
+
+      setToast({
+        show: true,
+        message: "✅ Ordem atualizada com sucesso!",
+        type: "success",
+      });
+    } catch (error) {
+      console.error("Erro ao reordenar:", error);
+      setToast({
+        show: true,
+        message: "❌ Erro ao reordenar exercício",
+        type: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleAddExercicio = async () => {
     if (!novoExercicio.exercicioId) {
       setToast({
@@ -120,7 +161,7 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...novoExercicio,
-          descanso: `${novoExercicio.descanso}s`, // ✅ Adiciona "s" ao salvar
+          descanso: `${novoExercicio.descanso}s`,
           ordem: treino.exercicios.length + 1,
         }),
       });
@@ -135,19 +176,20 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
         series: 3,
         repeticoes: "10-12",
         carga: "",
-        descanso: 60, // ✅ Reseta para 60
+        descanso: 60,
         observacoes: "",
       });
 
       setToast({
         show: true,
-        message: "Exercício adicionado com sucesso!",
+        message: "✅ Exercício adicionado com sucesso!",
         type: "success",
       });
     } catch (error) {
+      console.error("Erro ao adicionar:", error);
       setToast({
         show: true,
-        message: "Erro ao adicionar exercício",
+        message: "❌ Erro ao adicionar exercício",
         type: "error",
       });
     } finally {
@@ -155,7 +197,6 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
     }
   };
 
-  // ✅ MUDOU - Remove "s" ao carregar
   const handleOpenEditModal = (te: TreinoExercicio) => {
     const descansoNumero = te.descanso
       ? parseInt(te.descanso.replace(/\D/g, "")) || 60
@@ -166,13 +207,12 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
       series: te.series,
       repeticoes: te.repeticoes,
       carga: te.carga || "",
-      descanso: descansoNumero, // ✅ Apenas o número
+      descanso: descansoNumero,
       observacoes: te.observacoes || "",
     });
     setModalEditExercicio(true);
   };
 
-  // ✅ MUDOU - Adiciona "s" ao salvar
   const handleEditExercicio = async () => {
     if (!exercicioEditando) return;
 
@@ -188,7 +228,7 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
             series: exercicioEditando.series,
             repeticoes: exercicioEditando.repeticoes,
             carga: exercicioEditando.carga,
-            descanso: `${exercicioEditando.descanso}s`, // ✅ Adiciona "s"
+            descanso: `${exercicioEditando.descanso}s`,
             observacoes: exercicioEditando.observacoes,
           }),
         }
@@ -203,49 +243,18 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
 
       setToast({
         show: true,
-        message: "Exercício atualizado com sucesso!",
+        message: "✅ Exercício atualizado com sucesso!",
         type: "success",
       });
     } catch (error) {
+      console.error("Erro ao editar:", error);
       setToast({
         show: true,
-        message: "Erro ao atualizar exercício",
+        message: "❌ Erro ao atualizar exercício",
         type: "error",
       });
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleReordenar = async (
-    exercicioId: string,
-    direcao: "up" | "down"
-  ) => {
-    try {
-      const response = await fetch(
-        `/api/treinos/${treino.id}/exercicios/reordenar`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ exercicioId, direcao }),
-        }
-      );
-
-      if (!response.ok) throw new Error("Erro ao reordenar");
-
-      await refresh();
-
-      setToast({
-        show: true,
-        message: "Ordem atualizada!",
-        type: "success",
-      });
-    } catch (error) {
-      setToast({
-        show: true,
-        message: "Erro ao reordenar exercício",
-        type: "error",
-      });
     }
   };
 
@@ -273,7 +282,7 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
 
       setToast({
         show: true,
-        message: "Exercício removido com sucesso!",
+        message: "✅ Exercício removido com sucesso!",
         type: "success",
       });
 
@@ -283,7 +292,7 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
 
       setToast({
         show: true,
-        message: error.message || "Erro ao remover exercício",
+        message: error.message || "❌ Erro ao remover exercício",
         type: "error",
       });
     }
@@ -337,7 +346,11 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
           </div>
         </div>
         <div className={styles.headerActions}>
-          <Button variant="primary" onClick={() => setModalAddExercicio(true)}>
+          <Button
+            variant="primary"
+            onClick={() => setModalAddExercicio(true)}
+            disabled={loading}
+          >
             + Adicionar Exercício
           </Button>
           <Link href={`/dashboard/treinos/${treino.id}/editar`}>
@@ -346,7 +359,7 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
           <Button
             variant="outline"
             onClick={refresh}
-            disabled={isRefreshing}
+            disabled={isRefreshing || loading}
             size="medium"
           >
             {isRefreshing ? "🔄" : "↻"} Atualizar
@@ -386,7 +399,7 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
                         onClick={() => handleReordenar(te.id, "up")}
                         className={styles.reorderButton}
                         title="Mover para cima"
-                        disabled={index === 0}
+                        disabled={index === 0 || loading}
                       >
                         ↑
                       </button>
@@ -394,7 +407,9 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
                         onClick={() => handleReordenar(te.id, "down")}
                         className={styles.reorderButton}
                         title="Mover para baixo"
-                        disabled={index === treino.exercicios.length - 1}
+                        disabled={
+                          index === treino.exercicios.length - 1 || loading
+                        }
                       >
                         ↓
                       </button>
@@ -405,6 +420,7 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
                         onClick={() => handleOpenEditModal(te)}
                         className={styles.editButton}
                         title="Editar"
+                        disabled={loading}
                       >
                         ✏️
                       </button>
@@ -420,7 +436,7 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
                         }
                         className={styles.removeButton}
                         title="Remover"
-                        disabled={confirmModal.loading}
+                        disabled={confirmModal.loading || loading}
                       >
                         🗑️
                       </button>
@@ -597,7 +613,6 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
               />
             </div>
 
-            {/* ✅ MUDOU - Input numérico */}
             <div className={styles.modalField}>
               <label>Descanso (segundos)</label>
               <input
@@ -637,6 +652,7 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
             <Button
               variant="outline"
               onClick={() => setModalAddExercicio(false)}
+              disabled={loading}
             >
               Cancelar
             </Button>
@@ -710,7 +726,6 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
                 />
               </div>
 
-              {/* ✅ MUDOU - Input numérico */}
               <div className={styles.modalField}>
                 <label>Descanso (segundos)</label>
                 <input
@@ -753,6 +768,7 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
                   setModalEditExercicio(false);
                   setExercicioEditando(null);
                 }}
+                disabled={loading}
               >
                 Cancelar
               </Button>
