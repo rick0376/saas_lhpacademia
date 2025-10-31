@@ -7,7 +7,6 @@ import { usePathname } from "next/navigation";
 import {
   Menu,
   X,
-  User,
   LogOut,
   Settings,
   Home,
@@ -17,8 +16,8 @@ import {
   Building2,
   Activity,
   Ruler,
-  Calendar, // Novo: para calendário aluno
-  FileText, // Novo: para avaliações
+  Calendar,
+  FileText,
 } from "lucide-react";
 import styles from "./styles.module.scss";
 import nav from "./nav.module.scss";
@@ -27,7 +26,7 @@ type Props = {
   children: ReactNode;
 };
 
-type Role = "USER" | "PERSONAL" | "ALUNO" | "ADMIN" | "SUPERADMIN"; // Adicionado "ALUNO"
+type Role = "USER" | "PERSONAL" | "ALUNO" | "ADMIN" | "SUPERADMIN";
 
 export const Layout: React.FC<Props> = ({ children }) => {
   const pathname = usePathname();
@@ -35,12 +34,14 @@ export const Layout: React.FC<Props> = ({ children }) => {
   const isAuthed = status === "authenticated";
   const role: Role = ((session as any)?.user?.role as Role) || "USER";
 
-  // Estado do menu lateral
+  // Nome do cliente e usuário retirados da sessão
+  const clienteNome = (session?.user as any)?.cliente || "Academia Pro";
+  const usuarioNome = session?.user?.name || session?.user?.email || "Usuário";
+
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const burgerRef = useRef<HTMLButtonElement | null>(null);
 
-  // Modal de confirmação de logout
   const [logoutOpen, setLogoutOpen] = useState(false);
   const openLogout = () => {
     setMenuOpen(false);
@@ -48,16 +49,14 @@ export const Layout: React.FC<Props> = ({ children }) => {
   };
   const closeLogout = () => setLogoutOpen(false);
   const confirmLogout = () => {
-    const callbackUrl = role === "ALUNO" ? "/aluno/login" : "/"; // Incremento: PCW redirect
+    const callbackUrl = role === "ALUNO" ? "/aluno/login" : "/";
     signOut({ callbackUrl });
   };
 
-  // Fecha menu ao trocar de rota
   useEffect(() => {
     setMenuOpen(false);
   }, [pathname]);
 
-  // Fecha com ESC
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -69,7 +68,6 @@ export const Layout: React.FC<Props> = ({ children }) => {
     return () => document.removeEventListener("keydown", onKey);
   }, []);
 
-  // Clique-fora fecha menu
   useEffect(() => {
     if (!menuOpen) return;
     const onClick = (e: MouseEvent) => {
@@ -89,12 +87,11 @@ export const Layout: React.FC<Props> = ({ children }) => {
     manageUsers: role === "ADMIN" || role === "SUPERADMIN",
     superOnly: role === "SUPERADMIN",
     personal: role === "PERSONAL" || role === "ADMIN" || role === "SUPERADMIN",
-    aluno: role === "ALUNO", // Novo: para PCW
+    aluno: role === "ALUNO",
   };
 
   const groupedNav = useMemo(() => {
     if (can.aluno) {
-      // Nav específico para ALUNO (PCW: foco em views pessoais)
       return [
         {
           group: "Meu Portal",
@@ -113,7 +110,7 @@ export const Layout: React.FC<Props> = ({ children }) => {
               href: "/aluno/treinos/[id]",
               label: "Detalhes Treino",
               icon: <ClipboardList size={18} />,
-            }, // Dinâmico, mas link base
+            },
             {
               href: "/aluno/avaliacoes",
               label: "Avaliações",
@@ -134,7 +131,6 @@ export const Layout: React.FC<Props> = ({ children }) => {
       ];
     }
 
-    // Nav original para outros roles (admin/personal/super)
     return [
       {
         group: "Início",
@@ -142,40 +138,40 @@ export const Layout: React.FC<Props> = ({ children }) => {
           { href: "/dashboard", label: "Dashboard", icon: <Home size={18} /> },
         ],
       },
-      {
-        group: "Gestão de Alunos",
-        items: can.personal
-          ? [
-              {
-                href: "/dashboard/alunos",
-                label: "Alunos",
-                icon: <Users size={18} />,
-              },
-              {
-                href: "/dashboard/medidas",
-                label: "Medidas",
-                icon: <Ruler size={18} />,
-              },
-            ]
-          : [],
-      },
-      {
-        group: "Treinos",
-        items: can.personal
-          ? [
-              {
-                href: "/dashboard/treinos",
-                label: "Treinos",
-                icon: <ClipboardList size={18} />,
-              },
-              {
-                href: "/dashboard/exercicios",
-                label: "Exercícios",
-                icon: <Dumbbell size={18} />,
-              },
-            ]
-          : [],
-      },
+      ...(can.personal
+        ? [
+            {
+              group: "Gestão de Alunos",
+              items: [
+                {
+                  href: "/dashboard/alunos",
+                  label: "Alunos",
+                  icon: <Users size={18} />,
+                },
+                {
+                  href: "/dashboard/medidas",
+                  label: "Medidas",
+                  icon: <Ruler size={18} />,
+                },
+              ],
+            },
+            {
+              group: "Treinos",
+              items: [
+                {
+                  href: "/dashboard/treinos",
+                  label: "Treinos",
+                  icon: <ClipboardList size={18} />,
+                },
+                {
+                  href: "/dashboard/exercicios",
+                  label: "Exercícios",
+                  icon: <Dumbbell size={18} />,
+                },
+              ],
+            },
+          ]
+        : []),
       {
         group: "Cadastros",
         items: [
@@ -193,19 +189,18 @@ export const Layout: React.FC<Props> = ({ children }) => {
                 {
                   href: "/dashboard/usuarios",
                   label: "Usuários",
-                  icon: <User size={18} />,
+                  icon: <Users size={18} />,
                 },
               ]
             : []),
         ],
       },
     ].filter((g) => g.items.length > 0);
-  }, [can.personal, can.manageUsers, can.superOnly, can.aluno]); // Adicionado can.aluno
+  }, [can.personal, can.manageUsers, can.superOnly, can.aluno]);
 
-  const brandTitle = can.aluno ? "LHP - Meu Treino" : "Academia Pro"; // Incremento: Título PCW para aluno
-  const brandSub = can.aluno ? "Portal do Aluno" : "Sistema de Gestão";
+  const brandTitle = can.aluno ? "LHP - Meu Treino" : clienteNome;
+  const brandSub = can.aluno ? "Portal do Aluno" : usuarioNome;
 
-  // Breadcrumb simples no header (incremento para navegação clara no PCW)
   const getBreadcrumb = () => {
     const parts = pathname.split("/").filter(Boolean);
     if (parts[0] === "aluno") {
@@ -223,13 +218,12 @@ export const Layout: React.FC<Props> = ({ children }) => {
         </span>
       ));
     }
-    return <span className={styles.breadcrumbDefault}>Dashboard</span>;
+    // return <span className={styles.breadcrumbDefault}>Dashboard</span>;
   };
 
   const Header = (
     <header className={styles.header}>
       <div className={styles.headerContent}>
-        {/* Logo */}
         <Link
           href={
             isAuthed && can.aluno
@@ -245,18 +239,16 @@ export const Layout: React.FC<Props> = ({ children }) => {
           </div>
           <div className={styles.titleContainer}>
             <span className={styles.title}>{brandTitle}</span>
-            <span className={styles.subtitle}>{brandSub}</span>
+            {/*<span className={styles.subtitle}>{brandSub}</span>*/}
+            <span className={styles.subtitle}>Gestão de Academia</span>
           </div>
         </Link>
 
-        {/* Breadcrumb (novo para PCW) */}
         <nav className={styles.breadcrumbNav}>{getBreadcrumb()}</nav>
 
-        {/* Right Area */}
         <div className={nav.rightArea}>
           {isAuthed && (
             <>
-              {/* Botão de Menu */}
               <button
                 ref={burgerRef}
                 className={nav.menuButton}
@@ -267,36 +259,33 @@ export const Layout: React.FC<Props> = ({ children }) => {
                 <span className={nav.menuButtonText}>Menu</span>
               </button>
 
-              {/* User Chip */}
               <div className={nav.userChip}>
                 <span className={nav.userAvatar}>
-                  {(session?.user?.name || session?.user?.email || "?")
-                    .toString()
-                    .slice(0, 1)
-                    .toUpperCase()}
+                  {usuarioNome.charAt(0).toUpperCase()}
                 </span>
                 <div className={nav.userInfo}>
-                  <span className={nav.userName}>
-                    {session?.user?.name || session?.user?.email}
-                  </span>
+                  <span className={nav.userName}>{usuarioNome}</span>
                   <span className={nav.userRole}>
-                    {role === "ALUNO" && "Aluno"} // Incremento: Role aluno
-                    {role === "SUPERADMIN" && "Super Admin"}
-                    {role === "ADMIN" && "Admin"}
-                    {role === "PERSONAL" && "Personal"}
-                    {role === "USER" && "Usuário"}
+                    {role === "ALUNO"
+                      ? "Aluno"
+                      : role === "SUPERADMIN"
+                      ? "Super Admin"
+                      : role === "ADMIN"
+                      ? "Admin"
+                      : role === "PERSONAL"
+                      ? "Personal"
+                      : "Usuário"}
                   </span>
                 </div>
               </div>
 
-              {/* Actions */}
               <div className={nav.actions}>
                 <Link
                   href={
                     can.aluno
                       ? "/aluno/configuracoes"
                       : "/dashboard/configuracoes"
-                  } // Incremento: Path PCW
+                  }
                   className={nav.actionBtn}
                   title="Configurações"
                 >
@@ -320,7 +309,6 @@ export const Layout: React.FC<Props> = ({ children }) => {
 
   const Sidebar = isAuthed && (
     <>
-      {/* Menu Lateral */}
       <aside
         ref={menuRef}
         className={`${styles.sidebar} ${menuOpen ? styles.sidebarOpen : ""}`}
@@ -390,7 +378,6 @@ export const Layout: React.FC<Props> = ({ children }) => {
         </nav>
       </aside>
 
-      {/* Overlay */}
       {menuOpen && (
         <div className={styles.overlay} onClick={() => setMenuOpen(false)} />
       )}
@@ -418,7 +405,6 @@ export const Layout: React.FC<Props> = ({ children }) => {
         {Footer}
       </div>
 
-      {/* Modal de Logout */}
       {logoutOpen && (
         <div
           className={styles.modalOverlay}

@@ -70,25 +70,35 @@
   display: none;
 }
 
+/* Botão de upload com padrão roxo vibrante */
 .uploadButton {
   padding: 12px 24px;
-  background-color: var(--primary-color);
+  background: linear-gradient(135deg, #714797, #5d2691);
   color: white;
   border: none;
   border-radius: var(--border-radius);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: var(--transition);
+  transition: all 0.3s ease;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
   &:hover:not(:disabled) {
-    background-color: #5558e3;
+    background: linear-gradient(135deg, #5d2691, #4a1f6b);
     transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(113, 71, 151, 0.5);
   }
 
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.95);
   }
 }
 

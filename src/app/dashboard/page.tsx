@@ -14,7 +14,7 @@ export default async function DashboardPage() {
 
   const dashboardItems = [
     {
-      id: "clientes", // Único: corrige duplicata
+      id: "clientes",
       title: "Clientes",
       description: "Gerenciar clientes do sistema",
       icon: "🏢",
@@ -23,7 +23,7 @@ export default async function DashboardPage() {
       superAdminOnly: true,
     },
     {
-      id: "usuarios", // Único
+      id: "usuarios",
       title: "Usuários",
       description: "Gerenciar usuários do sistema",
       icon: "👥",
@@ -31,7 +31,7 @@ export default async function DashboardPage() {
       color: "#6366f1",
     },
     {
-      id: "alunos", // Único
+      id: "alunos",
       title: "Alunos",
       description: "Cadastro e acompanhamento de alunos",
       icon: "👤",
@@ -39,7 +39,7 @@ export default async function DashboardPage() {
       color: "#10b981",
     },
     {
-      id: "avaliacoes", // Único (mesmo href que alunos, mas key via id)
+      id: "avaliacoes",
       title: "Avaliações",
       description: "Gerenciar avaliações de alunos",
       icon: "📊",
@@ -48,7 +48,7 @@ export default async function DashboardPage() {
       adminOnly: true,
     },
     {
-      id: "exercicios", // Único
+      id: "exercicios",
       title: "Exercícios",
       description: "Biblioteca de exercícios",
       icon: "💪",
@@ -56,7 +56,7 @@ export default async function DashboardPage() {
       color: "#ef4444",
     },
     {
-      id: "treinos", // Único
+      id: "treinos",
       title: "Treinos",
       description: "Montagem de fichas de treino",
       icon: "📋",
@@ -64,7 +64,7 @@ export default async function DashboardPage() {
       color: "#8b5cf6",
     },
     {
-      id: "permissoes", // Único
+      id: "permissoes",
       title: "Permissões",
       description: "Configurar permissões de acesso",
       icon: "🔐",
@@ -89,33 +89,46 @@ export default async function DashboardPage() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.welcome}>
+      {/* Welcome Section */}
+      <div className={styles.header}>
         <h1 className={styles.title}>Olá, {session.user.name}! 👋</h1>
         <p className={styles.subtitle}>Bem-vindo ao painel de controle</p>
       </div>
 
-      {/* ✅ ESTATÍSTICAS */}
+      {/* Dashboard Stats */}
       <DashboardStats />
 
-      {/* Menu de Navegação */}
-      <div className={styles.menuSection}>
+      {/* Quick Access Menu */}
+      <section className={styles.menuSection}>
         <h2 className={styles.sectionTitle}>Acesso Rápido</h2>
-        <div className={styles.grid}>
+        <div className={styles.cardsGrid}>
           {filteredItems.map((item) => (
             <Link
-              key={item.id} // Fix: único via id (resolve duplicata de href, estável para React)
+              key={item.id}
               href={item.href}
               className={styles.card}
-              style={{ "--card-color": item.color } as React.CSSProperties}
+              style={
+                {
+                  borderTopColor: item.color,
+                } as React.CSSProperties
+              }
+              aria-label={`Acessar ${item.title}`}
             >
-              <div className={styles.cardIcon}>{item.icon}</div>
+              <div
+                className={styles.cardIcon}
+                style={{ backgroundColor: item.color }}
+              >
+                {item.icon}
+              </div>
               <h3 className={styles.cardTitle}>{item.title}</h3>
               <p className={styles.cardDescription}>{item.description}</p>
-              <div className={styles.cardArrow}>→</div>
+              <div className={styles.cardArrow} aria-hidden="true">
+                →
+              </div>
             </Link>
           ))}
         </div>
-      </div>
+      </section>
     </div>
   );
 }

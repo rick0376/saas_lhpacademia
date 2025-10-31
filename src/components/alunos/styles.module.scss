@@ -306,7 +306,7 @@
 }
 // ... (mantenha os estilos anteriores)
 
-// Estilos do Formulário
+/* Estilos base do formulário */
 .form {
   background: white;
   border-radius: 12px;
@@ -416,21 +416,33 @@
   border-top: 1px solid var(--border-color);
 }
 
-@media (max-width: 768px) {
-  .formGrid {
-    grid-template-columns: 1fr;
+/* Botão 'Selecionar Imagem' com padrão roxo vibrante */
+.buttonSelectImage,
+button[type="button"].selectImageBtn {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #714797, #5d2691);
+  color: white !important;
+  border: none !important;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 24px rgba(113, 71, 151, 0.3);
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: linear-gradient(135deg, #5d2691, #4a1f6b);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(113, 71, 151, 0.5);
   }
 
-  .formActions {
-    flex-direction: column-reverse;
+  &:active {
+    transform: scale(0.95);
   }
-}
-// 🆕 Estilos para acesso ao app
-.divider {
-  grid-column: 1 / -1;
-  height: 1px;
-  background-color: var(--border-color);
-  margin: 1rem 0;
 }
 
 .inputWrapper {
@@ -445,14 +457,17 @@
   margin: 0;
   padding-left: 4px;
 }
-.evaluateButton {
-  color: #3b82f6; // Azul para avaliação
-  stroke: currentColor;
-  padding: 0.5rem;
-  border-radius: 0.375rem;
-  transition: color 0.2s, background-color 0.2s;
-  &:hover {
-    color: #1d4ed8;
-    background-color: rgba(59, 130, 246, 0.1);
+
+@media (max-width: 768px) {
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .formActions {
+    flex-direction: column-reverse;
+  }
+
+  .title {
+    font-size: 24px;
   }
 }

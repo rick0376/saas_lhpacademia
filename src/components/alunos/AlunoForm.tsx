@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import styles from "./styles.module.scss";
+import styles from "./alunoForm.module.scss";
 import { Input } from "../ui/Input/Input";
 import { Button } from "../ui/Button/Button";
 import { ImageUpload } from "../ui/ImageUpload/ImageUpload";
@@ -88,7 +88,6 @@ export const AlunoForm: React.FC<AlunoFormProps> = ({
   };
 
   const handleFotoChange = (file: File | null, previewUrl: string) => {
-    console.log("📸 Foto selecionada:", file ? file.name : "removida");
     setFotoFile(file);
     setFotoPreview(previewUrl);
   };
@@ -184,7 +183,6 @@ export const AlunoForm: React.FC<AlunoFormProps> = ({
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
       <div className={styles.formGrid}>
-        {/* ✅ SELECT DE CLIENTE (só para SUPERADMIN) */}
         {!clienteId && !isEdit && (
           <div className={styles.selectWrapper}>
             <label className={styles.label}>Cliente/Academia *</label>

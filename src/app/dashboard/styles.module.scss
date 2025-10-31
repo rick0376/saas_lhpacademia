@@ -1,39 +1,142 @@
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .container {
-  max-width: 1400px;
-  margin: 0 auto;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #06b6d4 0%, #0284c7 50%, #0369a1 100%);
+  padding: 2rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  position: relative;
+
+  &::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(
+        circle at 20% 50%,
+        rgba(255, 255, 255, 0.1) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 80% 80%,
+        rgba(255, 255, 255, 0.08) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 40% 20%,
+        rgba(255, 255, 255, 0.06) 0%,
+        transparent 50%
+      );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
 }
 
-.welcome {
-  margin-bottom: 48px;
+.header {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 24px;
+  padding: 2rem;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  animation: slideDown 0.5s ease;
+
+  h1 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 800;
+    color: white;
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  p {
+    margin-top: 0.5rem;
+    font-size: 1.125rem;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+  }
+
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+
+    h1 {
+      font-size: 1.5rem;
+    }
+
+    p {
+      font-size: 1rem;
+    }
+  }
 }
 
-.title {
-  font-size: 36px;
-  font-weight: 800;
-  color: var(--dark-color);
-  margin-bottom: 12px;
+.menuSection {
+  margin-top: 2rem;
+
+  .sectionTitle {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  }
 }
 
-.subtitle {
-  font-size: 18px;
-  color: var(--gray-color);
-}
-
-.grid {
+.cardsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  animation: fadeInUp 0.6s ease 0.2s both;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
 }
 
 .card {
   background: white;
-  border-radius: 16px;
-  padding: 32px;
-  box-shadow: var(--shadow);
-  transition: var(--transition);
+  border-radius: 24px;
+  padding: 2rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+  text-align: center;
+  cursor: pointer;
+  text-decoration: none;
+  color: #1e293b;
   position: relative;
-  overflow: hidden;
-  border: 2px solid transparent;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 
   &::before {
     content: "";
@@ -41,75 +144,59 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 4px;
-    background: var(--card-color);
+    height: 6px;
+    border-top: 6px solid;
+    border-top-color: inherit; // herdará a cor definida inline no borderTopColor
     transform: scaleX(0);
-    transition: var(--transition);
+    transition: transform 0.4s ease;
+    transform-origin: left;
   }
 
   &:hover {
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-lg);
-    border-color: var(--card-color);
+    transform: translateY(-12px) scale(1.02);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
 
     &::before {
       transform: scaleX(1);
     }
 
-    .cardArrow {
-      transform: translateX(8px);
+    .cardIcon {
+      transform: scale(1.2) rotate(10deg);
     }
   }
 }
 
 .cardIcon {
-  font-size: 48px;
-  margin-bottom: 16px;
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  display: inline-block;
+  padding: 1rem;
+  border-radius: 16px;
+  color: white;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  transition: all 0.4s ease;
+  /* backgroundColor será setado via style inline no componente */
 }
 
 .cardTitle {
-  font-size: 22px;
   font-weight: 700;
-  color: var(--dark-color);
-  margin-bottom: 8px;
+  font-size: 1.125rem;
+  margin-bottom: 0.25rem;
 }
 
 .cardDescription {
-  font-size: 14px;
-  color: var(--gray-color);
-  line-height: 1.6;
-  margin-bottom: 16px;
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-bottom: 1rem;
 }
 
 .cardArrow {
-  font-size: 24px;
-  color: var(--card-color);
-  transition: var(--transition);
-  display: inline-block;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: inherit; /* herda cor do card */
+  transition: transform 0.3s ease;
 }
 
-@media (max-width: 768px) {
-  .title {
-    font-size: 28px;
-  }
-
-  .subtitle {
-    font-size: 16px;
-  }
-
-  .grid {
-    grid-template-columns: 1fr;
-  }
-}
-// ... (mantenha estilos anteriores)
-
-.menuSection {
-  margin-top: 48px;
-}
-
-.sectionTitle {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--dark-color);
-  margin-bottom: 24px;
+.card:hover .cardArrow {
+  transform: translateX(6px);
 }

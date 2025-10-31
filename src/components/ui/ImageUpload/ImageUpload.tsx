@@ -5,7 +5,7 @@ import styles from "./styles.module.scss";
 import Image from "next/image";
 
 interface ImageUploadProps {
-  value?: string; // URL existente (para edição)
+  value?: string;
   onChange: (file: File | null, previewUrl: string) => void;
   label?: string;
   disabled?: boolean;
@@ -26,7 +26,6 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
 
     if (!file) return;
 
-    // Validações
     const maxSize = 5 * 1024 * 1024; // 5MB
     const allowedTypes = [
       "image/jpeg",
@@ -46,22 +45,12 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
       return;
     }
 
-    console.log("📸 Arquivo selecionado:", {
-      name: file.name,
-      size: `${(file.size / 1024 / 1024).toFixed(2)}MB`,
-      type: file.type,
-    });
-
-    // Criar preview local
     const reader = new FileReader();
     reader.onloadend = () => {
       const previewUrl = reader.result as string;
       setPreview(previewUrl);
       setFileName(file.name);
       onChange(file, previewUrl);
-      console.log(
-        "✅ Preview criado localmente (ainda não foi enviado para Cloudinary)"
-      );
     };
     reader.readAsDataURL(file);
   };
@@ -73,7 +62,6 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
     if (inputRef.current) {
       inputRef.current.value = "";
     }
-    console.log("🗑️ Preview removido");
   };
 
   const handleClick = () => {
@@ -93,7 +81,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
               width={200}
               height={200}
               className={styles.image}
-              unoptimized // Para preview local
+              unoptimized
             />
           </div>
           <button

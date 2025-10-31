@@ -1,7 +1,7 @@
 .main {
   min-height: calc(100vh - 140px);
   padding: 40px 24px;
-  background: linear-gradient(135deg, #06b6d4 0%, #0284c7 50%, #0369a1 100%);
+  background: linear-gradient(135deg, #1e1b2c, #2a2940); // fundo escuro moderno
   color: white;
 }
 
@@ -21,14 +21,14 @@
 .title {
   font-size: 32px;
   font-weight: 800;
-  color: #ebf8ff;
+  color: #f3e8ff; // roxo claro para título
   margin-bottom: 8px;
-  text-shadow: 0 1px 4px rgba(3, 105, 161, 0.7);
+  text-shadow: 0 1px 4px rgba(113, 71, 151, 0.7);
 }
 
 .subtitle {
   font-size: 16px;
-  color: #bee3f8;
+  color: #c4b5fd; // roxo mais suave para subtítulo
 }
 
 .addButton {
@@ -36,11 +36,7 @@
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  background: linear-gradient(
-    135deg,
-    #714797,
-    #5d2691
-  ); /* gradiente roxo vibrante */
+  background: linear-gradient(135deg, #714797, #5d2691);
   color: white;
   border-radius: 12px;
   font-weight: 600;
