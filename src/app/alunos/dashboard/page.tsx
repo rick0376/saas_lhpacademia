@@ -19,6 +19,7 @@ import {
   ChevronDown,
   ChevronUp,
   Edit,
+  MessageCircle,
 } from "lucide-react";
 import { Modal } from "@/components/ui/Modal/Modal";
 import { Button } from "@/components/ui/Button/Button";
@@ -332,6 +333,30 @@ export default function AlunoDashboard() {
     }
   };
 
+  // ✅ Função para compartilhar no WhatsApp
+  const handleShareWhatsApp = (execucao: ExecucaoTreino) => {
+    const mensagem = `
+🏋️ *TREINO REALIZADO*
+
+*Treino:* ${execucao.treino.nome}
+*Data:* ${formatDateTime(execucao.data)}
+*Intensidade:* ${getIntensidadeLabel(execucao.intensidade).label}
+*Exercícios:* ${execucao.exerciciosCompletados}
+*Status:* ${execucao.completo ? "✅ Completo" : "⏳ Incompleto"}
+
+${execucao.exercicios
+  .map((ex) => `• ${ex.nome} - ${ex.series}x${ex.repeticoes}`)
+  .join("\n")}
+
+${execucao.observacoes ? `*Observações:* ${execucao.observacoes}` : ""}
+
+💪 Treino realizado com sucesso!
+  `.trim();
+
+    const url = `https://wa.me/?text=${encodeURIComponent(mensagem)}`;
+    window.open(url, "_blank");
+  };
+
   // ✅ RENDERS CONDICIONAIS
   if (status === "loading" || loading) {
     return (
@@ -632,6 +657,16 @@ export default function AlunoDashboard() {
                         >
                           <Edit size={18} />
                           Editar
+                        </button>
+
+                        {/* ✅ NOVO - BOTÃO WHATSAPP */}
+                        <button
+                          className={styles.whatsappButtonAction}
+                          onClick={() => handleShareWhatsApp(execucao)}
+                          title="Compartilhar no WhatsApp"
+                        >
+                          <MessageCircle size={18} />
+                          WhatsApp
                         </button>
                       </div>
 

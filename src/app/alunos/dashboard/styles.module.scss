@@ -1,3 +1,39 @@
+// ========================================
+// ALUNO DASHBOARD STYLES - COMPLETO
+// Com Responsividade Mobile Integrada
+// ========================================
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ========================================
+// CONTAINER PRINCIPAL
+// ========================================
 .container {
   min-height: 100vh;
   background: linear-gradient(135deg, #06b6d4 0%, #0284c7 50%, #0369a1 100%);
@@ -5,7 +41,6 @@
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   position: relative;
 
-  // Efeito de partículas no fundo
   &::before {
     content: "";
     position: fixed;
@@ -41,8 +76,9 @@
     padding: 1rem;
   }
 }
+
 // ========================================
-// LOADING E ERROR
+// LOADING, ERROR, EMPTY STATES
 // ========================================
 .loadingContainer,
 .errorContainer,
@@ -64,12 +100,6 @@
   animation: spin 0.8s linear infinite;
   margin-bottom: 2rem;
   box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 .loadingContainer p,
@@ -98,10 +128,6 @@
     transform: translateY(-3px);
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
   }
-
-  &:active {
-    transform: translateY(0);
-  }
 }
 
 .emptyIcon {
@@ -119,7 +145,7 @@
 }
 
 // ========================================
-// HEADER - GLASSMORPHISM ROXO
+// HEADER
 // ========================================
 .header {
   background: rgba(255, 255, 255, 0.15);
@@ -134,17 +160,6 @@
   @media (max-width: 768px) {
     padding: 1.5rem;
     margin-bottom: 2rem;
-  }
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
 
@@ -202,7 +217,7 @@
 }
 
 // ========================================
-// CARDS GRID - ROXO VIBRANTE
+// CARDS GRID
 // ========================================
 .cardsGrid {
   display: grid;
@@ -215,17 +230,6 @@
     grid-template-columns: 1fr;
     gap: 1.5rem;
     margin-bottom: 2rem;
-  }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
 
@@ -340,14 +344,10 @@
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(113, 71, 151, 0.4);
   }
-
-  &:active {
-    transform: translateY(0);
-  }
 }
 
 // ========================================
-// HISTÓRICO - MODERNO ROXO
+// HISTÓRICO SEÇÃO
 // ========================================
 .historicoSection {
   background: rgba(255, 255, 255, 0.15);
@@ -415,12 +415,17 @@
   }
 }
 
+// ========================================
+// HISTÓRICO GRID - RESPONSIVO
+// ========================================
 .historicoGrid {
   display: grid;
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
 
   @media (max-width: 768px) {
-    gap: 1.5rem;
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 }
 
@@ -455,7 +460,8 @@
   }
 
   @media (max-width: 768px) {
-    padding: 1.5rem;
+    padding: 0.75rem;
+    border-radius: 8px;
   }
 }
 
@@ -463,79 +469,83 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   gap: 1rem;
 
   @media (max-width: 768px) {
     flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
   }
 }
 
 .historicoCardTitleArea {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
   flex: 1;
+
+  @media (max-width: 768px) {
+    gap: 0.25rem;
+  }
 }
 
 .historicoCardTitle {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  margin-bottom: 0.75rem;
+
+  h3 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+
+    @media (max-width: 768px) {
+      font-size: 1rem;
+    }
+  }
 
   svg {
     color: #714797;
     flex-shrink: 0;
   }
-
-  h3 {
-    margin: 0;
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: #1e293b;
-    line-height: 1.3;
-  }
-
-  @media (max-width: 768px) {
-    h3 {
-      font-size: 1.25rem;
-    }
-  }
 }
 
 .treinoObjetivo {
-  display: inline-flex;
-  align-items: center;
   font-size: 0.875rem;
-  color: #714797;
-  font-weight: 600;
-  background: rgba(113, 71, 151, 0.1);
-  padding: 0.375rem 0.875rem;
-  border-radius: 50px;
-  border: 1px solid rgba(113, 71, 151, 0.2);
+  color: #64748b;
+  display: inline-block;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  @media (max-width: 768px) {
+    font-size: 0.75rem;
+  }
 }
 
 .historicoCardDate {
-  background: linear-gradient(135deg, #714797, #5d2691);
-  color: white;
-  padding: 0.625rem 1.25rem;
-  border-radius: 50px;
   font-size: 0.875rem;
-  font-weight: 700;
+  color: #64748b;
+  font-weight: 500;
   white-space: nowrap;
-  box-shadow: 0 4px 12px rgba(113, 71, 151, 0.3);
 
   @media (max-width: 768px) {
-    align-self: flex-start;
+    font-size: 0.8rem;
   }
 }
 
 .historicoCardInfo {
   display: flex;
-  flex-wrap: wrap;
   gap: 0.75rem;
-  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
 
   @media (max-width: 768px) {
-    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
   }
 }
 
@@ -543,55 +553,43 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
   background: #f8fafc;
-  padding: 0.625rem 1rem;
-  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
   font-size: 0.875rem;
   color: #475569;
-  border: 2px solid #e2e8f0;
-  transition: all 0.2s ease;
-
-  &:hover {
-    border-color: #714797;
-    background: rgba(113, 71, 151, 0.05);
-  }
-
-  svg {
-    color: #714797;
-    flex-shrink: 0;
-  }
-
-  span {
-    font-weight: 600;
-  }
 
   @media (max-width: 768px) {
-    width: 100%;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.75rem;
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
   }
 }
 
+// ========================================
+// EXERCÍCIOS LISTA (ESCONDIDA EM MOBILE)
+// ========================================
 .exerciciosLista {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border-radius: 16px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  border: 2px solid #e2e8f0;
-  animation: slideDown 0.3s ease;
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 }
 
 .exerciciosListaTitulo {
-  font-size: 1.125rem;
-  font-weight: 800;
-  color: #1e293b;
-  margin: 0 0 1.25rem 0;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-
-  &::before {
-    content: "📋";
-    font-size: 1.375rem;
-  }
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #475569;
+  margin: 0 0 0.75rem 0;
 }
 
 .exerciciosGrid {
@@ -646,6 +644,10 @@
   color: #1e293b;
   margin-bottom: 0.5rem;
   line-height: 1.4;
+
+  @media (max-width: 768px) {
+    font-size: 1rem;
+  }
 }
 
 .exercicioDetalhes {
@@ -718,97 +720,89 @@
   }
 }
 
+// ========================================
+// BOTÕES DE AÇÃO - RESPONSIVOS
+// ========================================
 .historicoCardActions {
   display: flex;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 2px solid #e2e8f0;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
 
   @media (max-width: 768px) {
     flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
   }
 }
 
-.actionButton {
+.actionButton,
+.editButtonAction {
   flex: 1;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e2e8f0;
+  background: white;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.625rem;
-  background: linear-gradient(135deg, #714797, #5d2691);
-  color: white;
-  border: none;
-  padding: 1rem 1.5rem;
-  border-radius: 12px;
-  font-size: 0.9375rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(113, 71, 151, 0.3);
+  gap: 0.5rem;
 
-  svg {
-    flex-shrink: 0;
+  @media (max-width: 768px) {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.8rem;
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
   }
 
   &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 24px rgba(113, 71, 151, 0.4);
-  }
-
-  &:active {
-    transform: translateY(0);
+    border-color: #714797;
+    color: #714797;
+    background: #f8f4fc;
   }
 }
 
 .editButtonAction {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.625rem;
-  background: linear-gradient(135deg, #10b981, #059669);
+  background: linear-gradient(135deg, #714797, #5d2691);
   color: white;
-  border: none;
-  padding: 1rem 1.5rem;
-  border-radius: 12px;
-  font-size: 0.9375rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-
-  svg {
-    flex-shrink: 0;
-  }
+  border-color: #714797;
 
   &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
-  }
-
-  &:active {
-    transform: translateY(0);
+    background: linear-gradient(135deg, #5d2691, #4a1f6b);
+    border-color: #5d2691;
   }
 }
 
 .historicoCardFooter {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 0.75rem;
+  margin-top: 0.75rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  @media (max-width: 768px) {
+    padding-top: 0.5rem;
+    margin-top: 0.5rem;
+  }
 }
 
 .historicoCardTime {
-  font-size: 0.9375rem;
-  color: #714797;
-  font-weight: 700;
-  background: rgba(113, 71, 151, 0.1);
-  padding: 0.5rem 1rem;
-  border-radius: 50px;
-  border: 1px solid rgba(113, 71, 151, 0.2);
+  font-size: 0.75rem;
+  color: #94a3b8;
+  font-weight: 500;
 }
 
 // ========================================
-// MODAL DE EDIÇÃO - ROXO MODERNO
+// MODAL - HEADER EDIÇÃO
 // ========================================
 .modalContent {
   padding: 0;
@@ -889,6 +883,9 @@
   font-weight: 500;
 }
 
+// ========================================
+// MODAL - BODY
+// ========================================
 .modalBodyEdit {
   display: grid;
   gap: 2rem;
@@ -976,7 +973,9 @@
   }
 }
 
-// Seletor Visual de Intensidade
+// ========================================
+// INTENSIDADE SELECTOR
+// ========================================
 .intensidadeSelector {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -1030,10 +1029,6 @@
     }
   }
 
-  &:active {
-    transform: translateY(-3px);
-  }
-
   @media (max-width: 768px) {
     padding: 1rem;
   }
@@ -1075,6 +1070,9 @@
   }
 }
 
+// ========================================
+// TEXTAREA E CHECKBOX
+// ========================================
 .textareaEdit {
   width: 100%;
   padding: 1rem;
@@ -1139,7 +1137,9 @@
   }
 }
 
-// Seção de Exercícios Realizados
+// ========================================
+// EXERCÍCIOS EDIT SECTION
+// ========================================
 .exerciciosEditSection {
   background: linear-gradient(135deg, #fafbfc 0%, #f3f4f6 100%);
   border: 2px solid #e2e8f0;
@@ -1264,16 +1264,14 @@
     box-shadow: 0 6px 16px rgba(239, 68, 68, 0.5);
   }
 
-  &:active {
-    transform: scale(1) rotate(90deg);
-  }
-
   @media (max-width: 768px) {
     margin-left: auto;
   }
 }
 
-// Seção de Adicionar Exercícios
+// ========================================
+// EXERCÍCIOS ADD SECTION
+// ========================================
 .exerciciosAddSection {
   background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
   border: 3px solid #10b981;
@@ -1408,7 +1406,9 @@
   font-weight: 600;
 }
 
-// Modal Actions
+// ========================================
+// MODAL ACTIONS
+// ========================================
 .modalActionsEdit {
   display: flex;
   justify-content: flex-end;
@@ -1427,7 +1427,9 @@
   }
 }
 
-// Footer
+// ========================================
+// FOOTER
+// ========================================
 .footer {
   text-align: center;
   padding: 2rem;
@@ -1449,7 +1451,7 @@
 }
 
 // ========================================
-// RESPONSIVIDADE EXTRA
+// MOBILE EXTRA
 // ========================================
 @media (max-width: 480px) {
   .historicoCardTitle h3 {
@@ -1466,5 +1468,48 @@
 
   .modalHeaderEdit h3 {
     font-size: 1.125rem;
+  }
+}
+// ========================================
+// BOTÃO WHATSAPP
+// ========================================
+.whatsappButtonAction {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  background: linear-gradient(135deg, #25d366, #1fa855);
+  color: white;
+  border: none;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+  flex: 1;
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(37, 211, 102, 0.4);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.8rem;
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
   }
 }
