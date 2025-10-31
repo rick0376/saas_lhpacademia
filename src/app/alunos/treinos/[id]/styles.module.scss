@@ -1796,25 +1796,30 @@
 }
 
 .cronometroModalTimer {
-  font-size: 5rem;
-  font-weight: 800;
-  margin: 2rem 0;
+  font-size: 8rem;
+  font-weight: 900;
+  margin: 3rem 0;
   font-family: "SF Mono", "Monaco", "Courier New", monospace;
   letter-spacing: 0.05em;
-  animation: pulseScale 1s infinite;
+  animation: pulseScale 0.8s ease-in-out infinite;
+  line-height: 1.1;
+  text-shadow: 0 0 40px currentColor;
 
   @media (max-width: 768px) {
-    font-size: 4rem;
+    font-size: 6rem;
+    margin: 2.5rem 0;
   }
 
   &.timerExecucao {
     color: #0284c7;
-    text-shadow: 0 0 30px rgba(2, 132, 199, 0.5);
+    text-shadow: 0 0 50px rgba(2, 132, 199, 0.8);
+    filter: drop-shadow(0 0 20px rgba(2, 132, 199, 0.6));
   }
 
   &.timerDescanso {
     color: #714797;
-    text-shadow: 0 0 30px rgba(113, 71, 151, 0.5);
+    text-shadow: 0 0 50px rgba(113, 71, 151, 0.8);
+    filter: drop-shadow(0 0 20px rgba(113, 71, 151, 0.6));
   }
 }
 

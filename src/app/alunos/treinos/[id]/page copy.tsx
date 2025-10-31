@@ -67,6 +67,8 @@ export default function TreinoDetalhesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedEx, setSelectedEx] = useState<Exercício | null>(null);
+
+  // ✅ NOVO - Modal de instruções do exercício
   const [showInstrucoesModal, setShowInstrucoesModal] = useState(false);
   const [exercicioInstrucoes, setExercicioInstrucoes] =
     useState<Exercício | null>(null);
@@ -99,18 +101,25 @@ export default function TreinoDetalhesPage() {
     exercicioId: string | null;
     tempo: number;
   }>({ exercicioId: null, tempo: 0 });
+
   const [cronometroAtivo, setCronometroAtivo] = useState<string | null>(null);
   const [tempoRestante, setTempoRestante] = useState<number>(0);
+
+  // ✅ NOVO - Controlar som da série
+  const [somSerieTocouRef, setSomSerieTocouRef] = useState(false);
+
   const [showCronometroModal, setShowCronometroModal] = useState(false);
   const [cronometroModalType, setCronometroModalType] = useState<
     "execucao" | "descanso"
   >("execucao");
   const [exercicioAtivo, setExercicioAtivo] = useState<Exercício | null>(null);
+
   const [showRegistroModal, setShowRegistroModal] = useState(false);
   const [intensidade, setIntensidade] = useState("");
   const [observacoes, setObservacoes] = useState("");
   const [dataExecucao, setDataExecucao] = useState("");
   const [salvando, setSalvando] = useState(false);
+
   const [showEditModal, setShowEditModal] = useState(false);
   const [execucaoEditando, setExecucaoEditando] = useState<Execucao | null>(
     null
@@ -122,21 +131,27 @@ export default function TreinoDetalhesPage() {
   const [editExerciciosSelecionados, setEditExerciciosSelecionados] = useState<
     Set<string>
   >(new Set());
+
   const [showVerDetalhesModal, setShowVerDetalhesModal] = useState(false);
   const [execucaoDetalhes, setExecucaoDetalhes] = useState<Execucao | null>(
     null
   );
+
   const [toast, setToast] = useState({
     show: false,
     message: "",
     type: "success" as "success" | "error" | "warning" | "info",
   });
+
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showConfirmCancelSerie, setShowConfirmCancelSerie] = useState(false);
   const [showCongratulacoes, setShowCongratulacoes] = useState(false);
   const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null);
   const [confirmMessage, setConfirmMessage] = useState("");
+
   const [execucoes, setExecucoes] = useState<Execucao[]>([]);
+
+  // ✅ NOVO - Estado para controlar sons
   const [soundEnabled, setSoundEnabled] = useState(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("sound_enabled");
@@ -145,11 +160,13 @@ export default function TreinoDetalhesPage() {
     return true;
   });
 
+  // ✅ NOVO - Função para abrir modal de instruções
   const openInstrucoesModal = (exercicio: Exercício) => {
     setExercicioInstrucoes(exercicio);
     setShowInstrucoesModal(true);
   };
 
+  // ✅ NOVO - Função para fechar modal de instruções
   const closeInstrucoesModal = () => {
     setShowInstrucoesModal(false);
     setExercicioInstrucoes(null);
@@ -180,18 +197,34 @@ export default function TreinoDetalhesPage() {
 
   useEffect(() => {
     if (!cronometroExecucao.exercicioId) return;
+
+    // ✅ Adiciona ISTO AQUI - bloqueia som ao iniciar
+    if (cronometroExecucao.tempo === 0 && !somSerieTocouRef) {
+      setSomSerieTocouRef(true);
+      // NÃO TOCA SOM AQUI - VAZIO!
+    }
+
     const timer = setInterval(() => {
-      setCronometroExecucao((prev) => ({ ...prev, tempo: prev.tempo + 1 }));
+      setCronometroExecucao((prev) => ({
+        ...prev,
+        tempo: prev.tempo + 1,
+      }));
     }, 1000);
-    return () => clearInterval(timer);
+
+    return () => {
+      clearInterval(timer);
+      setSomSerieTocouRef(false); // Reset ao sair
+    };
   }, [cronometroExecucao.exercicioId]);
 
   useEffect(() => {
     if (status === "loading") return;
+
     if (!session || !alunoId || !id) {
       router.push("/alunos/treinos");
       return;
     }
+
     fetchDetalhes(id, alunoId);
     fetchExecucoes(id);
   }, [status, session, id, alunoId, router]);
@@ -199,10 +232,12 @@ export default function TreinoDetalhesPage() {
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
+        // ✅ Se tem modal de confirmação de cancelamento, fecha só ela
         if (showConfirmCancelSerie) {
           setShowConfirmCancelSerie(false);
           return;
         }
+
         setSelectedEx(null);
         setShowRegistroModal(false);
         setShowEditModal(false);
@@ -223,7 +258,7 @@ export default function TreinoDetalhesPage() {
       showConfirmModal ||
       showInstrucoesModal ||
       showCronometroModal ||
-      showConfirmCancelSerie
+      showConfirmCancelSerie // ✅ ADICIONA ISSO
     ) {
       document.addEventListener("keydown", handleEsc);
     }
@@ -237,7 +272,7 @@ export default function TreinoDetalhesPage() {
     showConfirmModal,
     showInstrucoesModal,
     showCronometroModal,
-    showConfirmCancelSerie,
+    showConfirmCancelSerie, // ✅ ADICIONA ISSO TAMBÉM
   ]);
 
   useEffect(() => {
@@ -255,17 +290,20 @@ export default function TreinoDetalhesPage() {
       return;
     }
 
+    // ✅ NOVO - Quando cronômetro de descanso zera, inicia série automaticamente
     if (tempoRestante === 0 && cronometroAtivo && exercicioAtivo) {
       const timer = setTimeout(() => {
-        vibrate([200, 100, 200]);
+        vibrate([200, 100, 200]); // Só vibração, sem som
         iniciarCronometroExecucao(exercicioAtivo.id, exercicioAtivo);
       }, 1500);
+
       return () => clearTimeout(timer);
     }
 
     const timer = setInterval(() => {
       setTempoRestante((prev) => {
         if (prev <= 1) {
+          playDescansoFimSound();
           return 0;
         }
         return prev - 1;
@@ -293,16 +331,20 @@ export default function TreinoDetalhesPage() {
   const fetchDetalhes = async (treinoId: string, alunoId: string) => {
     setLoading(true);
     setError("");
+
     const url = `/api/alunos/treinos/${treinoId}/exercicios?alunoId=${alunoId}`;
+
     try {
       const response = await fetch(url, {
         credentials: "include",
         cache: "no-store",
       });
+
       if (!response.ok) {
         const errText = await response.text();
         throw new Error(`Erro: ${response.status} - ${errText}`);
       }
+
       const data: TreinoDetalhes = await response.json();
       setDetalhes(data);
     } catch (err: any) {
@@ -323,6 +365,7 @@ export default function TreinoDetalhesPage() {
           Expires: "0",
         },
       });
+
       if (response.ok) {
         const data = await response.json();
         setExecucoes(data);
@@ -385,16 +428,15 @@ export default function TreinoDetalhesPage() {
       setCronometroAtivo(null);
       setTempoRestante(0);
     }
-    setCronometroExecucao({ exercicioId, tempo: 0 });
+
+    setCronometroExecucao({
+      exercicioId,
+      tempo: 0,
+    });
+
     setExercicioAtivo(exercicio);
     setCronometroModalType("execucao");
     setShowCronometroModal(true);
-  };
-
-  const vibrate = (pattern: number | number[]) => {
-    if (typeof window !== "undefined" && "vibrate" in navigator) {
-      navigator.vibrate(pattern);
-    }
   };
 
   const cancelarExecucao = () => {
@@ -402,7 +444,10 @@ export default function TreinoDetalhesPage() {
   };
 
   const confirmarCancelamento = () => {
-    setCronometroExecucao({ exercicioId: null, tempo: 0 });
+    setCronometroExecucao({
+      exercicioId: null,
+      tempo: 0,
+    });
     setShowCronometroModal(false);
     setExercicioAtivo(null);
     setShowConfirmCancelSerie(false);
@@ -411,28 +456,51 @@ export default function TreinoDetalhesPage() {
 
   const concluirSerie = (exercicioId: string, exercicio: Exercício) => {
     const restantes = seriesRestantes[exercicioId];
+
     if (restantes > 1) {
-      setSeriesRestantes((prev) => ({ ...prev, [exercicioId]: restantes - 1 }));
-      setCronometroExecucao({ exercicioId: null, tempo: 0 });
+      setSeriesRestantes((prev) => ({
+        ...prev,
+        [exercicioId]: restantes - 1,
+      }));
+
+      setCronometroExecucao({
+        exercicioId: null,
+        tempo: 0,
+      });
+
       const segundos = parseTempoDescanso(exercicio.descanso);
       if (segundos > 0) {
         setCronometroAtivo(exercicioId);
         setTempoRestante(segundos);
         setExercicioAtivo(exercicio);
         setCronometroModalType("descanso");
-        setShowCronometroModal(true);
+        setShowCronometroModal(true); // ✅ ADICIONA ISSO!
       } else {
         setShowCronometroModal(false);
       }
+
+      playSerieConcluida();
       showToast(`✅ Série concluída! ${restantes - 1}x restantes`, "success");
     } else {
-      setSeriesRestantes((prev) => ({ ...prev, [exercicioId]: 0 }));
-      setCronometroExecucao({ exercicioId: null, tempo: 0 });
+      setSeriesRestantes((prev) => ({
+        ...prev,
+        [exercicioId]: 0,
+      }));
+
+      setCronometroExecucao({
+        exercicioId: null,
+        tempo: 0,
+      });
+
       setShowCronometroModal(false);
       toggleExercicioConcluido(exercicioId);
+      playExercicioCompleto();
       showToast(`🎉 Exercício ${exercicio.nome} completo!`, "success");
+
+      // ✅ VERIFICA SE TODOS OS EXERCÍCIOS FORAM COMPLETADOS
       const totalExercicios = detalhes?.exercicios.length || 0;
       const exerciciosCompletos = exerciciosConcluidos.size + 1;
+
       if (exerciciosCompletos === totalExercicios) {
         setShowCongratulacoes(true);
       }
@@ -441,8 +509,10 @@ export default function TreinoDetalhesPage() {
 
   const pularDescanso = () => {
     if (!exercicioAtivo) return;
+
     setCronometroAtivo(null);
     setTempoRestante(0);
+
     iniciarCronometroExecucao(exercicioAtivo.id, exercicioAtivo);
   };
 
@@ -455,7 +525,10 @@ export default function TreinoDetalhesPage() {
   };
 
   const resetarSeries = (exercicioId: string, seriesOriginais: number) => {
-    setSeriesRestantes((prev) => ({ ...prev, [exercicioId]: seriesOriginais }));
+    setSeriesRestantes((prev) => ({
+      ...prev,
+      [exercicioId]: seriesOriginais,
+    }));
     showToast("🔄 Séries resetadas!", "info");
   };
 
@@ -465,6 +538,7 @@ export default function TreinoDetalhesPage() {
       setTempoRestante(0);
       return;
     }
+
     const segundos = parseTempoDescanso(tempoDescanso);
     if (segundos > 0) {
       setCronometroAtivo(exercicioId);
@@ -474,13 +548,19 @@ export default function TreinoDetalhesPage() {
 
   const parseTempoDescanso = (tempo: string): number => {
     const match = tempo.match(
-      /(\d+)\s*(s|seg|segundo|segundos|m|min|minuto|minutos)?/i
+      /(\d+)\s*(s|seg|segundo|segundos|m|min|minuto|minutos)?/i // ✅ CORRETO
     );
     if (!match) return 0;
+
     const valor = parseInt(match[1]);
     const unidade = match[2]?.toLowerCase();
-    if (!unidade || unidade.startsWith("s")) return valor;
-    else if (unidade.startsWith("m")) return valor * 60;
+
+    if (!unidade || unidade.startsWith("s")) {
+      return valor;
+    } else if (unidade.startsWith("m")) {
+      return valor * 60;
+    }
+
     return valor;
   };
 
@@ -490,20 +570,126 @@ export default function TreinoDetalhesPage() {
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const getIntensidadeLabel = (intensidade: string) => {
-    const labels: Record<string, { emoji: string; text: string }> = {
-      LEVE: { emoji: "🟢", text: "Leve" },
-      MODERADO: { emoji: "🟡", text: "Moderado" },
-      PESADO: { emoji: "🟠", text: "Pesado" },
-      MUITO_PESADO: { emoji: "🔴", text: "Muito Pesado" },
-    };
-    return labels[intensidade] || { emoji: "", text: intensidade };
+  const vibrate = (pattern: number | number[]) => {
+    if (typeof window !== "undefined" && "vibrate" in navigator) {
+      navigator.vibrate(pattern);
+    }
   };
 
-  const totalExercicios = detalhes?.exercicios.length || 0;
-  const exerciciosRealizados = exerciciosConcluidos.size;
-  const progressoPercentual =
-    totalExercicios > 0 ? (exerciciosRealizados / totalExercicios) * 100 : 0;
+  const playDescansoFimSound = () => {
+    if (!soundEnabled) return;
+
+    try {
+      const audioContext = new (window.AudioContext ||
+        (window as any).webkitAudioContext)();
+
+      for (let i = 0; i < 3; i++) {
+        setTimeout(() => {
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+
+          oscillator.frequency.value = 1000;
+          oscillator.type = "square";
+
+          gainNode.gain.setValueAtTime(0.4, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(
+            0.01,
+            audioContext.currentTime + 0.2
+          );
+
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.2);
+        }, i * 250);
+      }
+
+      vibrate([100, 100, 100, 100, 100]);
+    } catch (e) {
+      console.log("Não foi possível reproduzir som");
+    }
+  };
+
+  const playSerieConcluida = () => {
+    if (!soundEnabled) return;
+
+    try {
+      const audioContext = new (window.AudioContext ||
+        (window as any).webkitAudioContext)();
+
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      oscillator.frequency.value = 600;
+      oscillator.type = "sine";
+
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(
+        0.01,
+        audioContext.currentTime + 0.4
+      );
+
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.4);
+
+      vibrate(100);
+    } catch (e) {
+      console.log("Não foi possível reproduzir som");
+    }
+  };
+
+  const playExercicioCompleto = () => {
+    if (!soundEnabled) return;
+
+    try {
+      const audioContext = new (window.AudioContext ||
+        (window as any).webkitAudioContext)();
+
+      const notas = [523, 659, 784];
+
+      notas.forEach((freq, i) => {
+        setTimeout(() => {
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+
+          oscillator.frequency.value = freq;
+          oscillator.type = "triangle";
+
+          gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(
+            0.01,
+            audioContext.currentTime + 0.3
+          );
+
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.3);
+        }, i * 150);
+      });
+
+      vibrate([100, 50, 100, 50, 200]);
+    } catch (e) {
+      console.log("Não foi possível reproduzir som");
+    }
+  };
+
+  const playNotificationSound = playDescansoFimSound;
+
+  const getDataTimeLocalFormat = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
 
   const openRegistroModal = () => {
     setIntensidade("");
@@ -519,26 +705,20 @@ export default function TreinoDetalhesPage() {
     setDataExecucao("");
   };
 
-  const getDataTimeLocalFormat = () => {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    const day = String(now.getDate()).padStart(2, "0");
-    const hours = String(now.getHours()).padStart(2, "0");
-    const minutes = String(now.getMinutes()).padStart(2, "0");
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
-  };
-
   const handleRegistrarExecucao = async () => {
     if (!intensidade) {
       showToast("⚠️ Selecione a intensidade do treino!", "warning");
       return;
     }
+
     setSalvando(true);
+
     try {
       const response = await fetch(`/api/alunos/treinos/${id}/execucao`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         credentials: "include",
         body: JSON.stringify({
           intensidade,
@@ -547,17 +727,21 @@ export default function TreinoDetalhesPage() {
           exerciciosRealizadosIds: Array.from(exerciciosConcluidos),
         }),
       });
+
       if (!response.ok) {
         throw new Error("Erro ao registrar execução");
       }
+
       await fetchExecucoes(id);
       closeRegistroModal();
+
       setExerciciosConcluidos(new Set());
       setSeriesRestantes({});
       if (typeof window !== "undefined") {
         localStorage.removeItem(`treino_${id}_concluidos`);
         localStorage.removeItem(`treino_${id}_series`);
       }
+
       showToast("✅ Treino registrado com sucesso!", "success");
     } catch (err: any) {
       showToast("❌ Erro ao registrar treino: " + err.message, "error");
@@ -572,10 +756,13 @@ export default function TreinoDetalhesPage() {
     setEditIntensidade("");
     setEditObservacoes("");
     setEditData("");
+
     await new Promise((resolve) => setTimeout(resolve, 100));
+
     setExecucaoEditando(execucao);
     setEditIntensidade(execucao.intensidade);
     setEditObservacoes(execucao.observacoes || "");
+
     const dataObj = new Date(execucao.data);
     const year = dataObj.getFullYear();
     const month = String(dataObj.getMonth() + 1).padStart(2, "0");
@@ -583,6 +770,7 @@ export default function TreinoDetalhesPage() {
     const hours = String(dataObj.getHours()).padStart(2, "0");
     const minutes = String(dataObj.getMinutes()).padStart(2, "0");
     setEditData(`${year}-${month}-${day}T${hours}:${minutes}`);
+
     try {
       const timestamp = Date.now();
       const response = await fetch(
@@ -597,11 +785,13 @@ export default function TreinoDetalhesPage() {
           },
         }
       );
+
       if (response.ok) {
         const todasExecucoes = await response.json();
         const execucaoAtualizada = todasExecucoes.find(
           (e: Execucao) => e.id === execucao.id
         );
+
         if (
           execucaoAtualizada?.exercicios &&
           execucaoAtualizada.exercicios.length > 0
@@ -609,6 +799,7 @@ export default function TreinoDetalhesPage() {
           const idsExecutados = execucaoAtualizada.exercicios
             .map((e: ExercicioExecutado) => e.treinoExercicioId)
             .filter((id): id is string => !!id);
+
           setEditExerciciosSelecionados(new Set(idsExecutados));
         } else {
           setEditExerciciosSelecionados(new Set());
@@ -618,12 +809,14 @@ export default function TreinoDetalhesPage() {
       console.error("❌ Erro ao buscar dados:", error);
       setEditExerciciosSelecionados(new Set());
     }
+
     await new Promise((resolve) => setTimeout(resolve, 100));
     setShowEditModal(true);
   };
 
   const closeEditModal = () => {
     setShowEditModal(false);
+
     setTimeout(() => {
       setExecucaoEditando(null);
       setEditIntensidade("");
@@ -638,12 +831,17 @@ export default function TreinoDetalhesPage() {
       showToast("⚠️ Selecione a intensidade do treino!", "warning");
       return;
     }
+
     if (!execucaoEditando) return;
+
     setSalvandoEdit(true);
+
     try {
       const response = await fetch(`/api/alunos/treinos/${id}/execucao`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         credentials: "include",
         body: JSON.stringify({
           execucaoId: execucaoEditando.id,
@@ -653,11 +851,14 @@ export default function TreinoDetalhesPage() {
           exerciciosRealizadosIds: Array.from(editExerciciosSelecionados),
         }),
       });
+
       if (!response.ok) {
         throw new Error("Erro ao editar execução");
       }
+
       await fetchExecucoes(id);
       await new Promise((resolve) => setTimeout(resolve, 200));
+
       closeEditModal();
       showToast("✅ Execução editada com sucesso!", "success");
     } catch (err: any) {
@@ -679,9 +880,11 @@ export default function TreinoDetalhesPage() {
               credentials: "include",
             }
           );
+
           if (!response.ok) {
             throw new Error("Erro ao deletar execução");
           }
+
           await fetchExecucoes(id);
           showToast("🗑️ Execução excluída com sucesso!", "success");
         } catch (err: any) {
@@ -707,6 +910,21 @@ export default function TreinoDetalhesPage() {
 
   const closeModal = () => setSelectedEx(null);
 
+  const getIntensidadeLabel = (intensidade: string) => {
+    const labels: Record<string, { emoji: string; text: string }> = {
+      LEVE: { emoji: "🟢", text: "Leve" },
+      MODERADO: { emoji: "🟡", text: "Moderado" },
+      PESADO: { emoji: "🟠", text: "Pesado" },
+      MUITO_PESADO: { emoji: "🔴", text: "Muito Pesado" },
+    };
+    return labels[intensidade] || { emoji: "", text: intensidade };
+  };
+
+  const totalExercicios = detalhes?.exercicios.length || 0;
+  const exerciciosRealizados = exerciciosConcluidos.size;
+  const progressoPercentual =
+    totalExercicios > 0 ? (exerciciosRealizados / totalExercicios) * 100 : 0;
+
   if (loading) {
     return (
       <AlunoLayout>
@@ -717,6 +935,8 @@ export default function TreinoDetalhesPage() {
       </AlunoLayout>
     );
   }
+
+  //4444444444444444444444444444444444
 
   if (error) {
     return (
@@ -917,6 +1137,7 @@ export default function TreinoDetalhesPage() {
                         )}
                       </div>
 
+                      {/* ✅ NOVO - REPETIÇÕES COM ÍCONE DE INFORMAÇÃO */}
                       <div className={styles.cardItem}>
                         <span className={styles.cardLabel}>
                           Repetições
@@ -960,6 +1181,7 @@ export default function TreinoDetalhesPage() {
                       </div>
                     </div>
 
+                    {/* ✅ MOSTRA A OBSERVAÇÃO DO TREINO (NÃO DA BIBLIOTECA) */}
                     {ex.observacao && (
                       <div className={styles.cardObs}>
                         <span className={styles.obsLabel}>Observações:</span>
@@ -1056,6 +1278,7 @@ export default function TreinoDetalhesPage() {
           </div>
         )}
 
+        {/* ✅ NOVO MODAL - INSTRUÇÕES DO EXERCÍCIO */}
         {showInstrucoesModal && exercicioInstrucoes && (
           <div className={styles.modalOverlay} onClick={closeInstrucoesModal}>
             <div
@@ -1068,11 +1291,13 @@ export default function TreinoDetalhesPage() {
               >
                 <X size={24} />
               </button>
+
               <div className={styles.instrucoesModalHeader}>
                 <h2 className={styles.instrucoesTitle}>
                   📖 {exercicioInstrucoes.nome}
                 </h2>
               </div>
+
               <div className={styles.instrucoesContent}>
                 <div className={styles.instrucoesSection}>
                   {exercicioInstrucoes.descricao ? (
@@ -1089,6 +1314,8 @@ export default function TreinoDetalhesPage() {
                   )}
                 </div>
               </div>
+
+              {/* ✅ FOTO EMBAIXO DAS INSTRUÇÕES */}
               {exercicioInstrucoes.fotoExecucao && (
                 <div className={styles.instrucoesImageWrapper}>
                   <img
@@ -1102,6 +1329,7 @@ export default function TreinoDetalhesPage() {
                   />
                 </div>
               )}
+
               <div className={styles.instrucoesFooter}>
                 <button
                   className={styles.instrucoesCloseBtn}
@@ -1114,6 +1342,7 @@ export default function TreinoDetalhesPage() {
           </div>
         )}
 
+        {/* MODAL - CRONÔMETRO EM DESTAQUE */}
         {showCronometroModal && exercicioAtivo && (
           <div className={styles.cronometroModalOverlay}>
             <div className={styles.cronometroModalContent}>
@@ -1123,6 +1352,7 @@ export default function TreinoDetalhesPage() {
               >
                 <X size={24} />
               </button>
+
               <div className={styles.cronometroModalHeader}>
                 <h3>{exercicioAtivo.nome}</h3>
                 <span className={styles.cronometroModalTipo}>
@@ -1131,6 +1361,7 @@ export default function TreinoDetalhesPage() {
                     : "😮‍💨 Descanso"}
                 </span>
               </div>
+
               <div
                 className={`${styles.cronometroModalTimer} ${
                   cronometroModalType === "execucao"
@@ -1142,6 +1373,7 @@ export default function TreinoDetalhesPage() {
                   ? formatarTempo(cronometroExecucao.tempo)
                   : formatarTempo(tempoRestante)}
               </div>
+
               {cronometroModalType === "execucao" ? (
                 <>
                   <div className={styles.cronometroModalInfo}>
@@ -1158,6 +1390,7 @@ export default function TreinoDetalhesPage() {
                       </span>
                     )}
                   </div>
+
                   <div className={styles.cronometroModalActions}>
                     <button
                       className={styles.btnModalCancelar}
@@ -1184,6 +1417,7 @@ export default function TreinoDetalhesPage() {
                       <strong>{seriesRestantes[exercicioAtivo.id]}x</strong>
                     </span>
                   </div>
+
                   <div className={styles.cronometroModalActions}>
                     <button
                       className={styles.btnModalPular}
@@ -1204,6 +1438,7 @@ export default function TreinoDetalhesPage() {
           </div>
         )}
 
+        {/* MODAL - FOTO DO EXERCÍCIO */}
         {selectedEx && selectedEx.fotoExecucao && (
           <div className={styles.modalOverlay} onClick={closeModal}>
             <div
@@ -1227,6 +1462,7 @@ export default function TreinoDetalhesPage() {
           </div>
         )}
 
+        {/* MODAL - REGISTRAR EXECUÇÃO */}
         {showRegistroModal && (
           <div className={styles.modalOverlay} onClick={closeRegistroModal}>
             <div
@@ -1239,9 +1475,11 @@ export default function TreinoDetalhesPage() {
               >
                 <X size={24} />
               </button>
+
               <h2 className={styles.registroTitle}>
                 ✅ Registrar Execução do Treino
               </h2>
+
               <div className={styles.registroForm}>
                 <label className={styles.formLabel}>Data e Hora *</label>
                 <input
@@ -1250,6 +1488,7 @@ export default function TreinoDetalhesPage() {
                   value={dataExecucao}
                   onChange={(e) => setDataExecucao(e.target.value)}
                 />
+
                 <label className={styles.formLabel}>
                   Como foi a intensidade do treino? *
                 </label>
@@ -1275,6 +1514,7 @@ export default function TreinoDetalhesPage() {
                     }
                   )}
                 </div>
+
                 <label className={styles.formLabel}>
                   Observações (opcional)
                 </label>
@@ -1285,6 +1525,7 @@ export default function TreinoDetalhesPage() {
                   onChange={(e) => setObservacoes(e.target.value)}
                   rows={4}
                 />
+
                 <div className={styles.registroActions}>
                   <button
                     type="button"
@@ -1308,6 +1549,7 @@ export default function TreinoDetalhesPage() {
           </div>
         )}
 
+        {/* MODAL - EDITAR EXECUÇÃO */}
         {showEditModal && execucaoEditando && (
           <div className={styles.modalOverlay} onClick={closeEditModal}>
             <div
@@ -1317,7 +1559,9 @@ export default function TreinoDetalhesPage() {
               <button className={styles.modalClose} onClick={closeEditModal}>
                 <X size={24} />
               </button>
+
               <h2 className={styles.registroTitle}>✏️ Editar Execução</h2>
+
               <div className={styles.registroForm}>
                 <label className={styles.formLabel}>Data e Hora *</label>
                 <input
@@ -1326,6 +1570,7 @@ export default function TreinoDetalhesPage() {
                   value={editData}
                   onChange={(e) => setEditData(e.target.value)}
                 />
+
                 <label className={styles.formLabel}>Intensidade *</label>
                 <div className={styles.intensidadeGrid}>
                   {["LEVE", "MODERADO", "PESADO", "MUITO_PESADO"].map(
@@ -1349,6 +1594,7 @@ export default function TreinoDetalhesPage() {
                     }
                   )}
                 </div>
+
                 <label className={styles.formLabel}>
                   Exercícios Realizados
                 </label>
@@ -1382,6 +1628,7 @@ export default function TreinoDetalhesPage() {
                     );
                   })}
                 </div>
+
                 <label className={styles.formLabel}>Observações</label>
                 <textarea
                   className={styles.formTextarea}
@@ -1390,6 +1637,7 @@ export default function TreinoDetalhesPage() {
                   onChange={(e) => setEditObservacoes(e.target.value)}
                   rows={4}
                 />
+
                 <div className={styles.registroActions}>
                   <button
                     type="button"
@@ -1413,6 +1661,7 @@ export default function TreinoDetalhesPage() {
           </div>
         )}
 
+        {/* MODAL - VER DETALHES DA EXECUÇÃO */}
         {showVerDetalhesModal && execucaoDetalhes && (
           <div className={styles.modalOverlay} onClick={closeVerDetalhesModal}>
             <div
@@ -1430,6 +1679,7 @@ export default function TreinoDetalhesPage() {
                   <X size={24} />
                 </button>
               </div>
+
               <div className={styles.detalhesContent}>
                 <div className={styles.detalhesHeader}>
                   <span className={styles.detalhesData}>
@@ -1455,6 +1705,7 @@ export default function TreinoDetalhesPage() {
                     </span>
                   </div>
                 </div>
+
                 <div className={styles.detalhesExercicios}>
                   <h3>Exercícios Realizados:</h3>
                   <div className={styles.exerciciosDetalhes}>
@@ -1481,6 +1732,7 @@ export default function TreinoDetalhesPage() {
                     )}
                   </div>
                 </div>
+
                 {execucaoDetalhes.observacoes && (
                   <div className={styles.detalhesObs}>
                     <h4>Observações:</h4>
@@ -1492,6 +1744,7 @@ export default function TreinoDetalhesPage() {
           </div>
         )}
 
+        {/* MODAL DE CONFIRMAÇÃO */}
         {showConfirmModal && (
           <div
             className={styles.modalOverlay}
@@ -1523,7 +1776,7 @@ export default function TreinoDetalhesPage() {
             </div>
           </div>
         )}
-
+        {/* MODAL - CONFIRMAÇÃO DE CANCELAMENTO DE SÉRIE */}
         {showConfirmCancelSerie && (
           <div
             className={styles.modalOverlay}
@@ -1559,6 +1812,7 @@ export default function TreinoDetalhesPage() {
           </div>
         )}
 
+        {/* MODAL - CONGRATULAÇÕES - TREINO COMPLETO */}
         {showCongratulacoes && (
           <div className={styles.modalOverlay}>
             <div
@@ -1585,7 +1839,6 @@ export default function TreinoDetalhesPage() {
             </div>
           </div>
         )}
-
         {toast.show && (
           <div className={`${styles.toast} ${styles[toast.type]}`}>
             <span>{toast.message}</span>
@@ -1601,3 +1854,4 @@ export default function TreinoDetalhesPage() {
     </AlunoLayout>
   );
 }
+//testando o deploy
