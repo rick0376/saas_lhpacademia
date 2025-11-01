@@ -1,7 +1,10 @@
+/* Fundo principal e texto */
 .main {
   min-height: calc(100vh - 140px);
   padding: 40px 24px;
-  background-color: var(--light-color);
+  background: linear-gradient(135deg, #06b6d4 0%, #0284c7 50%, #0369a1 100%);
+  color: white;
+  border-radius: 8px;
 }
 
 .container {
@@ -9,302 +12,281 @@
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 32px;
 }
 
+/* Header perfil */
 .profileHeader {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 }
 
 .backButton {
-  font-size: 14px;
-  color: var(--primary-color);
+  color: #ebf8ff;
   font-weight: 600;
-  transition: var(--transition);
+  text-decoration: none;
+  transition: color 0.3s;
 
   &:hover {
-    color: var(--secondary-color);
+    color: #a78bfa; /* roxo vibrante */
   }
 }
 
 .profileCard {
-  background: white;
-  border-radius: 12px;
-  padding: 32px;
-  box-shadow: var(--shadow);
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  gap: 24px;
+  align-items: center;
+  background: linear-gradient(135deg, #9882ee 0%, #7a5fca 50%, #856de2 100%);
+  padding: 20px 24px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(98, 77, 184, 0.3);
 }
 
 .profileInfo {
   display: flex;
-  gap: 24px;
   align-items: center;
-  flex: 1;
+  gap: 24px;
 }
 
 .avatar {
-  width: 100px;
-  height: 100px;
+  width: 96px;
+  height: 96px;
   border-radius: 50%;
-  background: linear-gradient(
-    135deg,
-    var(--primary-color) 0%,
-    var(--secondary-color) 100%
-  );
+  background: linear-gradient(135deg, #714797, #5d2691);
   display: flex;
   align-items: center;
   justify-content: center;
+  font-weight: 700;
+  font-size: 40px;
+  color: white;
   overflow: hidden;
-  flex-shrink: 0;
+}
 
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  span {
-    font-size: 40px;
-    font-weight: 700;
-    color: white;
-  }
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 .info {
-  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .nome {
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 800;
-  color: var(--dark-color);
-  margin-bottom: 12px;
+  color: #ebf8ff;
+  text-shadow: 0 1px 4px rgba(3, 105, 161, 0.7);
 }
 
 .meta {
   display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-  align-items: center;
-
-  span {
-    font-size: 14px;
-    color: var(--gray-color);
-  }
+  gap: 20px;
+  font-size: 16px;
+  color: #dbeafe;
 }
 
 .statusBadge {
-  padding: 6px 12px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
-
-  &.ativo {
-    background-color: #d1fae5;
-    color: #065f46;
-  }
-
-  &.inativo {
-    background-color: #fee2e2;
-    color: #991b1b;
-  }
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 14px;
+  user-select: none;
 }
 
+.ativo {
+  background-color: #d1fad4;
+  color: #065f46;
+}
+
+.inativo {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+/* Botão editar */
 .actions {
   display: flex;
-  gap: 12px;
+  align-items: center;
 }
 
 .editButton {
-  padding: 12px 24px;
-  background-color: var(--primary-color);
+  background: linear-gradient(135deg, #0597b4, #0277a1, #037c5e);
   color: white;
   border: none;
-  border-radius: var(--border-radius);
-  font-weight: 600;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-weight: 700;
   cursor: pointer;
-  transition: var(--transition);
+  box-shadow: 0 8px 24px rgba(122, 79, 237, 0.5);
+  transition: all 0.3s ease;
 
   &:hover {
-    background-color: #5558e3;
+    background: linear-gradient(135deg, #06a9c9, #03819f, #029164);
+
+    box-shadow: 0 12px 32px rgba(4, 159, 200, 0.8);
+    transform: translateY(-3px) scale(1.05);
+  }
+
+  &:active {
+    transform: translateY(-1px) scale(0.98);
   }
 }
 
+/* Grid de estatísticas */
 .statsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 20px;
 }
 
 .statCard {
-  background: white;
+  background: linear-gradient(135deg, #9882ee 0%, #7a5fca 50%, #856de2 100%);
   border-radius: 12px;
   padding: 24px;
-  box-shadow: var(--shadow);
+  box-shadow: 0 8px 32px rgba(98, 77, 184, 0.3);
   display: flex;
   align-items: center;
   gap: 16px;
 }
 
 .statIcon {
-  font-size: 40px;
-}
-
-.statContent {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  font-size: 28px;
 }
 
 .statValue {
-  font-size: 28px;
-  font-weight: 800;
-  color: var(--primary-color);
-  line-height: 1;
+  font-size: 24px;
+  font-weight: 700;
+  color: #e0e7ff;
 }
 
 .statLabel {
-  font-size: 13px;
-  color: var(--gray-color);
-  font-weight: 600;
-  text-transform: uppercase;
+  font-size: 14px;
+  color: #bfdbfe;
 }
 
+/* Cartões de contato, treinos, observações */
 .contactCard,
 .treinosCard,
 .observacoesCard {
-  background: white;
+  background: linear-gradient(135deg, #9882ee 0%, #7a5fca 50%, #856de2 100%);
+  padding: 24px;
   border-radius: 12px;
-  padding: 32px;
-  box-shadow: var(--shadow);
+  box-shadow: 0 8px 32px rgba(98, 77, 184, 0.3);
 }
 
 .cardTitle {
   font-size: 20px;
   font-weight: 700;
-  color: var(--dark-color);
-  margin-bottom: 20px;
+  color: #e0e7ff;
+  margin-bottom: 16px;
 }
 
-.cardHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.viewAll {
-  font-size: 14px;
-  color: var(--primary-color);
-  font-weight: 600;
-  transition: var(--transition);
-
-  &:hover {
-    color: var(--secondary-color);
-  }
-}
-
+/* Grid Contato */
 .contactGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
 }
 
 .contactItem {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 16px;
-  background-color: var(--light-color);
-  border-radius: 8px;
-
-  div {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
+  color: #dbeafe;
 }
 
 .contactIcon {
-  font-size: 24px;
+  font-size: 20px;
 }
 
 .contactLabel {
-  font-size: 12px;
-  color: var(--gray-color);
   font-weight: 600;
-  text-transform: uppercase;
+  font-size: 14px;
 }
 
 .contactValue {
-  font-size: 15px;
-  color: var(--dark-color);
+  font-size: 14px;
+  color: #cbd5e1;
+}
+
+/* Treinos */
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.viewAll {
   font-weight: 600;
+  color: #a78bfa;
+  text-decoration: none;
+  transition: color 0.3s;
+
+  &:hover {
+    color: #7c3aed;
+  }
 }
 
 .treinosGrid {
   display: grid;
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
 }
 
 .treinoItem {
-  padding: 16px;
-  background-color: var(--light-color);
-  border-radius: 8px;
-  border: 2px solid var(--border-color);
-  transition: var(--transition);
+  background: rgba(113, 71, 151, 0.15);
+  padding: 12px 16px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: white;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 600;
+  transition: background-color 0.3s;
 
   &:hover {
-    border-color: var(--primary-color);
-    transform: translateX(4px);
+    background: rgba(113, 71, 151, 0.3);
   }
 }
 
 .treinoNome {
   font-size: 16px;
-  font-weight: 700;
-  color: var(--dark-color);
 }
 
 .treinoObjetivo {
   font-size: 14px;
-  color: var(--gray-color);
+  font-weight: 400;
+  color: #d8b4fe;
 }
 
+/* Observações */
 .observacoesText {
-  font-size: 15px;
-  color: var(--text-color);
-  line-height: 1.7;
-  margin: 0;
+  font-size: 16px;
+  color: #e0e7ff;
+  white-space: pre-wrap;
 }
 
+/* Responsividade */
 @media (max-width: 768px) {
   .profileCard {
     flex-direction: column;
+    align-items: flex-start;
   }
 
-  .profileInfo {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .nome {
-    font-size: 24px;
-  }
-
-  .statsGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .contactGrid {
+  .statsGrid,
+  .contactGrid,
+  .treinosGrid {
     grid-template-columns: 1fr;
+  }
+
+  .backButton {
+    font-size: 14px;
   }
 }

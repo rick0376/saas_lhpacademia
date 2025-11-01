@@ -13,7 +13,7 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  background: linear-gradient(135deg, #714797, #5d2691);
+  background: linear-gradient(135deg, #9882ee 0%, #7a5fca 50%, #856de2 100%);
   border-bottom: 2px solid #5d2691;
   box-shadow: 0 4px 28px rgba(113, 71, 151, 0.8);
   backdrop-filter: blur(20px);
@@ -57,7 +57,7 @@
   justify-content: center;
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, #714797, #5d2691);
+  background: linear-gradient(135deg, #8651b4, #822ad4);
   border-radius: 14px;
   box-shadow: 0 8px 30px rgba(113, 71, 151, 0.65);
 
@@ -113,7 +113,7 @@
   left: 0;
   bottom: 0;
   width: 280px;
-  background: linear-gradient(180deg, #714797, #5d2691);
+  background: linear-gradient(135deg, #9882ee 0%, #7a5fca 50%, #856de2 100%);
   box-shadow: 2px 0 20px rgba(113, 71, 151, 0.9);
   z-index: 1100;
   transform: translateX(-100%);
