@@ -34,7 +34,6 @@ export const Layout: React.FC<Props> = ({ children }) => {
   const isAuthed = status === "authenticated";
   const role: Role = ((session as any)?.user?.role as Role) || "USER";
 
-  // Nome do cliente e usuário retirados da sessão
   const clienteNome = (session?.user as any)?.cliente || "Academia Pro";
   const usuarioNome = session?.user?.name || session?.user?.email || "Usuário";
 
@@ -80,8 +79,18 @@ export const Layout: React.FC<Props> = ({ children }) => {
     return () => document.removeEventListener("mousedown", onClick);
   }, [menuOpen]);
 
-  const isActive = (href: string) =>
-    pathname === href || pathname?.startsWith(href + "/");
+  // Nova função isActive mais precisa
+  const isActive = (href: string) => {
+    // Casos especiais para rotas raiz para evitar falsos positivos
+    if (href === "/dashboard") {
+      return pathname === "/dashboard";
+    }
+    if (href === "/aluno/dashboard") {
+      return pathname === "/aluno/dashboard";
+    }
+    // Para os demais, aceita prefixos para subrotas
+    return pathname === href || pathname?.startsWith(href + "/");
+  };
 
   const can = {
     manageUsers: role === "ADMIN" || role === "SUPERADMIN",
@@ -312,7 +321,7 @@ export const Layout: React.FC<Props> = ({ children }) => {
         className={`${styles.sidebar} ${menuOpen ? styles.sidebarOpen : ""}`}
       >
         <div className={styles.sidebarHeader}>
-          <h3 className={styles.sidebarTitle}>Menu de Navegação</h3>
+          <h3 className={styles.sidebarTitle}>Menu</h3>
           <button
             className={styles.sidebarClose}
             onClick={() => setMenuOpen(false)}
