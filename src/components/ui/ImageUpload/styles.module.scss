@@ -73,7 +73,7 @@
 /* Botão de upload com padrão roxo vibrante */
 .uploadButton {
   padding: 12px 24px;
-  background: linear-gradient(135deg, #714797, #5d2691);
+  background: linear-gradient(135deg, #6d2ed4 0%, #9167e4 100%);
   color: white;
   border: none;
   border-radius: var(--border-radius);
@@ -85,11 +85,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
 
   &:hover:not(:disabled) {
-    background: linear-gradient(135deg, #5d2691, #4a1f6b);
+    background: linear-gradient(135deg, #714797, #5d2691);
     transform: translateY(-2px);
-    box-shadow: 0 12px 32px rgba(113, 71, 151, 0.5);
+    box-shadow: 0 0 10px #6d2ed488;
   }
 
   &:disabled {

@@ -1,4 +1,73 @@
-/* Barra de Busca */
+/* ==========================
+   Animações e Estados Gerais
+   ========================== */
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #d1d5db;
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 16px;
+}
+
+.loading,
+.error,
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.emptyIcon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.empty p {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.retryButton {
+  padding: 10px 20px;
+  background-color: #6366f1;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.retryButton:hover {
+  background-color: #4f46e5;
+}
+
+/* ==========================
+   Formulário de Busca
+   ========================== */
+
 .searchForm {
   display: flex;
   gap: 12px;
@@ -16,17 +85,17 @@
   color: #1f2937;
   background-color: white;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
 
-  &::placeholder {
-    color: #a5b4fc;
-  }
+.searchInput::placeholder {
+  color: #a5b4fc;
+}
 
-  &:focus {
-    outline: none;
-    border-color: #7c3aed; /* roxo vibrante */
-    box-shadow: 0 0 8px #7c3aed88;
-    background-color: white;
-  }
+.searchInput:focus {
+  outline: none;
+  border-color: #7c3aed;
+  box-shadow: 0 0 8px #7c3aed88;
+  background-color: white;
 }
 
 .searchButton {
@@ -34,7 +103,7 @@
   font-size: 18px;
   height: 48px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
+  background: linear-gradient(135deg, #6d2ed4 0%, #9167e4 100%);
   color: white;
   border: none;
   font-weight: 700;
@@ -43,7 +112,7 @@
 }
 
 .searchButton:hover {
-  background: linear-gradient(135deg, #6d2ed4 0%, #9167e4 100%);
+  background: linear-gradient(135deg, #714797, #5d2691);
   box-shadow: 0 0 10px #6d2ed488;
 }
 
@@ -51,7 +120,10 @@
   background: linear-gradient(135deg, #5a25ab 0%, #7b51cd 100%);
 }
 
-/* Container da tabela desktop */
+/* ==========================
+   Container e Tabela Desktop
+   ========================== */
+
 .tableContainer {
   display: block;
   overflow-x: auto;
@@ -60,7 +132,6 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
-/* Tabela */
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -97,7 +168,10 @@
   vertical-align: middle;
 }
 
-/* AlunoCell - avatar e nome */
+/* ==========================
+   Aluno Cell - Avatar e Nome
+   ========================== */
+
 .alunoCell {
   display: flex;
   align-items: center;
@@ -123,7 +197,10 @@
   color: #1f2937;
 }
 
-/* Contato */
+/* ==========================
+   Contato
+   ========================== */
+
 .contactInfo {
   display: flex;
   flex-direction: column;
@@ -140,19 +217,24 @@
   color: #9ca3af;
 }
 
-/* Objetivo */
+/* ==========================
+   Objetivo e Treinos
+   ========================== */
+
 .objetivo {
   font-weight: 500;
   color: #3b82f6;
 }
 
-/* Treinos */
 .treinosCount {
   font-weight: 600;
   color: #10b981;
 }
 
-/* Status badges */
+/* ==========================
+   Status Badges
+   ========================== */
+
 .statusBadge {
   display: inline-block;
   padding: 4px 12px;
@@ -180,7 +262,10 @@
   box-shadow: 0 0 6px #ef4444aa;
 }
 
-/* Ações */
+/* ==========================
+   Ações - Botões
+   ========================== */
+
 .actions {
   display: flex;
   gap: 8px;
@@ -245,68 +330,9 @@
   box-shadow: 0 5px 14px rgba(220, 38, 38, 0.5);
 }
 
-/* Loading, erro e vazio */
-.loading,
-.error,
-.empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 20px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-}
-
-.spinner {
-  width: 48px;
-  height: 48px;
-  border: 4px solid #d1d5db;
-  border-top-color: #6366f1;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  margin-bottom: 16px;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.emptyIcon {
-  font-size: 64px;
-  margin-bottom: 16px;
-  opacity: 0.5;
-}
-
-.empty h3 {
-  font-size: 20px;
-  font-weight: 700;
-  color: #374151;
-  margin-bottom: 8px;
-}
-
-.empty p {
-  color: #6b7280;
-  font-size: 14px;
-}
-
-.retryButton {
-  padding: 10px 20px;
-  background-color: #6366f1;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-
-  &:hover {
-    background-color: #4f46e5;
-  }
-}
+/* ==========================
+   Modal Content e Ações
+   ========================== */
 
 .modalContent p {
   margin-bottom: 16px;
@@ -329,7 +355,10 @@
   margin-top: 24px;
 }
 
-/* Responsividade - cards para mobile */
+/* ==========================
+   Responsividade - Cards Mobile
+   ========================== */
+
 .cardsContainer {
   display: none;
 }
@@ -399,93 +428,50 @@
 
   .actions {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     flex-wrap: wrap;
-    margin-top: 10px;
+    margin-top: 12px;
   }
 
-  .viewButton,
-  .editButton,
-  .evaluateButton,
-  .deleteButton {
-    padding: 8px 18px;
-    border-radius: 12px;
-    font-weight: 700;
-    font-size: 12px;
+  .iconButton,
+  .iconButtonDelete {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 14px;
     cursor: pointer;
     border: none;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    user-select: none;
-    box-shadow: 0 4px 12px rgba(74, 44, 155, 0.3);
-  }
-
-  .viewButton {
-    background: #a78bfa;
     color: white;
+    box-shadow: 0 4px 10px rgba(74, 44, 155, 0.3);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
   }
 
-  .viewButton:hover {
-    background: #7c3aed;
-    box-shadow: 0 6px 18px rgba(124, 58, 237, 0.4);
+  .iconButton {
+    background-color: #a78bfa;
   }
 
-  .editButton {
-    background: #3b82f6;
-    color: white;
+  .iconButton:hover {
+    background-color: #7c3aed;
+    box-shadow: 0 5px 14px rgba(124, 58, 237, 0.4);
   }
 
-  .editButton:hover {
-    background: #2563eb;
-    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.4);
+  .iconButtonDelete {
+    background-color: #ef4444;
   }
 
-  .evaluateButton {
-    background: #22d3ee;
-    color: #1e40af;
-    font-weight: 700;
+  .iconButtonDelete:hover {
+    background-color: #dc2626;
+    box-shadow: 0 6px 15px rgba(220, 38, 38, 0.55);
   }
 
-  .evaluateButton:hover {
-    background: #06b6d4;
-    box-shadow: 0 6px 18px rgba(6, 182, 212, 0.4);
-  }
-
-  .deleteButton {
-    background: #ef4444;
-    color: white;
-  }
-
-  .deleteButton:hover {
-    background: #dc2626;
-    box-shadow: 0 6px 18px rgba(220, 38, 38, 0.5);
-  }
-
-  .statusBadge {
-    font-size: 14px;
-    padding: 6px 16px;
-    border-radius: 12px;
-    font-weight: 700;
-    display: inline-block;
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
-    user-select: none;
-  }
-
-  .ativo {
-    background-color: #22c55e;
-    color: white;
-    font-weight: 800;
-    text-shadow: none;
-  }
-
-  .inativo {
-    background: rgba(255, 99, 99, 0.6);
-    color: #991b1b;
-    font-weight: 800;
-    text-shadow: none;
+  .iconButton svg,
+  .iconButtonDelete svg {
+    width: 16px;
+    height: 16px;
+    stroke: white;
+    fill: none;
   }
 }
