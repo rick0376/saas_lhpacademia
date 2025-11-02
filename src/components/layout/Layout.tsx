@@ -218,7 +218,6 @@ export const Layout: React.FC<Props> = ({ children }) => {
         </span>
       ));
     }
-    // return <span className={styles.breadcrumbDefault}>Dashboard</span>;
   };
 
   const Header = (
@@ -239,7 +238,6 @@ export const Layout: React.FC<Props> = ({ children }) => {
           </div>
           <div className={styles.titleContainer}>
             <span className={styles.title}>{brandTitle}</span>
-            {/*<span className={styles.subtitle}>{brandSub}</span>*/}
             <span className={styles.subtitle}>Gestão de Academia</span>
           </div>
         </Link>
@@ -249,16 +247,6 @@ export const Layout: React.FC<Props> = ({ children }) => {
         <div className={nav.rightArea}>
           {isAuthed && (
             <>
-              <button
-                ref={burgerRef}
-                className={nav.menuButton}
-                onClick={() => setMenuOpen((v) => !v)}
-                title="Menu"
-              >
-                <Menu size={20} />
-                <span className={nav.menuButtonText}>Menu</span>
-              </button>
-
               <div className={nav.userChip}>
                 <span className={nav.userAvatar}>
                   {usuarioNome.charAt(0).toUpperCase()}
@@ -300,6 +288,16 @@ export const Layout: React.FC<Props> = ({ children }) => {
                   <LogOut size={18} />
                 </button>
               </div>
+
+              <button
+                ref={burgerRef}
+                className={nav.menuButton}
+                onClick={() => setMenuOpen((v) => !v)}
+                title="Menu"
+              >
+                <Menu size={20} />
+                <span className={nav.menuButtonText}>Menu</span>
+              </button>
             </>
           )}
         </div>

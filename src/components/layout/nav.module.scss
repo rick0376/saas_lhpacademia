@@ -15,11 +15,7 @@
   align-items: center;
   gap: 8px;
   padding: 10px 18px;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.2),
-    rgba(255, 255, 255, 0.1)
-  );
+  background: linear-gradient(135deg, #9882ee 0%, #7a5fca 50%, #856de2 100%);
   backdrop-filter: blur(10px);
   color: white;
   border: 1px solid rgba(255, 255, 255, 0.3);
@@ -30,15 +26,22 @@
   transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 
+  svg {
+    transition: all 0.3s ease;
+    color: white !important;
+  }
+
   &:hover {
-    background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.3),
-      rgba(255, 255, 255, 0.2)
-    );
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-    border-color: rgba(255, 255, 255, 0.5);
+    background: linear-gradient(135deg, #5d2691, #5a0f9b);
+    border-color: #5a0f9b;
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 28px rgba(113, 71, 151, 0.3);
+    color: white;
+
+    svg {
+      transform: scale(1.15);
+      color: white !important;
+    }
   }
 
   &:active {
@@ -90,7 +93,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #714797, #5d2691);
+  background: linear-gradient(135deg, #b6a4f7 0%, #9c8cea 50%, #a394f2 100%);
   color: white !important;
   display: flex;
   align-items: center;
@@ -98,21 +101,27 @@
   font-size: 16px;
   font-weight: 800;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(113, 71, 151, 0.4);
+  box-shadow: 0 8px 32px rgba(97, 56, 133, 0.4);
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
 
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), transparent);
-    opacity: 0;
-    transition: opacity 0.3s ease;
+  svg {
+    transition: all 0.3s ease;
+    color: white !important;
+  }
+
+  &:hover {
+    background: linear-gradient(135deg, #5d2691, #5a0f9b);
+    border-color: #5a0f9b;
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 28px rgba(113, 71, 151, 0.3);
+    color: white;
+
+    svg {
+      transform: scale(1.15);
+      color: white !important;
+    }
   }
 
   .userChip:hover & {
@@ -171,8 +180,8 @@
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #714797, #5d2691);
-  border: 2px solid #714797;
+  background: linear-gradient(135deg, #b6a4f7 0%, #9c8cea 50%, #a394f2 100%);
+  border: 2px solid #775fd8;
   color: white;
   display: flex;
   align-items: center;

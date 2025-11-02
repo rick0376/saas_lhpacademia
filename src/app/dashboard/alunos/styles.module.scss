@@ -3,6 +3,7 @@
   padding: 40px 24px;
   background: linear-gradient(135deg, #06b6d4 0%, #0284c7 50%, #0369a1 100%);
   color: white;
+  border-radius: 12px;
 }
 
 .container {
@@ -36,11 +37,7 @@
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  background: linear-gradient(
-    135deg,
-    #714797,
-    #5d2691
-  ); /* gradiente roxo vibrante */
+  background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
   color: white;
   border-radius: 12px;
   font-weight: 600;
