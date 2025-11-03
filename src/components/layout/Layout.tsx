@@ -121,7 +121,7 @@ export const Layout: React.FC<Props> = ({ children }) => {
               icon: <FileText size={18} />,
             }, // ADICIONADO
             {
-              href: "/dashboard/aluno/medidas",
+              href: "/dashboard/medidas",
               label: "Medidas",
               icon: <Ruler size={18} />,
             },

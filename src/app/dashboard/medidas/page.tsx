@@ -1,7 +1,9 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { MedidasList } from "@/components/medidas/MedidasList";
 import styles from "./styles.module.scss";
 
 interface Aluno {
@@ -10,30 +12,55 @@ interface Aluno {
 }
 
 export default function MedidasPage() {
+  const searchParams = useSearchParams();
+  const alunoId = searchParams.get("alunoId");
+  const alunoNomeParam = searchParams.get("alunoNome");
+
   const [alunos, setAlunos] = useState<Aluno[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // Este efeito busca os alunos só quando não há alunoId na query
   useEffect(() => {
-    async function fetchAlunos() {
-      try {
-        setLoading(true);
-        const res = await fetch("/api/alunos");
-        if (!res.ok) throw new Error("Falha ao buscar alunos");
-        const data = await res.json();
-        setAlunos(data);
-      } catch {
-        setError("Erro ao carregar alunos");
-      } finally {
-        setLoading(false);
-      }
+    if (!alunoId) {
+      setLoading(true);
+      fetch("/api/alunos")
+        .then((res) => {
+          if (!res.ok) throw new Error("Erro ao carregar alunos");
+          return res.json();
+        })
+        .then((data: Aluno[]) => {
+          setAlunos(data);
+          setError("");
+        })
+        .catch(() => {
+          setError("Erro ao carregar alunos");
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     }
-    fetchAlunos();
-  }, []);
+  }, [alunoId]);
 
-  if (loading) return <p>Carregando alunos...</p>;
-  if (error) return <p>{error}</p>;
-  if (alunos.length === 0) return <p>Nenhum aluno encontrado.</p>;
+  if (alunoId && alunoNomeParam) {
+    return (
+      <div className={styles.container}>
+        <h1 className={styles.title}>
+          Medidas do Aluno: {decodeURIComponent(alunoNomeParam)}
+        </h1>
+        <MedidasList alunoId={alunoId} alunoNome={alunoNomeParam} />
+      </div>
+    );
+  }
+
+  // Se não há alunoId, mostra a lista de alunos para selecionar
+  if (loading) {
+    return <p>Carregando alunos...</p>;
+  }
+
+  if (error) {
+    return <p>{error}</p>;
+  }
 
   return (
     <div className={styles.container}>
@@ -42,7 +69,9 @@ export default function MedidasPage() {
         {alunos.map((aluno) => (
           <li key={aluno.id} className={styles.alunoItem}>
             <Link
-              href={`/dashboard/medidas/${aluno.id}`}
+              href={`/dashboard/medidas?alunoId=${
+                aluno.id
+              }&alunoNome=${encodeURIComponent(aluno.nome)}`}
               className={styles.alunoLink}
             >
               {aluno.nome}
