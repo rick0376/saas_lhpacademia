@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { MedidasList } from "@/components/medidas/MedidasList";
 import styles from "./styles.module.scss";
@@ -13,14 +13,18 @@ interface Aluno {
 
 export default function MedidasPage() {
   const searchParams = useSearchParams();
-  const alunoId = searchParams.get("alunoId");
-  const alunoNomeParam = searchParams.get("alunoNome");
+  const [alunoId, setAlunoId] = useState<string | null>(null);
+  const [alunoNome, setAlunoNome] = useState<string | null>(null);
 
   const [alunos, setAlunos] = useState<Aluno[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Este efeito busca os alunos só quando não há alunoId na query
+  useEffect(() => {
+    setAlunoId(searchParams.get("alunoId"));
+    setAlunoNome(searchParams.get("alunoNome"));
+  }, [searchParams]);
+
   useEffect(() => {
     if (!alunoId) {
       setLoading(true);
@@ -42,25 +46,19 @@ export default function MedidasPage() {
     }
   }, [alunoId]);
 
-  if (alunoId && alunoNomeParam) {
+  if (alunoId && alunoNome) {
     return (
       <div className={styles.container}>
         <h1 className={styles.title}>
-          Medidas do Aluno: {decodeURIComponent(alunoNomeParam)}
+          Medidas do Aluno: {decodeURIComponent(alunoNome)}
         </h1>
-        <MedidasList alunoId={alunoId} alunoNome={alunoNomeParam} />
+        <MedidasList alunoId={alunoId} alunoNome={alunoNome} />
       </div>
     );
   }
 
-  // Se não há alunoId, mostra a lista de alunos para selecionar
-  if (loading) {
-    return <p>Carregando alunos...</p>;
-  }
-
-  if (error) {
-    return <p>{error}</p>;
-  }
+  if (loading) return <p>Carregando alunos...</p>;
+  if (error) return <p>{error}</p>;
 
   return (
     <div className={styles.container}>
