@@ -116,20 +116,16 @@ export const Layout: React.FC<Props> = ({ children }) => {
               icon: <Dumbbell size={18} />,
             },
             {
-              href: "/aluno/treinos/[id]",
-              label: "Detalhes Treino",
-              icon: <ClipboardList size={18} />,
-            },
-            {
               href: "/aluno/avaliacoes",
               label: "Avaliações",
               icon: <FileText size={18} />,
-            },
+            }, // ADICIONADO
             {
-              href: "/aluno/medidas",
+              href: "/dashboard/aluno/medidas",
               label: "Medidas",
               icon: <Ruler size={18} />,
             },
+
             {
               href: "/aluno/calendario",
               label: "Calendário",
@@ -158,10 +154,15 @@ export const Layout: React.FC<Props> = ({ children }) => {
                   icon: <Users size={18} />,
                 },
                 {
+                  href: "/dashboard/avaliacoes",
+                  label: "Avaliações",
+                  icon: <FileText size={18} />,
+                }, // ADICIONADO
+                {
                   href: "/dashboard/medidas",
                   label: "Medidas",
                   icon: <Ruler size={18} />,
-                },
+                }, // CONFIRMAR ROTA
               ],
             },
             {
