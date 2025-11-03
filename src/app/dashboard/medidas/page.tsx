@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { MedidasList } from "@/components/medidas/MedidasList";
 import styles from "./styles.module.scss";
@@ -13,18 +13,14 @@ interface Aluno {
 
 export default function MedidasPage() {
   const searchParams = useSearchParams();
-  const [alunoId, setAlunoId] = useState<string | null>(null);
-  const [alunoNome, setAlunoNome] = useState<string | null>(null);
+  const alunoId = searchParams.get("alunoId");
+  const alunoNomeParam = searchParams.get("alunoNome");
 
   const [alunos, setAlunos] = useState<Aluno[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    setAlunoId(searchParams.get("alunoId"));
-    setAlunoNome(searchParams.get("alunoNome"));
-  }, [searchParams]);
-
+  // Busca alunos só se não tiver aluno selecionado
   useEffect(() => {
     if (!alunoId) {
       setLoading(true);
@@ -37,32 +33,32 @@ export default function MedidasPage() {
           setAlunos(data);
           setError("");
         })
-        .catch(() => {
-          setError("Erro ao carregar alunos");
-        })
-        .finally(() => {
-          setLoading(false);
-        });
+        .catch(() => setError("Erro ao carregar alunos"))
+        .finally(() => setLoading(false));
     }
   }, [alunoId]);
 
-  if (alunoId && alunoNome) {
+  // Se tem aluno selecionado, mostra medidas
+  if (alunoId && alunoNomeParam) {
     return (
       <div className={styles.container}>
         <h1 className={styles.title}>
-          Medidas do Aluno: {decodeURIComponent(alunoNome)}
+          Medidas do Aluno: {decodeURIComponent(alunoNomeParam)}
         </h1>
-        <MedidasList alunoId={alunoId} alunoNome={alunoNome} />
+        <MedidasList alunoId={alunoId} alunoNome={alunoNomeParam} />
       </div>
     );
   }
 
+  // Se está carregando a lista de alunos
   if (loading) return <p>Carregando alunos...</p>;
   if (error) return <p>{error}</p>;
+  if (alunos.length === 0) return <p>Nenhum aluno encontrado.</p>;
 
+  // Renderiza lista de alunos para selecionar
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Selecione um Aluno para ver as Medidas</h1>
+      <h1 className={styles.title}>Selecione um aluno para ver as medidas</h1>
       <ul className={styles.alunoList}>
         {alunos.map((aluno) => (
           <li key={aluno.id} className={styles.alunoItem}>
