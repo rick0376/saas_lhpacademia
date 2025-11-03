@@ -1,17 +1,55 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-import { MedidasList } from "@/components/medidas/MedidasList";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import styles from "./styles.module.scss";
 
+interface Aluno {
+  id: string;
+  nome: string;
+}
+
 export default function MedidasPage() {
-  const searchParams = useSearchParams();
-  const alunoId = searchParams.get("alunoId") || "";
-  const alunoNome = searchParams.get("alunoNome") || "";
+  const [alunos, setAlunos] = useState<Aluno[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  if (!alunoId) {
-    return <p className={styles.alert}>Aluno não informado.</p>;
-  }
+  useEffect(() => {
+    async function fetchAlunos() {
+      try {
+        setLoading(true);
+        const res = await fetch("/api/alunos");
+        if (!res.ok) throw new Error("Falha ao buscar alunos");
+        const data = await res.json();
+        setAlunos(data);
+      } catch {
+        setError("Erro ao carregar alunos");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchAlunos();
+  }, []);
 
-  return <MedidasList alunoId={alunoId} alunoNome={alunoNome} />;
+  if (loading) return <p>Carregando alunos...</p>;
+  if (error) return <p>{error}</p>;
+  if (alunos.length === 0) return <p>Nenhum aluno encontrado.</p>;
+
+  return (
+    <div className={styles.container}>
+      <h1 className={styles.title}>Selecione um Aluno para ver as Medidas</h1>
+      <ul className={styles.alunoList}>
+        {alunos.map((aluno) => (
+          <li key={aluno.id} className={styles.alunoItem}>
+            <Link
+              href={`/dashboard/medidas/${aluno.id}`}
+              className={styles.alunoLink}
+            >
+              {aluno.nome}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 }
