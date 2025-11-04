@@ -61,6 +61,10 @@
   background-color: #4f46e5;
 }
 
+/* ==========================
+   Formulário de Busca
+========================== */
+
 .searchForm {
   display: flex;
   gap: 12px;
@@ -88,6 +92,7 @@
   outline: none;
   border-color: #7c3aed;
   box-shadow: 0 0 8px #7c3aed88;
+  background-color: #fff;
 }
 
 .searchButton {
@@ -108,105 +113,136 @@
   box-shadow: 0 0 10px #6d2ed488;
 }
 
+.searchButton:active {
+  background: linear-gradient(135deg, #5a25ab 0%, #7b51cd 100%);
+}
+
+/* ==========================
+   Container e Tabela Desktop
+========================== */
+
 .tableContainer {
+  display: block;
   overflow-x: auto;
-  border-radius: 12px;
   background: #fff;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 .table {
   width: 100%;
   border-collapse: collapse;
-  border-radius: 8px;
-  overflow: hidden;
 }
 
-.tableHead {
-  background-color: #f3f4f6;
+.table thead {
+  background-color: #f9fafb;
+  border-bottom: 2px solid #e5e7eb;
 }
 
-.thNome,
-.thContato,
-.thObjetivo,
-.thTreinos,
-.thStatus,
-.thCadastro,
-.thAcoes {
-  padding: 12px 16px;
+.table thead th {
+  padding: 16px;
+  text-align: left;
+  font-size: 14px;
   font-weight: 700;
   color: #374151;
-  border-bottom: 1px solid #e5e7eb;
-  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-.thStatus,
-.thCadastro,
-.thAcoes {
-  text-align: center;
-}
-
-.tableBodyRow {
+.table tbody tr {
   border-bottom: 1px solid #e5e7eb;
   transition: background-color 0.3s ease;
 }
 
-.tableBodyRow:hover {
+.table tbody tr:hover {
   background-color: #f3f4f6;
 }
 
-.tdNome,
-.tdContato,
-.tdObjetivo,
-.tdTreinos {
-  padding: 12px 16px;
-  color: #1f2937;
+.table tbody td {
+  padding: 16px;
+  font-size: 14px;
+  color: #4b5563;
   vertical-align: middle;
-  text-align: left;
 }
 
-.tdStatus,
-.tdCadastro,
-.tdAcoes {
-  padding: 12px 16px;
-  color: #1f2937;
-  vertical-align: middle;
-  text-align: center;
-}
+/* ==========================
+   Aluno Cell - Avatar e Nome
+========================== */
 
-.userCell {
+.alunoCell {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
 .avatar {
-  background-color: #7c3aed;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  color: white;
-  font-weight: 700;
+  background: linear-gradient(135deg, #b6a4f7, #9c8cea, #a394f2);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-weight: 700;
+  font-size: 16px;
+  color: #fff;
+  flex-shrink: 0;
 }
 
-.userName {
+.alunoNome {
   font-weight: 600;
   color: #1f2937;
 }
 
-.statusBadge {
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-weight: 600;
+/* ==========================
+   Contato
+========================== */
+
+.contactInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.email,
+.telefone {
   font-size: 13px;
+  color: #6b7280;
+}
+
+.noContact {
+  color: #9ca3af;
+}
+
+/* ==========================
+   Objetivo e Treinos
+========================== */
+
+.objetivo {
+  font-weight: 500;
+  color: #3b82f6;
+}
+
+.treinosCount {
+  font-weight: 600;
+  color: #10b981;
+}
+
+/* ==========================
+   Status Badges
+========================== */
+
+.statusBadge {
   display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  user-select: none;
+  background: rgba(0, 0, 0, 0.05);
+  color: #374151;
   min-width: 64px;
   text-align: center;
-  user-select: none;
 }
 
 .ativo {
@@ -225,58 +261,89 @@
   border-radius: 8px;
 }
 
+/* ==========================
+   Ações - Botões
+========================== */
+
 .actions {
   display: flex;
-  gap: 12px;
-  justify-content: center;
+  gap: 8px;
 }
 
-.iconButton {
+.actionButton {
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 13px;
   cursor: pointer;
-  background: transparent;
   border: none;
-  padding: 6px 10px;
-  border-radius: 12px;
-  color: #6366f1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.3s ease, background-color 0.3s ease, transform 0.3s ease,
-    box-shadow 0.3s ease;
+  user-select: none;
+  box-shadow: 0 3px 8px rgba(74, 44, 155, 0.15);
+  transition: background-color 0.25s ease, box-shadow 0.25s ease;
+  color: #fff;
 }
 
-.iconButton:hover,
-.iconButton:focus-visible {
-  color: #4338ca;
-  background-color: #e0e7ff;
-  outline: none;
-  transform: translateY(-2px) scale(1.1);
-  box-shadow: 0 4px 10px rgba(67, 56, 202, 0.3);
+.actionButton.perfil {
+  background-color: #6b7280;
 }
 
-.iconButtonDelete {
+.actionButton.perfil:hover {
+  background-color: #4b5563;
+}
+
+.actionButton.editar {
+  background-color: #3b82f6;
+}
+
+.actionButton.editar:hover {
+  background-color: #2563eb;
+}
+
+.actionButton.avaliacao {
+  background-color: #facc15;
+  color: #523c00;
+}
+
+.actionButton.avaliacao:hover {
+  background-color: #ca8a04;
+}
+
+.actionButton.medidas {
+  background-color: #22c55e;
+}
+
+.actionButton.medidas:hover {
+  background-color: #16a34a;
+}
+
+.deleteButton {
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 13px;
   cursor: pointer;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  box-shadow: 0 3px 8px rgba(239, 68, 68, 0.4);
   background-color: #ef4444;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 12px;
-  color: white;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease,
-    transform 0.3s ease;
+  color: #fff;
 }
 
-.iconButtonDelete:hover,
-.iconButtonDelete:focus-visible {
+.deleteButton:hover {
   background-color: #dc2626;
-  outline: none;
-  transform: translateY(-2px) scale(1.1);
-  box-shadow: 0 4px 10px rgba(220, 38, 38, 0.5);
+  box-shadow: 0 5px 14px rgba(220, 38, 38, 0.5);
 }
 
-/* Modal Content */
+/* ==========================
+   Modal Content e Ações
+========================== */
+
 .modalContent p {
   margin-bottom: 16px;
   color: #1f2937;
@@ -298,7 +365,10 @@
   margin-top: 24px;
 }
 
-/* Cards for mobile */
+/* ==========================
+   Responsividade - Cards Mobile
+========================== */
+
 .cardsContainer {
   display: none;
 }
@@ -373,67 +443,5 @@
     gap: 10px;
     flex-wrap: wrap;
     margin-top: 12px;
-  }
-
-  .actionButton {
-    padding: 6px 14px;
-    border-radius: 12px;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    user-select: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background-color: #6b7280;
-    color: white;
-    transition: background-color 0.3s ease;
-  }
-
-  .actionButton:hover {
-    background-color: #4b5563;
-  }
-
-  .actionButton.editar {
-    background-color: #2563eb;
-  }
-
-  .actionButton.editar:hover {
-    background-color: #1e40af;
-  }
-
-  .actionButton.avaliacao {
-    background-color: #facc15;
-    color: #523c00;
-  }
-
-  .actionButton.avaliacao:hover {
-    background-color: #ca8a04;
-  }
-
-  .actionButton.medidas {
-    background-color: #22c55e;
-  }
-
-  .actionButton.medidas:hover {
-    background-color: #166534;
-  }
-
-  .deleteButton {
-    background-color: #ef4444;
-    color: white;
-    padding: 6px 14px;
-    border-radius: 12px;
-    border: none;
-    font-weight: 600;
-    cursor: pointer;
-    user-select: none;
-    box-shadow: 0 3px 8px rgba(239, 68, 68, 0.4);
-    transition: background-color 0.3s ease;
-  }
-
-  .deleteButton:hover {
-    background-color: #dc2626;
-    box-shadow: 0 5px 14px rgba(220, 38, 38, 0.5);
   }
 }

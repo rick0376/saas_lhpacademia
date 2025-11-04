@@ -36,18 +36,13 @@ export const AlunoTable = () => {
       const url = search
         ? `/api/alunos?search=${encodeURIComponent(search)}`
         : "/api/alunos";
-
       const response = await fetch(url);
-
-      if (!response.ok) {
-        throw new Error("Erro ao buscar alunos");
-      }
-
+      if (!response.ok) throw new Error("Erro ao buscar alunos");
       const data = await response.json();
       setAlunos(data);
-    } catch (err) {
+      setError("");
+    } catch {
       setError("Erro ao carregar alunos");
-      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -64,19 +59,12 @@ export const AlunoTable = () => {
 
   const handleDelete = async (id: string) => {
     try {
-      const response = await fetch(`/api/alunos/${id}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        throw new Error("Erro ao excluir aluno");
-      }
-
-      setAlunos(alunos.filter((a) => a.id !== id));
+      const response = await fetch(`/api/alunos/${id}`, { method: "DELETE" });
+      if (!response.ok) throw new Error("Erro ao excluir aluno");
+      setAlunos((prev) => prev.filter((a) => a.id !== id));
       setDeleteModal({ isOpen: false });
-    } catch (err) {
+    } catch {
       alert("Erro ao excluir aluno");
-      console.error(err);
     }
   };
 
@@ -109,9 +97,19 @@ export const AlunoTable = () => {
     );
   }
 
+  if (alunos.length === 0) {
+    return (
+      <div className={styles.empty}>
+        <div className={styles.emptyIcon}>👥</div>
+        <h3>Nenhum aluno cadastrado</h3>
+        <p>Comece adicionando o primeiro aluno ao sistema</p>
+      </div>
+    );
+  }
+
   return (
     <>
-      {/* Barra de Busca */}
+      {/* Barra de busca */}
       <form onSubmit={handleSearch} className={styles.searchForm}>
         <input
           type="text"
@@ -126,56 +124,48 @@ export const AlunoTable = () => {
         </button>
       </form>
 
-      {/* Tabela para desktop e telas médias */}
+      {/* Tabela desktop */}
       <div className={styles.tableContainer}>
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>Nome</th>
-              <th>Contato</th>
-              <th>Objetivo</th>
-              <th>Treinos</th>
-              <th>Status</th>
-              <th>Cadastro</th>
-              <th>Ações</th>
+              <th className={styles.thNome}>Nome</th>
+              <th className={styles.thContato}>Contato</th>
+              <th className={styles.thObjetivo}>Objetivo</th>
+              <th className={styles.thTreinos}>Treinos</th>
+              <th className={styles.thStatus}>Status</th>
+              <th className={styles.thCadastro}>Cadastro</th>
+              <th className={styles.thAcoes}>Ações</th>
             </tr>
           </thead>
           <tbody>
             {alunos.map((aluno) => (
               <tr key={aluno.id}>
-                <td>
-                  <div className={styles.alunoCell}>
+                <td className={styles.tdNome}>
+                  <div className={styles.userCell}>
                     <div className={styles.avatar}>
                       {aluno.nome.charAt(0).toUpperCase()}
                     </div>
-                    <span className={styles.alunoNome}>{aluno.nome}</span>
+                    <span className={styles.userName}>{aluno.nome}</span>
                   </div>
                 </td>
-                <td>
-                  <div className={styles.contactInfo}>
-                    {aluno.email && (
-                      <span className={styles.email}>{aluno.email}</span>
-                    )}
-                    {aluno.telefone && (
-                      <span className={styles.telefone}>{aluno.telefone}</span>
-                    )}
-                    {!aluno.email && !aluno.telefone && (
-                      <span className={styles.noContact}>-</span>
-                    )}
-                  </div>
+                <td className={styles.tdContato}>
+                  {aluno.email && (
+                    <span className={styles.email}>{aluno.email}</span>
+                  )}
+                  {aluno.telefone && (
+                    <span className={styles.telefone}>{aluno.telefone}</span>
+                  )}
+                  {!aluno.email && !aluno.telefone && (
+                    <span className={styles.noContact}>-</span>
+                  )}
                 </td>
-                <td>
-                  <span className={styles.objetivo}>
-                    {aluno.objetivo || "-"}
-                  </span>
+                <td className={styles.tdObjetivo}>{aluno.objetivo || "-"}</td>
+                <td className={styles.tdTreinos}>
+                  {aluno._count.treinos}{" "}
+                  {aluno._count.treinos === 1 ? "treino" : "treinos"}
                 </td>
-                <td>
-                  <span className={styles.treinosCount}>
-                    {aluno._count.treinos}{" "}
-                    {aluno._count.treinos === 1 ? "treino" : "treinos"}
-                  </span>
-                </td>
-                <td>
+                <td className={styles.tdStatus}>
                   <span
                     className={`${styles.statusBadge} ${
                       aluno.ativo ? styles.ativo : styles.inativo
@@ -184,50 +174,122 @@ export const AlunoTable = () => {
                     {aluno.ativo ? "Ativo" : "Inativo"}
                   </span>
                 </td>
-                <td>{formatDate(aluno.createdAt)}</td>
-                <td>
+                <td className={styles.tdCadastro}>
+                  {formatDate(aluno.createdAt)}
+                </td>
+                <td className={styles.tdAcoes}>
                   <div className={styles.actions}>
                     <Link
                       href={`/dashboard/alunos/${aluno.id}`}
-                      className={`${styles.actionButton} ${styles.perfil}`}
                       title="Ver Perfil"
+                      className={styles.iconButton}
+                      aria-label={`Ver perfil ${aluno.nome}`}
                     >
-                      Perfil
+                      <svg
+                        width="20"
+                        height="20"
+                        fill="#64748b"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <circle cx="12" cy="7" r="4" />
+                        <path d="M5.5 21a7.5 7.5 0 0 1 13 0" />
+                      </svg>
                     </Link>
-
                     <Link
                       href={`/dashboard/alunos/${aluno.id}/editar`}
-                      className={`${styles.actionButton} ${styles.editar}`}
                       title="Editar"
+                      className={styles.iconButton}
+                      aria-label={`Editar ${aluno.nome}`}
                     >
-                      Editar
+                      <svg
+                        width="20"
+                        height="20"
+                        fill="#2563eb"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path d="M12 20h9" />
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
+                      </svg>
                     </Link>
-
                     <Link
                       href={`/dashboard/alunos/${aluno.id}/avaliacoes/nova`}
-                      className={`${styles.actionButton} ${styles.avaliacao}`}
                       title="Nova Avaliação"
+                      className={styles.iconButton}
+                      aria-label={`Nova avaliação ${aluno.nome}`}
                     >
-                      Avaliação
+                      <svg
+                        width="20"
+                        height="20"
+                        fill="#facc15"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                        stroke="#a16207"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                      </svg>
                     </Link>
-
                     <Link
                       href={`/dashboard/medidas?alunoId=${
                         aluno.id
                       }&alunoNome=${encodeURIComponent(aluno.nome)}`}
-                      className={`${styles.actionButton} ${styles.medidas}`}
                       title="Ver Medidas"
+                      className={styles.iconButton}
+                      aria-label={`Ver medidas ${aluno.nome}`}
                     >
-                      Medidas
+                      <svg
+                        width="20"
+                        height="20"
+                        fill="#22c55e"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                        stroke="#166534"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <rect
+                          x="3"
+                          y="3"
+                          width="18"
+                          height="18"
+                          rx="2"
+                          ry="2"
+                        />
+                        <line x1="3" y1="9" x2="21" y2="9" />
+                        <line x1="9" y1="21" x2="9" y2="9" />
+                      </svg>
                     </Link>
-
                     <button
                       onClick={() => setDeleteModal({ isOpen: true, aluno })}
-                      className={styles.deleteButton}
                       title="Excluir"
-                      aria-label={`Excluir aluno ${aluno.nome}`}
+                      className={styles.iconButtonDelete}
+                      aria-label={`Excluir ${aluno.nome}`}
                     >
-                      Excluir
+                      <svg
+                        width="20"
+                        height="20"
+                        fill="#ef4444"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                        stroke="#fff"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <polyline points="3 6 5 6 21 6" stroke="#fff" />
+                        <path
+                          d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"
+                          stroke="#fff"
+                        />
+                        <line x1="10" y1="11" x2="10" y2="17" stroke="#fff" />
+                        <line x1="14" y1="11" x2="14" y2="17" stroke="#fff" />
+                      </svg>
                     </button>
                   </div>
                 </td>
@@ -237,7 +299,7 @@ export const AlunoTable = () => {
         </table>
       </div>
 
-      {/* Cards para telas pequenas */}
+      {/* Cards mobile */}
       <div className={styles.cardsContainer}>
         {alunos.map((aluno) => (
           <div key={aluno.id} className={styles.card}>
@@ -271,49 +333,108 @@ export const AlunoTable = () => {
               <p>
                 <strong>Medidas:</strong> {aluno._count.medidas}
               </p>
-
               <div className={styles.actions}>
                 <Link
                   href={`/dashboard/alunos/${aluno.id}`}
-                  className={`${styles.actionButton} ${styles.perfil}`}
+                  className={styles.iconButton}
                   title="Ver Perfil"
+                  aria-label={`Ver perfil ${aluno.nome}`}
                 >
-                  Perfil
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="22"
+                    height="22"
+                    fill="#64748b"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle cx="12" cy="7" r="4" />
+                    <path d="M5.5 21a7.5 7.5 0 0 1 13 0" />
+                  </svg>
                 </Link>
-
                 <Link
                   href={`/dashboard/alunos/${aluno.id}/editar`}
-                  className={`${styles.actionButton} ${styles.editar}`}
+                  className={styles.iconButton}
                   title="Editar"
+                  aria-label={`Editar ${aluno.nome}`}
                 >
-                  Editar
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="22"
+                    height="22"
+                    fill="#2563eb"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path d="M12 20h9" />
+                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
+                  </svg>
                 </Link>
-
                 <Link
                   href={`/dashboard/alunos/${aluno.id}/avaliacoes/nova`}
-                  className={`${styles.actionButton} ${styles.avaliacao}`}
+                  className={styles.iconButton}
                   title="Nova Avaliação"
+                  aria-label={`Nova avaliação ${aluno.nome}`}
                 >
-                  Avaliação
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="22"
+                    height="22"
+                    fill="#facc15"
+                    xmlns="http://www.w3.org/2000/svg"
+                    stroke="#a16207"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
                 </Link>
-
                 <Link
                   href={`/dashboard/medidas?alunoId=${
                     aluno.id
                   }&alunoNome=${encodeURIComponent(aluno.nome)}`}
-                  className={`${styles.actionButton} ${styles.medidas}`}
+                  className={styles.iconButton}
                   title="Ver Medidas"
+                  aria-label={`Ver medidas ${aluno.nome}`}
                 >
-                  Medidas
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="22"
+                    height="22"
+                    fill="#22c55e"
+                    xmlns="http://www.w3.org/2000/svg"
+                    stroke="#166534"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                    <line x1="3" y1="9" x2="21" y2="9" />
+                    <line x1="9" y1="21" x2="9" y2="9" />
+                  </svg>
                 </Link>
-
                 <button
                   onClick={() => setDeleteModal({ isOpen: true, aluno })}
-                  className={styles.deleteButton}
+                  className={styles.iconButtonDelete}
                   title="Excluir"
-                  aria-label={`Excluir aluno ${aluno.nome}`}
+                  aria-label={`Excluir ${aluno.nome}`}
                 >
-                  Excluir
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="22"
+                    height="22"
+                    fill="#ef4444"
+                    xmlns="http://www.w3.org/2000/svg"
+                    stroke="#fff"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polyline points="3 6 5 6 21 6" stroke="#fff" />
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+                    <line x1="10" y1="11" x2="10" y2="17" />
+                    <line x1="14" y1="11" x2="14" y2="17" />
+                  </svg>
                 </button>
               </div>
             </div>
@@ -335,7 +456,6 @@ export const AlunoTable = () => {
           <p className={styles.warning}>
             ⚠️ Todos os treinos e medidas deste aluno também serão excluídos!
           </p>
-
           <div className={styles.modalActions}>
             <Button
               variant="outline"
