@@ -1,12 +1,18 @@
+/* styles.module.scss */
+
 .main {
+  background: linear-gradient(135deg, #06b6d4 0%, #0284c7 50%, #0369a1 100%);
+  border-radius: 12px;
   min-height: calc(100vh - 140px);
   padding: 40px 24px;
-  background-color: var(--light-color);
+  background-color: #f9fafb; /* light background */
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .container {
   max-width: 1400px;
   margin: 0 auto;
+  padding: 0 16px;
 }
 
 .header {
@@ -20,13 +26,13 @@
 .title {
   font-size: 32px;
   font-weight: 800;
-  color: var(--dark-color);
+  color: #fff;
   margin-bottom: 8px;
 }
 
 .subtitle {
   font-size: 16px;
-  color: var(--gray-color);
+  color: #e8eaec; /* medium gray */
 }
 
 .addButton {
@@ -34,28 +40,34 @@
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  background: linear-gradient(
-    135deg,
-    var(--primary-color) 0%,
-    var(--secondary-color) 100%
-  );
+  background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
   color: white;
-  border-radius: var(--border-radius);
+  border-radius: 12px;
   font-weight: 600;
   font-size: 14px;
-  transition: var(--transition);
+  cursor: pointer;
+  border: none;
+  user-select: none;
   white-space: nowrap;
+  transition: all 0.3s ease;
 
-  &:hover {
+  &:hover,
+  &:focus-visible {
     transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    outline: none;
   }
 }
 
 .icon {
   font-size: 20px;
   font-weight: 700;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
 }
+
+/* === Responsive and card styles for mobile === */
 
 @media (max-width: 768px) {
   .header {
@@ -69,5 +81,43 @@
 
   .addButton {
     justify-content: center;
+  }
+
+  .usuarioCard {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: white;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+  }
+
+  .usuarioIcon {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #7c3aed, #a78bfa);
+    border-radius: 50%;
+    color: white;
+    font-size: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .usuarioInfo {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    color: #1f2937;
+    font-weight: 600;
   }
 }

@@ -35,8 +35,9 @@ export const UserTable = () => {
       const data = await response.json();
       setUsuarios(data);
       setError("");
-    } catch {
+    } catch (err) {
       setError("Erro ao carregar usuários");
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -52,8 +53,9 @@ export const UserTable = () => {
       if (!response.ok) throw new Error("Erro ao excluir usuário");
       setUsuarios((prev) => prev.filter((u) => u.id !== id));
       setDeleteModal({ isOpen: false });
-    } catch {
+    } catch (err) {
       alert("Erro ao excluir usuário");
+      console.error(err);
     }
   };
 
@@ -115,18 +117,18 @@ export const UserTable = () => {
         <table className={styles.table}>
           <thead className={styles.tableHead}>
             <tr className={styles.tableHeadRow}>
-              <th className={styles.thNome}>Nome</th>
-              <th className={styles.thEmail}>Email</th>
-              <th className={styles.thPerfil}>Perfil</th>
-              <th className={styles.thStatus}>Status</th>
-              <th className={styles.thCadastro}>Cadastro</th>
-              <th className={styles.thAcoes}>Ações</th>
+              <th className={styles.tableHeadCell}>Nome</th>
+              <th className={styles.tableHeadCell}>Email</th>
+              <th className={styles.tableHeadCell}>Perfil</th>
+              <th className={styles.tableHeadCell}>Status</th>
+              <th className={styles.tableHeadCell}>Cadastro</th>
+              <th className={styles.tableHeadCell}>Ações</th>
             </tr>
           </thead>
           <tbody>
             {usuarios.map((usuario) => (
               <tr key={usuario.id} className={styles.tableBodyRow}>
-                <td className={styles.tdNome}>
+                <td className={styles.tableBodyCell}>
                   <div className={styles.userCell}>
                     <div className={styles.avatar}>
                       {usuario.nome.charAt(0).toUpperCase()}
@@ -134,11 +136,13 @@ export const UserTable = () => {
                     <span className={styles.userName}>{usuario.nome}</span>
                   </div>
                 </td>
-                <td className={styles.tdEmail}>{usuario.email}</td>
-                <td className={styles.tdPerfil}>
+                <td className={styles.tableBodyCell}>{usuario.email}</td>
+                <td
+                  className={`${styles.tableBodyCell} ${styles.tableBodyCellPerfil}`}
+                >
                   {getRoleBadge(usuario.role)}
                 </td>
-                <td className={styles.tdStatus}>
+                <td className={styles.tableBodyCell}>
                   <span
                     className={`${styles.statusBadge} ${
                       usuario.ativo ? styles.ativo : styles.inativo
@@ -147,10 +151,10 @@ export const UserTable = () => {
                     {usuario.ativo ? "Ativo" : "Inativo"}
                   </span>
                 </td>
-                <td className={styles.tdCadastro}>
+                <td className={styles.tableBodyCell}>
                   {formatDate(usuario.createdAt)}
                 </td>
-                <td className={styles.tdAcoes}>
+                <td className={styles.tableBodyCell}>
                   <div className={styles.actions}>
                     <Link
                       href={`/dashboard/usuarios/${usuario.id}/editar`}
