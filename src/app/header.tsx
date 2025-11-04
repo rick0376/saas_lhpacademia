@@ -1,4 +1,7 @@
 export default function RootHead() {
+  const baseUrl = "https://lhpsystems.com.br"; // Coloque aqui a URL base real do site
+  const imageUrl = baseUrl + "/imagens/logo.png";
+
   return (
     <>
       <title>LHPSYSTEMS Academia Pro</title>
@@ -13,9 +16,9 @@ export default function RootHead() {
         property="og:description"
         content="Gestão fácil e eficiente para academias. Controle completo de alunos, planos, medidas e muito mais."
       />
-      <meta property="og:image" content="/imagens/logo.png" />
+      <meta property="og:image" content={imageUrl} />
       <meta property="og:type" content="website" />
-      <meta property="og:url" content="https://lhpsystems.com.br/" />
+      <meta property="og:url" content={baseUrl} />
 
       {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
@@ -24,7 +27,7 @@ export default function RootHead() {
         name="twitter:description"
         content="Gestão fácil e eficiente para academias. Controle completo de alunos, planos, medidas e muito mais."
       />
-      <meta name="twitter:image" content="/imagens/logo.png" />
+      <meta name="twitter:image" content={imageUrl} />
     </>
   );
 }
