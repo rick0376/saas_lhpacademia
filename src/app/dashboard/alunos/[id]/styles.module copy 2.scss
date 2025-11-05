@@ -53,7 +53,7 @@
   width: 96px;
   height: 96px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #b6a4f7 0%, #9c8cea 50%, #a394f2 100%);
+  background: linear-gradient(135deg, #714797, #5d2691);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -127,6 +127,7 @@
 
   &:hover {
     background: linear-gradient(135deg, #06a9c9, #03819f, #029164);
+
     box-shadow: 0 12px 32px rgba(4, 159, 200, 0.8);
     transform: translateY(-3px) scale(1.05);
   }
@@ -272,15 +273,7 @@
   white-space: pre-wrap;
 }
 
-/* Estilos para tabela/cards responsivos AlunoTable */
-.tableContainer {
-  display: block !important;
-}
-
-.cardsContainer {
-  display: none !important;
-}
-
+/* Responsividade */
 @media (max-width: 768px) {
   .profileCard {
     flex-direction: column;
@@ -295,104 +288,5 @@
 
   .backButton {
     font-size: 14px;
-  }
-
-  /* Tabela fica oculta em telas pequenas */
-  .tableContainer {
-    display: none !important;
-  }
-
-  /* Cards exibidos somente em telas pequenas */
-  .cardsContainer {
-    display: grid !important;
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-
-  .card {
-    background-color: white;
-    border-radius: 12px;
-    padding: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .cardContent h3,
-  .cardName {
-    margin: 0;
-    font-size: 20px;
-    font-weight: 700;
-    color: #333;
-  }
-
-  .cardContent p {
-    margin: 4px 0;
-    font-size: 14px;
-    color: #555;
-  }
-
-  .avatar {
-    width: 50px;
-    height: 50px;
-    background: linear-gradient(135deg, #7f69d9, #7a5fca);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 20px;
-    color: #fff;
-  }
-
-  .actions {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-top: 8px;
-  }
-
-  .viewButton,
-  .editButton,
-  .evaluateButton,
-  .deleteButton {
-    padding: 6px 12px;
-    border-radius: 6px;
-    background-color: #7a5fca;
-    color: white;
-    text-decoration: none;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-    transition: background-color 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .viewButton:hover,
-  .editButton:hover,
-  .evaluateButton:hover,
-  .deleteButton:hover {
-    background-color: #624db8;
-  }
-
-  .statusBadge {
-    font-size: 12px;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-weight: 600;
-    display: inline-block;
-  }
-
-  .ativo {
-    background-color: #d1fae5;
-    color: #065f46;
-  }
-
-  .inativo {
-    background-color: #fee2e2;
-    color: #991b1b;
   }
 }

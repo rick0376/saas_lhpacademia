@@ -126,6 +126,15 @@
   background-color: #f3f4f6;
 }
 
+.thNome,
+.tdNome {
+  min-width: 180px;
+}
+
+.tdTreinos {
+  min-width: 90px;
+}
+
 .thAcoes,
 .tdAcoes {
   min-width: 180px;
@@ -142,7 +151,7 @@
 .thStatus,
 .thCadastro,
 .thAcoes {
-  padding: 12px 16px;
+  padding: 6px 8px;
   font-weight: 700;
   color: #374151;
   border-bottom: 1px solid #e5e7eb;
@@ -190,7 +199,7 @@
 }
 
 .avatar {
-  background-color: #7c3aed;
+  background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -200,11 +209,38 @@
   align-items: center;
   justify-content: center;
   font-size: 18px;
+
+  transition: background-color 0.3s ease, box-shadow 0.3s ease,
+    transform 0.3s ease;
+}
+
+.avatar:hover,
+.avatar:focus-visible {
+  color: #f8f9fa;
+  background: linear-gradient(135deg, #5a26bf 0%, #8a74c3 100%);
+  box-shadow: 0 8px 20px rgba(122, 79, 237, 0.6);
+  transform: scale(1.1);
 }
 
 .userName {
   font-weight: 600;
+  font-size: 14px;
   color: #1f2937;
+}
+
+.email {
+  font-size: 14px;
+}
+
+.telefone {
+  padding-left: 10px;
+  font-size: 14px;
+}
+
+.tdObjetivo,
+.tdTreinos,
+.tdCadastro {
+  font-size: 14px;
 }
 
 .statusBadge {
@@ -218,11 +254,15 @@
   user-select: none;
 }
 
+/*
+background-color: #22c55e;
+color: #f8f9fa;
+*/
 .ativo {
-  background-color: #22c55e;
-  color: #f8f9fa;
+  background-color: #dcfce7;
+  color: #15803d;
   font-weight: 700;
-  box-shadow: 0 0 8px #22c55eaa;
+  box-shadow: 0 0 8px #696d6baa;
   border-radius: 8px;
   transition: background-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease,
     transform 0.3s ease;
@@ -352,8 +392,8 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background-color: #d9f99d;
-  color: #426d05;
+  background-color: #22c55e;
+  color: #f8f9fa;
   padding: 4px 8px;
   border-radius: 10px;
   font-weight: 600;
@@ -375,7 +415,7 @@
 .iconAvaliacao {
   width: 20px;
   height: 20px;
-  stroke: #4b6f21;
+  stroke: #f8f9fa;
   stroke-width: 2;
   box-sizing: border-box;
   display: inline-flex;
@@ -479,7 +519,6 @@
 }
 
 /*==================== Modal Contente ========================*/
-
 .modalContent p {
   margin-bottom: 16px;
   color: #1f2937;
@@ -501,7 +540,6 @@
   margin-top: 24px;
 }
 
-/* Cards for mobile */
 .cardsContainer {
   display: none;
 }
@@ -519,15 +557,15 @@
   }
 
   .card {
-    background: #fafaf6;
+    padding: 16px;
+    gap: 12px;
+    background: #fff;
     border-radius: 12px;
-    padding: 24px;
-    box-shadow: 0 14px 36px rgba(122, 79, 237, 0.25);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    color: #022c20;
-    transition: box-shadow 0.3s ease;
+    align-items: center;
+    text-align: center;
   }
 
   .card:hover {
@@ -535,64 +573,36 @@
   }
 
   .avatar {
-    width: 56px;
-    height: 56px;
-    background: linear-gradient(135deg, #b6a4f7, #7a5fca);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 22px;
-    color: #fff;
-    flex-shrink: 0;
+    width: 70px;
+    height: 70px;
+    font-size: 24px;
   }
 
   .cardName {
-    font-weight: 800;
-    font-size: 22px;
-    margin: 0;
-    letter-spacing: 0.02em;
-    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
+    font-size: 20px;
+    margin: 8px 0;
+    font-weight: 700;
     color: #273b27;
+    letter-spacing: 0.02em;
   }
 
   .cardContent p {
-    margin: 0;
-    font-size: 15px;
-    line-height: 1.6;
-    color: #61725e;
-    font-weight: 500;
-  }
-
-  .cardContent strong {
-    color: #093119;
-    font-weight: 700;
-    letter-spacing: 0.02em;
+    font-size: 14px;
+    margin: 6px 0;
+    line-height: 1.4;
+    color: #555;
   }
 
   .actions {
-    display: flex;
-    gap: 10px;
+    justify-content: center;
+    gap: 8px;
     flex-wrap: wrap;
-    margin-top: 12px;
   }
 
   .actionButton {
-    padding: 6px 14px;
-    border-radius: 12px;
-    font-weight: 600;
+    padding: 8px 12px;
     font-size: 14px;
-    cursor: pointer;
-    user-select: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background-color: #6b7280;
-    color: white;
-    transition: background-color 0.3s ease;
   }
-
   .actionButton:hover {
     background-color: #4b5563;
   }
@@ -625,7 +635,8 @@
   .deleteButton {
     background-color: #ef4444;
     color: white;
-    padding: 6px 14px;
+    font-size: 14px;
+    padding: 8px 12px;
     border-radius: 12px;
     border: none;
     font-weight: 600;
@@ -638,5 +649,20 @@
   .deleteButton:hover {
     background-color: #dc2626;
     box-shadow: 0 5px 14px rgba(220, 38, 38, 0.5);
+  }
+}
+
+@media (max-width: 474px) {
+  .searchForm {
+    max-width: 100%;
+  }
+
+  .searchButton {
+    font-size: 14px;
+    white-space: nowrap;
+    padding: 10px 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
   }
 }
