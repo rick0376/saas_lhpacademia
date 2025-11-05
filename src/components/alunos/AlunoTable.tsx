@@ -6,6 +6,8 @@ import styles from "./alunoTable.module.scss";
 import { Button } from "../ui/Button/Button";
 import { Modal } from "../ui/Modal/Modal";
 
+import { User, Edit, ClipboardCheck, Ruler, Trash2 } from "lucide-react";
+
 interface Aluno {
   id: string;
   nome: string;
@@ -182,114 +184,52 @@ export const AlunoTable = () => {
                     <Link
                       href={`/dashboard/alunos/${aluno.id}`}
                       title="Ver Perfil"
-                      className={styles.iconButton}
                       aria-label={`Ver perfil ${aluno.nome}`}
+                      className={styles.iconPerfil}
                     >
-                      <svg
-                        width="20"
-                        height="20"
-                        fill="#64748b"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <circle cx="12" cy="7" r="4" />
-                        <path d="M5.5 21a7.5 7.5 0 0 1 13 0" />
-                      </svg>
+                      <User className={styles.iconUser} />
+                      <span className={styles.iconTextPerfil}>Perfil</span>
                     </Link>
+
                     <Link
                       href={`/dashboard/alunos/${aluno.id}/editar`}
                       title="Editar"
-                      className={styles.iconButton}
                       aria-label={`Editar ${aluno.nome}`}
+                      className={styles.iconEditar}
                     >
-                      <svg
-                        width="20"
-                        height="20"
-                        fill="#2563eb"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M12 20h9" />
-                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
-                      </svg>
+                      <Edit className={styles.iconEdit} />
+                      <span className={styles.iconTextEdit}>Editar</span>
                     </Link>
+
                     <Link
                       href={`/dashboard/alunos/${aluno.id}/avaliacoes/nova`}
                       title="Nova Avaliação"
-                      className={styles.iconButton}
                       aria-label={`Nova avaliação ${aluno.nome}`}
+                      className={styles.iconAvaliar}
                     >
-                      <svg
-                        width="20"
-                        height="20"
-                        fill="#facc15"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                        stroke="#a16207"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <line x1="12" y1="5" x2="12" y2="19" />
-                        <line x1="5" y1="12" x2="19" y2="12" />
-                      </svg>
+                      <ClipboardCheck className={styles.iconAvaliacao} />
+                      <span className={styles.iconTextAvaliar}>Avaliação</span>
                     </Link>
+
                     <Link
                       href={`/dashboard/medidas?alunoId=${
                         aluno.id
                       }&alunoNome=${encodeURIComponent(aluno.nome)}`}
                       title="Ver Medidas"
-                      className={styles.iconButton}
                       aria-label={`Ver medidas ${aluno.nome}`}
+                      className={styles.iconMedidas}
                     >
-                      <svg
-                        width="20"
-                        height="20"
-                        fill="#22c55e"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                        stroke="#166534"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <rect
-                          x="3"
-                          y="3"
-                          width="18"
-                          height="18"
-                          rx="2"
-                          ry="2"
-                        />
-                        <line x1="3" y1="9" x2="21" y2="9" />
-                        <line x1="9" y1="21" x2="9" y2="9" />
-                      </svg>
+                      <Ruler className={styles.iconMed} />
+                      <span className={styles.iconTextAvaliar}>Medidas</span>
                     </Link>
+
                     <button
                       onClick={() => setDeleteModal({ isOpen: true, aluno })}
                       title="Excluir"
-                      className={styles.iconButtonDelete}
                       aria-label={`Excluir ${aluno.nome}`}
+                      className={styles.iconButtonDelete}
                     >
-                      <svg
-                        width="20"
-                        height="20"
-                        fill="#ef4444"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                        stroke="#fff"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <polyline points="3 6 5 6 21 6" stroke="#fff" />
-                        <path
-                          d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"
-                          stroke="#fff"
-                        />
-                        <line x1="10" y1="11" x2="10" y2="17" stroke="#fff" />
-                        <line x1="14" y1="11" x2="14" y2="17" stroke="#fff" />
-                      </svg>
+                      <Trash2 className={styles.iconDelete} />
                     </button>
                   </div>
                 </td>
@@ -336,105 +276,49 @@ export const AlunoTable = () => {
               <div className={styles.actions}>
                 <Link
                   href={`/dashboard/alunos/${aluno.id}`}
-                  className={styles.iconButton}
                   title="Ver Perfil"
                   aria-label={`Ver perfil ${aluno.nome}`}
+                  className={styles.iconPerfil}
                 >
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="22"
-                    height="22"
-                    fill="#64748b"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <circle cx="12" cy="7" r="4" />
-                    <path d="M5.5 21a7.5 7.5 0 0 1 13 0" />
-                  </svg>
+                  <User className={styles.iconUser} />
                 </Link>
+
                 <Link
                   href={`/dashboard/alunos/${aluno.id}/editar`}
-                  className={styles.iconButton}
                   title="Editar"
                   aria-label={`Editar ${aluno.nome}`}
+                  className={styles.iconEditar}
                 >
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="22"
-                    height="22"
-                    fill="#2563eb"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path d="M12 20h9" />
-                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
-                  </svg>
+                  <Edit className={styles.iconEdit} />
                 </Link>
+
                 <Link
                   href={`/dashboard/alunos/${aluno.id}/avaliacoes/nova`}
-                  className={styles.iconButton}
                   title="Nova Avaliação"
                   aria-label={`Nova avaliação ${aluno.nome}`}
+                  className={styles.iconAvaliar}
                 >
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="22"
-                    height="22"
-                    fill="#facc15"
-                    xmlns="http://www.w3.org/2000/svg"
-                    stroke="#a16207"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <line x1="12" y1="5" x2="12" y2="19" />
-                    <line x1="5" y1="12" x2="19" y2="12" />
-                  </svg>
+                  <ClipboardCheck className={styles.iconAvaliacao} />
                 </Link>
+
                 <Link
                   href={`/dashboard/medidas?alunoId=${
                     aluno.id
                   }&alunoNome=${encodeURIComponent(aluno.nome)}`}
-                  className={styles.iconButton}
                   title="Ver Medidas"
                   aria-label={`Ver medidas ${aluno.nome}`}
+                  className={styles.iconMedidas}
                 >
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="22"
-                    height="22"
-                    fill="#22c55e"
-                    xmlns="http://www.w3.org/2000/svg"
-                    stroke="#166534"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                    <line x1="3" y1="9" x2="21" y2="9" />
-                    <line x1="9" y1="21" x2="9" y2="9" />
-                  </svg>
+                  <Ruler className={styles.iconMed} />
                 </Link>
+
                 <button
                   onClick={() => setDeleteModal({ isOpen: true, aluno })}
-                  className={styles.iconButtonDelete}
                   title="Excluir"
                   aria-label={`Excluir ${aluno.nome}`}
+                  className={styles.iconButtonDelete}
                 >
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="22"
-                    height="22"
-                    fill="#ef4444"
-                    xmlns="http://www.w3.org/2000/svg"
-                    stroke="#fff"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <polyline points="3 6 5 6 21 6" stroke="#fff" />
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
-                    <line x1="10" y1="11" x2="10" y2="17" />
-                    <line x1="14" y1="11" x2="14" y2="17" />
-                  </svg>
+                  <Trash2 className={styles.iconDelete} />
                 </button>
               </div>
             </div>

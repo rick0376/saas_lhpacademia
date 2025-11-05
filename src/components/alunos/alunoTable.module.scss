@@ -126,6 +126,15 @@
   background-color: #f3f4f6;
 }
 
+.thAcoes,
+.tdAcoes {
+  min-width: 180px;
+}
+
+.tdAcoes {
+  white-space: nowrap;
+}
+
 .thNome,
 .thContato,
 .thObjetivo,
@@ -211,18 +220,40 @@
 
 .ativo {
   background-color: #22c55e;
-  color: white;
+  color: #f8f9fa;
   font-weight: 700;
-  box-shadow: 0 0 6px #22c55eaa;
+  box-shadow: 0 0 8px #22c55eaa;
   border-radius: 8px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease,
+    transform 0.3s ease;
+  cursor: default;
+}
+
+.ativo:hover,
+.ativo:focus-visible {
+  background-color: #16a34a;
+  box-shadow: 0 0 12px 4px rgba(22, 163, 74, 0.6);
+  color: white;
+  transform: scale(1.3);
 }
 
 .inativo {
   background-color: #ef4444;
   color: white;
   font-weight: 700;
-  box-shadow: 0 0 6px #ef4444aa;
+  box-shadow: 0 0 4px #ef4444aa;
   border-radius: 8px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease,
+    transform 0.3s ease, color 0.3s ease;
+  cursor: default;
+}
+
+.inativo:hover,
+.inativo:focus-visible {
+  background-color: #b91c1c;
+  box-shadow: 0 0 10px 4px rgba(185, 28, 28, 0.6);
+  color: white;
+  transform: scale(1.05);
 }
 
 .actions {
@@ -231,52 +262,224 @@
   justify-content: center;
 }
 
-.iconButton {
-  cursor: pointer;
-  background: transparent;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 12px;
-  color: #6366f1;
+/*========================= Perfil ===========================*/
+.iconPerfil {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  transition: color 0.3s ease, background-color 0.3s ease, transform 0.3s ease,
-    box-shadow 0.3s ease;
-}
-
-.iconButton:hover,
-.iconButton:focus-visible {
-  color: #4338ca;
-  background-color: #e0e7ff;
-  outline: none;
-  transform: translateY(-2px) scale(1.1);
-  box-shadow: 0 4px 10px rgba(67, 56, 202, 0.3);
-}
-
-.iconButtonDelete {
+  gap: 6px;
+  background-color: #bee4f3;
+  color: #1d0feb;
+  padding: 4px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
   cursor: pointer;
-  background-color: #ef4444;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 12px;
-  color: white;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  user-select: none;
   transition: background-color 0.3s ease, box-shadow 0.3s ease,
     transform 0.3s ease;
+}
+
+.iconPerfil:hover,
+.iconPerfil:focus-visible {
+  color: #f8f9fa;
+  background-color: #1d0feb;
+  box-shadow: 0 0 8px 3px rgba(14, 18, 238, 0.5);
+  transform: scale(1.1);
+}
+
+.iconUser {
+  width: 20px;
+  height: 20px;
+  stroke: #1707f1;
+  stroke-width: 2;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: stroke 0.3s ease;
+  cursor: pointer;
+}
+
+.iconPerfil:hover .iconUser,
+.iconPerfil:focus-visible .iconUser {
+  stroke: #f8f9fa;
+}
+
+/*========================= Editar ===========================*/
+.iconEditar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #facc15;
+  color: #633b04;
+  padding: 4px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease,
+    transform 0.3s ease;
+}
+
+.iconEditar:hover,
+.iconEditar:focus-visible {
+  color: #f8f9fa;
+  background-color: #633b04;
+  box-shadow: 0 0 8px 3px rgba(14, 18, 238, 0.5);
+  transform: scale(1.1);
+}
+
+.iconEdit {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: stroke 0.3s ease;
+  cursor: pointer;
+}
+
+.iconEditar:hover .iconEdit,
+.iconEditar:focus-visible .iconEdit {
+  stroke: #f8f9fa;
+}
+
+/*========================= Avaliação ===========================*/
+.iconAvaliar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #d9f99d;
+  color: #426d05;
+  padding: 4px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease,
+    transform 0.3s ease;
+}
+
+.iconAvaliar:hover,
+.iconAvaliar:focus-visible {
+  color: #f8f9fa;
+  background-color: #426d05;
+  box-shadow: 0 0 8px 3px rgba(101, 163, 13, 0.5);
+  transform: scale(1.1);
+}
+
+.iconAvaliacao {
+  width: 20px;
+  height: 20px;
+  stroke: #4b6f21;
+  stroke-width: 2;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: stroke 0.3s ease;
+  cursor: pointer;
+}
+
+.iconAvaliar:hover .iconAvaliacao,
+.iconAvaliar:focus-visible .iconAvaliacao {
+  stroke: #f8f9fa;
+}
+
+/*========================= Medidas ===========================*/
+.iconMedidas {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #3a99d8;
+  color: #f8f9fa;
+  padding: 4px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease,
+    transform 0.3s ease;
+}
+
+.iconMedidas:hover,
+.iconMedidas:focus-visible {
+  color: #f8f9fa;
+  background-color: #074679;
+  box-shadow: 0 0 8px 3px rgba(14, 18, 238, 0.5);
+  transform: scale(1.1);
+}
+
+.iconMed {
+  width: 20px;
+  height: 20px;
+  stroke: #f4f6f7;
+  stroke-width: 2;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: stroke 0.3s ease;
+  cursor: pointer;
+}
+
+.iconMedidas:hover .iconMed,
+.iconMedidas:focus-visible .iconMed {
+  stroke: #f8f9fa;
+}
+
+/*========================= Delete ===========================*/
+.iconButtonDelete {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #ef4444;
+  color: #f8f9fa;
+  padding: 4px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  user-select: none;
+  border: 2px solid transparent;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease,
+    transform 0.3s ease, border-color 0.3s ease;
 }
 
 .iconButtonDelete:hover,
 .iconButtonDelete:focus-visible {
   background-color: #dc2626;
-  outline: none;
-  transform: translateY(-2px) scale(1.1);
-  box-shadow: 0 4px 10px rgba(220, 38, 38, 0.5);
+  border-color: #991b1b;
+  color: #f8f9fa;
+  box-shadow: 0 0 8px 3px rgba(220, 38, 38, 0.5);
+  transform: scale(1.3);
 }
 
-/* Modal Content */
+.iconDelete {
+  width: 20px;
+  height: 20px;
+  stroke: #f8f9fa;
+  stroke-width: 2;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: stroke 0.3s ease;
+  cursor: pointer;
+}
+
+.iconButtonDelete:hover .iconDelete,
+.iconButtonDelete:focus-visible .iconDelete {
+  stroke: #f8f9fa;
+}
+
+/*==================== Modal Contente ========================*/
+
 .modalContent p {
   margin-bottom: 16px;
   color: #1f2937;
