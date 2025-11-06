@@ -2,7 +2,7 @@
 .main {
   min-height: calc(100vh - 140px);
   padding: 40px 24px;
-  background: linear-gradient(135deg, #8bdbe9 0%, #41b8f3 50%, #19a3ee 100%);
+  background: linear-gradient(135deg, #9882ee 0%, #7a5fca 50%, #856de2 100%);
   color: white;
   border-radius: 8px;
 }
@@ -26,7 +26,8 @@
 
 /* Botão voltar */
 .backButton {
-  color: #673ce7;
+  // color: #673ce7;
+  color: #dbeafe;
   font-weight: 600;
   font-size: 16px;
   text-decoration: none;
@@ -34,7 +35,7 @@
 
   &:hover,
   &:focus-visible {
-    color: #9076e0;
+    color: #0c22e7;
     outline: none;
   }
 }
@@ -44,7 +45,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(135deg, #9882ee 0%, #7a5fca 50%, #856de2 100%);
+  background: linear-gradient(135deg, #8bdbe9 0%, #41b8f3 50%, #19a3ee 100%);
   padding: 24px 32px;
   border-radius: 16px;
   box-shadow: 0 10px 40px rgba(98, 77, 184, 0.3);
@@ -52,10 +53,10 @@
 
   &:hover,
   &:focus-within {
-    box-shadow: 0 14px 48px rgba(122, 79, 237, 0.4);
+    box-shadow: 0 14px 32px rgba(4, 159, 200, 0.8);
+    transform: translateY(-4px) scale(1.1);
   }
 }
-
 /* Conteúdo do perfil */
 .profileInfo {
   display: flex;
@@ -171,7 +172,7 @@
   &:focus-visible {
     background: linear-gradient(135deg, #06a9c9, #03819f, #029164);
     box-shadow: 0 14px 32px rgba(4, 159, 200, 0.8);
-    transform: translateY(-4px) scale(1.05);
+    transform: translateY(-4px) scale(1.1);
     outline: none;
   }
 
@@ -188,7 +189,7 @@
 }
 
 .statCard {
-  background: linear-gradient(135deg, #ac9ceb 0%, #7a5fca 50%, #856de2 100%);
+  background: linear-gradient(135deg, #8bdbe9 0%, #41b8f3 50%, #19a3ee 100%);
   border-radius: 16px;
   padding: 28px;
   box-shadow: 0 10px 40px rgba(98, 77, 184, 0.3);
@@ -201,7 +202,8 @@
 
   &:hover,
   &:focus-within {
-    box-shadow: 0 14px 48px rgba(122, 79, 237, 0.5);
+    box-shadow: 0 14px 32px rgba(4, 159, 200, 0.8);
+    transform: translateY(-4px) scale(1.1);
   }
 }
 
@@ -222,12 +224,19 @@
 
 /* Informações contato */
 .contactCard {
-  background: linear-gradient(135deg, #ac9ceb 0%, #7a5fca 50%, #856de2 100%);
+  background: linear-gradient(135deg, #8bdbe9 0%, #41b8f3 50%, #19a3ee 100%);
   padding: 28px;
   border-radius: 16px;
   box-shadow: 0 10px 40px rgba(98, 77, 184, 0.3);
   color: white;
   user-select: none;
+  transition: box-shadow 0.3s ease;
+
+  &:hover,
+  &:focus-within {
+    box-shadow: 0 14px 32px rgba(4, 159, 200, 0.8);
+    transform: translateY(-4px) scale(1.1);
+  }
 }
 
 .cardTitle {
@@ -279,13 +288,14 @@
 
 .viewAll {
   font-weight: 700;
-  color: #a78bfa;
+  //color: #a78bfa;
+  color: #dbeafe;
   text-decoration: none;
   transition: color 0.3s;
 
   &:hover,
   &:focus-visible {
-    color: #7c3aed;
+    color: #0c22e7;
     outline: none;
   }
 }
@@ -298,7 +308,7 @@
 }
 
 .treinoItem {
-  background: linear-gradient(135deg, #ac9ceb 0%, #7a5fca 50%, #856de2 100%);
+  background: linear-gradient(135deg, #8bdbe9 0%, #41b8f3 50%, #19a3ee 100%);
   padding: 16px 20px;
   border-radius: 14px;
   text-decoration: none;
@@ -307,12 +317,12 @@
   flex-direction: column;
   gap: 8px;
   font-weight: 700;
-  transition: background-color 0.3s;
+  transition: box-shadow 0.3s ease;
 
   &:hover,
-  &:focus-visible {
-    background: #0284c7;
-    outline: none;
+  &:focus-within {
+    box-shadow: 0 14px 32px rgba(4, 159, 200, 0.8);
+    transform: translateY(-4px) scale(1.1);
   }
 }
 
@@ -329,12 +339,19 @@
 
 /* Observações */
 .observacoesCard {
-  background: linear-gradient(135deg, #ac9ceb 0%, #7a5fca 50%, #856de2 100%);
+  background: linear-gradient(135deg, #8bdbe9 0%, #41b8f3 50%, #19a3ee 100%);
   padding: 28px;
   border-radius: 16px;
   box-shadow: 0 10px 40px rgba(98, 77, 184, 0.3);
   color: white;
   user-select: none;
+  transition: box-shadow 0.3s ease;
+
+  &:hover,
+  &:focus-within {
+    box-shadow: 0 14px 32px rgba(4, 159, 200, 0.8);
+    transform: translateY(-4px) scale(1.1);
+  }
 }
 
 .observacoesText {
