@@ -2,7 +2,7 @@
 .main {
   min-height: calc(100vh - 140px);
   padding: 40px 24px;
-  background: linear-gradient(135deg, #8bdbe9 0%, #41b8f3 50%, #19a3ee 100%);
+  background: linear-gradient(135deg, #9882ee 0%, #7a5fca 50%, #856de2 100%);
   color: white;
   border-radius: 8px;
 }
@@ -26,7 +26,7 @@
 
 /* Botão voltar */
 .backButton {
-  color: #673ce7;
+  color: #ebf8ff;
   font-weight: 600;
   font-size: 16px;
   text-decoration: none;
@@ -34,7 +34,7 @@
 
   &:hover,
   &:focus-visible {
-    color: #9076e0;
+    color: #a78bfa;
     outline: none;
   }
 }
@@ -44,7 +44,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(135deg, #9882ee 0%, #7a5fca 50%, #856de2 100%);
+  background: linear-gradient(135deg, #8bdbe9 0%, #41b8f3 50%, #19a3ee 100%);
   padding: 24px 32px;
   border-radius: 16px;
   box-shadow: 0 10px 40px rgba(98, 77, 184, 0.3);
@@ -344,6 +344,34 @@
   color: #e0e7ff;
 }
 
+/* Responsividade */
+@media (max-width: 900px) {
+  .profileCard {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .statsGrid,
+  .contactGrid,
+  .treinosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .backButton {
+    font-size: 15px;
+  }
+}
+
+/*
+@media (max-width: 480px) {
+  .editButton {
+    width: 100%;
+    padding: 14px 0;
+    font-size: 16px;
+  }
+}
+*/
+
 @media (max-width: 768px) {
   .profileCard {
     flex-direction: column;
@@ -369,13 +397,81 @@
   .info {
     width: 100%;
     max-width: 100%;
-    text-align: center;
   }
 
   .nome {
     font-size: 22px;
     font-weight: 700;
     margin: 0 0 8px 0;
+  }
+
+  .meta {
+    flex-direction: column;
+    gap: 8px;
+    font-size: 14px;
+    color: #dbeafe;
+    width: 100%;
+  }
+
+  .meta span {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    user-select: none;
+  }
+
+  .statusBadge {
+    font-size: 14px;
+    padding: 5px 14px;
+    margin-top: 8px;
+    min-width: auto;
+    display: inline-block;
+  }
+
+  .actions {
+    width: 100%;
+    margin-top: 12px;
+    justify-content: center;
+    display: flex;
+  }
+
+  .editButton {
+    width: 100%;
+    max-width: 280px;
+    font-size: 16px;
+    padding: 12px 0;
+  }
+}
+@media (max-width: 768px) {
+  .profileCard {
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    gap: 20px;
+  }
+
+  .profileInfo {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+  }
+
+  .avatar {
+    width: 90px;
+    height: 90px;
+    font-size: 36px;
+  }
+
+  .info {
+    width: 100%;
+    text-align: center;
+  }
+
+  .nome {
+    font-size: 24px;
+    margin: 0 0 8px 0;
+    word-break: break-word;
   }
 
   .meta {
@@ -394,28 +490,24 @@
   }
 
   .statusBadge {
-    display: block;
-    width: 100%;
-    box-sizing: border-box;
     margin-top: 8px;
-    padding: 7px 14px;
+    min-width: auto;
     font-size: 14px;
-    white-space: normal;
+    padding: 5px 14px;
+    display: inline-block;
   }
 
   .actions {
     width: 100%;
-    margin-top: 12px;
-    justify-content: center;
     display: flex;
+    justify-content: center;
+    margin-top: 12px;
   }
 
   .editButton {
-    width: 100% !important; /* força largura total */
-    max-width: 100% !important;
-    box-sizing: border-box;
+    width: 100%;
+    max-width: 280px;
+    padding: 12px 0;
     font-size: 16px;
-    padding: 14px 0;
-    height: auto;
   }
 }

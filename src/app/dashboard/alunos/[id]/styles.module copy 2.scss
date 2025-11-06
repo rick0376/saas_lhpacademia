@@ -2,17 +2,19 @@
 .main {
   min-height: calc(100vh - 140px);
   padding: 40px 24px;
-  background: linear-gradient(135deg, #06b6d4 0%, #0284c7 50%, #0369a1 100%);
+  background: linear-gradient(135deg, #9882ee 0%, #7a5fca 50%, #856de2 100%);
   color: white;
   border-radius: 8px;
 }
 
+/* Ajustes gerais no container */
 .container {
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 32px;
+  padding: 0 16px;
 }
 
 /* Header perfil */
@@ -22,80 +24,123 @@
   gap: 20px;
 }
 
+/* Botão voltar */
 .backButton {
   color: #ebf8ff;
   font-weight: 600;
+  font-size: 16px;
   text-decoration: none;
   transition: color 0.3s;
 
-  &:hover {
-    color: #a78bfa; /* roxo vibrante */
+  &:hover,
+  &:focus-visible {
+    color: #a78bfa;
+    outline: none;
   }
 }
 
+/* Card de perfil */
 .profileCard {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(135deg, #9882ee 0%, #7a5fca 50%, #856de2 100%);
-  padding: 20px 24px;
+  background: linear-gradient(135deg, #8bdbe9 0%, #41b8f3 50%, #19a3ee 100%);
+  padding: 24px 32px;
   border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(98, 77, 184, 0.3);
+  box-shadow: 0 10px 40px rgba(98, 77, 184, 0.3);
+  transition: box-shadow 0.3s ease;
+  flex-wrap: wrap;
+
+  &:hover,
+  &:focus-within {
+    box-shadow: 0 14px 48px rgba(122, 79, 237, 0.4);
+  }
 }
 
+/* Conteúdo do perfil */
 .profileInfo {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 28px;
+  flex: 1 1 300px;
+  min-width: 200px;
 }
 
+/* Avatar */
 .avatar {
-  width: 96px;
-  height: 96px;
+  width: 110px;
+  height: 110px;
   border-radius: 50%;
   background: linear-gradient(135deg, #714797, #5d2691);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 40px;
+  font-size: 42px;
   color: white;
   overflow: hidden;
+  user-select: none;
+  transition: transform 0.3s ease;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+
+  &:hover,
+  &:focus {
+    transform: scale(1.05);
+  }
 }
 
-.avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-}
-
+/* Informações textuais */
 .info {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+  max-width: 600px;
+  flex: 1 1 300px;
+  min-width: 200px;
 }
 
 .nome {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 800;
   color: #ebf8ff;
-  text-shadow: 0 1px 4px rgba(3, 105, 161, 0.7);
+  text-shadow: 0 1.5px 6px rgba(3, 105, 161, 0.75);
+  letter-spacing: 0.015em;
+  margin: 0;
+  word-break: break-word;
 }
 
 .meta {
   display: flex;
-  gap: 20px;
-  font-size: 16px;
+  gap: 28px;
+  font-size: 18px;
   color: #dbeafe;
+  flex-wrap: wrap;
+
+  span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    user-select: none;
+  }
 }
 
+/* Status badge */
 .statusBadge {
-  padding: 4px 12px;
-  border-radius: 20px;
+  padding: 6px 16px;
+  border-radius: 24px;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 16px;
   user-select: none;
+  min-width: 84px;
+  text-align: center;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .ativo {
@@ -108,10 +153,13 @@
   color: #991b1b;
 }
 
-/* Botão editar */
+/* Botões */
 .actions {
   display: flex;
   align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  flex: 0 0 auto;
 }
 
 .editButton {
@@ -119,174 +167,96 @@
   color: white;
   border: none;
   border-radius: 12px;
-  padding: 12px 24px;
+  padding: 14px 28px;
   font-weight: 700;
+  font-size: 16px;
   cursor: pointer;
-  box-shadow: 0 8px 24px rgba(122, 79, 237, 0.5);
+  box-shadow: 0 10px 28px rgba(122, 79, 237, 0.5);
   transition: all 0.3s ease;
 
-  &:hover {
+  &:hover,
+  &:focus-visible {
     background: linear-gradient(135deg, #06a9c9, #03819f, #029164);
-
-    box-shadow: 0 12px 32px rgba(4, 159, 200, 0.8);
-    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 14px 32px rgba(4, 159, 200, 0.8);
+    transform: translateY(-4px) scale(1.05);
+    outline: none;
   }
 
   &:active {
-    transform: translateY(-1px) scale(0.98);
+    transform: translateY(-2px) scale(0.97);
   }
-}
-
-/* Grid de estatísticas */
-.statsGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 20px;
-}
-
-.statCard {
-  background: linear-gradient(135deg, #9882ee 0%, #7a5fca 50%, #856de2 100%);
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 8px 32px rgba(98, 77, 184, 0.3);
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.statIcon {
-  font-size: 28px;
-}
-
-.statValue {
-  font-size: 24px;
-  font-weight: 700;
-  color: #e0e7ff;
-}
-
-.statLabel {
-  font-size: 14px;
-  color: #bfdbfe;
-}
-
-/* Cartões de contato, treinos, observações */
-.contactCard,
-.treinosCard,
-.observacoesCard {
-  background: linear-gradient(135deg, #9882ee 0%, #7a5fca 50%, #856de2 100%);
-  padding: 24px;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(98, 77, 184, 0.3);
-}
-
-.cardTitle {
-  font-size: 20px;
-  font-weight: 700;
-  color: #e0e7ff;
-  margin-bottom: 16px;
-}
-
-/* Grid Contato */
-.contactGrid {
-  display: flex;
-  gap: 40px;
-  flex-wrap: wrap;
-}
-
-.contactItem {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: #dbeafe;
-}
-
-.contactIcon {
-  font-size: 20px;
-}
-
-.contactLabel {
-  font-weight: 600;
-  font-size: 14px;
-}
-
-.contactValue {
-  font-size: 14px;
-  color: #cbd5e1;
-}
-
-/* Treinos */
-.cardHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.viewAll {
-  font-weight: 600;
-  color: #a78bfa;
-  text-decoration: none;
-  transition: color 0.3s;
-
-  &:hover {
-    color: #7c3aed;
-  }
-}
-
-.treinosGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 16px;
-  margin-top: 16px;
-}
-
-.treinoItem {
-  background: rgba(113, 71, 151, 0.15);
-  padding: 12px 16px;
-  border-radius: 12px;
-  text-decoration: none;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-weight: 600;
-  transition: background-color 0.3s;
-
-  &:hover {
-    background: rgba(113, 71, 151, 0.3);
-  }
-}
-
-.treinoNome {
-  font-size: 16px;
-}
-
-.treinoObjetivo {
-  font-size: 14px;
-  font-weight: 400;
-  color: #d8b4fe;
-}
-
-/* Observações */
-.observacoesText {
-  font-size: 16px;
-  color: #e0e7ff;
-  white-space: pre-wrap;
 }
 
 /* Responsividade */
 @media (max-width: 768px) {
   .profileCard {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+    padding: 20px;
+    gap: 24px;
+    text-align: center;
   }
 
-  .statsGrid,
-  .contactGrid,
-  .treinosGrid {
-    grid-template-columns: 1fr;
+  .profileInfo {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
   }
 
-  .backButton {
+  .avatar {
+    width: 90px;
+    height: 90px;
+    font-size: 36px;
+  }
+
+  .info {
+    width: 100%;
+    max-width: 100%;
+    text-align: center;
+  }
+
+  .nome {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+  }
+
+  .meta {
+    flex-direction: column;
+    gap: 8px;
     font-size: 14px;
+    color: #dbeafe;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .meta span {
+    display: block;
+    text-align: center;
+    gap: 4px;
+  }
+
+  .statusBadge {
+    margin-top: 8px;
+    min-width: auto;
+    font-size: 14px;
+    padding: 5px 14px;
+    display: inline-block;
+  }
+
+  .actions {
+    width: 100%;
+    justify-content: center;
+    margin-top: 12px;
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .editButton {
+    width: 100%;
+    max-width: 280px;
+    padding: 12px 0;
+    font-size: 16px;
   }
 }
