@@ -105,10 +105,12 @@ export default async function AlunoPerfilPage({ params }: Props) {
                 </div>
               </div>
 
-              <div className={styles.actions}>
-                <Link href={`/dashboard/alunos/${aluno.id}/editar`}>
-                  <button className={styles.editButton}>✏️ Editar</button>
-                </Link>
+              <div className={styles.actionsContainer}>
+                <div className={styles.actions}>
+                  <Link href={`/dashboard/alunos/${aluno.id}/editar`}>
+                    <button className={styles.editButton}>✏️ Editar</button>
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
