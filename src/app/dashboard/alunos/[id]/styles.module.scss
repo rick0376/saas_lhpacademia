@@ -1,4 +1,3 @@
-/* Fundo principal e texto */
 .main {
   min-height: calc(100vh - 140px);
   padding: 40px 24px;
@@ -7,7 +6,6 @@
   border-radius: 8px;
 }
 
-/* Ajustes gerais no container */
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -17,16 +15,13 @@
   padding: 0 16px;
 }
 
-/* Header perfil */
 .profileHeader {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-/* Botão voltar */
 .backButton {
-  // color: #673ce7;
   color: #dbeafe;
   font-weight: 600;
   font-size: 16px;
@@ -129,9 +124,7 @@
 /* Status badge */
 .statusBadge {
   padding: 6px 16px;
-  border-radius: 24px;
   font-weight: 700;
-  font-size: 16px;
   user-select: none;
   min-width: 84px;
   text-align: center;
@@ -140,11 +133,27 @@
 }
 
 .ativo {
+  font-size: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 12px;
   background-color: #d1fad4;
   color: #065f46;
 }
 
 .inativo {
+  font-size: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  width: 24px;
+  height: 24px;
+  border-radius: 12px;
   background-color: #fee2e2;
   color: #991b1b;
 }
@@ -155,8 +164,14 @@
   align-items: center;
 }
 
+.actionsContainer {
+  margin-top: 70px;
+  //margin-bottom: 10px;
+}
+
 /* Botão editar */
 .editButton {
+  width: 250px;
   background: linear-gradient(135deg, #0597b4, #0277a1, #037c5e);
   color: white;
   border: none;
@@ -246,7 +261,6 @@
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
 }
 
-/* Contato grid - mais espaçamento */
 .contactGrid {
   display: flex;
   gap: 48px;
@@ -288,7 +302,6 @@
 
 .viewAll {
   font-weight: 700;
-  //color: #a78bfa;
   color: #dbeafe;
   text-decoration: none;
   transition: color 0.3s;
@@ -334,7 +347,7 @@
 .treinoObjetivo {
   font-size: 15px;
   font-weight: 500;
-  color: #dfc6fa;
+  color: #cbd5e1;
 }
 
 /* Observações */
@@ -361,7 +374,44 @@
   color: #e8ecfc;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1082px) {
+  .profileCard {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .meta {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .actionsContainer {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 8px;
+  }
+
+  .actions {
+    padding: 0;
+    width: 100%;
+    max-width: 300px;
+    flex-grow: 1;
+    display: block;
+    box-sizing: border-box;
+  }
+
+  .editButton {
+    width: 100% !important;
+    box-sizing: border-box;
+    padding: 12px 24px;
+    display: block;
+  }
+}
+
+@media (max-width: 792px) {
   .profileCard {
     flex-direction: column;
     align-items: center;
@@ -417,19 +467,22 @@
     margin-top: 8px;
   }
 
+  .ativo,
+  .inativo {
+    height: 34px;
+  }
+
   .actionsContainer {
-    width: 100%;
+    justify-content: center;
   }
 
   .actions {
     width: 100%;
-    display: block;
+    max-width: none;
   }
 
   .editButton {
     width: 100% !important;
     box-sizing: border-box;
-    padding: 14px 24px;
-    cursor: pointer;
   }
 }

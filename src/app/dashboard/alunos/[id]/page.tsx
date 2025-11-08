@@ -91,6 +91,7 @@ export default async function AlunoPerfilPage({ params }: Props) {
                 </div>
                 <div className={styles.info}>
                   <h1 className={styles.nome}>{aluno.nome}</h1>
+
                   <div className={styles.meta}>
                     {idade && <span>📅 {idade} anos</span>}
                     {aluno.objetivo && <span>🎯 {aluno.objetivo}</span>}
@@ -121,7 +122,7 @@ export default async function AlunoPerfilPage({ params }: Props) {
               <div className={styles.statIcon}>📋</div>
               <div className={styles.statContent}>
                 <span className={styles.statValue}>{aluno._count.treinos}</span>
-                <span className={styles.statLabel}>Treinos</span>
+                <span className={styles.statLabel}> Treinos</span>
               </div>
             </div>
 
@@ -129,7 +130,7 @@ export default async function AlunoPerfilPage({ params }: Props) {
               <div className={styles.statIcon}>📏</div>
               <div className={styles.statContent}>
                 <span className={styles.statValue}>{aluno._count.medidas}</span>
-                <span className={styles.statLabel}>Medidas</span>
+                <span className={styles.statLabel}> Medidas</span>
               </div>
             </div>
 
