@@ -1,9 +1,15 @@
 .main {
+  max-width: 1400px;
   min-height: calc(100vh - 140px);
   padding: 40px 24px;
   background: linear-gradient(135deg, #9882ee 0%, #7a5fca 50%, #856de2 100%);
   color: white;
   border-radius: 8px;
+
+  /* Centralizar conteúdo interno se necessário */
+  display: flex;
+  justify-content: center; /* Centraliza horizontalmente */
+  align-items: flex-start; /* Alinhamento vertical de início */
 }
 
 .container {
@@ -233,7 +239,7 @@
 }
 
 .statLabel {
-  font-size: 14px;
+  font-size: 12px;
   opacity: 0.9;
 }
 
@@ -285,12 +291,12 @@
 .contactLabel {
   font-weight: 700;
   font-size: 15px;
-  color: #cbd5e1;
+  color: #dbeafe;
 }
 
 .contactValue {
   font-size: 15px;
-  color: #e0e7ff;
+  color: #dbeafe;
 }
 
 /* Treinos */
@@ -347,7 +353,7 @@
 .treinoObjetivo {
   font-size: 15px;
   font-weight: 500;
-  color: #cbd5e1;
+  color: #dbeafe;
 }
 
 /* Observações */
@@ -371,7 +377,7 @@
   font-size: 16px;
   white-space: pre-wrap;
   line-height: 1.5;
-  color: #e8ecfc;
+  color: #dbeafe;
 }
 
 @media (max-width: 1082px) {

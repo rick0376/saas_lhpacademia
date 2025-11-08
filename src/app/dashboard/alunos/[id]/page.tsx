@@ -142,7 +142,7 @@ export default async function AlunoPerfilPage({ params }: Props) {
                     <span className={styles.statValue}>
                       {ultimaMedida.peso} kg
                     </span>
-                    <span className={styles.statLabel}>Peso Atual</span>
+                    <span className={styles.statLabel}> Peso Atual</span>
                   </div>
                 </div>
 
@@ -151,7 +151,7 @@ export default async function AlunoPerfilPage({ params }: Props) {
                     <div className={styles.statIcon}>📊</div>
                     <div className={styles.statContent}>
                       <span className={styles.statValue}>{imc}</span>
-                      <span className={styles.statLabel}>IMC</span>
+                      <span className={styles.statLabel}> IMC</span>
                     </div>
                   </div>
                 )}
@@ -168,7 +168,7 @@ export default async function AlunoPerfilPage({ params }: Props) {
                   <div className={styles.contactItem}>
                     <span className={styles.contactIcon}>📧</span>
                     <div>
-                      <span className={styles.contactLabel}>Email</span>
+                      <span className={styles.contactLabel}>Email: </span>
                       <span className={styles.contactValue}>{aluno.email}</span>
                     </div>
                   </div>
