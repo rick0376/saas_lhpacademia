@@ -178,6 +178,13 @@
   text-align: center;
 }
 
+.actions {
+  display: inline-flex; /* Para os botões ficarem lado a lado */
+  justify-content: center; /* Centraliza horizontalmente o conteúdo flex */
+  gap: 12px; /* Espaçamento entre os botões */
+  width: 100%; /* Opcional, para ocupar toda a célula */
+}
+
 /* User cell */
 
 .userCell {
@@ -248,66 +255,94 @@
   color: #374151;
 }
 
-/* Actions (edit/delete buttons) */
-
-.actions {
-  display: flex;
-  gap: 12px;
-}
-
-.editButton {
-  color: #2563eb;
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 6px 10px;
-  border-radius: 12px;
+/*========================= Editar ===========================*/
+.iconEditar {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  transition: color 0.3s ease, background-color 0.3s ease, transform 0.3s ease,
-    box-shadow 0.3s ease;
-}
-
-.editButton:hover,
-.editButton:focus-visible {
-  color: #fdfeff;
-  background-color: #3b82f6;
-  outline: none;
-  transform: translateY(-3px) scale(1.1);
-  box-shadow: 0 4px 10px rgba(59, 130, 246, 0.5);
-}
-
-.deleteButton {
-  color: #dc2626;
-  background-color: transparent;
-  border: none;
+  gap: 6px;
+  background-color: #facc15;
+  color: #633b04;
+  padding: 4px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
   cursor: pointer;
-  padding: 6px 10px;
-  border-radius: 12px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: color 0.3s ease, background-color 0.3s ease, transform 0.3s ease,
-    box-shadow 0.3s ease;
+  user-select: none;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease,
+    transform 0.3s ease;
 }
 
-.deleteButton:hover,
-.deleteButton:focus-visible {
-  color: #fff;
-  background-color: #ef4444;
-  outline: none;
-  transform: translateY(-3px) scale(1.1);
-  box-shadow: 0 4px 10px rgba(239, 68, 68, 0.5);
+.iconEditar:hover,
+.iconEditar:focus-visible {
+  color: #f8f9fa;
+  background-color: #633b04;
+  box-shadow: 0 0 8px 3px rgba(14, 18, 238, 0.5);
+  transform: scale(1.1);
 }
 
-.actionIcon {
-  display: block;
+.iconEdit {
   width: 20px;
   height: 20px;
+  stroke-width: 2;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: stroke 0.3s ease;
+  cursor: pointer;
 }
 
-/* Loading, Error, Empty */
+.iconEditar:hover .iconEdit,
+.iconEditar:focus-visible .iconEdit {
+  stroke: #f8f9fa;
+}
+
+/*========================= Delete ===========================*/
+.iconButtonDelete {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #ef4444;
+  color: #f8f9fa;
+  padding: 4px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  user-select: none;
+  border: 2px solid transparent;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease,
+    transform 0.3s ease, border-color 0.3s ease;
+}
+
+.iconButtonDelete:hover,
+.iconButtonDelete:focus-visible {
+  background-color: #dc2626;
+  border-color: #991b1b;
+  color: #f8f9fa;
+  box-shadow: 0 0 8px 3px rgba(220, 38, 38, 0.5);
+  transform: scale(1.3);
+}
+
+.iconDelete {
+  width: 20px;
+  height: 20px;
+  stroke: #f8f9fa;
+  stroke-width: 2;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: stroke 0.3s ease;
+  cursor: pointer;
+}
+
+.iconButtonDelete:hover .iconDelete,
+.iconButtonDelete:focus-visible .iconDelete {
+  stroke: #f8f9fa;
+}
+
+/*==================== Fim Buttons ========================*/
 
 .loading,
 .error,
@@ -328,6 +363,13 @@
   width: 36px;
   height: 36px;
   animation: spin 1s linear infinite;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 24px;
 }
 
 @keyframes spin {
@@ -388,6 +430,7 @@
     margin-top: 8px;
     display: flex;
     gap: 12px;
+    justify-content: center;
   }
 
   .editButton,

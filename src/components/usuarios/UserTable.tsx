@@ -5,6 +5,7 @@ import Link from "next/link";
 import styles from "./usertable.module.scss";
 import { Button } from "../ui/Button/Button";
 import { Modal } from "../ui/Modal/Modal";
+import { Edit, Trash2 } from "lucide-react";
 
 interface Usuario {
   id: string;
@@ -154,47 +155,18 @@ export const UserTable = () => {
                   <div className={styles.actions}>
                     <Link
                       href={`/dashboard/usuarios/${usuario.id}/editar`}
-                      className={styles.editButton}
                       title="Editar"
+                      className={styles.iconEditar}
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="20"
-                        height="20"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        viewBox="0 0 24 24"
-                        className={styles.actionIcon}
-                      >
-                        <path d="M12 20h9" />
-                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
-                      </svg>
+                      <Edit className={styles.iconEdit} />
                     </Link>
+
                     <button
                       onClick={() => setDeleteModal({ isOpen: true, usuario })}
-                      className={styles.deleteButton}
+                      className={styles.iconButtonDelete}
                       title="Excluir"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="20"
-                        height="20"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        viewBox="0 0 24 24"
-                        className={styles.actionIcon}
-                      >
-                        <polyline points="3 6 5 6 21 6" />
-                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                        <line x1="10" y1="11" x2="10" y2="17" />
-                        <line x1="14" y1="11" x2="14" y2="17" />
-                      </svg>
+                      <Trash2 className={styles.iconDelete} />
                     </button>
                   </div>
                 </td>
@@ -227,46 +199,16 @@ export const UserTable = () => {
                 <Link
                   href={`/dashboard/usuarios/${usuario.id}/editar`}
                   title="Editar"
-                  className={styles.editButton}
+                  className={styles.iconEditar}
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    viewBox="0 0 24 24"
-                    className={styles.actionIcon}
-                  >
-                    <path d="M12 20h9" />
-                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
-                  </svg>
+                  <Edit className={styles.iconEdit} />
                 </Link>
                 <button
                   onClick={() => setDeleteModal({ isOpen: true, usuario })}
+                  className={styles.iconButtonDelete}
                   title="Excluir"
-                  className={styles.deleteButton}
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    viewBox="0 0 24 24"
-                    className={styles.actionIcon}
-                  >
-                    <polyline points="3 6 5 6 21 6" />
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                    <line x1="10" y1="11" x2="10" y2="17" />
-                    <line x1="14" y1="11" x2="14" y2="17" />
-                  </svg>
+                  <Trash2 className={styles.iconDelete} />
                 </button>
               </div>
             </div>
