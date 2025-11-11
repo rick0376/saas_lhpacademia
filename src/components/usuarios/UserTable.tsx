@@ -186,7 +186,9 @@ export const UserTable = () => {
             <div className={styles.usuarioInfo}>
               <strong>{usuario.nome}</strong>
               <span>{usuario.email}</span>
-              {getRoleBadge(usuario.role)}
+              <div className={styles.roleBadgeContainer}>
+                {getRoleBadge(usuario.role)}
+              </div>
               <span
                 className={`${styles.statusBadge} ${
                   usuario.ativo ? styles.ativo : styles.inativo

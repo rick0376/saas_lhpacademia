@@ -6,6 +6,15 @@ import styles from "./alunoTable.module.scss";
 import { Button } from "../ui/Button/Button";
 import { Modal } from "../ui/Modal/Modal";
 
+import {
+  FaEnvelope,
+  FaPhone,
+  FaBullseye,
+  FaCheckCircle,
+  FaDumbbell,
+  FaRuler,
+} from "react-icons/fa";
+
 import { User, Edit, ClipboardCheck, Ruler, Trash2 } from "lucide-react";
 
 interface Aluno {
@@ -20,6 +29,7 @@ interface Aluno {
     treinos: number;
     medidas: number;
   };
+  clienteId: string; // Adicione esta linha para incluir o clienteId
 }
 
 export const AlunoTable = () => {
@@ -192,7 +202,7 @@ export const AlunoTable = () => {
                     </Link>
 
                     <Link
-                      href={`/dashboard/alunos/${aluno.id}/editar`}
+                      href={`/dashboard/alunos/${aluno.id}/editar?clienteId=${aluno.clienteId}`}
                       title="Editar"
                       aria-label={`Editar ${aluno.nome}`}
                       className={styles.iconEditar}
@@ -248,17 +258,17 @@ export const AlunoTable = () => {
             </div>
             <div className={styles.cardContent}>
               <h3 className={styles.cardName}>{aluno.nome}</h3>
-              <p>
-                <strong>Email:</strong> {aluno.email || "-"}
+              <p className={styles.emailField}>
+                <FaEnvelope size={20} color="#0f4aca" /> {aluno.email || "-"}
               </p>
-              <p>
-                <strong>Telefone:</strong> {aluno.telefone || "-"}
+              <p className={styles.telefoneField}>
+                <FaPhone size={20} color="#166d1b" /> {aluno.telefone || "-"}
               </p>
-              <p>
-                <strong>Objetivo:</strong> {aluno.objetivo || "-"}
+              <p className={styles.objetivoField}>
+                <FaBullseye size={20} color="#5a21a0" /> {aluno.objetivo || "-"}
               </p>
-              <p>
-                <strong>Status:</strong>{" "}
+              <p className={styles.statusField}>
+                <strong>Status: </strong>{" "}
                 <span
                   className={`${styles.statusBadge} ${
                     aluno.ativo ? styles.ativo : styles.inativo
@@ -267,12 +277,13 @@ export const AlunoTable = () => {
                   {aluno.ativo ? "Ativo" : "Inativo"}
                 </span>
               </p>
-              <p>
-                <strong>Treinos:</strong> {aluno._count.treinos}
+              <p className={styles.treinosField}>
+                <strong>Treinos: </strong> {aluno._count.treinos}
               </p>
-              <p>
-                <strong>Medidas:</strong> {aluno._count.medidas}
+              <p className={styles.medidasField}>
+                <strong>Medidas: </strong> {aluno._count.medidas}
               </p>
+
               <div className={styles.actions}>
                 <Link
                   href={`/dashboard/alunos/${aluno.id}`}

@@ -1,11 +1,14 @@
-// components/ui/Button/Button.tsx
 import React from "react";
 import styles from "./styles.module.scss";
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps {
+  children: React.ReactNode;
   variant?: "primary" | "secondary" | "success" | "danger" | "outline";
   size?: "small" | "medium" | "large";
   fullWidth?: boolean;
+  disabled?: boolean;
+  type?: "button" | "submit" | "reset";
+  onClick?: () => void;
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -15,7 +18,7 @@ export const Button: React.FC<ButtonProps> = ({
   fullWidth = false,
   disabled = false,
   type = "button",
-  ...props
+  onClick,
 }) => {
   return (
     <button
@@ -24,7 +27,7 @@ export const Button: React.FC<ButtonProps> = ({
         fullWidth ? styles.fullWidth : ""
       }`}
       disabled={disabled}
-      {...props}
+      onClick={onClick}
     >
       {children}
     </button>

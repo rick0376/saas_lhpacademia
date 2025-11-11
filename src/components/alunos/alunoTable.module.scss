@@ -209,7 +209,6 @@
   align-items: center;
   justify-content: center;
   font-size: 18px;
-
   transition: background-color 0.3s ease, box-shadow 0.3s ease,
     transform 0.3s ease;
 }
@@ -243,6 +242,91 @@
   font-size: 14px;
 }
 
+.emailField,
+.telefoneField,
+.objetivoField,
+.statusField,
+.treinosField,
+.medidasField {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* espaço entre ícone e texto */
+  justify-content: flex-start; /* alinhamento à esquerda */
+  text-align: left;
+  border-radius: 12px;
+  padding: 4px 12px;
+  user-select: none;
+  font-weight: 600;
+}
+
+/* Novas classes para colorir campos individualmente */
+.emailField {
+  border-radius: 12px;
+  padding: 8px 12px;
+  background-color: #c6d5f7;
+  //color: #0f4aca;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 8px;
+  user-select: none;
+}
+
+.telefoneField {
+  border-radius: 12px;
+  padding: 8px 12px;
+  background-color: #d4f7d6;
+  //color: #166d1b;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 8px;
+  user-select: none;
+}
+
+.objetivoField {
+  border-radius: 12px;
+  padding: 8px 12px;
+  background-color: #dfd4f7; /* Fundo roxo clarinho */
+  //color: #5a21a0; /* Roxo escuro */
+  font-weight: 600;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 8px;
+  user-select: none;
+}
+
+.statusField {
+  border-radius: 12px;
+  padding: 8px 12px;
+  background-color: #f0ecec; /* Fundo vermelho clarinho */
+  //color: #9b231b; /* Vermelho escuro */
+  font-weight: 700;
+  display: block;
+  margin-bottom: 8px;
+  user-select: none;
+}
+
+.treinosField {
+  border-radius: 12px;
+  padding: 8px 12px;
+  background-color: #f7efc6; /* Fundo amarelo clarinho */
+  //color: #a97d04; /* Amarelo escuro */
+  font-weight: 600;
+  display: block;
+  margin-bottom: 8px;
+  user-select: none;
+}
+
+.medidasField {
+  border-radius: 12px;
+  padding: 8px 12px;
+  background-color: #c5d3f7; /* Fundo azul escuro clarinho */
+  //color: #193285; /* Azul escuro */
+  font-weight: 600;
+  display: block;
+  margin-bottom: 8px;
+  user-select: none;
+}
+
 .statusBadge {
   padding: 4px 12px;
   border-radius: 20px;
@@ -254,16 +338,12 @@
   user-select: none;
 }
 
-/*
-background-color: #22c55e;
-color: #f8f9fa;
-*/
 .ativo {
   background-color: #dcfce7;
   color: #15803d;
   font-weight: 700;
   box-shadow: 0 0 8px #696d6baa;
-  border-radius: 8px;
+  border-radius: 12px;
   transition: background-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease,
     transform 0.3s ease;
   cursor: default;
@@ -282,7 +362,7 @@ color: #f8f9fa;
   color: white;
   font-weight: 700;
   box-shadow: 0 0 4px #ef4444aa;
-  border-radius: 8px;
+  border-radius: 12px;
   transition: background-color 0.3s ease, box-shadow 0.3s ease,
     transform 0.3s ease, color 0.3s ease;
   cursor: default;
@@ -518,7 +598,7 @@ color: #f8f9fa;
   stroke: #f8f9fa;
 }
 
-/*==================== Modal Contente ========================*/
+/*==================== Modal Content ========================*/
 .modalContent p {
   margin-bottom: 16px;
   color: #1f2937;
@@ -558,14 +638,15 @@ color: #f8f9fa;
 
   .card {
     padding: 16px;
-    gap: 12px;
-    background: #fff;
+    gap: 4px;
+    background: #f1f3df;
     border-radius: 12px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
+    transition: box-shadow 0.3s ease;
   }
 
   .card:hover {
@@ -597,12 +678,15 @@ color: #f8f9fa;
     justify-content: center;
     gap: 8px;
     flex-wrap: wrap;
+    display: flex;
   }
 
   .actionButton {
     padding: 8px 12px;
     font-size: 14px;
+    cursor: pointer;
   }
+
   .actionButton:hover {
     background-color: #4b5563;
   }
