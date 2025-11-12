@@ -51,21 +51,25 @@
 }
 
 .alunoList {
+  background-color: #181531;
+  border-radius: 12px;
   list-style: none;
-  padding: 0;
+  padding: 20px;
   margin: 0;
   display: flex;
   flex-wrap: wrap;
   gap: 32px;
-  justify-content: flex-start;
+  justify-content: center;
 }
 
 .alunoItem {
   border-radius: 21px;
   box-shadow: 0 8px 30px 0 #8338ec22;
   padding: 38px 30px 28px;
-  min-width: 340px;
+  flex-grow: 1;
+  flex-basis: calc((100% / 4) - 32px);
   max-width: 370px;
+  min-width: 280px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -78,45 +82,46 @@
 
 /* Alternância de cores */
 .alunoItem:nth-child(5n + 1) {
-  border-left-color: #06d6a0;
-  background: linear-gradient(120deg, #fff 40%, #34d399 100%);
+  border-left-color: #49a713;
+  //background: linear-gradient(120deg, #fff 40%, #34d399 100%);
+  background: linear-gradient(120deg, #34d399 10%, #fff 60%, #34d399 90%);
 }
 .alunoItem:nth-child(5n + 2) {
   border-left-color: #ef4444;
-  background: linear-gradient(120deg, #fff 40%, #f87171 100%);
+  background: linear-gradient(120deg, #f87171 10%, #fff 60%, #f87171 90%);
 }
 .alunoItem:nth-child(5n + 3) {
   border-left-color: #2563eb;
-  background: linear-gradient(120deg, #fff 40%, #60a5fa 100%);
+  background: linear-gradient(120deg, #60a5fa 10%, #fff 60%, #60a5fa 90%);
 }
 .alunoItem:nth-child(5n + 4) {
   border-left-color: #b45309;
-  background: linear-gradient(120deg, #fff 40%, #fbbf24 100%);
+  background: linear-gradient(120deg, #fbbf24 10%, #fff 60%, #fbbf24 90%);
 }
 .alunoItem:nth-child(5n + 5) {
   border-left-color: #7c3aed;
-  background: linear-gradient(120deg, #fff 40%, #a78bfa 100%);
+  background: linear-gradient(120deg, #a78bfa 10%, #fff 60%, #a78bfa 90%);
 }
 
 /* Hover com inversão de cor por item */
 .alunoItem:nth-child(5n + 1):hover {
-  background: #06d6a0;
-  border-left-color: #34d399;
+  border-left-color: #06d6a0;
+  background: linear-gradient(120deg, #fff 10%, #34d399 40%, #fff 90%);
 }
 .alunoItem:nth-child(5n + 2):hover {
-  background: #ef4444;
+  background: linear-gradient(120deg, #fff 10%, #f87171 40%, #fff 90%);
   border-left-color: #f87171;
 }
 .alunoItem:nth-child(5n + 3):hover {
-  background: #2563eb;
+  background: linear-gradient(120deg, #fff 10%, #60a5fa 40%, #fff 90%);
   border-left-color: #60a5fa;
 }
 .alunoItem:nth-child(5n + 4):hover {
-  background: #b45309;
+  background: linear-gradient(120deg, #fff 10%, #fbbf24 40%, #fff 90%);
   border-left-color: #fbbf24;
 }
 .alunoItem:nth-child(5n + 5):hover {
-  background: #7c3aed;
+  background: linear-gradient(120deg, #fff 10%, #a78bfa 40%, #fff 90%);
   border-left-color: #a78bfa;
 }
 
@@ -149,6 +154,7 @@
   color: #22223b;
 }
 
+/*
 .alunoLink:hover {
   background: linear-gradient(90deg, #ff6b6b 40%, #fbbf24 100%);
   color: #fff;
@@ -156,6 +162,7 @@
   box-shadow: 0 3px 18px #fbbf2477;
   transform: scale(1.04);
 }
+*/
 
 .alert {
   text-align: center;
