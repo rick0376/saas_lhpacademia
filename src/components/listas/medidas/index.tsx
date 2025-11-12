@@ -6,6 +6,8 @@ import Link from "next/link";
 import { MedidasList } from "@/components/medidas/MedidasList";
 import styles from "./styles.module.scss";
 
+import { FiSearch } from "react-icons/fi";
+
 interface Aluno {
   id: string;
   nome: string;
@@ -19,6 +21,7 @@ export default function MedidasClient() {
   const [alunos, setAlunos] = useState<Aluno[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [busca, setBusca] = useState("");
 
   useEffect(() => {
     if (!alunoId) {
@@ -32,12 +35,8 @@ export default function MedidasClient() {
           setAlunos(data);
           setError("");
         })
-        .catch(() => {
-          setError("Erro ao carregar alunos");
-        })
-        .finally(() => {
-          setLoading(false);
-        });
+        .catch(() => setError("Erro ao carregar alunos"))
+        .finally(() => setLoading(false));
     }
   }, [alunoId]);
 
@@ -54,13 +53,40 @@ export default function MedidasClient() {
 
   if (loading) return <p>Carregando alunos...</p>;
   if (error) return <p>{error}</p>;
-  if (alunos.length === 0) return <p>Nenhum aluno encontrado.</p>;
+
+  // Filtro incremental, busca por início e insensível a maiúscula/minúscula
+  const buscaNormalizada = busca.trim().toLowerCase();
+  const alunosFiltrados =
+    buscaNormalizada === ""
+      ? alunos
+      : alunos.filter((a) =>
+          a.nome
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .startsWith(
+              buscaNormalizada.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            )
+        );
+
+  if (alunosFiltrados.length === 0) return <p>Nenhum aluno encontrado.</p>;
 
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>Selecione um aluno para ver as medidas</h1>
+      <div className={styles.searchWrapper}>
+        <input
+          className={styles.searchInput}
+          type="text"
+          placeholder="Digite o nome do aluno..."
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+          autoFocus
+        />
+        <FiSearch className={styles.searchIcon} />
+      </div>
       <ul className={styles.alunoList}>
-        {alunos.map((aluno) => (
+        {alunosFiltrados.map((aluno) => (
           <li key={aluno.id} className={styles.alunoItem}>
             <Link
               href={`/dashboard/medidas?alunoId=${
