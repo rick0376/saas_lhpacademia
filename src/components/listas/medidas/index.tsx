@@ -92,7 +92,7 @@ export default function MedidasClient() {
               href={`/dashboard/medidas?alunoId=${
                 aluno.id
               }&alunoNome=${encodeURIComponent(aluno.nome)}`}
-              className={styles.alunoLink}
+              className={styles.alunoLink} // Opcional, pode criar uma classe para link total
             >
               {aluno.nome}
             </Link>
