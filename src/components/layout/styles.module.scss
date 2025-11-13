@@ -13,7 +13,7 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  background: linear-gradient(135deg, #9882ee 0%, #7a5fca 50%, #856de2 100%);
+  background: linear-gradient(90deg, #6a11cb 0%, #2575fc 50%, #29abe2 100%);
   border-bottom: 2px solid #7c3aed;
   box-shadow: 0 4px 28px rgba(124, 58, 237, 0.7);
   backdrop-filter: blur(20px);
@@ -57,9 +57,9 @@
   justify-content: center;
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, #7b64da 0%, #7a5fca 50%, #765fd4 100%);
+  background: linear-gradient(135deg, #5b0ecc 0%, #1f5efb 60%, #218be6 100%);
   border-radius: 14px;
-  box-shadow: 0 8px 32px rgba(98, 77, 184, 0.3);
+  box-shadow: 0 4px 15px rgba(33, 139, 230, 0.5);
 
   svg {
     transition: all 0.3s ease;
@@ -67,7 +67,7 @@
   }
 
   &:hover {
-    background: linear-gradient(135deg, #5d2691, #5a0f9b);
+    background: linear-gradient(135deg, #4509b8 0%, #1a4ee0 65%, #1f7be6 100%);
     border-color: #5a0f9b;
     transform: translateY(-3px) scale(1.05);
     box-shadow: 0 8px 28px rgba(113, 71, 151, 0.3);
@@ -165,7 +165,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 1.8rem 1.4rem;
-  background: #7c3aed; /* fundo roxo */
+  background: linear-gradient(90deg, #6a11cb 0%, #2575fc 50%, #29abe2 100%);
   border-bottom: 2px solid #553a8a;
   box-shadow: 0 6px 30px rgba(75, 38, 154, 0.8);
   color: white; /* texto branco */
@@ -183,8 +183,8 @@
     height: 36px;
     border-radius: 12px;
     background-color: white;
-    border: 2px solid #7c3aed;
-    color: #7c3aed;
+    border-color: #184ed0;
+    border-color: #184ed0;
     cursor: pointer;
     transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
     display: flex;
@@ -193,10 +193,11 @@
     box-shadow: none;
 
     &:hover {
-      background-color: #a78bfa;
+      background: linear-gradient(90deg, #430e97 0%, #184ed0 55%, #1f72be 100%);
+      box-shadow: 0 14px 45px rgba(34, 85, 247, 0.75);
+      transform: translateY(-3px) scale(1.05);
+      border-color: #184ed0;
       color: white;
-      box-shadow: 0 0 8px #7c3aedaa;
-      transform: scale(1.1);
     }
 
     &:active {
@@ -225,7 +226,7 @@
   padding: 12px 16px;
   font-size: 13px;
   font-weight: 900;
-  color: #7c3aed;
+  color: #184ed0;
   text-transform: uppercase;
   letter-spacing: 0.12em;
   user-select: none;
@@ -239,7 +240,7 @@
   border-radius: 12px;
   font-size: 16px;
   font-weight: 600;
-  color: #5b21b6;
+  color: #184ed0;
   text-decoration: none;
   cursor: pointer;
   background: transparent;
@@ -251,9 +252,8 @@
 
   &:hover {
     background-color: #ede6ff;
-    color: #7c3aed;
-    border-color: #7c3aed;
-
+    border-color: #184ed0;
+    color: #184ed0;
     .navItemIcon {
       color: #7c3aed;
       transform: scale(1.1);
@@ -262,12 +262,12 @@
 
   &.navItemActive {
     background-color: #f3e8ff;
-    border-color: #7c3aed;
-    color: #5b21b6;
+    border-color: #184ed0;
+    color: #184ed0;
     font-weight: 800;
 
     .navItemIcon {
-      color: #7c3aed;
+      color: #184ed0;
       transform: scale(1.15);
     }
   }
@@ -277,7 +277,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #7c3aed;
+  color: #184ed0;
   flex-shrink: 0;
   transition: color 0.3s ease, transform 0.25s ease;
 }
@@ -314,7 +314,7 @@
 
 .navDivider {
   height: 1.5px;
-  background-color: rgba(124, 58, 237, 0.3);
+  background-color: rgba(33, 94, 235, 0.7);
   margin: 0.7rem 0;
 }
 
@@ -359,7 +359,7 @@
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background-color: rgba(124, 58, 237, 0.5);
+  background-color: rgba(33, 94, 235, 0.7);
   margin: 0 10px;
 }
 
@@ -392,7 +392,7 @@
   box-shadow: 0 30px 40px -10px rgba(0, 0, 0, 0.3),
     0 15px 20px -10px rgba(0, 0, 0, 0.2);
   animation: slideUp 0.35s ease;
-  color: #5b21b6;
+  color: #184ed0;
 }
 
 @keyframes slideUp {
@@ -421,14 +421,14 @@
 .modalTitle {
   font-size: 26px;
   font-weight: 900;
-  color: #5b21b6;
+  color: #184ed0;
   text-align: center;
   margin: 0 0 1.25rem 0;
 }
 
 .modalText {
   font-size: 17px;
-  color: #7c3aed;
+  color: #184ed0;
   text-align: center;
   margin: 0 0 3rem 0;
   line-height: 1.7;
@@ -455,8 +455,8 @@
 
 .ghostBtn {
   background: transparent;
-  color: #7c3aed;
-  border: 3px solid #7c3aed;
+  color: #184ed0;
+  border: 3px solid #184ed0;
 
   &:hover {
     background: rgba(124, 58, 237, 0.15);

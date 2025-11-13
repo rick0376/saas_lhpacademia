@@ -85,8 +85,8 @@ export const Layout: React.FC<Props> = ({ children }) => {
     if (href === "/dashboard") {
       return pathname === "/dashboard";
     }
-    if (href === "/aluno/dashboard") {
-      return pathname === "/aluno/dashboard";
+    if (href === "/alunos/dashboard") {
+      return pathname === "/alunos/dashboard";
     }
     // Para os demais, aceita prefixos para subrotas
     return pathname === href || pathname?.startsWith(href + "/");
@@ -106,17 +106,17 @@ export const Layout: React.FC<Props> = ({ children }) => {
           group: "Meu Portal",
           items: [
             {
-              href: "/aluno/dashboard",
+              href: "/alunos/dashboard",
               label: "Dashboard",
               icon: <Home size={18} />,
             },
             {
-              href: "/aluno/treinos",
+              href: "/alunos/treinos",
               label: "Treinos",
               icon: <Dumbbell size={18} />,
             },
             {
-              href: "/aluno/avaliacoes",
+              href: "/alunos/avaliacoes",
               label: "Avaliações",
               icon: <FileText size={18} />,
             }, // ADICIONADO
@@ -127,7 +127,7 @@ export const Layout: React.FC<Props> = ({ children }) => {
             },
 
             {
-              href: "/aluno/calendario",
+              href: "/alunos/calendario",
               label: "Calendário",
               icon: <Calendar size={18} />,
             },
@@ -154,7 +154,7 @@ export const Layout: React.FC<Props> = ({ children }) => {
                   icon: <Users size={18} />,
                 },
                 {
-                  href: "/dashboard/avaliacoes",
+                  href: "/dashboard/alunos/avaliacoes",
                   label: "Avaliações",
                   icon: <FileText size={18} />,
                 }, // ADICIONADO

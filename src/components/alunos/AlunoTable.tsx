@@ -222,6 +222,16 @@ export const AlunoTable = () => {
                     </Link>
 
                     <Link
+                      href={`/dashboard/alunos/${aluno.id}/avaliacoes`}
+                      title="Nova AvaliaçãoLista"
+                      aria-label={`Nova avaliação ${aluno.nome}`}
+                      className={styles.iconAvaliar}
+                    >
+                      <ClipboardCheck className={styles.iconAvaliacao} />
+                      <span className={styles.iconTextAvaliar}>Avaliação</span>
+                    </Link>
+
+                    <Link
                       href={`/dashboard/medidas?alunoId=${
                         aluno.id
                       }&alunoNome=${encodeURIComponent(aluno.nome)}`}
