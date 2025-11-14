@@ -79,16 +79,15 @@ export const Layout: React.FC<Props> = ({ children }) => {
     return () => document.removeEventListener("mousedown", onClick);
   }, [menuOpen]);
 
-  // Nova função isActive mais precisa
   const isActive = (href: string) => {
-    // Casos especiais para rotas raiz para evitar falsos positivos
+    if (!pathname) return false;
     if (href === "/dashboard") {
       return pathname === "/dashboard";
     }
     if (href === "/alunos/dashboard") {
       return pathname === "/alunos/dashboard";
     }
-    // Para os demais, aceita prefixos para subrotas
+    // compara exato ou subrotas
     return pathname === href || pathname?.startsWith(href + "/");
   };
 
@@ -119,13 +118,12 @@ export const Layout: React.FC<Props> = ({ children }) => {
               href: "/alunos/avaliacoes",
               label: "Avaliações",
               icon: <FileText size={18} />,
-            }, // ADICIONADO
+            },
             {
               href: "/dashboard/medidas",
               label: "Medidas",
               icon: <Ruler size={18} />,
             },
-
             {
               href: "/alunos/calendario",
               label: "Calendário",
@@ -154,15 +152,15 @@ export const Layout: React.FC<Props> = ({ children }) => {
                   icon: <Users size={18} />,
                 },
                 {
-                  href: "/dashboard/alunos/avaliacoes",
+                  href: "/alunos/avaliacoes",
                   label: "Avaliações",
                   icon: <FileText size={18} />,
-                }, // ADICIONADO
+                },
                 {
                   href: "/dashboard/medidas",
                   label: "Medidas",
                   icon: <Ruler size={18} />,
-                }, // CONFIRMAR ROTA
+                },
               ],
             },
             {

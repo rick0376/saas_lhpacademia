@@ -1,6 +1,4 @@
-// src/app/dashboard/alunos/[id]/avaliacoes/page.tsx
-
-import { prisma } from "@/lib/prisma"; // Ajuste o caminho conforme necessário
+import { prisma } from "@/lib/prisma"; // ajuste o caminho conforme seu projeto
 import { format } from "date-fns";
 import Link from "next/link";
 import styles from "./styles.module.scss";
@@ -18,19 +16,13 @@ interface Props {
 }
 
 export default async function AvaliacoesPage({ params }: Props) {
-  const alunoId = params.id; // ID do aluno a partir dos parâmetros da URL
+  const alunoId = params.id;
 
-  // Buscando o aluno com o ID
   const aluno = await prisma.aluno.findUnique({
     where: { id: alunoId },
     select: { nome: true },
   });
 
-  if (!aluno) {
-    return <div>Aluno não encontrado.</div>;
-  }
-
-  // Buscando as avaliações do aluno
   const avaliacoes = await prisma.avaliacao.findMany({
     where: { alunoId },
     select: {
@@ -52,6 +44,7 @@ export default async function AvaliacoesPage({ params }: Props) {
         <Link
           href={`/dashboard/alunos/${alunoId}/avaliacoes/nova`}
           title="Nova Avaliação"
+          aria-label={`Nova avaliação ${aluno?.nome ?? ""}`}
           className={styles.iconAvaliar}
         >
           Nova Avaliação
@@ -62,6 +55,7 @@ export default async function AvaliacoesPage({ params }: Props) {
         <p className={styles.noData}>Sem avaliações cadastradas.</p>
       ) : (
         <>
+          {/* Tabela visível em telas maiores */}
           <table className={styles.table}>
             <thead className={styles.tableHead}>
               <tr className={styles.tableHeadRow}>
@@ -107,6 +101,7 @@ export default async function AvaliacoesPage({ params }: Props) {
             </tbody>
           </table>
 
+          {/* Cards visíveis em telas menores */}
           <div className={styles.cardsContainer}>
             {avaliacoes.map((av) => (
               <div key={av.id} className={styles.card}>

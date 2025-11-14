@@ -10,7 +10,7 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  // ✅ ROTAS PÚBLICAS
+  // Rotas públicas que não exigem autenticação
   const publicRoutes = ["/", "/login", "/login-superadmin", "/alunos/login"];
   const isPublicRoute = publicRoutes.some((route) => pathname === route);
 
@@ -18,20 +18,20 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // ✅ ROTAS DO ALUNO (/alunos/*)
+  // Rotas de /alunos/**: permitido para ALUNO, ADMIN e SUPERADMIN
   if (pathname.startsWith("/alunos")) {
     if (!token) {
       return NextResponse.redirect(new URL("/alunos/login", request.url));
     }
 
-    if (token.role !== "ALUNO") {
+    if (!["ALUNO", "ADMIN", "SUPERADMIN"].includes(token.role)) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
 
     return NextResponse.next();
   }
 
-  // ✅ ROTAS DO DASHBOARD (/dashboard/*)
+  // Rotas de /dashboard/**:
   if (pathname.startsWith("/dashboard")) {
     if (!token) {
       return NextResponse.redirect(new URL("/", request.url));
@@ -41,7 +41,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/alunos/dashboard", request.url));
     }
 
-    // ✅ ROTAS APENAS PARA SUPERADMIN
+    // Rotas restritas a SUPERADMIN
     const superAdminOnlyRoutes = [
       "/dashboard/clientes",
       "/dashboard/permissoes",
@@ -55,13 +55,11 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
 
-    // ✅ /dashboard/usuarios permite SUPERADMIN e ADMIN
-    // Testando o commit
-
-    // ADMIN e SUPERADMIN → permite acesso
+    // ADMIN e SUPERADMIN têm acesso às demais rotas dashboard
     return NextResponse.next();
   }
 
+  // Outras rotas públicas ou não protegidas
   return NextResponse.next();
 }
 

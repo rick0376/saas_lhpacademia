@@ -43,8 +43,8 @@ export default async function DashboardPage() {
       title: "Avaliações",
       description: "Gerenciar avaliações de alunos",
       icon: "📊",
-      href: "/dashboard/alunos",
-      color: "#06b6d4",
+      href: "/alunos/avaliacoes",
+      color: "#60daf0ff",
       adminOnly: true,
     },
     {
