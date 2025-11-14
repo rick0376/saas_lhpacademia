@@ -1,5 +1,3 @@
-// src/app/dashboard/alunos/[id]/avaliacoes/page.tsx
-
 import { prisma } from "@/lib/prisma"; // Ajuste o caminho conforme necessário
 import { format } from "date-fns";
 import Link from "next/link";
@@ -13,14 +11,13 @@ interface Avaliacao {
   observacoes: string | null;
 }
 
-interface Props {
-  params: { id: string };
-}
+export default async function AvaliacoesPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id: alunoId } = await params; // <- AQUI resolve o params
 
-export default async function AvaliacoesPage({ params }: Props) {
-  const alunoId = params.id; // ID do aluno a partir dos parâmetros da URL
-
-  // Buscando o aluno com o ID
   const aluno = await prisma.aluno.findUnique({
     where: { id: alunoId },
     select: { nome: true },
@@ -30,7 +27,6 @@ export default async function AvaliacoesPage({ params }: Props) {
     return <div>Aluno não encontrado.</div>;
   }
 
-  // Buscando as avaliações do aluno
   const avaliacoes = await prisma.avaliacao.findMany({
     where: { alunoId },
     select: {
