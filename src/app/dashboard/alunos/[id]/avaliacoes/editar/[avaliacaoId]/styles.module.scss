@@ -1,0 +1,264 @@
+/* Container geral */
+.container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  font-family: "Inter", sans-serif;
+  color: #222; /* cor legível para textos no fundo branco */
+}
+
+/* Header */
+.header {
+  margin-bottom: 2rem;
+}
+
+.headerContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #0070f3;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: color 0.2s ease;
+}
+.backLink:hover {
+  color: #005bb5;
+}
+
+/* Títulos de seção */
+.section {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 2rem;
+  background-color: #fff;
+}
+
+/* Título das seções com ícones alinhados */
+.sectionTitle {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #333;
+}
+
+/* Ícones dentro dos títulos da seção */
+.icon {
+  color: #0070f3;
+}
+
+/* Estrutura padrão de inputs e labels */
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+.inputGroup label {
+  margin-bottom: 0.4rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #444;
+}
+
+.inputGroup input[type="text"],
+.inputGroup input[type="number"],
+.inputGroup input[type="date"],
+.inputGroup select,
+.inputGroup textarea {
+  padding: 0.5rem 0.6rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  transition: border-color 0.15s ease-in-out;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.inputGroup input[type="text"]:focus,
+.inputGroup input[type="number"]:focus,
+.inputGroup input[type="date"]:focus,
+.inputGroup select:focus,
+.inputGroup textarea:focus {
+  border-color: #0070f3;
+  outline: none;
+}
+
+/* Inputs com leitura apenas */
+.input[readonly] {
+  background-color: #f7f7f7;
+  color: #666;
+  cursor: not-allowed;
+}
+
+/* Checkbox grupo */
+.checkboxGroup {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap; /* para evitar que fiquem cortados em telas pequenas */
+  align-items: center;
+}
+
+.checkboxGroup label {
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: #222;
+}
+
+.checkboxGroup input[type="checkbox"] {
+  cursor: pointer;
+  accent-color: #0070f3;
+  width: 16px;
+  height: 16px;
+}
+
+/* Grid para Dobras Cutâneas */
+.inputGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.sectionSubTitle {
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.3rem;
+  color: #555;
+}
+
+/* Row para inputs lado a lado */
+.inputRow {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+/* Mensagens de erro */
+.errorContainer {
+  background-color: #ffe1e1;
+  border: 1px solid #e60000;
+  color: #b70000;
+  padding: 0.8rem 1rem;
+  border-radius: 5px;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+/* Ícone de erro */
+.errorIcon {
+  color: #b70000;
+}
+
+/* Mensagem de sucesso */
+.successContainer {
+  text-align: center;
+  padding: 2rem;
+  background-color: #e6ffed;
+  border: 1px solid #4bb543;
+  border-radius: 6px;
+  color: #27632a;
+  font-weight: 700;
+}
+
+.successIcon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+/* File Input customizado */
+.fileInput {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.fileInput input[type="file"] {
+  cursor: pointer;
+}
+
+/* Botões de ação do formulário */
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.submitButton,
+.cancelButton {
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0.7rem 1.4rem;
+  border-radius: 5px;
+  border: none;
+  font-size: 1rem;
+  user-select: none;
+  transition: background-color 0.3s ease;
+}
+
+.submitButton {
+  background-color: #0070f3;
+  color: white;
+}
+
+.submitButton:hover:not(:disabled) {
+  background-color: #005bb5;
+}
+
+.submitButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cancelButton {
+  background-color: #f0f0f0;
+  color: #555;
+}
+
+.cancelButton:hover {
+  background-color: #cacaca;
+}
+
+/* Pequena estilização para textos */
+.classificacao {
+  font-style: italic;
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 0.25rem;
+}
+
+/* Estilos responsivos simples */
+@media (max-width: 600px) {
+  .inputRow {
+    flex-direction: column;
+  }
+  .checkboxGroup {
+    flex-direction: column;
+  }
+  .inputGrid {
+    grid-template-columns: 1fr;
+  }
+  .formActions {
+    justify-content: center;
+  }
+}

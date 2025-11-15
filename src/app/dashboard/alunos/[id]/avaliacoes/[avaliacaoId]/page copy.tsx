@@ -4,8 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { ArrowLeft, Edit, Delete, Share2 } from "lucide-react";
-import { jsPDF } from "jspdf";
+import { ArrowLeft, Edit, Delete } from "lucide-react";
 import styles from "./styles.module.scss";
 import { Toast } from "@/components/ui/Toast/Toast";
 import { ConfirmModal } from "@/components/ui/ConfirmModal/ConfirmModal";
@@ -56,7 +55,6 @@ export default function AvaliacaoPage() {
 
   const alunoId = params.id as string;
   const avaliacaoId = params.avaliacaoId as string;
-  const [nomeAluno, setNomeAluno] = useState<string | null>(null);
 
   const [avaliacao, setAvaliacao] = useState<Avaliacao | null>(null);
   const [loading, setLoading] = useState(true);
@@ -93,27 +91,6 @@ export default function AvaliacaoPage() {
     fetchAvaliacao();
   }, [session, alunoId, avaliacaoId]);
 
-  useEffect(() => {
-    if (!session?.user || !alunoId) {
-      setError("Acesso negado ou aluno não encontrado.");
-      setLoading(false);
-      return;
-    }
-
-    async function fetchAluno() {
-      try {
-        const res = await fetch(`/api/alunos/${alunoId}`);
-        if (!res.ok) throw new Error("Aluno não encontrado.");
-        const data = await res.json();
-        setNomeAluno(data.nome); // Ajuste para o campo real do nome retornado
-      } catch (err: any) {
-        setError(err.message);
-      }
-    }
-
-    fetchAluno();
-  }, [session, alunoId]);
-
   function showToast(
     message: string,
     type: "success" | "error" | "info" | "warning"
@@ -147,148 +124,25 @@ export default function AvaliacaoPage() {
     }
   };
 
-  const safeNum = (num: number | null | undefined) => (num != null ? num : "-");
-
-  // Gera texto formatado para enviar pelo WhatsApp
-  const gerarTextoWhatsApp = (a: Avaliacao) => {
-    return encodeURIComponent(`
-Avaliação Física:
-Tipo: ${a.tipo ?? "-"}
-Data: ${a.data ? new Date(a.data).toLocaleDateString() : "-"}
-
-Histórico Médico: ${a.historicoMedico ?? "-"}
-Objetivos: ${a.objetivos ?? "-"}
-Prática Anterior: ${a.praticaAnterior ?? "-"}
-
-Fumante: ${a.fumante ? "Sim" : "Não"}
-Diabetes: ${a.diabetes ? "Sim" : "Não"}
-Doenças Articulares: ${a.doencasArticulares ? "Sim" : "Não"}
-Cirurgias: ${a.cirurgias ?? "-"}
-
-Peso: ${safeNum(a.peso)} kg
-Altura: ${safeNum(a.altura)} cm
-IMC: ${safeNum(a.imc)}
-% Gordura Corporal: ${safeNum(a.percentualGordura)}%
-Circunferência Cintura: ${safeNum(a.circunferenciaCintura)} cm
-Circunferência Quadril: ${safeNum(a.circunferenciaQuadril)} cm
-
-Dobras Cutâneas (mm):
- Subescapular: ${a.dobrasCutaneas?.subescapular ?? "-"}
- Tríceps: ${a.dobrasCutaneas?.triceps ?? "-"}
- Peitoral: ${a.dobrasCutaneas?.peitoral ?? "-"}
- Axilar: ${a.dobrasCutaneas?.axilar ?? "-"}
- Suprailiaca: ${a.dobrasCutaneas?.suprailiaca ?? "-"}
- Abdominal: ${a.dobrasCutaneas?.abdominal ?? "-"}
- Femural: ${a.dobrasCutaneas?.femural ?? "-"}
-
-VO2 Max: ${safeNum(a.vo2Max)}
-Teste de Cooper: ${safeNum(a.testeCooper)}
-
-Força Supino: ${safeNum(a.forcaSupino)} kg
-Repetições Flexões: ${safeNum(a.repeticoesFlexoes)}
-Tempo Prancha: ${safeNum(a.pranchaTempo)} s
-
-Teste Sentar e Esticar: ${safeNum(a.testeSentarEsticar)} cm
-
-Resultado: ${a.resultado ?? "-"}
-Observações: ${a.observacoes ?? "-"}
-    `);
-  };
-
-  // Abre WhatsApp com texto da avaliação
-  const enviarWhatsApp = () => {
-    if (!avaliacao) return;
-    const text = gerarTextoWhatsApp(avaliacao);
-    const url = `https://wa.me/?text=${text}`;
-    window.open(url, "_blank");
-  };
-
-  // Gera pdf da avaliação com jsPDF
-  const gerarPdf = () => {
-    if (!avaliacao) return;
-    const doc = new jsPDF();
-
-    doc.setFontSize(16);
-    doc.text("Avaliação Física", 10, 10);
-    doc.setFontSize(12);
-    doc.text(`Tipo: ${avaliacao.tipo ?? "-"}`, 10, 20);
-    doc.text(
-      `Data: ${
-        avaliacao.data ? new Date(avaliacao.data).toLocaleDateString() : "-"
-      }`,
-      10,
-      30
-    );
-
-    // Exemplo acrescentar campos; incrementa a posição y para não sobrepor
-    let y = 40;
-    const linha = (
-      label: string,
-      value: string | number | null | undefined
-    ) => {
-      doc.text(`${label}: ${value ?? "-"}`, 10, y);
-      y += 10;
-    };
-
-    linha("Histórico Médico", avaliacao.historicoMedico);
-    linha("Objetivos", avaliacao.objetivos);
-    linha("Prática Anterior", avaliacao.praticaAnterior);
-    linha("Fumante", avaliacao.fumante ? "Sim" : "Não");
-    linha("Diabetes", avaliacao.diabetes ? "Sim" : "Não");
-    linha("Doenças Articulares", avaliacao.doencasArticulares ? "Sim" : "Não");
-    linha("Cirurgias", avaliacao.cirurgias);
-
-    linha("Peso (kg)", safeNum(avaliacao.peso));
-    linha("Altura (cm)", safeNum(avaliacao.altura));
-    linha("IMC", safeNum(avaliacao.imc));
-    linha("% Gordura Corporal", safeNum(avaliacao.percentualGordura));
-    linha(
-      "Circunferência Cintura (cm)",
-      safeNum(avaliacao.circunferenciaCintura)
-    );
-    linha(
-      "Circunferência Quadril (cm)",
-      safeNum(avaliacao.circunferenciaQuadril)
-    );
-
-    if (avaliacao.dobrasCutaneas) {
-      linha("Subescapular (mm)", avaliacao.dobrasCutaneas.subescapular);
-      linha("Tríceps (mm)", avaliacao.dobrasCutaneas.triceps);
-      linha("Peitoral (mm)", avaliacao.dobrasCutaneas.peitoral);
-      linha("Axilar (mm)", avaliacao.dobrasCutaneas.axilar);
-      linha("Suprailiaca (mm)", avaliacao.dobrasCutaneas.suprailiaca);
-      linha("Abdominal (mm)", avaliacao.dobrasCutaneas.abdominal);
-      linha("Femural (mm)", avaliacao.dobrasCutaneas.femural);
-    }
-
-    linha("VO2 Max (ml/kg/min)", safeNum(avaliacao.vo2Max));
-    linha("Teste de Cooper (m)", safeNum(avaliacao.testeCooper));
-
-    linha("Força Supino (kg)", safeNum(avaliacao.forcaSupino));
-    linha("Repetições Flexões", safeNum(avaliacao.repeticoesFlexoes));
-    linha("Tempo Prancha (s)", safeNum(avaliacao.pranchaTempo));
-
-    linha("Teste Sentar e Esticar (cm)", safeNum(avaliacao.testeSentarEsticar));
-
-    linha("Resultado", avaliacao.resultado);
-    linha("Observações", avaliacao.observacoes);
-
-    doc.save(`avaliacao-${avaliacao.id}.pdf`);
-  };
-
   if (loading) return <div>Carregando...</div>;
+
   if (error)
     return (
       <div className={styles.errorContainer}>
         <p>{error}</p>
       </div>
     );
+
   if (!avaliacao)
     return (
       <div className={styles.errorContainer}>
         <p>Avaliação não encontrada.</p>
       </div>
     );
+
+  // Helper para números com fallback
+  const safeNum = (num: number | null | undefined) =>
+    num !== null && num !== undefined ? num : "-";
 
   return (
     <div className={styles.container}>
@@ -324,14 +178,12 @@ Observações: ${a.observacoes ?? "-"}
           </Link>
           <h1 className={styles.title}>Detalhes da Avaliação</h1>
           <p>
-            Avaliação {avaliacao.tipo ?? "-"} para o aluno{" "}
-            {nomeAluno ?? alunoId}
+            Avaliação de {avaliacao.tipo ?? "-"} para o aluno {alunoId}
           </p>
         </div>
       </div>
 
       <div className={styles.card}>
-        {/* Informações Básicas */}
         <h3>Informações Básicas</h3>
         <p>
           <strong>Tipo:</strong> {avaliacao.tipo ?? "-"}
@@ -341,7 +193,6 @@ Observações: ${a.observacoes ?? "-"}
           {avaliacao.data ? new Date(avaliacao.data).toLocaleDateString() : "-"}
         </p>
 
-        {/* Anamnese */}
         <h3>Anamnese</h3>
         <p>
           <strong>Histórico Médico:</strong> {avaliacao.historicoMedico ?? "-"}
@@ -366,7 +217,6 @@ Observações: ${a.observacoes ?? "-"}
           <strong>Cirurgias:</strong> {avaliacao.cirurgias ?? "-"}
         </p>
 
-        {/* Antropometria */}
         <h3>Antropometria</h3>
         <p>
           <strong>Peso:</strong> {safeNum(avaliacao.peso)} kg
@@ -390,7 +240,6 @@ Observações: ${a.observacoes ?? "-"}
           {safeNum(avaliacao.circunferenciaQuadril)} cm
         </p>
 
-        {/* Dobras Cutâneas */}
         <h3>Dobras Cutâneas</h3>
         <p>
           <strong>Subescapular:</strong>{" "}
@@ -420,7 +269,6 @@ Observações: ${a.observacoes ?? "-"}
           mm
         </p>
 
-        {/* Cardiorespiratória */}
         <h3>Cardiorespiratória</h3>
         <p>
           <strong>VO2 Max:</strong> {safeNum(avaliacao.vo2Max)}
@@ -429,7 +277,6 @@ Observações: ${a.observacoes ?? "-"}
           <strong>Teste de Cooper:</strong> {safeNum(avaliacao.testeCooper)}
         </p>
 
-        {/* Força Muscular */}
         <h3>Força Muscular</h3>
         <p>
           <strong>Força Supino:</strong> {safeNum(avaliacao.forcaSupino)} kg
@@ -442,14 +289,12 @@ Observações: ${a.observacoes ?? "-"}
           <strong>Tempo Prancha:</strong> {safeNum(avaliacao.pranchaTempo)} s
         </p>
 
-        {/* Flexibilidade */}
         <h3>Flexibilidade</h3>
         <p>
           <strong>Teste Sentar e Esticar:</strong>{" "}
           {safeNum(avaliacao.testeSentarEsticar)} cm
         </p>
 
-        {/* Observações */}
         <h3>Observações</h3>
         <p>
           <strong>Resultado:</strong> {avaliacao.resultado ?? "-"}
@@ -470,40 +315,22 @@ Observações: ${a.observacoes ?? "-"}
             </a>
           </div>
         )}
-      </div>
 
-      {/* Ações */}
-      <div className={styles.formActions}>
-        <Link
-          href={`/dashboard/alunos/${alunoId}/avaliacoes/editar/${avaliacaoId}`}
-          className={`${styles.buttonBase} ${styles.submitButton}`}
-        >
-          <Edit size={20} /> Editar
-        </Link>
-
-        <button
-          type="button"
-          className={`${styles.buttonBase} ${styles.whatsappButton}`}
-          onClick={() => enviarWhatsApp()}
-        >
-          <Share2 size={20} /> WhatsApp
-        </button>
-
-        <button
-          type="button"
-          className={`${styles.buttonBase} ${styles.pdfButton}`}
-          onClick={() => gerarPdf()}
-        >
-          Gerar PDF
-        </button>
-
-        <button
-          type="button"
-          className={`${styles.buttonBase} ${styles.deleteButton}`}
-          onClick={openConfirm}
-        >
-          <Delete size={20} /> Excluir
-        </button>
+        <div className={styles.formActions}>
+          <Link
+            href={`/dashboard/alunos/${alunoId}/avaliacoes/editar/${avaliacaoId}`}
+            className={styles.submitButton}
+          >
+            <Edit size={20} /> Editar Avaliação
+          </Link>
+          <button
+            type="button"
+            className={styles.deleteButton}
+            onClick={openConfirm}
+          >
+            <Delete size={20} /> Excluir Avaliação
+          </button>
+        </div>
       </div>
     </div>
   );
