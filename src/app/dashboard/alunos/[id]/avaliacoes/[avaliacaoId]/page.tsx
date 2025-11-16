@@ -105,7 +105,7 @@ export default function AvaliacaoPage() {
         const res = await fetch(`/api/alunos/${alunoId}`);
         if (!res.ok) throw new Error("Aluno não encontrado.");
         const data = await res.json();
-        setNomeAluno(data.nome); // Ajuste para o campo real do nome retornado
+        setNomeAluno(data.nome);
       } catch (err: any) {
         setError(err.message);
       }
@@ -149,50 +149,69 @@ export default function AvaliacaoPage() {
 
   const safeNum = (num: number | null | undefined) => (num != null ? num : "-");
 
+  // Linha divisor
+  const divisor = "-------------------------------------------------";
+
   // Gera texto formatado para enviar pelo WhatsApp
   const gerarTextoWhatsApp = (a: Avaliacao) => {
     return encodeURIComponent(`
-Avaliação Física:
-Tipo: ${a.tipo ?? "-"}
-Data: ${a.data ? new Date(a.data).toLocaleDateString() : "-"}
+*Avaliação Física:*
+*Tipo:* ${a.tipo ?? "-"}
+*Data:* ${a.data ? new Date(a.data).toLocaleDateString() : "-"}
 
-Histórico Médico: ${a.historicoMedico ?? "-"}
-Objetivos: ${a.objetivos ?? "-"}
-Prática Anterior: ${a.praticaAnterior ?? "-"}
+${divisor}
 
-Fumante: ${a.fumante ? "Sim" : "Não"}
-Diabetes: ${a.diabetes ? "Sim" : "Não"}
-Doenças Articulares: ${a.doencasArticulares ? "Sim" : "Não"}
-Cirurgias: ${a.cirurgias ?? "-"}
+*Histórico Médico:* ${a.historicoMedico ?? "-"}
+*Objetivos:* ${a.objetivos ?? "-"}
+*Prática Anterior:* ${a.praticaAnterior ?? "-"}
 
-Peso: ${safeNum(a.peso)} kg
-Altura: ${safeNum(a.altura)} cm
-IMC: ${safeNum(a.imc)}
-% Gordura Corporal: ${safeNum(a.percentualGordura)}%
-Circunferência Cintura: ${safeNum(a.circunferenciaCintura)} cm
-Circunferência Quadril: ${safeNum(a.circunferenciaQuadril)} cm
+${divisor}
 
-Dobras Cutâneas (mm):
- Subescapular: ${a.dobrasCutaneas?.subescapular ?? "-"}
- Tríceps: ${a.dobrasCutaneas?.triceps ?? "-"}
- Peitoral: ${a.dobrasCutaneas?.peitoral ?? "-"}
- Axilar: ${a.dobrasCutaneas?.axilar ?? "-"}
- Suprailiaca: ${a.dobrasCutaneas?.suprailiaca ?? "-"}
- Abdominal: ${a.dobrasCutaneas?.abdominal ?? "-"}
- Femural: ${a.dobrasCutaneas?.femural ?? "-"}
+*Fumante:* ${a.fumante ? "Sim" : "Não"}
+*Diabetes:* ${a.diabetes ? "Sim" : "Não"}
+*Doenças Articulares:* ${a.doencasArticulares ? "Sim" : "Não"}
+*Cirurgias:* ${a.cirurgias ?? "-"}
 
-VO2 Max: ${safeNum(a.vo2Max)}
-Teste de Cooper: ${safeNum(a.testeCooper)}
+${divisor}
 
-Força Supino: ${safeNum(a.forcaSupino)} kg
-Repetições Flexões: ${safeNum(a.repeticoesFlexoes)}
-Tempo Prancha: ${safeNum(a.pranchaTempo)} s
+*Peso:* ${safeNum(a.peso)} kg
+*Altura:* ${safeNum(a.altura)} cm
+*IMC:* ${safeNum(a.imc)}
+*% Gordura Corporal:* ${safeNum(a.percentualGordura)}%
+*Circunferência Cintura:* ${safeNum(a.circunferenciaCintura)} cm
+*Circunferência Quadril:* ${safeNum(a.circunferenciaQuadril)} cm
 
-Teste Sentar e Esticar: ${safeNum(a.testeSentarEsticar)} cm
+${divisor}
 
-Resultado: ${a.resultado ?? "-"}
-Observações: ${a.observacoes ?? "-"}
-    `);
+*Dobras Cutâneas (mm):*
+  *Subescapular:* ${a.dobrasCutaneas?.subescapular ?? "-"}
+  *Tríceps:* ${a.dobrasCutaneas?.triceps ?? "-"}
+  *Peitoral:* ${a.dobrasCutaneas?.peitoral ?? "-"}
+  *Axilar:* ${a.dobrasCutaneas?.axilar ?? "-"}
+  *Suprailiaca:* ${a.dobrasCutaneas?.suprailiaca ?? "-"}
+  *Abdominal:* ${a.dobrasCutaneas?.abdominal ?? "-"}
+  *Femural:* ${a.dobrasCutaneas?.femural ?? "-"}
+
+${divisor}
+
+*VO2 Max:* ${safeNum(a.vo2Max)}
+*Teste de Cooper:* ${safeNum(a.testeCooper)}
+
+${divisor}
+
+*Força Supino:* ${safeNum(a.forcaSupino)} kg
+*Repetições Flexões:* ${safeNum(a.repeticoesFlexoes)}
+*Tempo Prancha:* ${safeNum(a.pranchaTempo)} s
+
+${divisor}
+
+*Teste Sentar e Esticar:* ${safeNum(a.testeSentarEsticar)} cm
+
+${divisor}
+
+*Resultado:* ${a.resultado ?? "-"}
+*Observações:* ${a.observacoes ?? "-"}
+`);
   };
 
   // Abre WhatsApp com texto da avaliação
@@ -203,36 +222,74 @@ Observações: ${a.observacoes ?? "-"}
     window.open(url, "_blank");
   };
 
-  // Gera pdf da avaliação com jsPDF
   const gerarPdf = () => {
     if (!avaliacao) return;
     const doc = new jsPDF();
 
-    doc.setFontSize(16);
-    doc.text("Avaliação Física", 10, 10);
-    doc.setFontSize(12);
-    doc.text(`Tipo: ${avaliacao.tipo ?? "-"}`, 10, 20);
-    doc.text(
-      `Data: ${
-        avaliacao.data ? new Date(avaliacao.data).toLocaleDateString() : "-"
-      }`,
-      10,
-      30
-    );
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 10;
+    let y = 20;
 
-    // Exemplo acrescentar campos; incrementa a posição y para não sobrepor
-    let y = 40;
+    // Cabeçalho simples
+    const printHeader = () => {
+      doc.setFontSize(16);
+      doc.setTextColor("#000000");
+      doc.text("Avaliação Física", margin, 15);
+    };
+
+    // Rodapé simples com número da página
+    const printFooter = () => {
+      const totalPages = doc.getNumberOfPages();
+      for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        doc.setFontSize(10);
+        doc.setTextColor("#000000");
+        doc.text(
+          `Página ${i} / ${totalPages}`,
+          pageWidth / 2,
+          pageHeight - 10,
+          { align: "center" }
+        );
+      }
+    };
+
+    printHeader();
+
+    doc.setFontSize(12);
+    doc.setTextColor("#000000");
+
     const linha = (
       label: string,
       value: string | number | null | undefined
     ) => {
-      doc.text(`${label}: ${value ?? "-"}`, 10, y);
-      y += 10;
+      const text = `${label}: ${value ?? "-"}`;
+      const maxTextWidth = pageWidth - margin * 2;
+      const splitText = doc.splitTextToSize(text, maxTextWidth);
+
+      // Se ultrapassar altura da página, adiciona nova página e imprime header
+      if (y + splitText.length * 7 > pageHeight - 20) {
+        doc.addPage();
+        printHeader();
+        doc.setFontSize(12);
+        doc.setTextColor("#000000");
+        y = 25;
+      }
+
+      doc.text(splitText, margin, y);
+      y += splitText.length * 7 + 3;
     };
+
+    linha("Tipo", avaliacao.tipo ?? "-");
+    linha(
+      "Data",
+      avaliacao.data ? new Date(avaliacao.data).toLocaleDateString() : "-"
+    );
 
     linha("Histórico Médico", avaliacao.historicoMedico);
     linha("Objetivos", avaliacao.objetivos);
     linha("Prática Anterior", avaliacao.praticaAnterior);
+
     linha("Fumante", avaliacao.fumante ? "Sim" : "Não");
     linha("Diabetes", avaliacao.diabetes ? "Sim" : "Não");
     linha("Doenças Articulares", avaliacao.doencasArticulares ? "Sim" : "Não");
@@ -272,6 +329,8 @@ Observações: ${a.observacoes ?? "-"}
 
     linha("Resultado", avaliacao.resultado);
     linha("Observações", avaliacao.observacoes);
+
+    printFooter();
 
     doc.save(`avaliacao-${avaliacao.id}.pdf`);
   };

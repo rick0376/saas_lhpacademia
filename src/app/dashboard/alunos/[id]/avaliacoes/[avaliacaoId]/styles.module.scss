@@ -30,7 +30,7 @@
 .title {
   font-weight: 900;
   font-size: 2.75rem;
-  color: #3457d5;
+  color: #184ed0;
   letter-spacing: 1.4px;
   line-height: 1.1;
   margin-bottom: 0;
@@ -42,7 +42,7 @@
   align-items: center;
   gap: 10px;
   font-size: 1.1rem;
-  color: #3d63ff;
+  color: #184ed0;
   font-weight: 600;
   text-decoration: none;
   margin-bottom: 1.2rem;
@@ -65,11 +65,11 @@
 }
 
 .card h3 {
-  color: #3a57c6;
+  color: #184ed0;
   font-size: 1.75rem;
   font-weight: 700;
   margin-bottom: 1.2rem;
-  border-bottom: 2px solid #3a57c6;
+  border-bottom: 2px solid #184ed0;
   padding-bottom: 0.3rem;
   letter-spacing: 0.05em;
 }
@@ -84,18 +84,25 @@
   color: #314069;
 }
 
-.formActions {
-  display: flex;
-  flex-wrap: wrap; /* permite quebra, mas também alinhamento horizontal */
-  gap: 1.25rem;
-  justify-content: center; /* centraliza na tela */
+.card p,
+.card p strong {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  overflow-x: hidden;
 }
 
-/* Torna todos os botões iguais na largura e com tamanho harmonizado */
+.formActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  justify-content: center;
+}
+
 .buttonBase {
-  flex: 1; /* ocupa espaço igual entre os botões */
-  min-width: 180px; /* largura mínima para evitar que fiquem muito pequenos */
-  max-width: 220px; /* limita o máximo para não esticar demais */
+  flex: 1;
+  min-width: 180px;
+  max-width: 220px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -112,7 +119,6 @@
   text-transform: uppercase;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 
-  /* Ícones SVG com tamanho consistente */
   svg {
     width: 20px;
     height: 20px;
@@ -312,7 +318,7 @@
   .formActions {
     flex-direction: column;
     gap: 1.2rem;
-    align-items: center; /* centraliza botões na coluna */
+    align-items: center;
   }
 
   /* Para ocupar 100% da largura disponível e manter botão grande */
