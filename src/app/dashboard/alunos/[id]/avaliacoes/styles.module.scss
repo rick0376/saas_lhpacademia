@@ -119,8 +119,6 @@
   background: #2c2c77;
 }
 
-/* Responsividade */
-
 @media (max-width: 480px) {
   .cardsContainer {
     grid-template-columns: 1fr;
@@ -130,9 +128,60 @@
   }
   .iconAvaliar {
     width: 100%;
-    max-width: 100%;
     padding: 0.7rem 0;
     font-size: 1rem;
     margin-left: 0;
   }
+}
+
+/* Ícones coloridos - base com hover distinto */
+
+.iconButtonDelete {
+  color: #ef4444; /* vermelho intenso */
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.iconButtonDelete:hover {
+  color: #9b1c1c; /* vermelho mais escuro/forte */
+}
+
+.iconPerfil {
+  color: #2563eb; /* azul */
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.iconPerfil:hover {
+  color: #1e40af; /* azul escuro */
+}
+
+.iconEditar {
+  color: #f59e0b; /* amarelo */
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.iconEditar:hover {
+  color: #b45309; /* amarelo escuro */
+}
+
+.iconAvaliar {
+  color: #10b981; /* verde */
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.iconAvaliar:hover {
+  color: #065f46; /* verde escuro */
+}
+
+.iconMedidas {
+  color: #3b82f6; /* azul claro */
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.iconMedidas:hover {
+  color: #1e40af; /* azul forte */
 }

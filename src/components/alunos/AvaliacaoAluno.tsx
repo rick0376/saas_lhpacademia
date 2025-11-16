@@ -25,7 +25,7 @@ interface Aluno {
   clienteId: string;
 }
 
-export const AlunoTable = () => {
+export const AvaliacaoAluno = () => {
   const [alunos, setAlunos] = useState<Aluno[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");

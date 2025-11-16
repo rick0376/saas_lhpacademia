@@ -115,7 +115,7 @@ export const Layout: React.FC<Props> = ({ children }) => {
               icon: <Dumbbell size={18} />,
             },
             {
-              href: "/alunos/avaliacoes",
+              href: "/dashboard/avaliacoes",
               label: "Avaliações",
               icon: <FileText size={18} />,
             },
@@ -152,7 +152,7 @@ export const Layout: React.FC<Props> = ({ children }) => {
                   icon: <Users size={18} />,
                 },
                 {
-                  href: "/alunos/avaliacoes",
+                  href: "/dashboard/avaliacoes",
                   label: "Avaliações",
                   icon: <FileText size={18} />,
                 },
