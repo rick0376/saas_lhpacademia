@@ -10,6 +10,21 @@ import styles from "./styles.module.scss";
 import { Toast } from "@/components/ui/Toast/Toast";
 import { ConfirmModal } from "@/components/ui/ConfirmModal/ConfirmModal";
 
+interface Cliente {
+  id: string;
+  nome: string;
+  logo?: string | null;
+  ativo: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface Aluno {
+  id: string;
+  nome: string;
+  cliente: Cliente;
+}
+
 interface DobrasCutaneas {
   subescapular: number | null;
   triceps: number | null;
@@ -22,6 +37,7 @@ interface DobrasCutaneas {
 
 interface Avaliacao {
   id: string;
+  aluno: Aluno;
   tipo: string | null;
   data: string | null;
   resultado: string | null;
@@ -155,14 +171,14 @@ export default function AvaliacaoPage() {
 
   const gerarPdf = async () => {
     if (!avaliacao) return;
-    const doc = new jsPDF();
 
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
     const margin = 10;
+    const bottomMargin = 20;
     let y = 50;
 
-    // Carregar logo em base64
     const getLogoBase64 = async () => {
       try {
         const origin =
@@ -171,6 +187,7 @@ export default function AvaliacaoPage() {
         const resp = await fetch(url, { cache: "no-store" });
         if (!resp.ok) return "";
         const blob = await resp.blob();
+
         return await new Promise<string>((resolve) => {
           const reader = new FileReader();
           reader.onloadend = () =>
@@ -185,30 +202,33 @@ export default function AvaliacaoPage() {
 
     const logoDataUri = await getLogoBase64();
 
-    // Cabeçalho com logo e texto
+    const nomeAluno = avaliacao.aluno?.nome ?? "Aluno não informado";
+    const nomeCliente = avaliacao?.aluno?.cliente?.nome || "SaaS Academia LHP";
+
     const printHeader = () => {
       doc.setFillColor(25, 35, 55);
       doc.rect(0, 0, pageWidth, 40, "F");
       doc.setFillColor(218, 165, 32);
       doc.rect(0, 35, pageWidth, 5, "F");
+
       if (logoDataUri) {
         try {
           doc.addImage(logoDataUri, "PNG", 10, 7, 18, 18);
-        } catch {}
+        } catch {
+          // Se der erro na imagem, seguimos sem o logo
+        }
       }
+
       doc.setFont("helvetica", "bold");
       doc.setFontSize(18);
       doc.setTextColor(255, 255, 255);
       doc.text("AVALIAÇÃO FÍSICA", pageWidth / 2, 18, { align: "center" });
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(9);
-      doc.setTextColor(218, 165, 32);
-      doc.text("Relatório de Avaliação", margin + 0, 30);
 
-      // Aqui adiciona o nome do aluno
-      doc.setFontSize(10);
-      doc.setTextColor(255, 255, 255);
-      doc.text(`Aluno: ${nomeAluno}`, margin + 80, 30);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(14);
+      doc.setTextColor(218, 165, 32);
+      doc.text("Relatório de Avaliação", margin, 30);
+      doc.text(`Aluno: ${nomeAluno}`, pageWidth / 2, 30, { align: "center" });
 
       const agora = new Date();
       doc.setFontSize(7);
@@ -218,72 +238,135 @@ export default function AvaliacaoPage() {
           "pt-BR"
         )} ${agora.toLocaleTimeString("pt-BR")}`,
         pageWidth - margin,
-        27,
+        30,
         { align: "right" }
       );
     };
 
     const printFooter = () => {
       const totalPages = doc.getNumberOfPages();
-      const footerY = doc.internal.pageSize.getHeight() - 15;
+      const footerY = pageHeight - 15;
 
       doc.setDrawColor(220, 225, 235);
       doc.setLineWidth(0.5);
 
       for (let i = 1; i <= totalPages; i++) {
         doc.setPage(i);
+
         doc.line(margin, footerY - 5, pageWidth - margin, footerY - 5);
+
         doc.setFont("helvetica", "bold");
         doc.setFontSize(8);
         doc.setTextColor(25, 35, 55);
-        doc.text(`© Academia LHP ${new Date().getFullYear()}`, margin, footerY);
+        /*
+        doc.text(
+          `© ${nomeCliente} ${new Date().getFullYear()}`,
+          margin,
+          footerY
+        );
+        */
+        doc.text(`Cliente: ${nomeCliente}`, margin, footerY);
+
         doc.setFont("helvetica", "normal");
         doc.setFontSize(7);
         doc.setTextColor(100, 116, 139);
         doc.text("Relatório de Avaliação Física", margin, footerY + 4);
+
         doc.text(
           `Página ${i} de ${totalPages}`,
           pageWidth - margin,
           footerY + 4,
-          {
-            align: "right",
-          }
+          { align: "right" }
         );
       }
     };
 
-    printHeader();
+    const newPage = () => {
+      doc.addPage();
+      y = 50; // reinicia a posição y abaixo do cabeçalho
+      printHeader(); // cabeçalho em todas as páginas novas
 
-    doc.setFontSize(12);
-    doc.setTextColor("#000000");
-
-    const linha = (
-      label: string,
-      value: string | number | null | undefined
-    ) => {
-      const text = `${label}: ${value ?? "-"}`;
-      const maxTextWidth = pageWidth - margin * 2;
-      const splitText = doc.splitTextToSize(text, maxTextWidth);
-
-      if (y + splitText.length * 7 > pageHeight - 20) {
-        doc.addPage();
-        printHeader();
-        doc.setFontSize(12);
-        doc.setTextColor("#000000");
-        y = 50;
-      }
-      doc.text(splitText, margin, y);
-      y += splitText.length * 7 + 3;
+      // RESET do estilo do corpo na nova página
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(12);
+      doc.setTextColor(0, 0, 0);
     };
 
-    // Para números nulos ou indefinidos, converte para "-"
     const safeNum = (num: number | null | undefined) =>
       num === null || num === undefined ? "-" : num;
 
+    const linha = (label: string, value: unknown, withLine = false) => {
+      const maxTextWidth = pageWidth - margin * 2;
+      const lineHeight = 7;
+
+      const labelText = label + ":";
+
+      // configura fonte do rótulo antes de medir
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(12);
+      doc.setTextColor(0, 0, 0);
+
+      const gap = 4; // espaço entre label e valor
+      const labelWidth = doc.getTextWidth(labelText);
+      const labelX = margin;
+      let valueX = labelX + labelWidth + gap;
+
+      if (valueX > pageWidth - margin - 20) {
+        valueX = margin;
+      }
+
+      const maxValueWidth = pageWidth - margin - valueX;
+
+      const splitValue = doc.splitTextToSize(
+        String(value ?? "-"),
+        maxValueWidth > 0 ? maxValueWidth : maxTextWidth
+      );
+
+      const blocoHeight = Math.max(1, splitValue.length) * lineHeight;
+
+      // quebra de página se não couber
+      if (y + blocoHeight > pageHeight - bottomMargin) {
+        newPage();
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(12);
+        doc.setTextColor(0, 0, 0);
+      }
+
+      // label
+      doc.text(labelText, labelX, y);
+
+      // valor
+      doc.setFont("helvetica", "normal");
+      doc.text(splitValue, valueX, y);
+
+      y += blocoHeight + 3;
+
+      // traço opcional abaixo desta linha
+      if (withLine) {
+        const lineY = y + 2;
+        if (lineY > pageHeight - bottomMargin) {
+          newPage();
+        }
+        doc.setDrawColor(200, 200, 200);
+        doc.setLineWidth(0.2);
+        doc.line(margin, lineY, pageWidth - margin, lineY);
+        y = lineY - 2; // espaço depois do traço
+      }
+    };
+
+    // Primeira página
+    printHeader();
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+
+    // Dados gerais
     linha("Tipo", avaliacao.tipo ?? "-");
     linha(
       "Data",
-      avaliacao.data ? new Date(avaliacao.data).toLocaleDateString() : "-"
+      avaliacao.data
+        ? new Date(avaliacao.data).toLocaleDateString("pt-BR")
+        : "-"
     );
     linha("Histórico Médico", avaliacao.historicoMedico);
     linha("Objetivos", avaliacao.objetivos);
@@ -319,16 +402,18 @@ export default function AvaliacaoPage() {
     linha("Teste de Cooper (m)", safeNum(avaliacao.testeCooper));
     linha("Força Supino (kg)", safeNum(avaliacao.forcaSupino));
     linha("Repetições Flexões", safeNum(avaliacao.repeticoesFlexoes));
-    linha("Tempo Prancha (s)", safeNum(avaliacao.pranchaTempo));
+    linha("Tempo Prancha (s)", safeNum(avaliacao.pranchaTempo), true);
     linha("Teste Sentar e Esticar (cm)", safeNum(avaliacao.testeSentarEsticar));
     linha("Resultado", avaliacao.resultado);
     linha("Observações", avaliacao.observacoes);
 
+    // Rodapé em todas as páginas
     printFooter();
 
     doc.save(`avaliacao-${avaliacao.id}.pdf`);
   };
 
+  // mensagens via whatsapp
   const gerarTextoWhatsApp = (a: Avaliacao): string => {
     const divisor = "-------------------------------------------------\n";
     return encodeURIComponent(`
