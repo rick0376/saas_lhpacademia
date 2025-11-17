@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -11,41 +11,41 @@ import { Toast } from "@/components/ui/Toast/Toast";
 import { ConfirmModal } from "@/components/ui/ConfirmModal/ConfirmModal";
 
 interface DobrasCutaneas {
-  subescapular: number | null;
-  triceps: number | null;
-  peitoral: number | null;
-  axilar: number | null;
-  suprailiaca: number | null;
-  abdominal: number | null;
-  femural: number | null;
+  subescapular: number;
+  triceps: number;
+  peitoral: number;
+  axilar: number;
+  suprailiaca: number;
+  abdominal: number;
+  femural: number;
 }
 
 interface Avaliacao {
   id: string;
   tipo: string | null;
-  data: string | null;
+  data: Date;
   resultado: string | null;
   observacoes: string | null;
   historicoMedico: string | null;
   objetivos: string | null;
   praticaAnterior: string | null;
-  fumante: boolean | null;
-  diabetes: boolean | null;
-  doencasArticulares: boolean | null;
+  fumante: boolean;
+  diabetes: boolean;
+  doencasArticulares: boolean;
   cirurgias: string | null;
-  peso: number | null;
-  altura: number | null;
-  imc: number | null;
-  percentualGordura: number | null;
-  circunferenciaCintura: number | null;
-  circunferenciaQuadril: number | null;
+  peso: number;
+  altura: number;
+  imc: number;
+  percentualGordura: number;
+  circunferenciaCintura: number;
+  circunferenciaQuadril: number;
   dobrasCutaneas: DobrasCutaneas | null;
-  vo2Max: number | null;
-  testeCooper: number | null;
-  forcaSupino: number | null;
-  repeticoesFlexoes: number | null;
-  pranchaTempo: number | null;
-  testeSentarEsticar: number | null;
+  vo2Max: number;
+  testeCooper: number;
+  forcaSupino: number;
+  repeticoesFlexoes: number;
+  pranchaTempo: number;
+  testeSentarEsticar: number;
   arquivo: string | null;
 }
 
@@ -56,8 +56,8 @@ export default function AvaliacaoPage() {
 
   const alunoId = params.id as string;
   const avaliacaoId = params.avaliacaoId as string;
-
   const [nomeAluno, setNomeAluno] = useState<string | null>(null);
+
   const [avaliacao, setAvaliacao] = useState<Avaliacao | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -99,6 +99,7 @@ export default function AvaliacaoPage() {
       setLoading(false);
       return;
     }
+
     async function fetchAluno() {
       try {
         const res = await fetch(`/api/alunos/${alunoId}`);
@@ -109,6 +110,7 @@ export default function AvaliacaoPage() {
         setError(err.message);
       }
     }
+
     fetchAluno();
   }, [session, alunoId]);
 
@@ -145,109 +147,109 @@ export default function AvaliacaoPage() {
     }
   };
 
-  const toStr = (
-    value: string | number | boolean | null | undefined
-  ): string => {
-    if (value === null || value === undefined) return "-";
-    if (typeof value === "boolean") return value ? "Sim" : "Não";
-    return String(value);
+  const safeNum = (num: number | null | undefined) => (num != null ? num : "-");
+
+  // Linha divisor
+  const divisor = "-------------------------------------------------";
+
+  // Gera texto formatado para enviar pelo WhatsApp
+  const gerarTextoWhatsApp = (a: Avaliacao) => {
+    return encodeURIComponent(`
+*Avaliação Física:*
+*Tipo:* ${a.tipo ?? "-"}
+*Data:* ${a.data ? new Date(a.data).toLocaleDateString() : "-"}
+
+${divisor}
+
+*Histórico Médico:* ${a.historicoMedico ?? "-"}
+*Objetivos:* ${a.objetivos ?? "-"}
+*Prática Anterior:* ${a.praticaAnterior ?? "-"}
+
+${divisor}
+
+*Fumante:* ${a.fumante ? "Sim" : "Não"}
+*Diabetes:* ${a.diabetes ? "Sim" : "Não"}
+*Doenças Articulares:* ${a.doencasArticulares ? "Sim" : "Não"}
+*Cirurgias:* ${a.cirurgias ?? "-"}
+
+${divisor}
+
+*Peso:* ${safeNum(a.peso)} kg
+*Altura:* ${safeNum(a.altura)} cm
+*IMC:* ${safeNum(a.imc)}
+*% Gordura Corporal:* ${safeNum(a.percentualGordura)}%
+*Circunferência Cintura:* ${safeNum(a.circunferenciaCintura)} cm
+*Circunferência Quadril:* ${safeNum(a.circunferenciaQuadril)} cm
+
+${divisor}
+
+*Dobras Cutâneas (mm):*
+  *Subescapular:* ${a.dobrasCutaneas?.subescapular ?? "-"}
+  *Tríceps:* ${a.dobrasCutaneas?.triceps ?? "-"}
+  *Peitoral:* ${a.dobrasCutaneas?.peitoral ?? "-"}
+  *Axilar:* ${a.dobrasCutaneas?.axilar ?? "-"}
+  *Suprailiaca:* ${a.dobrasCutaneas?.suprailiaca ?? "-"}
+  *Abdominal:* ${a.dobrasCutaneas?.abdominal ?? "-"}
+  *Femural:* ${a.dobrasCutaneas?.femural ?? "-"}
+
+${divisor}
+
+*VO2 Max:* ${safeNum(a.vo2Max)}
+*Teste de Cooper:* ${safeNum(a.testeCooper)}
+
+${divisor}
+
+*Força Supino:* ${safeNum(a.forcaSupino)} kg
+*Repetições Flexões:* ${safeNum(a.repeticoesFlexoes)}
+*Tempo Prancha:* ${safeNum(a.pranchaTempo)} s
+
+${divisor}
+
+*Teste Sentar e Esticar:* ${safeNum(a.testeSentarEsticar)} cm
+
+${divisor}
+
+*Resultado:* ${a.resultado ?? "-"}
+*Observações:* ${a.observacoes ?? "-"}
+`);
   };
 
-  const gerarPdf = async () => {
+  // Abre WhatsApp com texto da avaliação
+  const enviarWhatsApp = () => {
+    if (!avaliacao) return;
+    const text = gerarTextoWhatsApp(avaliacao);
+    const url = `https://wa.me/?text=${text}`;
+    window.open(url, "_blank");
+  };
+
+  const gerarPdf = () => {
     if (!avaliacao) return;
     const doc = new jsPDF();
 
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
     const margin = 10;
-    let y = 50;
+    let y = 20;
 
-    // Carregar logo em base64
-    const getLogoBase64 = async () => {
-      try {
-        const origin =
-          typeof window !== "undefined" ? window.location.origin : "";
-        const url = `${origin}/imagens/logo.png`;
-        const resp = await fetch(url, { cache: "no-store" });
-        if (!resp.ok) return "";
-        const blob = await resp.blob();
-        return await new Promise<string>((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () =>
-            resolve(typeof reader.result === "string" ? reader.result : "");
-          reader.onerror = () => resolve("");
-          reader.readAsDataURL(blob);
-        });
-      } catch {
-        return "";
-      }
-    };
-
-    const logoDataUri = await getLogoBase64();
-
-    // Cabeçalho com logo e texto
+    // Cabeçalho simples
     const printHeader = () => {
-      doc.setFillColor(25, 35, 55);
-      doc.rect(0, 0, pageWidth, 40, "F");
-      doc.setFillColor(218, 165, 32);
-      doc.rect(0, 35, pageWidth, 5, "F");
-      if (logoDataUri) {
-        try {
-          doc.addImage(logoDataUri, "PNG", 10, 7, 18, 18);
-        } catch {}
-      }
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(18);
-      doc.setTextColor(255, 255, 255);
-      doc.text("AVALIAÇÃO FÍSICA", pageWidth / 2, 18, { align: "center" });
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(9);
-      doc.setTextColor(218, 165, 32);
-      doc.text("Relatório de Avaliação", margin + 0, 30);
-
-      // Aqui adiciona o nome do aluno
-      doc.setFontSize(10);
-      doc.setTextColor(255, 255, 255);
-      doc.text(`Aluno: ${nomeAluno}`, margin + 80, 30);
-
-      const agora = new Date();
-      doc.setFontSize(7);
-      doc.setTextColor(255, 255, 255);
-      doc.text(
-        `Gerado em ${agora.toLocaleDateString(
-          "pt-BR"
-        )} ${agora.toLocaleTimeString("pt-BR")}`,
-        pageWidth - margin,
-        27,
-        { align: "right" }
-      );
+      doc.setFontSize(16);
+      doc.setTextColor("#000000");
+      doc.text("Avaliação Física", margin, 15);
     };
 
+    // Rodapé simples com número da página
     const printFooter = () => {
       const totalPages = doc.getNumberOfPages();
-      const footerY = doc.internal.pageSize.getHeight() - 15;
-
-      doc.setDrawColor(220, 225, 235);
-      doc.setLineWidth(0.5);
-
       for (let i = 1; i <= totalPages; i++) {
         doc.setPage(i);
-        doc.line(margin, footerY - 5, pageWidth - margin, footerY - 5);
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(8);
-        doc.setTextColor(25, 35, 55);
-        doc.text(`© Academia LHP ${new Date().getFullYear()}`, margin, footerY);
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(7);
-        doc.setTextColor(100, 116, 139);
-        doc.text("Relatório de Avaliação Física", margin, footerY + 4);
+        doc.setFontSize(10);
+        doc.setTextColor("#000000");
         doc.text(
-          `Página ${i} de ${totalPages}`,
-          pageWidth - margin,
-          footerY + 4,
-          {
-            align: "right",
-          }
+          `Página ${i} / ${totalPages}`,
+          pageWidth / 2,
+          pageHeight - 10,
+          { align: "center" }
         );
       }
     };
@@ -265,33 +267,34 @@ export default function AvaliacaoPage() {
       const maxTextWidth = pageWidth - margin * 2;
       const splitText = doc.splitTextToSize(text, maxTextWidth);
 
+      // Se ultrapassar altura da página, adiciona nova página e imprime header
       if (y + splitText.length * 7 > pageHeight - 20) {
         doc.addPage();
         printHeader();
         doc.setFontSize(12);
         doc.setTextColor("#000000");
-        y = 50;
+        y = 25;
       }
+
       doc.text(splitText, margin, y);
       y += splitText.length * 7 + 3;
     };
-
-    // Para números nulos ou indefinidos, converte para "-"
-    const safeNum = (num: number | null | undefined) =>
-      num === null || num === undefined ? "-" : num;
 
     linha("Tipo", avaliacao.tipo ?? "-");
     linha(
       "Data",
       avaliacao.data ? new Date(avaliacao.data).toLocaleDateString() : "-"
     );
+
     linha("Histórico Médico", avaliacao.historicoMedico);
     linha("Objetivos", avaliacao.objetivos);
     linha("Prática Anterior", avaliacao.praticaAnterior);
+
     linha("Fumante", avaliacao.fumante ? "Sim" : "Não");
     linha("Diabetes", avaliacao.diabetes ? "Sim" : "Não");
     linha("Doenças Articulares", avaliacao.doencasArticulares ? "Sim" : "Não");
     linha("Cirurgias", avaliacao.cirurgias);
+
     linha("Peso (kg)", safeNum(avaliacao.peso));
     linha("Altura (cm)", safeNum(avaliacao.altura));
     linha("IMC", safeNum(avaliacao.imc));
@@ -317,85 +320,19 @@ export default function AvaliacaoPage() {
 
     linha("VO2 Max (ml/kg/min)", safeNum(avaliacao.vo2Max));
     linha("Teste de Cooper (m)", safeNum(avaliacao.testeCooper));
+
     linha("Força Supino (kg)", safeNum(avaliacao.forcaSupino));
     linha("Repetições Flexões", safeNum(avaliacao.repeticoesFlexoes));
     linha("Tempo Prancha (s)", safeNum(avaliacao.pranchaTempo));
+
     linha("Teste Sentar e Esticar (cm)", safeNum(avaliacao.testeSentarEsticar));
+
     linha("Resultado", avaliacao.resultado);
     linha("Observações", avaliacao.observacoes);
 
     printFooter();
 
     doc.save(`avaliacao-${avaliacao.id}.pdf`);
-  };
-
-  const gerarTextoWhatsApp = (a: Avaliacao): string => {
-    const divisor = "-------------------------------------------------\n";
-    return encodeURIComponent(`
-*Avaliação Física:*
-*Tipo:* ${a.tipo ?? "-"}
-*Data:* ${a.data ?? "-"}
-
-${divisor}
-
-*Histórico Médico:* ${a.historicoMedico ?? "-"}
-*Objetivos:* ${a.objetivos ?? "-"}
-*Prática Anterior:* ${a.praticaAnterior ?? "-"}
-
-${divisor}
-
-*Fumante:* ${a.fumante ? "Sim" : "Não"}
-*Diabetes:* ${a.diabetes ? "Sim" : "Não"}
-*Doenças Articulares:* ${a.doencasArticulares ? "Sim" : "Não"}
-*Cirurgias:* ${a.cirurgias ?? "-"}
-
-${divisor}
-
-*Peso:* ${toStr(a.peso)} kg
-*Altura:* ${toStr(a.altura)} cm
-*IMC:* ${toStr(a.imc)}
-*% Gordura Corporal:* ${toStr(a.percentualGordura)}%
-*Circunferência Cintura:* ${toStr(a.circunferenciaCintura)} cm
-*Circunferência Quadril:* ${toStr(a.circunferenciaQuadril)} cm
-
-${divisor}
-
-*Dobras Cutâneas (mm):*
-  *Subescapular:* ${a.dobrasCutaneas?.subescapular ?? "-"}
-  *Tríceps:* ${a.dobrasCutaneas?.triceps ?? "-"}
-  *Peitoral:* ${a.dobrasCutaneas?.peitoral ?? "-"}
-  *Axilar:* ${a.dobrasCutaneas?.axilar ?? "-"}
-  *Suprailiaca:* ${a.dobrasCutaneas?.suprailiaca ?? "-"}
-  *Abdominal:* ${a.dobrasCutaneas?.abdominal ?? "-"}
-  *Femural:* ${a.dobrasCutaneas?.femural ?? "-"}
-
-${divisor}
-
-*VO2 Max:* ${toStr(a.vo2Max)}
-*Teste de Cooper:* ${toStr(a.testeCooper)}
-
-${divisor}
-
-*Força Supino:* ${toStr(a.forcaSupino)} kg
-*Repetições Flexões:* ${toStr(a.repeticoesFlexoes)}
-*Tempo Prancha:* ${toStr(a.pranchaTempo)} s
-
-${divisor}
-
-*Teste Sentar e Esticar:* ${toStr(a.testeSentarEsticar)} cm
-
-${divisor}
-
-*Resultado:* ${a.resultado ?? "-"}
-*Observações:* ${a.observacoes ?? "-"}
-    `);
-  };
-
-  const enviarWhatsApp = () => {
-    if (!avaliacao) return;
-    const text = gerarTextoWhatsApp(avaliacao);
-    const url = `https://wa.me/?text=${text}`;
-    window.open(url, "_blank");
   };
 
   if (loading) return <div>Carregando...</div>;
@@ -453,6 +390,7 @@ ${divisor}
       </div>
 
       <div className={styles.card}>
+        {/* Informações Básicas */}
         <h3>Informações Básicas</h3>
         <p>
           <strong>Tipo:</strong> {avaliacao.tipo ?? "-"}
@@ -462,6 +400,7 @@ ${divisor}
           {avaliacao.data ? new Date(avaliacao.data).toLocaleDateString() : "-"}
         </p>
 
+        {/* Anamnese */}
         <h3>Anamnese</h3>
         <p>
           <strong>Histórico Médico:</strong> {avaliacao.historicoMedico ?? "-"}
@@ -486,29 +425,31 @@ ${divisor}
           <strong>Cirurgias:</strong> {avaliacao.cirurgias ?? "-"}
         </p>
 
+        {/* Antropometria */}
         <h3>Antropometria</h3>
         <p>
-          <strong>Peso:</strong> {toStr(avaliacao.peso)} kg
+          <strong>Peso:</strong> {safeNum(avaliacao.peso)} kg
         </p>
         <p>
-          <strong>Altura:</strong> {toStr(avaliacao.altura)} cm
+          <strong>Altura:</strong> {safeNum(avaliacao.altura)} cm
         </p>
         <p>
-          <strong>IMC:</strong> {toStr(avaliacao.imc)}
+          <strong>IMC:</strong> {safeNum(avaliacao.imc)}
         </p>
         <p>
           <strong>% Gordura Corporal:</strong>{" "}
-          {toStr(avaliacao.percentualGordura)}%
+          {safeNum(avaliacao.percentualGordura)}%
         </p>
         <p>
           <strong>Circunferência Cintura:</strong>{" "}
-          {toStr(avaliacao.circunferenciaCintura)} cm
+          {safeNum(avaliacao.circunferenciaCintura)} cm
         </p>
         <p>
           <strong>Circunferência Quadril:</strong>{" "}
-          {toStr(avaliacao.circunferenciaQuadril)} cm
+          {safeNum(avaliacao.circunferenciaQuadril)} cm
         </p>
 
+        {/* Dobras Cutâneas */}
         <h3>Dobras Cutâneas</h3>
         <p>
           <strong>Subescapular:</strong>{" "}
@@ -538,32 +479,36 @@ ${divisor}
           mm
         </p>
 
+        {/* Cardiorespiratória */}
         <h3>Cardiorespiratória</h3>
         <p>
-          <strong>VO2 Max:</strong> {toStr(avaliacao.vo2Max)}
+          <strong>VO2 Max:</strong> {safeNum(avaliacao.vo2Max)}
         </p>
         <p>
-          <strong>Teste de Cooper:</strong> {toStr(avaliacao.testeCooper)}
+          <strong>Teste de Cooper:</strong> {safeNum(avaliacao.testeCooper)}
         </p>
 
+        {/* Força Muscular */}
         <h3>Força Muscular</h3>
         <p>
-          <strong>Força Supino:</strong> {toStr(avaliacao.forcaSupino)} kg
+          <strong>Força Supino:</strong> {safeNum(avaliacao.forcaSupino)} kg
         </p>
         <p>
           <strong>Repetições Flexões:</strong>{" "}
-          {toStr(avaliacao.repeticoesFlexoes)}
+          {safeNum(avaliacao.repeticoesFlexoes)}
         </p>
         <p>
-          <strong>Tempo Prancha:</strong> {toStr(avaliacao.pranchaTempo)} s
+          <strong>Tempo Prancha:</strong> {safeNum(avaliacao.pranchaTempo)} s
         </p>
 
+        {/* Flexibilidade */}
         <h3>Flexibilidade</h3>
         <p>
           <strong>Teste Sentar e Esticar:</strong>{" "}
-          {toStr(avaliacao.testeSentarEsticar)} cm
+          {safeNum(avaliacao.testeSentarEsticar)} cm
         </p>
 
+        {/* Observações */}
         <h3>Observações</h3>
         <p>
           <strong>Resultado:</strong> {avaliacao.resultado ?? "-"}
@@ -586,6 +531,7 @@ ${divisor}
         )}
       </div>
 
+      {/* Ações */}
       <div className={styles.formActions}>
         <Link
           href={`/dashboard/alunos/${alunoId}/avaliacoes/editar/${avaliacaoId}`}
@@ -597,7 +543,7 @@ ${divisor}
         <button
           type="button"
           className={`${styles.buttonBase} ${styles.whatsappButton}`}
-          onClick={enviarWhatsApp}
+          onClick={() => enviarWhatsApp()}
         >
           <Share2 size={20} /> WhatsApp
         </button>
@@ -605,7 +551,7 @@ ${divisor}
         <button
           type="button"
           className={`${styles.buttonBase} ${styles.pdfButton}`}
-          onClick={gerarPdf}
+          onClick={() => gerarPdf()}
         >
           Gerar PDF
         </button>
