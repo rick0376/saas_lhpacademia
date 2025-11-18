@@ -323,7 +323,9 @@ export default function EditarAvaliacaoPage() {
             Voltar à Avaliação
           </Link>
           <h1>Editar Avaliação Física</h1>
-          <p>Aluno: {alunoNome}</p>
+          <p>
+            Aluno: <span className={styles.nomeDestaque}>{alunoNome}</span>
+          </p>
         </div>
       </div>
 

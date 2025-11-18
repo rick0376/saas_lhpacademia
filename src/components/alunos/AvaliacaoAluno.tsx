@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import styles from "./alunoTable.module.scss";
+import styles from "./avalicaoAluno.module.scss";
 import { Button } from "../ui/Button/Button";
 import { Modal } from "../ui/Modal/Modal";
 
@@ -146,7 +146,7 @@ export const AvaliacaoAluno = () => {
                   <FaPhone size={20} color="#166d1b" /> {aluno.telefone || "-"}
                 </p>
                 <p className={styles.objetivoField}>
-                  <FaBullseye size={20} color="#5a21a0" />{" "}
+                  <FaBullseye size={20} color="#a06921ff" />{" "}
                   {aluno.objetivo || "-"}
                 </p>
                 <p className={styles.statusField}>
@@ -167,91 +167,19 @@ export const AvaliacaoAluno = () => {
                   <strong>Medidas: </strong>
                   {aluno._count.medidas}
                 </p>
-                <div className={styles.actions}>
-                  <Link
-                    href={`/dashboard/alunos/${aluno.id}`}
-                    title="Ver Perfil"
-                    aria-label={`Ver perfil ${aluno.nome}`}
-                    className={styles.iconPerfil}
-                  >
-                    <User className={styles.iconUser} />
-                  </Link>
-                  <Link
-                    href={`/dashboard/alunos/${aluno.id}/editar`}
-                    title="Editar"
-                    aria-label={`Editar ${aluno.nome}`}
-                    className={styles.iconEditar}
-                  >
-                    <Edit className={styles.iconEdit} />
-                  </Link>
-
-                  <Link
-                    href={`/dashboard/alunos/${aluno.id}/avaliacoes`}
-                    title={`Ver Avaliações de ${aluno.nome}`}
-                    aria-label={`Ver avaliações do(a) ${aluno.nome}`}
-                    className={styles.iconAvaliar}
-                  >
-                    <ClipboardCheck />
-                  </Link>
-
-                  <Link
-                    href={`/dashboard/medidas?alunoId=${
-                      aluno.id
-                    }&alunoNome=${encodeURIComponent(aluno.nome)}`}
-                    title="Ver Medidas"
-                    aria-label={`Ver medidas ${aluno.nome}`}
-                    className={styles.iconMedidas}
-                  >
-                    <Ruler className={styles.iconMed} />
-                  </Link>
-                  <button
-                    onClick={() => setDeleteModal({ isOpen: true, aluno })}
-                    title="Excluir"
-                    aria-label={`Excluir ${aluno.nome}`}
-                    className={styles.iconButtonDelete}
-                  >
-                    <Trash2 className={styles.iconDelete} />
-                  </button>
-                </div>
+                <Link
+                  href={`/dashboard/alunos/${aluno.id}/avaliacoes`}
+                  title={`Ver Avaliações de ${aluno.nome}`}
+                  aria-label={`Ver avaliações do(a) ${aluno.nome}`}
+                  className={styles.iconAvaliar}
+                >
+                  <ClipboardCheck />
+                  <span>Avaliações</span>
+                </Link>
               </div>
             </div>
           ))}
         </div>
-      )}
-
-      {deleteModal.isOpen && (
-        <Modal
-          isOpen={deleteModal.isOpen}
-          onClose={() => setDeleteModal({ isOpen: false })}
-          title="Confirmar Exclusão"
-          size="small"
-        >
-          <div className={styles.modalContent}>
-            <p>
-              Tem certeza que deseja excluir o aluno{" "}
-              <strong>{deleteModal.aluno?.nome}</strong>?
-            </p>
-            <p className={styles.warning}>
-              ⚠️ Todos os treinos e medidas deste aluno também serão excluídos!
-            </p>
-            <div className={styles.modalActions}>
-              <Button
-                variant="outline"
-                onClick={() => setDeleteModal({ isOpen: false })}
-              >
-                Cancelar
-              </Button>
-              <Button
-                variant="danger"
-                onClick={() =>
-                  deleteModal.aluno && handleDelete(deleteModal.aluno.id)
-                }
-              >
-                Excluir
-              </Button>
-            </div>
-          </div>
-        </Modal>
       )}
     </>
   );

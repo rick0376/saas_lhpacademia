@@ -2,14 +2,14 @@
   max-width: 1400px;
   min-height: calc(100vh - 140px);
   padding: 40px 24px;
-  background: linear-gradient(135deg, #9882ee 0%, #7a5fca 50%, #856de2 100%);
-  color: white;
+  background: linear-gradient(90deg, #6a11cb 0%, #2575fc 50%, #29abe2 100%);
+  color: #2f2f6d;
   border-radius: 8px;
 
   /* Centralizar conteúdo interno se necessário */
   display: flex;
-  justify-content: center; /* Centraliza horizontalmente */
-  align-items: flex-start; /* Alinhamento vertical de início */
+  justify-content: center;
+  align-items: flex-start;
 }
 
 .container {
@@ -46,7 +46,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(135deg, #8bdbe9 0%, #41b8f3 50%, #19a3ee 100%);
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(106, 17, 203, 0.15);
   padding: 24px 32px;
   border-radius: 16px;
   box-shadow: 0 10px 40px rgba(98, 77, 184, 0.3);
@@ -105,7 +106,7 @@
 .nome {
   font-size: 32px;
   font-weight: 800;
-  color: #ebf8ff;
+  color: #1a4ee0;
   text-shadow: 0 1.5px 6px rgba(3, 105, 161, 0.75);
   letter-spacing: 0.015em;
   margin: 0;
@@ -116,7 +117,7 @@
   display: flex;
   gap: 28px;
   font-size: 18px;
-  color: #dbeafe;
+  color: #1a4ee0;
   flex-wrap: wrap;
 
   span {
@@ -178,7 +179,7 @@
 /* Botão editar */
 .editButton {
   width: 250px;
-  background: linear-gradient(135deg, #0597b4, #0277a1, #037c5e);
+  background: linear-gradient(90deg, #5710b8 0%, #2255f7 55%, #277ad2 100%);
   color: white;
   border: none;
   border-radius: 12px;
@@ -186,13 +187,13 @@
   font-weight: 700;
   font-size: 16px;
   cursor: pointer;
-  box-shadow: 0 10px 28px rgba(122, 79, 237, 0.5);
+  box-shadow: 0 10px 25px rgba(34, 85, 247, 0.6);
   transition: all 0.3s ease;
 
   &:hover,
   &:focus-visible {
-    background: linear-gradient(135deg, #06a9c9, #03819f, #029164);
-    box-shadow: 0 14px 32px rgba(4, 159, 200, 0.8);
+    background: linear-gradient(90deg, #430e97 0%, #184ed0 55%, #1f72be 100%);
+    box-shadow: 0 14px 45px rgba(34, 85, 247, 0.75);
     transform: translateY(-4px) scale(1.1);
     outline: none;
   }
@@ -210,14 +211,15 @@
 }
 
 .statCard {
-  background: linear-gradient(135deg, #8bdbe9 0%, #41b8f3 50%, #19a3ee 100%);
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(106, 17, 203, 0.15);
   border-radius: 16px;
   padding: 28px;
   box-shadow: 0 10px 40px rgba(98, 77, 184, 0.3);
   display: flex;
   align-items: center;
   gap: 20px;
-  color: white;
+  color: #1a4ee0;
   user-select: none;
   transition: box-shadow 0.3s ease;
 
@@ -245,11 +247,12 @@
 
 /* Informações contato */
 .contactCard {
-  background: linear-gradient(135deg, #8bdbe9 0%, #41b8f3 50%, #19a3ee 100%);
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(106, 17, 203, 0.15);
   padding: 28px;
   border-radius: 16px;
   box-shadow: 0 10px 40px rgba(98, 77, 184, 0.3);
-  color: white;
+  color: #1a4ee0;
   user-select: none;
   transition: box-shadow 0.3s ease;
 
@@ -260,7 +263,24 @@
   }
 }
 
+.cardTitleContacto {
+  color: #1a4ee0;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+}
+
 .cardTitle {
+  color: #e0dbfe;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+}
+
+.cardTitleObs {
+  color: #1a4ee0;
   font-size: 22px;
   font-weight: 700;
   margin-bottom: 20px;
@@ -279,7 +299,7 @@
   align-items: center;
   gap: 16px;
   font-size: 15px;
-  color: #dbeafe;
+  color: #1a4ee0;
 }
 
 /* Ícones contato */
@@ -291,12 +311,12 @@
 .contactLabel {
   font-weight: 700;
   font-size: 15px;
-  color: #dbeafe;
+  color: #1a4ee0;
 }
 
 .contactValue {
   font-size: 15px;
-  color: #dbeafe;
+  color: #1a4ee0;
 }
 
 /* Treinos */
@@ -308,7 +328,7 @@
 
 .viewAll {
   font-weight: 700;
-  color: #dbeafe;
+  color: #e0dbfe;
   text-decoration: none;
   transition: color 0.3s;
 
@@ -327,11 +347,12 @@
 }
 
 .treinoItem {
-  background: linear-gradient(135deg, #8bdbe9 0%, #41b8f3 50%, #19a3ee 100%);
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(106, 17, 203, 0.15);
   padding: 16px 20px;
   border-radius: 14px;
   text-decoration: none;
-  color: white;
+  color: #1a4ee0;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -353,16 +374,17 @@
 .treinoObjetivo {
   font-size: 15px;
   font-weight: 500;
-  color: #dbeafe;
+  color: #1a4ee0;
 }
 
 /* Observações */
 .observacoesCard {
-  background: linear-gradient(135deg, #8bdbe9 0%, #41b8f3 50%, #19a3ee 100%);
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(106, 17, 203, 0.15);
   padding: 28px;
   border-radius: 16px;
   box-shadow: 0 10px 40px rgba(98, 77, 184, 0.3);
-  color: white;
+  color: #1a4ee0;
   user-select: none;
   transition: box-shadow 0.3s ease;
 
@@ -377,7 +399,7 @@
   font-size: 16px;
   white-space: pre-wrap;
   line-height: 1.5;
-  color: #dbeafe;
+  color: #1a4ee0;
 }
 
 @media (max-width: 1082px) {
@@ -455,7 +477,6 @@
     flex-direction: column;
     gap: 8px;
     font-size: 14px;
-    color: #dbeafe;
     width: 100%;
   }
 

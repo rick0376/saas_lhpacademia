@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import styles from "./statsStyles.module.scss";
 
+import { User } from "lucide-react";
+
 interface Stats {
   totais: {
     alunos: number;

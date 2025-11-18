@@ -7,7 +7,7 @@ import Link from "next/link";
 import styles from "./styles.module.scss";
 
 interface Props {
-  params: Promise<{ id: string }>; // ✅ Next.js 15: Params como Promise (resolve type error no build)
+  params: Promise<{ id: string }>;
 }
 
 export default async function AlunoPerfilPage({ params }: Props) {
@@ -162,7 +162,9 @@ export default async function AlunoPerfilPage({ params }: Props) {
           {/* Informações de Contato */}
           {(aluno.email || aluno.telefone) && (
             <div className={styles.contactCard}>
-              <h3 className={styles.cardTitle}>Informações de Contato</h3>
+              <h3 className={styles.cardTitleContacto}>
+                Informações de Contato
+              </h3>
               <div className={styles.contactGrid}>
                 {aluno.email && (
                   <div className={styles.contactItem}>
@@ -222,7 +224,7 @@ export default async function AlunoPerfilPage({ params }: Props) {
           {/* Observações */}
           {aluno.observacoes && (
             <div className={styles.observacoesCard}>
-              <h3 className={styles.cardTitle}>Observações</h3>
+              <h3 className={styles.cardTitleObs}>Observações</h3>
               <p className={styles.observacoesText}>{aluno.observacoes}</p>
             </div>
           )}

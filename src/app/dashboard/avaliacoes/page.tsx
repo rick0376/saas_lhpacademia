@@ -28,12 +28,7 @@ export default async function AlunosPage() {
                 Cadastre e acompanhe todas as avaliacões da academia
               </p>
             </div>
-            <Link href="/dashboard/alunos/novo" className={styles.addButton}>
-              <span className={styles.icon}>+</span>
-              Novo Aluno
-            </Link>
           </div>
-
           <AvaliacaoAluno />
         </div>
       </main>

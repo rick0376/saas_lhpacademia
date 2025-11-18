@@ -19,7 +19,13 @@ export async function GET(
   try {
     const avaliacao = await prisma.avaliacao.findUnique({
       where: { id: avaliacaoId },
-      include: { aluno: true },
+      include: { 
+        aluno: {
+          include: {
+            cliente: true  // ✅ ADICIONE ISSO
+          }
+        }
+      },
     });
 
     if (!avaliacao) {

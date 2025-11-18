@@ -2,7 +2,7 @@
   max-width: 960px;
   margin: 3rem auto;
   padding: 2.5rem 2rem;
-  background-color: #ffffff;
+  background: #e2edf7ff;
   border-radius: 18px;
   box-shadow: 0 12px 48px rgba(50, 50, 93, 0.15);
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -51,6 +51,11 @@
 
 .backLink:hover {
   color: #1a3dcc;
+}
+
+.nomeDestaque {
+  color: rgb(54, 50, 50);
+  font-weight: 700;
 }
 
 .card {
@@ -126,13 +131,13 @@
 }
 /* Estilos específicos para cada tipo de botão */
 .submitButton {
-  background: linear-gradient(90deg, #5a3eaa, #3b5ddd);
-  box-shadow: 0 5px 15px rgba(58, 62, 150, 0.5);
+  background: linear-gradient(90deg, #f97316 0%, #ea580c 55%, #c2410c 100%);
+  box-shadow: 0 5px 15px rgba(249, 115, 22, 0.5);
 }
 .submitButton:hover {
-  background: linear-gradient(90deg, #48368a, #2a44b0);
-  box-shadow: 0 8px 22px rgba(46, 50, 120, 0.7);
-  transform: translateY(-3px);
+  background: linear-gradient(90deg, #ea580c 0%, #c2410c 55%, #9a3412 100%);
+  box-shadow: 0 5px 15px rgba(234, 88, 12, 0.6);
+  transform: translateY(-3px) scale(1.05);
 }
 
 .deleteButton {
@@ -142,21 +147,25 @@
 .deleteButton:hover {
   background: linear-gradient(90deg, #a92c2c, #8b2323);
   box-shadow: 0 8px 22px rgba(169, 44, 44, 0.7);
-  transform: translateY(-3px);
+  transform: translateY(-3px) scale(1.05);
 }
 
 .whatsappButton {
   background: linear-gradient(90deg, #20c659, #189e4a);
+  box-shadow: 0 5px 15px rgba(32, 198, 89, 0.5);
 }
 .whatsappButton:hover {
   background: linear-gradient(90deg, #189e4a, #13743b);
+  transform: translateY(-3px) scale(1.05);
 }
 
 .pdfButton {
-  background: linear-gradient(90deg, #3469e8, #204ec2);
+  background: linear-gradient(90deg, #5710b8 0%, #2255f7 55%, #277ad2 100%);
+  box-shadow: 0 5px 15px rgba(139, 92, 246, 0.5);
 }
 .pdfButton:hover {
-  background: linear-gradient(90deg, #204ec2, #1a3c93);
+  background: linear-gradient(90deg, #4509a8 0%, #1a45d7 55%, #1d5db2 100%);
+  transform: translateY(-3px) scale(1.05);
 }
 
 /* Contêineres de feedback visual (erro e sucesso) */

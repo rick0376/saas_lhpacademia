@@ -70,3 +70,16 @@
     }
   }
 }
+
+.card {
+  background: #e2edf7ff;
+  background: rgb(241, 246, 250);
+  padding: 1.4rem 1.6rem;
+  border-radius: 14px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+  color: #2f2f6d;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  word-break: break-word;
+}

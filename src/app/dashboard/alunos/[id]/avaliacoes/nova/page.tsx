@@ -105,13 +105,26 @@ export default function NovaAvaliacaoPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [imcClassificacao, setImcClassificacao] = useState("");
+  const [nomeAluno, setNomeAluno] = useState<string>("");
 
   useEffect(() => {
     if (!session?.user || !alunoId) {
       setError("Acesso negado ou aluno não encontrado.");
       return;
     }
-    // Aqui você pode pré-carregar dados do aluno se necessário (ex.: via API)
+
+    async function fetchAluno() {
+      try {
+        const res = await fetch(`/api/alunos/${alunoId}`);
+        if (!res.ok) throw new Error("Aluno não encontrado");
+        const data = await res.json();
+        setNomeAluno(data.nome);
+      } catch (err: any) {
+        setError(err.message);
+      }
+    }
+
+    fetchAluno();
   }, [session, alunoId]);
 
   const calcularIMC = (peso: number, altura: number) => {
@@ -256,7 +269,10 @@ export default function NovaAvaliacaoPage() {
             Voltar às Avaliações
           </Link>
           <h1>Nova Avaliação Física</h1>
-          <p>Preencha os dados para o aluno {alunoId}</p>{" "}
+          <p>
+            Preencha os dados para o aluno:{" "}
+            <span className={styles.nomeDestaque}>{nomeAluno}</span>
+          </p>
           {/* Substitua por nome real via API */}
         </div>
       </div>

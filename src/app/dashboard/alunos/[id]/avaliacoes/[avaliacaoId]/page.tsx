@@ -179,6 +179,10 @@ export default function AvaliacaoPage() {
     const bottomMargin = 20;
     let y = 50;
 
+    // ✅ DECLARE AQUI NO INÍCIO
+    const nomeAluno = avaliacao.aluno?.nome ?? "Aluno não informado";
+    const nomeCliente = avaliacao?.aluno?.cliente?.nome || "SaaS Academia LHP";
+
     const getLogoBase64 = async () => {
       try {
         const origin =
@@ -201,9 +205,6 @@ export default function AvaliacaoPage() {
     };
 
     const logoDataUri = await getLogoBase64();
-
-    const nomeAluno = avaliacao.aluno?.nome ?? "Aluno não informado";
-    const nomeCliente = avaliacao?.aluno?.cliente?.nome || "SaaS Academia LHP";
 
     const printHeader = () => {
       doc.setFillColor(25, 35, 55);
@@ -258,13 +259,7 @@ export default function AvaliacaoPage() {
         doc.setFont("helvetica", "bold");
         doc.setFontSize(8);
         doc.setTextColor(25, 35, 55);
-        /*
-        doc.text(
-          `© ${nomeCliente} ${new Date().getFullYear()}`,
-          margin,
-          footerY
-        );
-        */
+
         doc.text(`Cliente: ${nomeCliente}`, margin, footerY);
 
         doc.setFont("helvetica", "normal");
@@ -531,8 +526,8 @@ ${divisor}
           </Link>
           <h1 className={styles.title}>Detalhes da Avaliação</h1>
           <p>
-            Avaliação {avaliacao.tipo ?? "-"} para o aluno{" "}
-            {nomeAluno ?? alunoId}
+            Avaliação {avaliacao.tipo ?? "-"} para o aluno:{" "}
+            <span className={styles.nomeDestaque}>{nomeAluno}</span>
           </p>
         </div>
       </div>

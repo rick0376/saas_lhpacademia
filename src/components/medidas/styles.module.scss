@@ -83,7 +83,7 @@
 }
 
 .medidaCard {
-  background: var(--light-color);
+  background: #e2edf7ff;
   border-radius: 12px;
   padding: 20px;
   border: 2px solid var(--border-color);
@@ -190,6 +190,9 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
   margin-bottom: 24px;
+  background: #e2edf7ff;
+  border-radius: 12px;
+  padding: 20px;
 }
 
 .fullWidth {
@@ -236,6 +239,9 @@
 // Detalhes Modal
 .detailsContent {
   padding: 8px 0;
+  background: #e2edf7ff;
+  padding: 20px;
+  border-radius: 12px;
 }
 
 .detailsGrid {
