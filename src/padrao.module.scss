@@ -83,3 +83,16 @@
   gap: 0.9rem;
   word-break: break-word;
 }
+.recentItem {
+  padding: 16px;
+  background-color: var(--light-color);
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: var(--transition);
+
+  &:hover {
+    background-color: #bbc9fa;
+  }
+}

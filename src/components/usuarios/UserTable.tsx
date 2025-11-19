@@ -6,6 +6,7 @@ import styles from "./usertable.module.scss";
 import { Button } from "../ui/Button/Button";
 import { Modal } from "../ui/Modal/Modal";
 import { Edit, Trash2 } from "lucide-react";
+import { FaEnvelope, FaUserShield, FaCalendarAlt } from "react-icons/fa";
 
 interface Usuario {
   id: string;
@@ -23,31 +24,55 @@ export const UserTable = () => {
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedTerm, setDebouncedTerm] = useState("");
   const [deleteModal, setDeleteModal] = useState<{
     isOpen: boolean;
     usuario?: Usuario;
   }>({ isOpen: false });
+  const [deleting, setDeleting] = useState(false);
 
-  const fetchUsuarios = async () => {
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedTerm(searchTerm);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    fetchUsuarios(debouncedTerm);
+  }, [debouncedTerm]);
+
+  async function fetchUsuarios(search = "") {
     try {
       setLoading(true);
-      const response = await fetch("/api/usuarios");
+      const url = search
+        ? `/api/usuarios?search=${encodeURIComponent(search)}`
+        : "/api/usuarios";
+      const response = await fetch(url);
       if (!response.ok) throw new Error("Erro ao buscar usuários");
       const data = await response.json();
       setUsuarios(data);
       setError("");
     } catch {
       setError("Erro ao carregar usuários");
+      setUsuarios([]);
     } finally {
       setLoading(false);
     }
+  }
+
+  const usuariosOrdenados = [...usuarios].sort((a, b) =>
+    a.nome.localeCompare(b.nome, "pt-BR", { sensitivity: "base" })
+  );
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setDebouncedTerm(searchTerm);
   };
 
-  useEffect(() => {
-    fetchUsuarios();
-  }, []);
-
   const handleDelete = async (id: string) => {
+    setDeleting(true);
     try {
       const response = await fetch(`/api/usuarios/${id}`, { method: "DELETE" });
       if (!response.ok) throw new Error("Erro ao excluir usuário");
@@ -55,6 +80,8 @@ export const UserTable = () => {
       setDeleteModal({ isOpen: false });
     } catch {
       alert("Erro ao excluir usuário");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -79,67 +106,60 @@ export const UserTable = () => {
     });
   };
 
-  if (loading) {
-    return (
-      <div className={styles.loading}>
-        <div className={styles.spinner}></div>
-        <p>Carregando usuários...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className={styles.error}>
-        <p>{error}</p>
-        <button onClick={fetchUsuarios} className={styles.retryButton}>
-          Tentar novamente
-        </button>
-      </div>
-    );
-  }
-
-  if (usuarios.length === 0) {
-    return (
-      <div className={styles.empty}>
-        <div className={styles.emptyIcon}>👥</div>
-        <h3>Nenhum usuário cadastrado</h3>
-        <p>Comece adicionando o primeiro usuário ao sistema</p>
-      </div>
-    );
-  }
-
   return (
     <>
-      {/* Tabela desktop */}
-      <div className={styles.tableContainer}>
-        <table className={styles.table}>
-          <thead className={styles.tableHead}>
-            <tr className={styles.tableHeadRow}>
-              <th className={styles.thNome}>Nome</th>
-              <th className={styles.thEmail}>Email</th>
-              <th className={styles.thPerfil}>Perfil</th>
-              <th className={styles.thStatus}>Status</th>
-              <th className={styles.thCadastro}>Cadastro</th>
-              <th className={styles.thAcoes}>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {usuarios.map((usuario) => (
-              <tr key={usuario.id} className={styles.tableBodyRow}>
-                <td className={styles.tdNome}>
-                  <div className={styles.userCell}>
-                    <div className={styles.avatar}>
-                      {usuario.nome.charAt(0).toUpperCase()}
-                    </div>
-                    <span className={styles.userName}>{usuario.nome}</span>
-                  </div>
-                </td>
-                <td className={styles.tdEmail}>{usuario.email}</td>
-                <td className={styles.tdPerfil}>
-                  {getRoleBadge(usuario.role)}
-                </td>
-                <td className={styles.tdStatus}>
+      <form onSubmit={handleSearch} className={styles.searchForm}>
+        <input
+          type="text"
+          placeholder="Buscar por nome ou email..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className={styles.searchInput}
+          aria-label="Buscar usuários"
+          autoFocus
+        />
+        <button type="submit" className={styles.searchButton}>
+          🔍 Buscar
+        </button>
+      </form>
+
+      {loading && (
+        <div className={styles.loading}>
+          <div className={styles.spinner}></div>
+          <p>Carregando usuários...</p>
+        </div>
+      )}
+
+      {error && !loading && (
+        <div className={styles.error}>
+          <p>{error}</p>
+          <button
+            onClick={() => fetchUsuarios()}
+            className={styles.retryButton}
+          >
+            Tentar novamente
+          </button>
+        </div>
+      )}
+
+      {!loading && !error && usuarios.length === 0 && (
+        <div className={styles.empty}>
+          <div className={styles.emptyIcon}>👥</div>
+          <h3>Nenhum usuário cadastrado</h3>
+          <p>Comece adicionando o primeiro usuário ao sistema</p>
+        </div>
+      )}
+
+      {!loading && !error && usuarios.length > 0 && (
+        <div className={styles.cardsContainer}>
+          {usuariosOrdenados.map((usuario) => (
+            <div key={usuario.id} className={styles.card}>
+              <div className={styles.cardHeader}>
+                <div className={styles.avatar}>
+                  {usuario.nome.charAt(0).toUpperCase()}
+                </div>
+                <div className={styles.headerInfo}>
+                  <h3 className={styles.cardName}>{usuario.nome}</h3>
                   <span
                     className={`${styles.statusBadge} ${
                       usuario.ativo ? styles.ativo : styles.inativo
@@ -147,108 +167,81 @@ export const UserTable = () => {
                   >
                     {usuario.ativo ? "Ativo" : "Inativo"}
                   </span>
-                </td>
-                <td className={styles.tdCadastro}>
-                  {formatDate(usuario.createdAt)}
-                </td>
-                <td className={styles.tdAcoes}>
-                  <div className={styles.actions}>
-                    <Link
-                      href={`/dashboard/usuarios/${usuario.id}/editar`}
-                      title="Editar"
-                      className={styles.iconEditar}
-                    >
-                      <Edit className={styles.iconEdit} />
-                    </Link>
-
-                    <button
-                      onClick={() => setDeleteModal({ isOpen: true, usuario })}
-                      className={styles.iconButtonDelete}
-                      title="Excluir"
-                    >
-                      <Trash2 className={styles.iconDelete} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Cards mobile */}
-      <div className={styles.cardsContainer}>
-        {usuarios.map((usuario) => (
-          <div key={usuario.id} className={styles.usuarioCard}>
-            <div className={styles.usuarioIcon}>
-              {usuario.nome.charAt(0).toUpperCase()}
-            </div>
-            <div className={styles.usuarioInfo}>
-              <strong>{usuario.nome}</strong>
-              <span>{usuario.email}</span>
-              <div className={styles.roleBadgeContainer}>
-                {getRoleBadge(usuario.role)}
+                </div>
               </div>
-              <span
-                className={`${styles.statusBadge} ${
-                  usuario.ativo ? styles.ativo : styles.inativo
-                }`}
-              >
-                {usuario.ativo ? "Ativo" : "Inativo"}
-              </span>
-              <span>Cadastro: {formatDate(usuario.createdAt)}</span>
+              <div className={styles.cardContent}>
+                <p className={styles.infoItem}>
+                  <FaEnvelope size={24} className={styles.iconEmail} />
+                  <span>{usuario.email}</span>
+                </p>
+                <p className={styles.infoItem}>
+                  <FaUserShield size={24} className={styles.iconRole} />
+                  <span>{getRoleBadge(usuario.role)}</span>
+                </p>
+                <p className={styles.infoItem}>
+                  <FaCalendarAlt size={24} className={styles.iconDate} />
+                  <span>Cadastrado em {formatDate(usuario.createdAt)}</span>
+                </p>
+                {usuario.cliente && (
+                  <div className={styles.clienteBadge}>
+                    Cliente: {usuario.cliente.nome}
+                  </div>
+                )}
+              </div>
               <div className={styles.actions}>
                 <Link
                   href={`/dashboard/usuarios/${usuario.id}/editar`}
                   title="Editar"
                   className={styles.iconEditar}
                 >
-                  <Edit className={styles.iconEdit} />
+                  <Edit size={24} />
                 </Link>
                 <button
                   onClick={() => setDeleteModal({ isOpen: true, usuario })}
-                  className={styles.iconButtonDelete}
                   title="Excluir"
+                  className={styles.iconButtonDelete}
                 >
-                  <Trash2 className={styles.iconDelete} />
+                  <Trash2 size={24} />
                 </button>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
-
-      <Modal
-        isOpen={deleteModal.isOpen}
-        onClose={() => setDeleteModal({ isOpen: false })}
-        title="Confirmar Exclusão"
-        size="small"
-      >
-        <div className={styles.modalContent}>
-          <p>
-            Tem certeza que deseja excluir o usuário{" "}
-            <strong>{deleteModal.usuario?.nome}</strong>?
-          </p>
-          <p className={styles.warning}>Esta ação não pode ser desfeita.</p>
-
-          <div className={styles.modalActions}>
-            <Button
-              variant="outline"
-              onClick={() => setDeleteModal({ isOpen: false })}
-            >
-              Cancelar
-            </Button>
-            <Button
-              variant="danger"
-              onClick={() =>
-                deleteModal.usuario && handleDelete(deleteModal.usuario.id)
-              }
-            >
-              Excluir
-            </Button>
-          </div>
+          ))}
         </div>
-      </Modal>
+      )}
+
+      {deleteModal.isOpen && (
+        <Modal
+          isOpen={deleteModal.isOpen}
+          onClose={() => setDeleteModal({ isOpen: false })}
+          title="Confirmar Exclusão"
+          size="small"
+        >
+          <div className={styles.modalContent}>
+            <p>
+              Tem certeza que deseja excluir o usuário{" "}
+              <strong>{deleteModal.usuario?.nome}</strong>?
+            </p>
+            <p className={styles.warning}>Esta ação não pode ser desfeita.</p>
+            <div className={styles.modalActions}>
+              <Button
+                variant="outline"
+                onClick={() => setDeleteModal({ isOpen: false })}
+              >
+                Cancelar
+              </Button>
+              <Button
+                variant="danger"
+                onClick={() =>
+                  deleteModal.usuario && handleDelete(deleteModal.usuario.id)
+                }
+                disabled={deleting}
+              >
+                {deleting ? "Excluindo..." : "Excluir"}
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </>
   );
 };

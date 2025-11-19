@@ -7,7 +7,6 @@ import { Button } from "../ui/Button/Button";
 import { Modal } from "../ui/Modal/Modal";
 
 import { FaEnvelope, FaPhone, FaBullseye } from "react-icons/fa";
-
 import { User, Edit, ClipboardCheck, Ruler, Trash2 } from "lucide-react";
 
 interface Aluno {
@@ -37,7 +36,6 @@ export const AlunoTable = () => {
   }>({ isOpen: false });
   const [deleting, setDeleting] = useState(false);
 
-  // Debounce para busca após digitar
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedTerm(searchTerm);
@@ -46,7 +44,6 @@ export const AlunoTable = () => {
     return () => clearTimeout(handler);
   }, [searchTerm]);
 
-  // Busca via debounce
   useEffect(() => {
     fetchAlunos(debouncedTerm);
   }, [debouncedTerm]);
@@ -69,10 +66,13 @@ export const AlunoTable = () => {
       setLoading(false);
     }
   }
+  const alunosOrdenados = [...alunos].sort((a, b) =>
+    a.nome.localeCompare(b.nome, "pt-BR", { sensitivity: "base" })
+  );
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    setDebouncedTerm(searchTerm); // Garante execução imediata ao clicar no botão buscar
+    setDebouncedTerm(searchTerm);
   };
 
   const handleDelete = async (id: string) => {
@@ -90,7 +90,7 @@ export const AlunoTable = () => {
   };
 
   return (
-    <>
+    <div className={styles.container}>
       <form onSubmit={handleSearch} className={styles.searchForm}>
         <input
           type="text"
@@ -132,25 +132,14 @@ export const AlunoTable = () => {
 
       {!loading && alunos.length > 0 && (
         <div className={styles.cardsContainer}>
-          {alunos.map((aluno) => (
+          {alunosOrdenados.map((aluno) => (
             <div key={aluno.id} className={styles.card}>
-              <div className={styles.avatar}>
-                {aluno.nome.charAt(0).toUpperCase()}
-              </div>
-              <div className={styles.cardContent}>
-                <h3 className={styles.cardName}>{aluno.nome}</h3>
-                <p className={styles.emailField}>
-                  <FaEnvelope size={20} color="#0f4aca" /> {aluno.email || "-"}
-                </p>
-                <p className={styles.telefoneField}>
-                  <FaPhone size={20} color="#166d1b" /> {aluno.telefone || "-"}
-                </p>
-                <p className={styles.objetivoField}>
-                  <FaBullseye size={20} color="#5a21a0" />{" "}
-                  {aluno.objetivo || "-"}
-                </p>
-                <p className={styles.statusField}>
-                  <strong>Status: </strong>
+              <div className={styles.cardHeader}>
+                <div className={styles.avatar}>
+                  {aluno.nome.charAt(0).toUpperCase()}
+                </div>
+                <div className={styles.headerInfo}>
+                  <h3 className={styles.cardName}>{aluno.nome}</h3>
                   <span
                     className={`${styles.statusBadge} ${
                       aluno.ativo ? styles.ativo : styles.inativo
@@ -158,61 +147,77 @@ export const AlunoTable = () => {
                   >
                     {aluno.ativo ? "Ativo" : "Inativo"}
                   </span>
-                </p>
-                <p className={styles.treinosField}>
-                  <strong>Treinos: </strong>
-                  {aluno._count.treinos}
-                </p>
-                <p className={styles.medidasField}>
-                  <strong>Medidas: </strong>
-                  {aluno._count.medidas}
-                </p>
-                <div className={styles.actions}>
-                  <Link
-                    href={`/dashboard/alunos/${aluno.id}`}
-                    title="Ver Perfil"
-                    aria-label={`Ver perfil ${aluno.nome}`}
-                    className={styles.iconPerfil}
-                  >
-                    <User className={styles.iconUser} />
-                  </Link>
-                  <Link
-                    href={`/dashboard/alunos/${aluno.id}/editar`}
-                    title="Editar"
-                    aria-label={`Editar ${aluno.nome}`}
-                    className={styles.iconEditar}
-                  >
-                    <Edit className={styles.iconEdit} />
-                  </Link>
-
-                  <Link
-                    href={`/dashboard/alunos/${aluno.id}/avaliacoes`}
-                    title={`Ver Avaliações de ${aluno.nome}`}
-                    aria-label={`Ver avaliações do(a) ${aluno.nome}`}
-                    className={styles.iconAvaliar}
-                  >
-                    <ClipboardCheck />
-                  </Link>
-
-                  <Link
-                    href={`/dashboard/medidas?alunoId=${
-                      aluno.id
-                    }&alunoNome=${encodeURIComponent(aluno.nome)}`}
-                    title="Ver Medidas"
-                    aria-label={`Ver medidas ${aluno.nome}`}
-                    className={styles.iconMedidas}
-                  >
-                    <Ruler className={styles.iconMed} />
-                  </Link>
-                  <button
-                    onClick={() => setDeleteModal({ isOpen: true, aluno })}
-                    title="Excluir"
-                    aria-label={`Excluir ${aluno.nome}`}
-                    className={styles.iconButtonDelete}
-                  >
-                    <Trash2 className={styles.iconDelete} />
-                  </button>
                 </div>
+              </div>
+
+              <div className={styles.cardContent}>
+                <p className={styles.infoItem}>
+                  <FaEnvelope size={24} className={styles.iconEmail} />
+                  <span>{aluno.email || "Sem email"}</span>
+                </p>
+                <p className={styles.infoItem}>
+                  <FaPhone size={24} className={styles.iconPhone} />
+                  <span>{aluno.telefone || "Sem telefone"}</span>
+                </p>
+                <p className={styles.infoItem}>
+                  <FaBullseye size={24} className={styles.iconObjetivo} />
+                  <span>{aluno.objetivo || "Sem objetivo"}</span>
+                </p>
+
+                <div className={styles.statsRow}>
+                  <div className={styles.statItem}>
+                    <span className={styles.statNumber}>
+                      {aluno._count.treinos}
+                    </span>
+                    <span className={styles.statLabel}>Treinos</span>
+                  </div>
+                  <div className={styles.statItem}>
+                    <span className={styles.statNumber}>
+                      {aluno._count.medidas}
+                    </span>
+                    <span className={styles.statLabel}>Medidas</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.actions}>
+                <Link
+                  href={`/dashboard/alunos/${aluno.id}`}
+                  title="Ver Perfil"
+                  className={styles.iconPerfil}
+                >
+                  <User size={24} />
+                </Link>
+                <Link
+                  href={`/dashboard/alunos/${aluno.id}/editar`}
+                  title="Editar"
+                  className={styles.iconEditar}
+                >
+                  <Edit size={24} />
+                </Link>
+                <Link
+                  href={`/dashboard/alunos/${aluno.id}/avaliacoes`}
+                  title="Ver Avaliações"
+                  className={styles.iconAvaliar}
+                >
+                  <ClipboardCheck size={24} />
+                </Link>
+                <Link
+                  href={`/dashboard/medidas?alunoId=${
+                    aluno.id
+                  }&alunoNome=${encodeURIComponent(aluno.nome)}`}
+                  title="Ver Medidas"
+                  className={styles.iconMedidas}
+                >
+                  <Ruler size={24} />
+                </Link>
+                <button
+                  onClick={() => setDeleteModal({ isOpen: true, aluno })}
+                  title="Excluir"
+                  className={styles.iconButtonDelete}
+                >
+                  <Trash2 size={24} />
+                </button>
               </div>
             </div>
           ))}
@@ -246,13 +251,14 @@ export const AlunoTable = () => {
                 onClick={() =>
                   deleteModal.aluno && handleDelete(deleteModal.aluno.id)
                 }
+                disabled={deleting}
               >
-                Excluir
+                {deleting ? "Excluindo..." : "Excluir"}
               </Button>
             </div>
           </div>
         </Modal>
       )}
-    </>
+    </div>
   );
 };

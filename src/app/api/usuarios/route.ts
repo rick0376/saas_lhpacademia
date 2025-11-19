@@ -13,23 +13,37 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
     }
 
-    // ✅ ALUNO não pode listar usuários
     if (session.user.role === "ALUNO") {
       return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
     }
 
     const { searchParams } = new URL(request.url);
     const clienteId = searchParams.get("clienteId");
+    const search = (searchParams.get("search") || "").trim();
 
-    const whereClause: any = {};
-
+    // Filtro base de clienteId
+    const baseWhere: any = {};
     if (session.user.role !== "SUPERADMIN") {
-      // ✅ ADMIN só vê usuários do seu cliente
-      whereClause.clienteId = session.user.clienteId;
+      baseWhere.clienteId = session.user.clienteId;
     } else if (clienteId) {
-      // ✅ SUPERADMIN pode filtrar por clienteId
-      whereClause.clienteId = clienteId;
+      baseWhere.clienteId = clienteId;
     }
+
+    // Construir where final evitando referência circular
+    const whereClause =
+      search.length > 0
+        ? {
+            AND: [
+              baseWhere,
+              {
+                OR: [
+                  { nome: { contains: search, mode: "insensitive" } },
+                  { email: { contains: search, mode: "insensitive" } },
+                ],
+              },
+            ],
+          }
+        : baseWhere;
 
     const usuarios = await prisma.usuario.findMany({
       where: whereClause,

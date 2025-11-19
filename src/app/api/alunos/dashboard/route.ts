@@ -8,7 +8,6 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user || !(session.user as any)?.aluno?.id) {
-      console.log("Unauthorized access to dashboard API");
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -20,13 +19,6 @@ export async function GET(request: NextRequest) {
         { status: 400 }
       );
     }
-
-    console.log(
-      "🔍 API /api/alunos/dashboard: User ID:",
-      session.user.id,
-      "Aluno ID:",
-      alunoId
-    );
 
     // ========================================
     // ✅ OTIMIZAÇÃO: UMA TRANSACTION COM TUDO
@@ -117,7 +109,6 @@ export async function GET(request: NextRequest) {
     ]);
 
     if (!aluno) {
-      console.log("Aluno not found for ID:", alunoId);
       return NextResponse.json({ error: "Aluno not found" }, { status: 404 });
     }
 
@@ -172,24 +163,12 @@ export async function GET(request: NextRequest) {
       ultimasExecucoes: execucoesFormatadas,
     };
 
-    console.log(
-      "✅ Dados do aluno carregados:",
-      aluno.nome,
-      "- Treinos:",
-      data.treinosAtivos,
-      "- Próximo Treino:",
-      proximoTreinoFormatado?.data || "Nenhum agendado",
-      "- Execuções:",
-      execucoesFormatadas.length
-    );
-
     return NextResponse.json(data, {
       headers: {
         "Cache-Control": "public, max-age=60",
       },
     });
   } catch (error) {
-    console.error("API Error:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

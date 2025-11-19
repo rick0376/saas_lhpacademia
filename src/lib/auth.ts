@@ -19,19 +19,13 @@ export const authOptions: NextAuthOptions = {
         clienteId: { label: "Cliente ID", type: "text", required: false },
       },
       async authorize(credentials) {
-        console.log("🔍 Credenciais recebidas:", credentials);
-
-        // ✅ ACEITA TANTO 'password' QUANTO 'senha'
         const senha = credentials?.password || (credentials as any)?.senha;
 
         if (!credentials?.email || !senha) {
-          console.log("❌ Credenciais incompletas (email/password ausentes)");
           throw new Error("Email e senha são obrigatórios");
         }
 
         try {
-          console.log("🔍 Buscando usuário por email:", credentials.email);
-
           const usuario = await prisma.usuario.findFirst({
             where: {
               email: credentials.email,
@@ -44,10 +38,6 @@ export const authOptions: NextAuthOptions = {
           });
 
           if (!usuario) {
-            console.log(
-              "❌ Usuário não encontrado ou inativo:",
-              credentials.email
-            );
             throw new Error("Usuário não encontrado ou inativo");
           }
 
@@ -59,36 +49,14 @@ export const authOptions: NextAuthOptions = {
             usuario.role !== "SUPERADMIN" &&
             usuario.clienteId !== clienteId
           ) {
-            console.log(
-              "❌ Cliente ID não corresponde:",
-              clienteId,
-              "vs",
-              usuario.clienteId
-            );
             throw new Error("Cliente ID inválido");
           }
 
-          console.log(
-            "✅ Usuário encontrado:",
-            usuario.email,
-            "Role:",
-            usuario.role
-          );
-
-          // ✅ USA A SENHA CORRETA
           const senhaValida = await compare(senha, usuario.senha);
 
           if (!senhaValida) {
-            console.log("❌ Senha incorreta para:", credentials.email);
             throw new Error("Senha incorreta");
           }
-
-          console.log(
-            "✅ Autenticação bem-sucedida:",
-            usuario.email,
-            "Role:",
-            usuario.role
-          );
 
           const user = {
             id: usuario.id,
@@ -102,7 +70,6 @@ export const authOptions: NextAuthOptions = {
 
           return user;
         } catch (error) {
-          console.error("❌ Erro na autenticação:", error);
           throw error;
         }
       },

@@ -26,7 +26,7 @@ export default function LoginSuperAdminPage() {
     try {
       const result = await signIn("credentials", {
         email: formData.email,
-        senha: formData.senha,
+        password: formData.senha,
         redirect: false,
       });
 

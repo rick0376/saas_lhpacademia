@@ -28,11 +28,6 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
 
-    console.log("📤 Tentando fazer login com:", {
-      email: formData.email,
-      clienteId,
-    });
-
     try {
       const result = await signIn("credentials", {
         email: formData.email.trim(),
@@ -41,8 +36,6 @@ export default function LoginPage() {
         redirect: false,
       });
 
-      console.log("📥 Result signIn:", result);
-
       if (result?.error) {
         setError(result.error || "Email ou senha inválidos");
         setLoading(false);
@@ -50,29 +43,23 @@ export default function LoginPage() {
       }
 
       if (result?.ok) {
-        console.log("✅ Login bem-sucedido, aguardando session...");
-        // Não redireciona aqui, deixa o useEffect fazer isso
+        // Login bem-sucedido
       }
     } catch (err) {
-      console.error("❌ Erro no login:", err);
       setError("Erro ao fazer login. Tente novamente.");
       setLoading(false);
     }
   };
 
-  // ✅ useEffect para redirecionar após login bem-sucedido
+  // useEffect para redirecionar após login bem-sucedido
   useEffect(() => {
     if (session?.user) {
-      console.log("🔄 Session atualizada, role:", session.user.role);
-
       if (session.user.role === "ALUNO") {
-        console.log("➡️ Redirecionando ALUNO para /alunos/dashboard");
         router.push("/alunos/dashboard");
       } else if (
         session.user.role === "ADMIN" ||
         session.user.role === "SUPERADMIN"
       ) {
-        console.log("➡️ Redirecionando ADMIN para /dashboard");
         router.push("/dashboard");
       }
     }
