@@ -428,7 +428,6 @@ ${execucao.observacoes ? `*Observações:* ${execucao.observacoes}` : ""}
         </div>
 
         {/* Cards Grid */}
-        {/* Cards Grid - OS 4 PRINCIPAIS */}
         <div className={styles.cardsGrid}>
           {/* Treinos */}
           <div className={styles.premiumCard}>
