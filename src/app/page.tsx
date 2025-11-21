@@ -18,7 +18,7 @@ export default async function Home() {
       </div>
 
       <div className={styles.hero}>
-        <h1 className={styles.title}>Bem-vindo a Academia Pro</h1>
+        <h1 className={styles.title}>Bem-vindo a Academia LHP</h1>
         <p className={styles.subtitle}>Selecione um cliente para fazer login</p>
       </div>
 

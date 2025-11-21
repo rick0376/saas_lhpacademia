@@ -25,6 +25,11 @@ interface Permissao {
 
 const RECURSOS = [
   {
+    value: "dashboard",
+    label: "📊 Dashboard",
+    description: "Acessar métricas e relatórios",
+  },
+  {
     value: "clientes",
     label: "🏢 Clientes",
     description: "Gerenciar clientes/academias",
@@ -165,6 +170,73 @@ export const PermissoesManager = () => {
     });
   };
 
+  // ✅ NOVO: Marcar/Desmarcar TODAS as permissões de um tipo
+  const handleToggleTodas = (tipo: "criar" | "ler" | "editar" | "deletar") => {
+    setPermissoes((prev) => {
+      const novoEstado: Record<string, Permissao> = { ...prev };
+      const novoValor = !(
+        RECURSOS.every((r) => novoEstado[r.value]?.[tipo]) ?? false
+      );
+
+      RECURSOS.forEach(({ value: recurso }) => {
+        novoEstado[recurso] = {
+          ...(novoEstado[recurso] || {
+            id: "",
+            recurso,
+            criar: false,
+            ler: true,
+            editar: false,
+            deletar: false,
+          }),
+          [tipo]: novoValor,
+        };
+      });
+
+      return novoEstado;
+    });
+  };
+
+  // ✅ NOVO: Marcar/Desmarcar TODOS os tipos de UM recurso específico
+  const handleToggleTodosTiposRecurso = (recurso: string) => {
+    setPermissoes((prev) => {
+      const permissaoAtual = prev[recurso] || {
+        id: "",
+        recurso,
+        criar: false,
+        ler: true,
+        editar: false,
+        deletar: false,
+      };
+
+      // Se algum estiver marcado, desmarca todos. Se nenhum estiver, marca todos.
+      const algumMarcado =
+        permissaoAtual.criar ||
+        permissaoAtual.ler ||
+        permissaoAtual.editar ||
+        permissaoAtual.deletar;
+
+      return {
+        ...prev,
+        [recurso]: {
+          ...permissaoAtual,
+          criar: !algumMarcado,
+          ler: !algumMarcado,
+          editar: !algumMarcado,
+          deletar: !algumMarcado,
+        },
+      };
+    });
+  };
+
+  // ✅ NOVO: Verifica se todos os tipos de um recurso estão marcados
+  const todosTiposMarcadosNoRecurso = (recurso: string) => {
+    const permissao = permissoes[recurso];
+    if (!permissao) return false;
+    return (
+      permissao.criar && permissao.ler && permissao.editar && permissao.deletar
+    );
+  };
+
   const handleSalvar = async () => {
     if (!usuarioSelecionado) {
       showToast("Selecione um usuário", "warning");
@@ -216,6 +288,11 @@ export const PermissoesManager = () => {
 
   const closeToast = () => {
     setToast({ ...toast, show: false });
+  };
+
+  // ✅ NOVO: Verifica se todos os itens de um tipo estão marcados
+  const todasMarcadas = (tipo: "criar" | "ler" | "editar" | "deletar") => {
+    return RECURSOS.every((r) => permissoes[r.value]?.[tipo]);
   };
 
   const usuarioInfo = usuarios.find((u) => u.id === usuarioSelecionado);
@@ -276,6 +353,17 @@ export const PermissoesManager = () => {
                   </div>
 
                   <div className={styles.checkboxGrid}>
+                    <label className={styles.checkboxLabel}>
+                      <input
+                        type="checkbox"
+                        checked={todosTiposMarcadosNoRecurso(recurso)}
+                        onChange={() => handleToggleTodosTiposRecurso(recurso)}
+                        className={styles.checkbox}
+                        title="Marcar/Desmarcar todos os tipos deste recurso"
+                      />
+                      <span>Geral</span>
+                    </label>
+
                     <label className={styles.checkboxLabel}>
                       <input
                         type="checkbox"

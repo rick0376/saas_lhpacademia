@@ -1,0 +1,28 @@
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+
+  .title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #1e293b;
+  }
+
+  .canvasContainer {
+    position: relative;
+    height: 300px;
+
+    @media (max-width: 768px) {
+      height: 250px;
+    }
+  }
+
+  .canvas {
+    width: 100% !important;
+    height: 100% !important;
+  }
+}
