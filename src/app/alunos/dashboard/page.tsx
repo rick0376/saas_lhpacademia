@@ -428,20 +428,19 @@ ${execucao.observacoes ? `*Observações:* ${execucao.observacoes}` : ""}
         </div>
 
         {/* Cards Grid */}
+        {/* Cards Grid - OS 4 PRINCIPAIS */}
         <div className={styles.cardsGrid}>
           {/* Treinos */}
-          <div className={styles.card}>
-            <Dumbbell size={32} className={styles.cardIcon} />
+          <div className={styles.premiumCard}>
+            <Dumbbell size={32} className={styles.premiumCardIcon} />
             <div>
-              <h3 className="font-semibold text-gray-700 mb-1">
-                Treinos Ativos
-              </h3>
-              <p className={styles.cardNumber}>
+              <h3 className={styles.premiumCardTitle}>Treinos Ativos</h3>
+              <p className={styles.premiumCardNumber}>
                 {alunoData.treinosAtivos || 0}
               </p>
             </div>
             <button
-              className={styles.cardButton}
+              className={styles.premiumCardButton}
               onClick={() => router.push("/alunos/treinos")}
             >
               Ver Treinos
@@ -449,18 +448,16 @@ ${execucao.observacoes ? `*Observações:* ${execucao.observacoes}` : ""}
           </div>
 
           {/* Medidas */}
-          <div className={styles.card}>
-            <Ruler size={32} className={styles.cardIcon} />
+          <div className={styles.premiumCard}>
+            <Ruler size={32} className={styles.premiumCardIcon} />
             <div>
-              <h3 className="font-semibold text-gray-700 mb-1">
-                Última Medida
-              </h3>
-              <p className={styles.cardNumber}>
+              <h3 className={styles.premiumCardTitle}>Última Medida</h3>
+              <p className={styles.premiumCardNumber}>
                 {alunoData.ultimaMedida?.peso || 0} kg
               </p>
             </div>
             <button
-              className={styles.cardButton}
+              className={styles.premiumCardButton}
               onClick={() => router.push("/alunos/medidas")}
             >
               Ver Evolução
@@ -468,14 +465,16 @@ ${execucao.observacoes ? `*Observações:* ${execucao.observacoes}` : ""}
           </div>
 
           {/* Avaliações */}
-          <div className={styles.card}>
-            <Heart size={32} className={styles.cardIcon} />
+          <div className={styles.premiumCard}>
+            <Heart size={32} className={styles.premiumCardIcon} />
             <div>
-              <h3 className="font-semibold text-gray-700 mb-1">Avaliações</h3>
-              <p className={styles.cardNumber}>{alunoData.avaliacoes || 0}</p>
+              <h3 className={styles.premiumCardTitle}>Avaliações</h3>
+              <p className={styles.premiumCardNumber}>
+                {alunoData.avaliacoes || 0}
+              </p>
             </div>
             <button
-              className={styles.cardButton}
+              className={styles.premiumCardButton}
               onClick={() => router.push("/alunos/avaliacoes")}
             >
               Ver Avaliações
@@ -483,18 +482,16 @@ ${execucao.observacoes ? `*Observações:* ${execucao.observacoes}` : ""}
           </div>
 
           {/* Próximo Treino */}
-          <div className={styles.card}>
-            <Calendar size={32} className={styles.cardIcon} />
+          <div className={styles.premiumCard}>
+            <Calendar size={32} className={styles.premiumCardIcon} />
             <div>
-              <h3 className="font-semibold text-gray-700 mb-1">
-                Próximo Treino
-              </h3>
-              <p className={styles.cardNumber}>
+              <h3 className={styles.premiumCardTitle}>Próximo Treino</h3>
+              <p className={styles.premiumCardNumber}>
                 {alunoData.proximoTreino?.data || "Sem agendamento"}
               </p>
             </div>
             <button
-              className={styles.cardButton}
+              className={styles.premiumCardButton}
               onClick={() => router.push("/alunos/calendario")}
             >
               Ver Cronograma
