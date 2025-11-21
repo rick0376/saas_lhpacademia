@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import styles from "./alunoTable.module.scss";
 import { Button } from "../ui/Button/Button";
 import { Modal } from "../ui/Modal/Modal";
-
 import { FaEnvelope, FaPhone, FaBullseye } from "react-icons/fa";
-import { User, Edit, ClipboardCheck, Ruler, Trash2 } from "lucide-react";
+import { User, Edit, ClipboardCheck, Ruler, Trash2, Plus } from "lucide-react";
 
 interface Aluno {
   id: string;
@@ -24,7 +25,17 @@ interface Aluno {
   clienteId: string;
 }
 
+interface Permissao {
+  recurso: string;
+  criar: boolean;
+  ler: boolean;
+  editar: boolean;
+  deletar: boolean;
+}
+
 export const AlunoTable = () => {
+  const router = useRouter();
+  const { data: session, status } = useSession();
   const [alunos, setAlunos] = useState<Aluno[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -35,6 +46,63 @@ export const AlunoTable = () => {
     aluno?: Aluno;
   }>({ isOpen: false });
   const [deleting, setDeleting] = useState(false);
+  const [permissoes, setPermissoes] = useState<Permissao>({
+    recurso: "alunos",
+    criar: false,
+    ler: false,
+    editar: false,
+    deletar: false,
+  });
+  const [permissoesCarregadas, setPermissoesCarregadas] = useState(false);
+
+  // Busca permissões do usuário logado
+  const fetchPermissoes = async () => {
+    try {
+      // SUPERADMIN tem acesso total automaticamente
+      if (session?.user?.role === "SUPERADMIN") {
+        setPermissoes({
+          recurso: "alunos",
+          criar: true,
+          ler: true,
+          editar: true,
+          deletar: true,
+        });
+        setPermissoesCarregadas(true);
+        return;
+      }
+
+      // Se não for SUPERADMIN, busca do banco
+      const response = await fetch("/api/permissoes/usuario");
+      if (!response.ok) throw new Error("Erro ao buscar permissões");
+      const data = await response.json();
+
+      const permissaoAlunos = data.find(
+        (p: Permissao) => p.recurso === "alunos"
+      );
+      if (permissaoAlunos) {
+        setPermissoes(permissaoAlunos);
+      } else {
+        setPermissoes({
+          recurso: "alunos",
+          criar: false,
+          ler: false,
+          editar: false,
+          deletar: false,
+        });
+      }
+      setPermissoesCarregadas(true);
+    } catch (error) {
+      console.error("❌ Erro ao carregar permissões:", error);
+      setPermissoes({
+        recurso: "alunos",
+        criar: false,
+        ler: false,
+        editar: false,
+        deletar: false,
+      });
+      setPermissoesCarregadas(true);
+    }
+  };
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -45,8 +113,17 @@ export const AlunoTable = () => {
   }, [searchTerm]);
 
   useEffect(() => {
-    fetchAlunos(debouncedTerm);
-  }, [debouncedTerm]);
+    if (permissoesCarregadas && permissoes.ler) {
+      fetchAlunos(debouncedTerm);
+    }
+  }, [debouncedTerm, permissoesCarregadas, permissoes.ler]);
+
+  // Carrega permissões quando o session está disponível
+  useEffect(() => {
+    if (status === "authenticated" && session) {
+      fetchPermissoes();
+    }
+  }, [status, session]);
 
   async function fetchAlunos(search = "") {
     try {
@@ -66,6 +143,7 @@ export const AlunoTable = () => {
       setLoading(false);
     }
   }
+
   const alunosOrdenados = [...alunos].sort((a, b) =>
     a.nome.localeCompare(b.nome, "pt-BR", { sensitivity: "base" })
   );
@@ -76,6 +154,11 @@ export const AlunoTable = () => {
   };
 
   const handleDelete = async (id: string) => {
+    if (!permissoes.deletar) {
+      alert("⛔ Você não tem permissão para deletar alunos");
+      return;
+    }
+
     setDeleting(true);
     try {
       const response = await fetch(`/api/alunos/${id}`, { method: "DELETE" });
@@ -89,8 +172,35 @@ export const AlunoTable = () => {
     }
   };
 
+  // Verifica se tem permissão de ler
+  if (
+    permissoesCarregadas &&
+    !permissoes.ler &&
+    session?.user?.role !== "SUPERADMIN"
+  ) {
+    return (
+      <div className={styles.error}>
+        <p>⛔ Você não tem permissão para visualizar alunos</p>
+        <button
+          onClick={() => window.location.reload()}
+          className={styles.retryButton}
+        >
+          Tentar novamente
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.container}>
+      {/* Botão Novo Aluno - Só aparece se tiver permissão */}
+      {permissoes.criar && (
+        <Link href="/dashboard/alunos/novo" className={styles.addButton}>
+          <Plus size={20} />
+          Novo Aluno
+        </Link>
+      )}
+
       <form onSubmit={handleSearch} className={styles.searchForm}>
         <input
           type="text"
@@ -188,13 +298,15 @@ export const AlunoTable = () => {
                 >
                   <User size={24} />
                 </Link>
-                <Link
-                  href={`/dashboard/alunos/${aluno.id}/editar`}
-                  title="Editar"
-                  className={styles.iconEditar}
-                >
-                  <Edit size={24} />
-                </Link>
+                {permissoes.editar && (
+                  <Link
+                    href={`/dashboard/alunos/${aluno.id}/editar`}
+                    title="Editar"
+                    className={styles.iconEditar}
+                  >
+                    <Edit size={24} />
+                  </Link>
+                )}
                 <Link
                   href={`/dashboard/alunos/${aluno.id}/avaliacoes`}
                   title="Ver Avaliações"
@@ -211,13 +323,15 @@ export const AlunoTable = () => {
                 >
                   <Ruler size={24} />
                 </Link>
-                <button
-                  onClick={() => setDeleteModal({ isOpen: true, aluno })}
-                  title="Excluir"
-                  className={styles.iconButtonDelete}
-                >
-                  <Trash2 size={24} />
-                </button>
+                {permissoes.deletar && (
+                  <button
+                    onClick={() => setDeleteModal({ isOpen: true, aluno })}
+                    title="Excluir"
+                    className={styles.iconButtonDelete}
+                  >
+                    <Trash2 size={24} />
+                  </button>
+                )}
               </div>
             </div>
           ))}

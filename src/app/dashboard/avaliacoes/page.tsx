@@ -2,36 +2,48 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { AvaliacaoAluno } from "@/components/alunos/AvaliacaoAluno";
-import Link from "next/link";
+import { prisma } from "@/lib/prisma";
 import styles from "./styles.module.scss";
 
-export default async function AlunosPage() {
+export default async function AvaliacoesPage() {
   const session = await getServerSession(authOptions);
 
   if (!session) {
     redirect("/");
   }
 
-  // ✅ Novo: Proteção por role (só admins acessam avaliações via aqui)
-  if (!["ADMIN", "SUPERADMIN"].includes((session.user as any).role)) {
-    redirect("/dashboard"); // Redireciona para dashboard principal se não admin
+  if (session.user.role === "ALUNO") {
+    redirect("/dashboard");
+  }
+
+  if (session.user.role !== "SUPERADMIN") {
+    const permissao = await prisma.permissao.findUnique({
+      where: {
+        usuarioId_recurso: {
+          usuarioId: session.user.id,
+          recurso: "avaliacoes",
+        },
+      },
+    });
+
+    if (!permissao || !permissao.ler) {
+      redirect("/dashboard?erro=sem-permissao");
+    }
   }
 
   return (
-    <>
-      <main className={styles.main}>
-        <div className={styles.container}>
-          <div className={styles.header}>
-            <div>
-              <h1 className={styles.title}>Gerenciamento das Avaliações</h1>
-              <p className={styles.subtitle}>
-                Cadastre e acompanhe todas as avaliacões da academia
-              </p>
-            </div>
+    <main className={styles.main}>
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <div>
+            <h1 className={styles.title}>Gerenciamento das Avaliações</h1>
+            <p className={styles.subtitle}>
+              Cadastre e acompanhe todas as avaliações da academia
+            </p>
           </div>
-          <AvaliacaoAluno />
         </div>
-      </main>
-    </>
+        <AvaliacaoAluno />
+      </div>
+    </main>
   );
 }

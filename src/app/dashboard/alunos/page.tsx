@@ -2,7 +2,6 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { AlunoTable } from "@/components/alunos/AlunoTable";
-import Link from "next/link";
 import styles from "./styles.module.scss";
 
 export default async function AlunosPage() {
@@ -12,11 +11,12 @@ export default async function AlunosPage() {
     redirect("/");
   }
 
-  // ✅ Novo: Proteção por role (só admins acessam avaliações via aqui)
-  if (!["ADMIN", "SUPERADMIN"].includes((session.user as any).role)) {
-    redirect("/dashboard"); // Redireciona para dashboard principal se não admin
+  // ALUNO não acessa esta página (eles usam o app mobile)
+  if (session.user.role === "ALUNO") {
+    redirect("/dashboard");
   }
 
+  // ADMIN, USER e SUPERADMIN podem acessar (com permissões controladas no componente)
   return (
     <>
       <main className={styles.main}>
@@ -28,10 +28,6 @@ export default async function AlunosPage() {
                 Cadastre e acompanhe todos os alunos da academia
               </p>
             </div>
-            <Link href="/dashboard/alunos/novo" className={styles.addButton}>
-              <span className={styles.icon}>+</span>
-              Novo Aluno
-            </Link>
           </div>
 
           <AlunoTable />

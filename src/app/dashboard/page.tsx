@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { DashboardStats } from "@/components/dashboard/DashboardStats";
+import { AlertaSemPermissao } from "@/components/ui/Alerta/AlertaSemPermissao";
 import styles from "./styles.module.scss";
 import Link from "next/link";
 
@@ -20,7 +21,7 @@ export default async function DashboardPage() {
       icon: "🏢",
       href: "/dashboard/clientes",
       color: "#f59e0b",
-      superAdminOnly: true,
+      superAdminOnly: false, // Alterado para permitir ADMIN
     },
     {
       id: "usuarios",
@@ -70,7 +71,7 @@ export default async function DashboardPage() {
       icon: "🔐",
       href: "/dashboard/permissoes",
       color: "#ec4899",
-      adminOnly: true,
+      superAdminOnly: true,
     },
   ];
 
@@ -89,6 +90,9 @@ export default async function DashboardPage() {
 
   return (
     <div className={styles.container}>
+      {/* Alerta de permissão negada */}
+      <AlertaSemPermissao />
+
       {/* Welcome Section */}
       <div className={styles.header}>
         <h1 className={styles.title}>Olá, {session.user.name}! 👋</h1>

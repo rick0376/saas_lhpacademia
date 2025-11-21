@@ -3,9 +3,17 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import styles from "./styles.module.scss";
 import { Button } from "../ui/Button/Button";
 import { Modal } from "../ui/Modal/Modal";
+import {
+  FaEnvelope,
+  FaPhone,
+  FaBuilding,
+  FaMapMarkerAlt,
+} from "react-icons/fa";
+import { Edit, Trash2, Plus } from "lucide-react";
 
 interface Cliente {
   id: string;
@@ -18,8 +26,17 @@ interface Cliente {
   };
 }
 
+interface Permissao {
+  recurso: string;
+  criar: boolean;
+  ler: boolean;
+  editar: boolean;
+  deletar: boolean;
+}
+
 export const ClienteTable = () => {
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -27,6 +44,64 @@ export const ClienteTable = () => {
     isOpen: boolean;
     cliente?: Cliente;
   }>({ isOpen: false });
+  const [permissoes, setPermissoes] = useState<Permissao>({
+    recurso: "clientes",
+    criar: false,
+    ler: false,
+    editar: false,
+    deletar: false,
+  });
+  const [permissoesCarregadas, setPermissoesCarregadas] = useState(false);
+
+  // Busca permissões do usuário logado
+  const fetchPermissoes = async () => {
+    try {
+      // SUPERADMIN tem acesso total automaticamente
+      if (session?.user?.role === "SUPERADMIN") {
+        setPermissoes({
+          recurso: "clientes",
+          criar: true,
+          ler: true,
+          editar: true,
+          deletar: true,
+        });
+        setPermissoesCarregadas(true);
+        return;
+      }
+
+      // Se não for SUPERADMIN, busca do banco
+      const response = await fetch("/api/permissoes/usuario");
+      if (!response.ok) throw new Error("Erro ao buscar permissões");
+      const data = await response.json();
+
+      const permissaoCliente = data.find(
+        (p: Permissao) => p.recurso === "clientes"
+      );
+      if (permissaoCliente) {
+        setPermissoes(permissaoCliente);
+      } else {
+        // Se não encontrar permissão no banco, nega tudo
+        setPermissoes({
+          recurso: "clientes",
+          criar: false,
+          ler: false,
+          editar: false,
+          deletar: false,
+        });
+      }
+      setPermissoesCarregadas(true);
+    } catch (error) {
+      console.error("❌ Erro ao carregar permissões:", error);
+      setPermissoes({
+        recurso: "clientes",
+        criar: false,
+        ler: false,
+        editar: false,
+        deletar: false,
+      });
+      setPermissoesCarregadas(true);
+    }
+  };
 
   const fetchClientes = async () => {
     try {
@@ -47,11 +122,32 @@ export const ClienteTable = () => {
     }
   };
 
+  // EFEITO 1: Carrega permissões quando o session está disponível
   useEffect(() => {
-    fetchClientes();
-  }, []);
+    if (status === "authenticated" && session) {
+      fetchPermissoes();
+    }
+  }, [status, session]);
+
+  // EFEITO 2: Só busca clientes QUANDO as permissões estiverem carregadas
+  useEffect(() => {
+    if (status === "authenticated" && permissoesCarregadas) {
+      // Se não tiver permissão de ler, mostra erro e não busca
+      if (!permissoes.ler && session?.user?.role !== "SUPERADMIN") {
+        setError("⛔ Você não tem permissão para visualizar clientes");
+        setLoading(false);
+      } else {
+        fetchClientes();
+      }
+    }
+  }, [status, permissoesCarregadas, permissoes.ler, session?.user?.role]);
 
   const handleDelete = async (id: string) => {
+    if (!permissoes.deletar) {
+      alert("⛔ Você não tem permissão para deletar clientes");
+      return;
+    }
+
     try {
       const response = await fetch(`/api/clientes/${id}`, {
         method: "DELETE",
@@ -93,7 +189,10 @@ export const ClienteTable = () => {
     return (
       <div className={styles.error}>
         <p>{error}</p>
-        <button onClick={fetchClientes} className={styles.retryButton}>
+        <button
+          onClick={() => window.location.reload()}
+          className={styles.retryButton}
+        >
           Tentar novamente
         </button>
       </div>
@@ -112,6 +211,14 @@ export const ClienteTable = () => {
 
   return (
     <>
+      {/* Botão Novo - Só aparece se tiver permissão */}
+      {permissoes.criar && (
+        <Link href="/dashboard/clientes/novo" className={styles.addButton}>
+          <Plus size={20} />
+          Novo Cliente
+        </Link>
+      )}
+
       <div className={styles.tableContainer}>
         <table className={styles.table}>
           <thead>
@@ -163,7 +270,7 @@ export const ClienteTable = () => {
                 <td>{formatDate(cliente.createdAt)}</td>
                 <td>
                   <div className={styles.actions}>
-                    {/* ✅ BOTÃO CRIAR ALUNO - Vai para novo aluno com clienteId fixo */}
+                    {/* Botão Criar Aluno - Usa permissão de ALUNOS, não CLIENTES */}
                     <button
                       onClick={() =>
                         router.push(
@@ -172,6 +279,7 @@ export const ClienteTable = () => {
                       }
                       className={styles.manageButton}
                       title="Criar Aluno"
+                      // A permissão de criar ALUNOS será verificada na página de Alunos
                     >
                       <svg
                         width="16"
@@ -188,42 +296,51 @@ export const ClienteTable = () => {
                       </svg>
                     </button>
 
-                    <Link
-                      href={`/dashboard/clientes/${cliente.id}/editar`}
-                      className={styles.editButton}
-                      title="Editar"
-                    >
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
+                    {/* Botão Editar Cliente - Usa permissão EDITAR de clientes */}
+                    {permissoes.editar && (
+                      <Link
+                        href={`/dashboard/clientes/${cliente.id}/editar`}
+                        className={styles.editButton}
+                        title="Editar Cliente"
                       >
-                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                      </svg>
-                    </Link>
-                    <button
-                      onClick={() => setDeleteModal({ isOpen: true, cliente })}
-                      className={styles.deleteButton}
-                      title="Excluir"
-                    >
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
+                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                        </svg>
+                      </Link>
+                    )}
+
+                    {/* Botão Deletar Cliente - Usa permissão DELETAR de clientes */}
+                    {permissoes.deletar && (
+                      <button
+                        onClick={() =>
+                          setDeleteModal({ isOpen: true, cliente })
+                        }
+                        className={styles.deleteButton}
+                        title="Excluir Cliente"
                       >
-                        <polyline points="3 6 5 6 21 6" />
-                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                        <line x1="10" y1="11" x2="10" y2="17" />
-                        <line x1="14" y1="11" x2="14" y2="17" />
-                      </svg>
-                    </button>
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
+                          <polyline points="3 6 5 6 21 6" />
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                          <line x1="10" y1="11" x2="10" y2="17" />
+                          <line x1="14" y1="11" x2="14" y2="17" />
+                        </svg>
+                      </button>
+                    )}
                   </div>
                 </td>
               </tr>

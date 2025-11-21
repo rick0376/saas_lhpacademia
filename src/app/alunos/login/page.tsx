@@ -12,8 +12,8 @@ export default function AlunoLoginPage() {
   const [error, setError] = useState("");
 
   const [formData, setFormData] = useState({
-    email: "",
-    password: "",
+    email: "rickpereira@lhp.com",
+    password: "123456",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {

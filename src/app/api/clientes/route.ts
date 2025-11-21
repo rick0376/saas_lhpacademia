@@ -14,12 +14,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
     }
 
-    if (session.user.role !== "SUPERADMIN") {
-      return NextResponse.json(
-        { error: "Apenas SuperAdmin pode listar clientes" },
-        { status: 403 }
-      );
-    }
+    // REMOVIDO: Não bloqueia por role, deixa o controle para o componente
+    // if (session.user.role !== "SUPERADMIN") {
+    //   return NextResponse.json(
+    //     { error: "Apenas SuperAdmin pode listar clientes" },
+    //     { status: 403 }
+    //   );
+    // }
 
     const clientes = await prisma.cliente.findMany({
       include: {

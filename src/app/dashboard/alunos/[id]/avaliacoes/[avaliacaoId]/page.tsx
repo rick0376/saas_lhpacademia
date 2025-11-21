@@ -65,6 +65,14 @@ interface Avaliacao {
   arquivo: string | null;
 }
 
+interface Permissao {
+  recurso: string;
+  criar: boolean;
+  ler: boolean;
+  editar: boolean;
+  deletar: boolean;
+}
+
 export default function AvaliacaoPage() {
   const { data: session } = useSession();
   const params = useParams();
@@ -77,14 +85,19 @@ export default function AvaliacaoPage() {
   const [avaliacao, setAvaliacao] = useState<Avaliacao | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [toastType, setToastType] = useState<
     "success" | "error" | "info" | "warning"
   >("info");
-
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [permissoes, setPermissoes] = useState<Permissao>({
+    recurso: "avaliacoes",
+    criar: false,
+    ler: false,
+    editar: false,
+    deletar: false,
+  });
 
   useEffect(() => {
     if (!session?.user || !alunoId || !avaliacaoId) {
@@ -94,12 +107,39 @@ export default function AvaliacaoPage() {
     }
     async function fetchAvaliacao() {
       try {
-        const res = await fetch(
-          `/api/alunos/${alunoId}/avaliacoes/${avaliacaoId}`
+        const [avaliacaoRes, permissoesRes] = await Promise.all([
+          fetch(`/api/alunos/${alunoId}/avaliacoes/${avaliacaoId}`),
+          fetch("/api/permissoes/usuario"),
+        ]);
+
+        if (!avaliacaoRes.ok) throw new Error("Avaliação não encontrada.");
+        const avaliacaoData = await avaliacaoRes.json();
+        setAvaliacao(avaliacaoData);
+
+        const permissoesData = await permissoesRes.json();
+        const permissaoAvaliacoes = permissoesData.find(
+          (p: Permissao) => p.recurso === "avaliacoes"
         );
-        if (!res.ok) throw new Error("Avaliação não encontrada.");
-        const data = await res.json();
-        setAvaliacao(data);
+
+        if (session.user.role === "SUPERADMIN") {
+          setPermissoes({
+            recurso: "avaliacoes",
+            criar: true,
+            ler: true,
+            editar: true,
+            deletar: true,
+          });
+        } else {
+          setPermissoes(
+            permissaoAvaliacoes || {
+              recurso: "avaliacoes",
+              criar: false,
+              ler: false,
+              editar: false,
+              deletar: false,
+            }
+          );
+        }
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -179,7 +219,6 @@ export default function AvaliacaoPage() {
     const bottomMargin = 20;
     let y = 50;
 
-    // ✅ DECLARE AQUI NO INÍCIO
     const nomeAluno = avaliacao.aluno?.nome ?? "Aluno não informado";
     const nomeCliente = avaliacao?.aluno?.cliente?.nome || "SaaS Academia LHP";
 
@@ -191,7 +230,6 @@ export default function AvaliacaoPage() {
         const resp = await fetch(url, { cache: "no-store" });
         if (!resp.ok) return "";
         const blob = await resp.blob();
-
         return await new Promise<string>((resolve) => {
           const reader = new FileReader();
           reader.onloadend = () =>
@@ -215,9 +253,7 @@ export default function AvaliacaoPage() {
       if (logoDataUri) {
         try {
           doc.addImage(logoDataUri, "PNG", 10, 7, 18, 18);
-        } catch {
-          // Se der erro na imagem, seguimos sem o logo
-        }
+        } catch {}
       }
 
       doc.setFont("helvetica", "bold");
@@ -253,13 +289,11 @@ export default function AvaliacaoPage() {
 
       for (let i = 1; i <= totalPages; i++) {
         doc.setPage(i);
-
         doc.line(margin, footerY - 5, pageWidth - margin, footerY - 5);
 
         doc.setFont("helvetica", "bold");
         doc.setFontSize(8);
         doc.setTextColor(25, 35, 55);
-
         doc.text(`Cliente: ${nomeCliente}`, margin, footerY);
 
         doc.setFont("helvetica", "normal");
@@ -278,10 +312,8 @@ export default function AvaliacaoPage() {
 
     const newPage = () => {
       doc.addPage();
-      y = 50; // reinicia a posição y abaixo do cabeçalho
-      printHeader(); // cabeçalho em todas as páginas novas
-
-      // RESET do estilo do corpo na nova página
+      y = 50;
+      printHeader();
       doc.setFont("helvetica", "normal");
       doc.setFontSize(12);
       doc.setTextColor(0, 0, 0);
@@ -293,33 +325,23 @@ export default function AvaliacaoPage() {
     const linha = (label: string, value: unknown, withLine = false) => {
       const maxTextWidth = pageWidth - margin * 2;
       const lineHeight = 7;
-
       const labelText = label + ":";
 
-      // configura fonte do rótulo antes de medir
       doc.setFont("helvetica", "bold");
       doc.setFontSize(12);
       doc.setTextColor(0, 0, 0);
-
-      const gap = 4; // espaço entre label e valor
+      const gap = 4;
       const labelWidth = doc.getTextWidth(labelText);
       const labelX = margin;
       let valueX = labelX + labelWidth + gap;
-
-      if (valueX > pageWidth - margin - 20) {
-        valueX = margin;
-      }
-
+      if (valueX > pageWidth - margin - 20) valueX = margin;
       const maxValueWidth = pageWidth - margin - valueX;
-
       const splitValue = doc.splitTextToSize(
         String(value ?? "-"),
         maxValueWidth > 0 ? maxValueWidth : maxTextWidth
       );
-
       const blocoHeight = Math.max(1, splitValue.length) * lineHeight;
 
-      // quebra de página se não couber
       if (y + blocoHeight > pageHeight - bottomMargin) {
         newPage();
         doc.setFont("helvetica", "bold");
@@ -327,35 +349,26 @@ export default function AvaliacaoPage() {
         doc.setTextColor(0, 0, 0);
       }
 
-      // label
       doc.text(labelText, labelX, y);
-
-      // valor
       doc.setFont("helvetica", "normal");
       doc.text(splitValue, valueX, y);
-
       y += blocoHeight + 3;
 
-      // traço opcional abaixo desta linha
       if (withLine) {
         const lineY = y + 2;
-        if (lineY > pageHeight - bottomMargin) {
-          newPage();
-        }
+        if (lineY > pageHeight - bottomMargin) newPage();
         doc.setDrawColor(200, 200, 200);
         doc.setLineWidth(0.2);
         doc.line(margin, lineY, pageWidth - margin, lineY);
-        y = lineY - 2; // espaço depois do traço
+        y = lineY - 2;
       }
     };
 
-    // Primeira página
     printHeader();
     doc.setFont("helvetica", "normal");
     doc.setFontSize(12);
     doc.setTextColor(0, 0, 0);
 
-    // Dados gerais
     linha("Tipo", avaliacao.tipo ?? "-");
     linha(
       "Data",
@@ -402,13 +415,10 @@ export default function AvaliacaoPage() {
     linha("Resultado", avaliacao.resultado);
     linha("Observações", avaliacao.observacoes);
 
-    // Rodapé em todas as páginas
     printFooter();
-
     doc.save(`avaliacao-${avaliacao.id}.pdf`);
   };
 
-  // mensagens via whatsapp
   const gerarTextoWhatsApp = (a: Avaliacao): string => {
     const divisor = "-------------------------------------------------\n";
     return encodeURIComponent(`
@@ -667,36 +677,44 @@ ${divisor}
       </div>
 
       <div className={styles.formActions}>
-        <Link
-          href={`/dashboard/alunos/${alunoId}/avaliacoes/editar/${avaliacaoId}`}
-          className={`${styles.buttonBase} ${styles.submitButton}`}
-        >
-          <Edit size={20} /> Editar
-        </Link>
+        {permissoes.editar && (
+          <Link
+            href={`/dashboard/alunos/${alunoId}/avaliacoes/editar/${avaliacaoId}`}
+            className={`${styles.buttonBase} ${styles.submitButton}`}
+          >
+            <Edit size={20} /> Editar
+          </Link>
+        )}
 
-        <button
-          type="button"
-          className={`${styles.buttonBase} ${styles.whatsappButton}`}
-          onClick={enviarWhatsApp}
-        >
-          <Share2 size={20} /> WhatsApp
-        </button>
+        {permissoes.editar && (
+          <button
+            type="button"
+            className={`${styles.buttonBase} ${styles.whatsappButton}`}
+            onClick={enviarWhatsApp}
+          >
+            <Share2 size={20} /> WhatsApp
+          </button>
+        )}
 
-        <button
-          type="button"
-          className={`${styles.buttonBase} ${styles.pdfButton}`}
-          onClick={gerarPdf}
-        >
-          Gerar PDF
-        </button>
+        {permissoes.editar && (
+          <button
+            type="button"
+            className={`${styles.buttonBase} ${styles.pdfButton}`}
+            onClick={gerarPdf}
+          >
+            Gerar PDF
+          </button>
+        )}
 
-        <button
-          type="button"
-          className={`${styles.buttonBase} ${styles.deleteButton}`}
-          onClick={openConfirm}
-        >
-          <Delete size={20} /> Excluir
-        </button>
+        {permissoes.deletar && (
+          <button
+            type="button"
+            className={`${styles.buttonBase} ${styles.deleteButton}`}
+            onClick={openConfirm}
+          >
+            <Delete size={20} /> Excluir
+          </button>
+        )}
       </div>
     </div>
   );

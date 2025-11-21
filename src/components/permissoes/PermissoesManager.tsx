@@ -24,9 +24,24 @@ interface Permissao {
 
 const RECURSOS = [
   {
+    value: "clientes",
+    label: "🏢 Clientes",
+    description: "Gerenciar clientes/academias",
+  },
+  {
+    value: "usuarios",
+    label: "👥 Usuários",
+    description: "Gerenciar usuários do sistema",
+  },
+  {
     value: "alunos",
     label: "👤 Alunos",
     description: "Gerenciar cadastro de alunos",
+  },
+  {
+    value: "avaliacoes",
+    label: "📊 Avaliações",
+    description: "Gerenciar avaliações de alunos",
   },
   {
     value: "exercicios",
@@ -53,7 +68,7 @@ const RECURSOS = [
 export const PermissoesManager = () => {
   const router = useRouter();
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
-  const [todosUsuarios, setTodosUsuarios] = useState<Usuario[]>([]); // Para debug
+  const [todosUsuarios, setTodosUsuarios] = useState<Usuario[]>([]);
   const [usuarioSelecionado, setUsuarioSelecionado] = useState<string>("");
   const [permissoes, setPermissoes] = useState<Record<string, Permissao>>({});
   const [loading, setLoading] = useState(false);
@@ -85,10 +100,8 @@ export const PermissoesManager = () => {
       console.log("📦 Usuários recebidos da API:", data);
       console.log("📊 Total de usuários:", data.length);
 
-      // Guarda todos para debug
       setTodosUsuarios(data);
 
-      // Filtra apenas ativos que não são SUPERADMIN
       const usuariosFiltrados = data.filter(
         (u: Usuario) => u.ativo && (u.role === "ADMIN" || u.role === "USER")
       );
@@ -99,7 +112,6 @@ export const PermissoesManager = () => {
       );
       console.log("📊 Total filtrado:", usuariosFiltrados.length);
 
-      // Mostra quantos foram filtrados por role
       const superAdmins = data.filter(
         (u: Usuario) => u.role === "SUPERADMIN"
       ).length;
@@ -209,7 +221,6 @@ export const PermissoesManager = () => {
 
   return (
     <div className={styles.container}>
-      {/* DEBUG INFO */}
       <div className={styles.debugInfo}>
         <h4>🔍 Informações de Debug:</h4>
         <p>
@@ -308,7 +319,8 @@ export const PermissoesManager = () => {
                         onChange={() => handleTogglePermissao(recurso, "criar")}
                         className={styles.checkbox}
                       />
-                      <span>Criar</span>
+                      <span>Novo</span>{" "}
+                      {/* ✅ ALTERADO DE "Criar" PARA "Novo" */}
                     </label>
 
                     <label className={styles.checkboxLabel}>

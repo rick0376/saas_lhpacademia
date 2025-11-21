@@ -1,3 +1,6 @@
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { format } from "date-fns";
 import Link from "next/link";
@@ -42,7 +45,6 @@ interface Avaliacao {
   arquivo: string | null;
 }
 
-// Função para parsear JSON e garantir tipagem para dobrasCutaneas
 function parseDobrasCutaneas(data: unknown): DobrasCutaneas | null {
   if (!data || typeof data !== "object") return null;
   const d = data as Partial<DobrasCutaneas>;
@@ -62,7 +64,32 @@ export default async function AvaliacoesPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const session = await getServerSession(authOptions);
   const { id: alunoId } = await params;
+
+  if (!session) {
+    redirect("/");
+  }
+
+  if (session.user.role === "ALUNO") {
+    redirect("/dashboard");
+  }
+
+  // Verificar permissão de ler avaliações
+  if (session.user.role !== "SUPERADMIN") {
+    const permissao = await prisma.permissao.findUnique({
+      where: {
+        usuarioId_recurso: {
+          usuarioId: session.user.id,
+          recurso: "avaliacoes",
+        },
+      },
+    });
+
+    if (!permissao || !permissao.ler) {
+      redirect("/dashboard?erro=sem-permissao");
+    }
+  }
 
   const aluno = await prisma.aluno.findUnique({
     where: { id: alunoId },
@@ -70,7 +97,6 @@ export default async function AvaliacoesPage({
   });
   if (!aluno) return <div>Aluno não encontrado.</div>;
 
-  // Buscar avaliação incluindo dobrasCutaneas como Json que deve ser parseado
   const rawAvaliacoes = await prisma.avaliacao.findMany({
     where: { alunoId },
     select: {
@@ -104,7 +130,6 @@ export default async function AvaliacoesPage({
     orderBy: { data: "desc" },
   });
 
-  // Parse seguro dobrasCutaneas
   const avaliacoes: Avaliacao[] = rawAvaliacoes.map((av) => ({
     ...av,
     dobrasCutaneas: parseDobrasCutaneas(av.dobrasCutaneas),
@@ -114,16 +139,32 @@ export default async function AvaliacoesPage({
   const boolToStr = (b: boolean | null | undefined) =>
     b == null ? "-" : b ? "Sim" : "Não";
 
+  // Verificar permissão de criar avaliações para mostrar o botão
+  let podeCriarAvaliacao = true;
+  if (session.user.role !== "SUPERADMIN") {
+    const permissao = await prisma.permissao.findUnique({
+      where: {
+        usuarioId_recurso: {
+          usuarioId: session.user.id,
+          recurso: "avaliacoes",
+        },
+      },
+    });
+    podeCriarAvaliacao = !!permissao?.criar;
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.headerTop}>
         <h1 className={styles.title}>Avaliações de: {aluno.nome ?? "-"}</h1>
-        <Link
-          href={`/dashboard/alunos/${alunoId}/avaliacoes/nova`}
-          className={styles.iconAvaliar}
-        >
-          Nova Avaliação
-        </Link>
+        {podeCriarAvaliacao && (
+          <Link
+            href={`/dashboard/alunos/${alunoId}/avaliacoes/nova`}
+            className={styles.iconAvaliar}
+          >
+            Nova Avaliação
+          </Link>
+        )}
       </div>
       {avaliacoes.length === 0 ? (
         <p className={styles.noData}>Sem avaliações cadastradas.</p>

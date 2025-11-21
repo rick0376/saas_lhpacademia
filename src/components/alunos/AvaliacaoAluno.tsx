@@ -2,13 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import styles from "./avalicaoAluno.module.scss";
-import { Button } from "../ui/Button/Button";
-import { Modal } from "../ui/Modal/Modal";
-
 import { FaEnvelope, FaPhone, FaBullseye } from "react-icons/fa";
-
-import { User, Edit, ClipboardCheck, Ruler, Trash2 } from "lucide-react";
+import { ClipboardCheck } from "lucide-react";
 
 interface Aluno {
   id: string;
@@ -25,31 +22,94 @@ interface Aluno {
   clienteId: string;
 }
 
+interface Permissao {
+  recurso: string;
+  criar: boolean;
+  ler: boolean;
+  editar: boolean;
+  deletar: boolean;
+}
+
 export const AvaliacaoAluno = () => {
+  const { data: session, status } = useSession();
   const [alunos, setAlunos] = useState<Aluno[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedTerm, setDebouncedTerm] = useState("");
-  const [deleteModal, setDeleteModal] = useState<{
-    isOpen: boolean;
-    aluno?: Aluno;
-  }>({ isOpen: false });
-  const [deleting, setDeleting] = useState(false);
+  const [permissoes, setPermissoes] = useState<Permissao>({
+    recurso: "avaliacoes",
+    criar: false,
+    ler: false,
+    editar: false,
+    deletar: false,
+  });
+  const [permissoesCarregadas, setPermissoesCarregadas] = useState(false);
 
-  // Debounce para busca após digitar
+  const fetchPermissoes = async () => {
+    try {
+      if (session?.user?.role === "SUPERADMIN") {
+        setPermissoes({
+          recurso: "avaliacoes",
+          criar: true,
+          ler: true,
+          editar: true,
+          deletar: true,
+        });
+        setPermissoesCarregadas(true);
+        return;
+      }
+
+      const response = await fetch("/api/permissoes/usuario");
+      if (!response.ok) throw new Error("Erro ao buscar permissões");
+      const data = await response.json();
+
+      const permissaoAvaliacoes = data.find(
+        (p: Permissao) => p.recurso === "avaliacoes"
+      );
+      if (permissaoAvaliacoes) {
+        setPermissoes(permissaoAvaliacoes);
+      } else {
+        setPermissoes({
+          recurso: "avaliacoes",
+          criar: false,
+          ler: false,
+          editar: false,
+          deletar: false,
+        });
+      }
+      setPermissoesCarregadas(true);
+    } catch (error) {
+      console.error("Erro ao carregar permissões:", error);
+      setPermissoes({
+        recurso: "avaliacoes",
+        criar: false,
+        ler: false,
+        editar: false,
+        deletar: false,
+      });
+      setPermissoesCarregadas(true);
+    }
+  };
+
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedTerm(searchTerm);
     }, 300);
-
     return () => clearTimeout(handler);
   }, [searchTerm]);
 
-  // Busca via debounce
   useEffect(() => {
-    fetchAlunos(debouncedTerm);
-  }, [debouncedTerm]);
+    if (permissoesCarregadas && permissoes.ler) {
+      fetchAlunos(debouncedTerm);
+    }
+  }, [debouncedTerm, permissoesCarregadas, permissoes.ler]);
+
+  useEffect(() => {
+    if (status === "authenticated" && session) {
+      fetchPermissoes();
+    }
+  }, [status, session]);
 
   async function fetchAlunos(search = "") {
     try {
@@ -72,22 +132,26 @@ export const AvaliacaoAluno = () => {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    setDebouncedTerm(searchTerm); // Garante execução imediata ao clicar no botão buscar
+    setDebouncedTerm(searchTerm);
   };
 
-  const handleDelete = async (id: string) => {
-    setDeleting(true);
-    try {
-      const response = await fetch(`/api/alunos/${id}`, { method: "DELETE" });
-      if (!response.ok) throw new Error("Erro ao excluir aluno");
-      setAlunos((prev) => prev.filter((a) => a.id !== id));
-      setDeleteModal({ isOpen: false });
-    } catch {
-      alert("Erro ao excluir aluno");
-    } finally {
-      setDeleting(false);
-    }
-  };
+  if (
+    permissoesCarregadas &&
+    !permissoes.ler &&
+    session?.user?.role !== "SUPERADMIN"
+  ) {
+    return (
+      <div className={styles.error}>
+        <p>⛔ Você não tem permissão para visualizar avaliações</p>
+        <button
+          onClick={() => window.location.reload()}
+          className={styles.retryButton}
+        >
+          Tentar novamente
+        </button>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -113,7 +177,7 @@ export const AvaliacaoAluno = () => {
         </div>
       )}
 
-      {error && (
+      {error && !loading && (
         <div className={styles.error}>
           <p>{error}</p>
           <button onClick={() => fetchAlunos()} className={styles.retryButton}>
@@ -167,15 +231,17 @@ export const AvaliacaoAluno = () => {
                   <strong>Medidas: </strong>
                   {aluno._count.medidas}
                 </p>
-                <Link
-                  href={`/dashboard/alunos/${aluno.id}/avaliacoes`}
-                  title={`Ver Avaliações de ${aluno.nome}`}
-                  aria-label={`Ver avaliações do(a) ${aluno.nome}`}
-                  className={styles.iconAvaliar}
-                >
-                  <ClipboardCheck />
-                  <span>Avaliações</span>
-                </Link>
+                {permissoes.ler && (
+                  <Link
+                    href={`/dashboard/alunos/${aluno.id}/avaliacoes`}
+                    title={`Ver Avaliações de ${aluno.nome}`}
+                    aria-label={`Ver avaliações do(a) ${aluno.nome}`}
+                    className={styles.iconAvaliar}
+                  >
+                    <ClipboardCheck />
+                    <span>Avaliações</span>
+                  </Link>
+                )}
               </div>
             </div>
           ))}

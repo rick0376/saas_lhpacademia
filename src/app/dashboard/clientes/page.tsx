@@ -12,10 +12,12 @@ export default async function ClientesPage() {
     redirect("/");
   }
 
-  if (session.user.role !== "SUPERADMIN") {
-    redirect("/dashboard");
+  // ALUNO não acessa esta página
+  if (session.user.role === "ALUNO") {
+    redirect("/dashboard?erro=sem-permissao");
   }
 
+  // ADMIN e SUPERADMIN podem acessar (com permissões controladas no componente)
   return (
     <>
       <main className={styles.main}>
@@ -27,10 +29,6 @@ export default async function ClientesPage() {
                 Cadastre e gerencie todos os clientes do sistema
               </p>
             </div>
-            <Link href="/dashboard/clientes/novo" className={styles.addButton}>
-              <span className={styles.icon}>+</span>
-              Novo Cliente
-            </Link>
           </div>
 
           <ClienteTable />

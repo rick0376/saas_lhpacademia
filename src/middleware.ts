@@ -43,7 +43,7 @@ export async function middleware(request: NextRequest) {
 
     // Rotas restritas a SUPERADMIN
     const superAdminOnlyRoutes = [
-      "/dashboard/clientes",
+      /*"/dashboard/clientes",*/
       "/dashboard/permissoes",
     ];
 
@@ -52,7 +52,9 @@ export async function middleware(request: NextRequest) {
     );
 
     if (isSuperAdminOnlyRoute && token.role !== "SUPERADMIN") {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
+      return NextResponse.redirect(
+        new URL("/dashboard?erro=sem-permissao", request.url)
+      );
     }
 
     // ADMIN e SUPERADMIN têm acesso às demais rotas dashboard

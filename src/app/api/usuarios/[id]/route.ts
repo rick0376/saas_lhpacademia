@@ -111,22 +111,43 @@ export async function PUT(
 // DELETE - Excluir usuário
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> } // ✅ Next.js 15: Params como Promise
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const resolvedParams = await params; // ✅ Await resolve o Promise
-    const id = resolvedParams.id; // Agora síncrono após await
-
+    const resolvedParams = await params;
+    const id = resolvedParams.id;
     const session = await getServerSession(authOptions);
 
     if (!session) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
     }
 
-    if (session.user.role !== "SUPERADMIN" && session.user.role !== "ADMIN") {
+    if (session.user.role === "ALUNO") {
+      return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
+    }
+
+    if (session.user.role !== "SUPERADMIN") {
+      const permissao = await prisma.permissao.findUnique({
+        where: {
+          usuarioId_recurso: {
+            usuarioId: session.user.id,
+            recurso: "usuarios",
+          },
+        },
+      });
+
+      if (!permissao || !permissao.deletar) {
+        return NextResponse.json(
+          { error: "Sem permissão para excluir usuários" },
+          { status: 403 }
+        );
+      }
+    }
+
+    if (id === session.user.id) {
       return NextResponse.json(
-        { error: "Sem permissão para excluir usuários" },
-        { status: 403 }
+        { error: "Não é possível excluir seu próprio usuário" },
+        { status: 400 }
       );
     }
 

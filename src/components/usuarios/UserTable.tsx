@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import styles from "./usertable.module.scss";
 import { Button } from "../ui/Button/Button";
 import { Modal } from "../ui/Modal/Modal";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, Plus } from "lucide-react";
 import { FaEnvelope, FaUserShield, FaCalendarAlt } from "react-icons/fa";
 
 interface Usuario {
@@ -20,7 +21,16 @@ interface Usuario {
   };
 }
 
+interface Permissao {
+  recurso: string;
+  criar: boolean;
+  ler: boolean;
+  editar: boolean;
+  deletar: boolean;
+}
+
 export const UserTable = () => {
+  const { data: session, status } = useSession();
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -31,6 +41,63 @@ export const UserTable = () => {
     usuario?: Usuario;
   }>({ isOpen: false });
   const [deleting, setDeleting] = useState(false);
+  const [permissoes, setPermissoes] = useState<Permissao>({
+    recurso: "usuarios",
+    criar: false,
+    ler: false,
+    editar: false,
+    deletar: false,
+  });
+  const [permissoesCarregadas, setPermissoesCarregadas] = useState(false);
+
+  // Busca permissões do usuário logado para o recurso "usuarios"
+  const fetchPermissoes = async () => {
+    try {
+      // SUPERADMIN tem acesso total
+      if (session?.user?.role === "SUPERADMIN") {
+        setPermissoes({
+          recurso: "usuarios",
+          criar: true,
+          ler: true,
+          editar: true,
+          deletar: true,
+        });
+        setPermissoesCarregadas(true);
+        return;
+      }
+
+      const response = await fetch("/api/permissoes/usuario");
+      if (!response.ok) throw new Error("Erro ao buscar permissões");
+      const data = await response.json();
+
+      const permissaoUsuarios = data.find(
+        (p: Permissao) => p.recurso === "usuarios"
+      );
+
+      if (permissaoUsuarios) {
+        setPermissoes(permissaoUsuarios);
+      } else {
+        setPermissoes({
+          recurso: "usuarios",
+          criar: false,
+          ler: false,
+          editar: false,
+          deletar: false,
+        });
+      }
+      setPermissoesCarregadas(true);
+    } catch (err) {
+      console.error("Erro ao carregar permissões de usuários:", err);
+      setPermissoes({
+        recurso: "usuarios",
+        criar: false,
+        ler: false,
+        editar: false,
+        deletar: false,
+      });
+      setPermissoesCarregadas(true);
+    }
+  };
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -40,8 +107,16 @@ export const UserTable = () => {
   }, [searchTerm]);
 
   useEffect(() => {
-    fetchUsuarios(debouncedTerm);
-  }, [debouncedTerm]);
+    if (permissoesCarregadas && permissoes.ler) {
+      fetchUsuarios(debouncedTerm);
+    }
+  }, [debouncedTerm, permissoesCarregadas, permissoes.ler]);
+
+  useEffect(() => {
+    if (status === "authenticated" && session) {
+      fetchPermissoes();
+    }
+  }, [status, session]);
 
   async function fetchUsuarios(search = "") {
     try {
@@ -72,6 +147,11 @@ export const UserTable = () => {
   };
 
   const handleDelete = async (id: string) => {
+    if (!permissoes.deletar) {
+      alert("⛔ Você não tem permissão para excluir usuários");
+      return;
+    }
+
     setDeleting(true);
     try {
       const response = await fetch(`/api/usuarios/${id}`, { method: "DELETE" });
@@ -106,8 +186,37 @@ export const UserTable = () => {
     });
   };
 
+  // Sem permissão de leitura
+  if (
+    permissoesCarregadas &&
+    !permissoes.ler &&
+    session?.user?.role !== "SUPERADMIN"
+  ) {
+    return (
+      <div className={styles.error}>
+        <p>⛔ Você não tem permissão para visualizar usuários</p>
+        <button
+          onClick={() => window.location.reload()}
+          className={styles.retryButton}
+        >
+          Tentar novamente
+        </button>
+      </div>
+    );
+  }
+
   return (
     <>
+      {/* Botão Novo Usuário controlado por permissão */}
+      {permissoes.criar && (
+        <div className={styles.topActions}>
+          <Link href="/dashboard/usuarios/novo" className={styles.addButton}>
+            <Plus size={20} />
+            Novo Usuário
+          </Link>
+        </div>
+      )}
+
       <form onSubmit={handleSearch} className={styles.searchForm}>
         <input
           type="text"
@@ -189,20 +298,24 @@ export const UserTable = () => {
                 )}
               </div>
               <div className={styles.actions}>
-                <Link
-                  href={`/dashboard/usuarios/${usuario.id}/editar`}
-                  title="Editar"
-                  className={styles.iconEditar}
-                >
-                  <Edit size={24} />
-                </Link>
-                <button
-                  onClick={() => setDeleteModal({ isOpen: true, usuario })}
-                  title="Excluir"
-                  className={styles.iconButtonDelete}
-                >
-                  <Trash2 size={24} />
-                </button>
+                {permissoes.editar && (
+                  <Link
+                    href={`/dashboard/usuarios/${usuario.id}/editar`}
+                    title="Editar"
+                    className={styles.iconEditar}
+                  >
+                    <Edit size={24} />
+                  </Link>
+                )}
+                {permissoes.deletar && (
+                  <button
+                    onClick={() => setDeleteModal({ isOpen: true, usuario })}
+                    title="Excluir"
+                    className={styles.iconButtonDelete}
+                  >
+                    <Trash2 size={24} />
+                  </button>
+                )}
               </div>
             </div>
           ))}

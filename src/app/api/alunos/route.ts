@@ -14,6 +14,25 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
     }
 
+    // Verificar permissão de ler alunos (se não for SUPERADMIN)
+    if (session.user.role !== "SUPERADMIN") {
+      const permissoes = await prisma.permissao.findUnique({
+        where: {
+          usuarioId_recurso: {
+            usuarioId: session.user.id,
+            recurso: "alunos",
+          },
+        },
+      });
+
+      if (!permissoes || !permissoes.ler) {
+        return NextResponse.json(
+          { error: "Sem permissão para listar alunos" },
+          { status: 403 }
+        );
+      }
+    }
+
     const clienteId = (session.user as any).clienteId;
 
     if (!clienteId) {
@@ -68,6 +87,25 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
     }
 
+    // Verificar permissão de criar alunos (se não for SUPERADMIN)
+    if (session.user.role !== "SUPERADMIN") {
+      const permissoes = await prisma.permissao.findUnique({
+        where: {
+          usuarioId_recurso: {
+            usuarioId: session.user.id,
+            recurso: "alunos",
+          },
+        },
+      });
+
+      if (!permissoes || !permissoes.criar) {
+        return NextResponse.json(
+          { error: "Sem permissão para criar alunos" },
+          { status: 403 }
+        );
+      }
+    }
+
     const clienteId = (session.user as any).clienteId;
 
     if (!clienteId) {
@@ -77,9 +115,8 @@ export async function POST(req: Request) {
       );
     }
 
-    // ✅ Processar FormData
+    // Resto do código permanece igual...
     const formData = await req.formData();
-
     const nome = formData.get("nome") as string;
     const email = formData.get("email") as string;
     const telefone = formData.get("telefone") as string;
@@ -91,7 +128,6 @@ export async function POST(req: Request) {
     const senhaInicial = formData.get("senhaInicial") as string;
     const fotoFile = formData.get("foto") as File | null;
 
-    // Validação
     if (!nome) {
       return NextResponse.json(
         { error: "Nome é obrigatório" },
@@ -99,7 +135,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Verificar se já existe aluno com este email
     if (email) {
       const alunoExistente = await prisma.aluno.findFirst({
         where: {
@@ -118,7 +153,6 @@ export async function POST(req: Request) {
 
     let usuarioId = null;
 
-    // ✅ Se marcou para dar acesso ao app, criar usuário com role ALUNO
     if (darAcessoApp) {
       if (!email) {
         return NextResponse.json(
@@ -134,7 +168,6 @@ export async function POST(req: Request) {
         );
       }
 
-      // Verificar se já existe usuário com este email
       const usuarioExistente = await prisma.usuario.findUnique({
         where: { email },
       });
@@ -146,32 +179,26 @@ export async function POST(req: Request) {
         );
       }
 
-      // Criar usuário com role "ALUNO" ✅
       const senhaHash = await bcrypt.hash(senhaInicial, 10);
       const usuario = await prisma.usuario.create({
         data: {
           nome,
           email,
           senha: senhaHash,
-          role: "ALUNO", // ✅ MUDOU de "USER" para "ALUNO"
+          role: "ALUNO",
           ativo: true,
           clienteId,
         },
       });
 
       usuarioId = usuario.id;
-      console.log("✅ Usuário ALUNO criado:", email);
     }
 
-    // ✅ Upload de foto (se houver)
     let fotoUrl = null;
     if (fotoFile && fotoFile.size > 0) {
-      console.log("📸 Fazendo upload da foto:", fotoFile.name);
       fotoUrl = await uploadToCloudinary(fotoFile, "alunos");
-      console.log("✅ Foto enviada:", fotoUrl);
     }
 
-    // Criar aluno
     const aluno = await prisma.aluno.create({
       data: {
         nome,
@@ -189,8 +216,6 @@ export async function POST(req: Request) {
         usuario: true,
       },
     });
-
-    console.log("✅ Aluno criado:", aluno.nome);
 
     return NextResponse.json(aluno, { status: 201 });
   } catch (error) {
