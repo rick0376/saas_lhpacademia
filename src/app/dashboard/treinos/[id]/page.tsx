@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import styles from "./styles.module.scss";
 
 interface Props {
-  params: Promise<{ id: string }>; // ✅ Promise
+  params: Promise<{ id: string }>;
 }
 
 export default async function TreinoDetalhesPage({ params }: Props) {
@@ -16,7 +16,10 @@ export default async function TreinoDetalhesPage({ params }: Props) {
     redirect("/");
   }
 
-  // ✅ Await params
+  if (session.user.role === "ALUNO") {
+    redirect("/dashboard");
+  }
+
   const { id } = await params;
 
   const treino = await prisma.treino.findUnique({
@@ -39,13 +42,26 @@ export default async function TreinoDetalhesPage({ params }: Props) {
     redirect("/dashboard/treinos");
   }
 
+  // Verificar permissão de editar treinos (se não for SUPERADMIN)
+  // Isso controla a visibilidade dos botões de editar/excluir exercícios
+  let podeEditar = true;
+  if (session.user.role !== "SUPERADMIN") {
+    const permissao = await prisma.permissao.findUnique({
+      where: {
+        usuarioId_recurso: {
+          usuarioId: session.user.id,
+          recurso: "treinos",
+        },
+      },
+    });
+    podeEditar = !!permissao?.editar;
+  }
+
   return (
-    <>
-      <main className={styles.main}>
-        <div className={styles.container}>
-          <TreinoDetalhes treino={treino} />
-        </div>
-      </main>
-    </>
+    <main className={styles.main}>
+      <div className={styles.container}>
+        <TreinoDetalhes treino={treino} permissoesEditar={podeEditar} />
+      </div>
+    </main>
   );
 }

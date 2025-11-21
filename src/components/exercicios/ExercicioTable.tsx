@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import styles from "./styles.module.scss";
 import { Button } from "../ui/Button/Button";
 import { Modal } from "../ui/Modal/Modal";
@@ -16,7 +17,16 @@ interface Exercicio {
   createdAt: string;
 }
 
+interface Permissao {
+  recurso: string;
+  criar: boolean;
+  ler: boolean;
+  editar: boolean;
+  deletar: boolean;
+}
+
 export const ExercicioTable = () => {
+  const { data: session, status } = useSession();
   const [exercicios, setExercicios] = useState<Exercicio[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -26,22 +36,75 @@ export const ExercicioTable = () => {
     isOpen: boolean;
     exercicio?: Exercicio;
   }>({ isOpen: false });
+  const [permissoes, setPermissoes] = useState<Permissao>({
+    recurso: "exercicios",
+    criar: false,
+    ler: false,
+    editar: false,
+    deletar: false,
+  });
+  const [permissoesCarregadas, setPermissoesCarregadas] = useState(false);
+
+  const fetchPermissoes = async () => {
+    try {
+      if (session?.user?.role === "SUPERADMIN") {
+        setPermissoes({
+          recurso: "exercicios",
+          criar: true,
+          ler: true,
+          editar: true,
+          deletar: true,
+        });
+        setPermissoesCarregadas(true);
+        return;
+      }
+
+      const response = await fetch("/api/permissoes/usuario");
+      if (!response.ok) throw new Error("Erro ao buscar permissões");
+      const data = await response.json();
+
+      const permissaoExercicios = data.find(
+        (p: Permissao) => p.recurso === "exercicios"
+      );
+      if (permissaoExercicios) {
+        setPermissoes(permissaoExercicios);
+      } else {
+        setPermissoes({
+          recurso: "exercicios",
+          criar: false,
+          ler: false,
+          editar: false,
+          deletar: false,
+        });
+      }
+      setPermissoesCarregadas(true);
+    } catch (error) {
+      console.error("❌ Erro ao carregar permissões:", error);
+      setPermissoes({
+        recurso: "exercicios",
+        criar: false,
+        ler: false,
+        editar: false,
+        deletar: false,
+      });
+      setPermissoesCarregadas(true);
+    }
+  };
 
   const fetchExercicios = async (grupo = "", search = "") => {
     try {
       setLoading(true);
+      if (!permissoesCarregadas || !permissoes.ler) return;
+
       let url = "/api/exercicios?";
       if (grupo) url += `grupoMuscular=${grupo}&`;
       if (search) url += `search=${encodeURIComponent(search)}`;
 
       const response = await fetch(url);
-
-      if (!response.ok) {
-        throw new Error("Erro ao buscar exercícios");
-      }
-
+      if (!response.ok) throw new Error("Erro ao buscar exercícios");
       const data = await response.json();
       setExercicios(data);
+      setError("");
     } catch (err) {
       setError("Erro ao carregar exercícios");
       console.error(err);
@@ -51,23 +114,37 @@ export const ExercicioTable = () => {
   };
 
   useEffect(() => {
-    fetchExercicios();
-  }, []);
+    const handler = setTimeout(() => {
+      if (permissoesCarregadas && permissoes.ler) {
+        fetchExercicios(filtroGrupo, searchTerm);
+      }
+    }, 300);
+
+    return () => clearTimeout(handler);
+  }, [filtroGrupo, searchTerm, permissoesCarregadas, permissoes.ler]);
+
+  useEffect(() => {
+    if (status === "authenticated" && session) {
+      fetchPermissoes();
+    }
+  }, [status, session]);
 
   const handleFilter = () => {
     fetchExercicios(filtroGrupo, searchTerm);
   };
 
   const handleDelete = async (id: string) => {
+    if (!permissoes.deletar) {
+      alert("⛔ Você não tem permissão para excluir exercícios");
+      return;
+    }
+
     try {
       const response = await fetch(`/api/exercicios/${id}`, {
         method: "DELETE",
       });
 
-      if (!response.ok) {
-        throw new Error("Erro ao excluir exercício");
-      }
-
+      if (!response.ok) throw new Error("Erro ao excluir exercício");
       setExercicios(exercicios.filter((e) => e.id !== id));
       setDeleteModal({ isOpen: false });
     } catch (err) {
@@ -114,11 +191,25 @@ export const ExercicioTable = () => {
     return colors[grupo] || "#6b7280";
   };
 
-  if (loading) {
+  if (!permissoesCarregadas || loading) {
     return (
       <div className={styles.loading}>
         <div className={styles.spinner}></div>
         <p>Carregando exercícios...</p>
+      </div>
+    );
+  }
+
+  if (!permissoes.ler && session?.user?.role !== "SUPERADMIN") {
+    return (
+      <div className={styles.error}>
+        <p>⛔ Você não tem permissão para visualizar exercícios</p>
+        <button
+          onClick={() => window.location.reload()}
+          className={styles.retryButton}
+        >
+          Tentar novamente
+        </button>
       </div>
     );
   }
@@ -139,6 +230,16 @@ export const ExercicioTable = () => {
 
   return (
     <>
+      {/* Botão Novo Exercício - Só aparece se tiver permissão */}
+      {permissoes.criar && (
+        <div className={styles.topActions}>
+          <Link href="/dashboard/exercicios/novo" className={styles.addButton}>
+            <span className={styles.icon}>+</span>
+            Novo Exercício
+          </Link>
+        </div>
+      )}
+
       {/* Filtros */}
       <div className={styles.filterBar}>
         <input
@@ -224,18 +325,22 @@ export const ExercicioTable = () => {
               )}
 
               <div className={styles.cardActions}>
-                <Link
-                  href={`/dashboard/exercicios/${exercicio.id}/editar`}
-                  className={styles.editButton}
-                >
-                  ✏️ Editar
-                </Link>
-                <button
-                  onClick={() => setDeleteModal({ isOpen: true, exercicio })}
-                  className={styles.deleteButton}
-                >
-                  🗑️ Excluir
-                </button>
+                {permissoes.editar && (
+                  <Link
+                    href={`/dashboard/exercicios/${exercicio.id}/editar`}
+                    className={styles.editButton}
+                  >
+                    ✏️ Editar
+                  </Link>
+                )}
+                {permissoes.deletar && (
+                  <button
+                    onClick={() => setDeleteModal({ isOpen: true, exercicio })}
+                    className={styles.deleteButton}
+                  >
+                    🗑️ Excluir
+                  </button>
+                )}
               </div>
             </div>
           ))}

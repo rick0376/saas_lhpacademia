@@ -13,6 +13,25 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
     }
 
+    // Verificar permissão de ler exercícios (se não for SUPERADMIN)
+    if (session.user.role !== "SUPERADMIN") {
+      const permissao = await prisma.permissao.findUnique({
+        where: {
+          usuarioId_recurso: {
+            usuarioId: session.user.id,
+            recurso: "exercicios",
+          },
+        },
+      });
+
+      if (!permissao || !permissao.ler) {
+        return NextResponse.json(
+          { error: "Sem permissão para listar exercícios" },
+          { status: 403 }
+        );
+      }
+    }
+
     const { searchParams } = new URL(request.url);
     const grupoMuscular = searchParams.get("grupoMuscular");
     const search = searchParams.get("search");
@@ -20,7 +39,6 @@ export async function GET(request: NextRequest) {
     const whereClause: any = {};
 
     if (session.user.role !== "SUPERADMIN") {
-      // ✅ Se clienteId undefined, whereClause sem filtro (mostra todos? Ajuste lógica se precisar)
       if (session.user.clienteId) {
         whereClause.clienteId = session.user.clienteId;
       }
@@ -58,9 +76,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
     }
 
-    // Receber FormData
-    const formData = await request.formData();
+    // Verificar permissão de criar exercícios (se não for SUPERADMIN)
+    if (session.user.role !== "SUPERADMIN") {
+      const permissao = await prisma.permissao.findUnique({
+        where: {
+          usuarioId_recurso: {
+            usuarioId: session.user.id,
+            recurso: "exercicios",
+          },
+        },
+      });
 
+      if (!permissao || !permissao.criar) {
+        return NextResponse.json(
+          { error: "Sem permissão para criar exercícios" },
+          { status: 403 }
+        );
+      }
+    }
+
+    const formData = await request.formData();
     const nome = formData.get("nome") as string;
     const grupoMuscular = formData.get("grupoMuscular") as string;
     const descricao = formData.get("descricao") as string;
@@ -68,14 +103,6 @@ export async function POST(request: NextRequest) {
     const equipamento = formData.get("equipamento") as string;
     const imagemFile = formData.get("imagem") as File | null;
 
-    console.log("📥 Recebendo dados do exercício:", {
-      nome,
-      grupoMuscular,
-      temArquivo: !!imagemFile,
-      nomeArquivo: imagemFile?.name || null,
-    });
-
-    // Validações básicas
     if (!nome || !grupoMuscular) {
       return NextResponse.json(
         { error: "Nome e grupo muscular são obrigatórios" },
@@ -83,7 +110,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // ✅ Validar GrupoMuscular
     const gruposMuscularesValidos = [
       "PEITO",
       "COSTAS",
@@ -108,10 +134,7 @@ export async function POST(request: NextRequest) {
 
     let imagemUrl: string | null = null;
 
-    // Upload da imagem para Cloudinary
     if (imagemFile) {
-      console.log("📤 Fazendo upload da imagem para Cloudinary...");
-
       const arrayBuffer = await imagemFile.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
 
@@ -120,7 +143,6 @@ export async function POST(request: NextRequest) {
           buffer,
           "saas_academia/exercicios"
         );
-        console.log("✅ Imagem enviada para Cloudinary:", imagemUrl);
       } catch (uploadError) {
         console.error("❌ Erro ao fazer upload:", uploadError);
         return NextResponse.json(
@@ -130,32 +152,21 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Salvar no banco
-    console.log("💾 Salvando no banco de dados...");
-
-    // ✅ Data para Prisma: Construa condicional para clienteId (omite se undefined)
     const data: any = {
       nome,
-      grupoMuscular: grupoMuscular as any, // ✅ Cast para GrupoMuscular
+      grupoMuscular: grupoMuscular as any,
       descricao: descricao || null,
       video: video || null,
       imagem: imagemUrl,
       equipamento: equipamento || null,
     };
 
-    // ✅ Adicione clienteId só se definido (resolve type mismatch: evita string | undefined)
     if (session.user.clienteId) {
       data.clienteId = session.user.clienteId;
     }
 
     const novoExercicio = await prisma.exercicio.create({
-      data, // ✅ Agora compatível com ExercicioCreateInput (clienteId omitido se undefined)
-    });
-
-    console.log("✅ Exercício criado com sucesso:", {
-      id: novoExercicio.id,
-      nome: novoExercicio.nome,
-      imagemSalva: novoExercicio.imagem ? "SIM ✅" : "NÃO ❌",
+      data,
     });
 
     return NextResponse.json(novoExercicio, { status: 201 });

@@ -1,8 +1,9 @@
-// components/treinos/TreinoDetalhes.tsx (COMPLETO E CORRIGIDO)
+// components/treinos/TreinoDetalhes.tsx (COMPLETO COM PERMISSÕES)
 "use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import styles from "./detalhesStyles.module.scss";
 import { Button } from "../ui/Button/Button";
@@ -32,10 +33,15 @@ interface TreinoExercicio {
 
 interface TreinoDetalhesProps {
   treino: any;
+  permissoesEditar: boolean;
 }
 
-export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
+export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
+  treino,
+  permissoesEditar,
+}) => {
   const router = useRouter();
+  const { data: session } = useSession();
 
   const { refresh, isRefreshing } = useAutoRefresh({
     interval: 30000,
@@ -102,14 +108,21 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
     }
   };
 
-  // ✅ CORRIGIDO: Função de reordenação usa a rota correta
   const handleReordenar = async (
     exercicioId: string,
     direcao: "up" | "down"
   ) => {
+    if (!permissoesEditar) {
+      setToast({
+        show: true,
+        message: "⛔ Você não tem permissão para reordenar exercícios",
+        type: "error",
+      });
+      return;
+    }
+
     try {
       setLoading(true);
-
       const response = await fetch(
         `/api/treinos/${treino.id}/exercicios/reordenar`,
         {
@@ -123,9 +136,7 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
       );
 
       if (!response.ok) throw new Error("Erro ao reordenar");
-
       await refresh();
-
       setToast({
         show: true,
         message: "✅ Ordem atualizada com sucesso!",
@@ -144,6 +155,15 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
   };
 
   const handleAddExercicio = async () => {
+    if (!permissoesEditar) {
+      setToast({
+        show: true,
+        message: "⛔ Você não tem permissão para adicionar exercícios",
+        type: "error",
+      });
+      return;
+    }
+
     if (!novoExercicio.exercicioId) {
       setToast({
         show: true,
@@ -154,7 +174,6 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
     }
 
     setLoading(true);
-
     try {
       const response = await fetch(`/api/treinos/${treino.id}/exercicios`, {
         method: "POST",
@@ -167,9 +186,7 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
       });
 
       if (!response.ok) throw new Error("Erro ao adicionar exercício");
-
       await refresh();
-
       setModalAddExercicio(false);
       setNovoExercicio({
         exercicioId: "",
@@ -179,7 +196,6 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
         descanso: 60,
         observacoes: "",
       });
-
       setToast({
         show: true,
         message: "✅ Exercício adicionado com sucesso!",
@@ -214,8 +230,16 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
   };
 
   const handleEditExercicio = async () => {
-    if (!exercicioEditando) return;
+    if (!permissoesEditar) {
+      setToast({
+        show: true,
+        message: "⛔ Você não tem permissão para editar exercícios",
+        type: "error",
+      });
+      return;
+    }
 
+    if (!exercicioEditando) return;
     setLoading(true);
 
     try {
@@ -235,12 +259,9 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
       );
 
       if (!response.ok) throw new Error("Erro ao atualizar exercício");
-
       await refresh();
-
       setModalEditExercicio(false);
       setExercicioEditando(null);
-
       setToast({
         show: true,
         message: "✅ Exercício atualizado com sucesso!",
@@ -259,8 +280,16 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
   };
 
   const handleRemoveExercicio = async () => {
-    setConfirmModal((prev) => ({ ...prev, loading: true }));
+    if (!permissoesEditar) {
+      setToast({
+        show: true,
+        message: "⛔ Você não tem permissão para remover exercícios",
+        type: "error",
+      });
+      return;
+    }
 
+    setConfirmModal((prev) => ({ ...prev, loading: true }));
     try {
       const response = await fetch(
         `/api/treinos/${treino.id}/exercicios?exercicioId=${confirmModal.exercicioId}`,
@@ -268,7 +297,6 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
       );
 
       const data = await response.json();
-
       if (!response.ok) {
         throw new Error(data.error || "Erro ao remover exercício");
       }
@@ -279,17 +307,14 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
         exercicioNome: "",
         loading: false,
       });
-
       setToast({
         show: true,
         message: "✅ Exercício removido com sucesso!",
         type: "success",
       });
-
       await refresh();
     } catch (error: any) {
       setConfirmModal((prev) => ({ ...prev, loading: false }));
-
       setToast({
         show: true,
         message: error.message || "❌ Erro ao remover exercício",
@@ -346,13 +371,15 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
           </div>
         </div>
         <div className={styles.headerActions}>
-          <Button
-            variant="primary"
-            onClick={() => setModalAddExercicio(true)}
-            disabled={loading}
-          >
-            + Adicionar Exercício
-          </Button>
+          {permissoesEditar && (
+            <Button
+              variant="primary"
+              onClick={() => setModalAddExercicio(true)}
+              disabled={loading}
+            >
+              + Adicionar Exercício
+            </Button>
+          )}
           <Link href={`/dashboard/treinos/${treino.id}/editar`}>
             <Button variant="outline">✏️ Editar Treino</Button>
           </Link>
@@ -394,52 +421,59 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
                   </div>
 
                   <div className={styles.actionButtons}>
-                    <div className={styles.reorderButtons}>
-                      <button
-                        onClick={() => handleReordenar(te.id, "up")}
-                        className={styles.reorderButton}
-                        title="Mover para cima"
-                        disabled={index === 0 || loading}
-                      >
-                        ↑
-                      </button>
-                      <button
-                        onClick={() => handleReordenar(te.id, "down")}
-                        className={styles.reorderButton}
-                        title="Mover para baixo"
-                        disabled={
-                          index === treino.exercicios.length - 1 || loading
-                        }
-                      >
-                        ↓
-                      </button>
-                    </div>
+                    {/* REORDENAR - Só aparece se tiver permissão de editar */}
+                    {permissoesEditar && (
+                      <div className={styles.reorderButtons}>
+                        <button
+                          onClick={() => handleReordenar(te.id, "up")}
+                          className={styles.reorderButton}
+                          title="Mover para cima"
+                          disabled={index === 0 || loading}
+                        >
+                          ↑
+                        </button>
+                        <button
+                          onClick={() => handleReordenar(te.id, "down")}
+                          className={styles.reorderButton}
+                          title="Mover para baixo"
+                          disabled={
+                            index === treino.exercicios.length - 1 || loading
+                          }
+                        >
+                          ↓
+                        </button>
+                      </div>
+                    )}
 
                     <div className={styles.editRemoveButtons}>
-                      <button
-                        onClick={() => handleOpenEditModal(te)}
-                        className={styles.editButton}
-                        title="Editar"
-                        disabled={loading}
-                      >
-                        ✏️
-                      </button>
+                      {permissoesEditar && (
+                        <>
+                          <button
+                            onClick={() => handleOpenEditModal(te)}
+                            className={styles.editButton}
+                            title="Editar"
+                            disabled={loading}
+                          >
+                            ✏️
+                          </button>
 
-                      <button
-                        onClick={() =>
-                          setConfirmModal({
-                            isOpen: true,
-                            exercicioId: te.id,
-                            exercicioNome: te.exercicio.nome,
-                            loading: false,
-                          })
-                        }
-                        className={styles.removeButton}
-                        title="Remover"
-                        disabled={confirmModal.loading || loading}
-                      >
-                        🗑️
-                      </button>
+                          <button
+                            onClick={() =>
+                              setConfirmModal({
+                                isOpen: true,
+                                exercicioId: te.id,
+                                exercicioNome: te.exercicio.nome,
+                                loading: false,
+                              })
+                            }
+                            className={styles.removeButton}
+                            title="Remover"
+                            disabled={confirmModal.loading || loading}
+                          >
+                            🗑️
+                          </button>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -481,6 +515,7 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
       <CronogramaSection
         treinoId={treino.id}
         cronogramas={treino.cronogramas}
+        permissoesEditar={permissoesEditar}
       />
 
       <ExecucaoSection
@@ -516,175 +551,66 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
       )}
 
       {/* Modal Adicionar Exercício */}
-      <Modal
-        isOpen={modalAddExercicio}
-        onClose={() => setModalAddExercicio(false)}
-        title="Adicionar Exercício"
-        size="large"
-      >
-        <div className={styles.modalContent}>
-          <div className={styles.modalGrid}>
-            <div className={styles.modalField}>
-              <label>Filtrar por grupo</label>
-              <select
-                value={filtroGrupo}
-                onChange={(e) => setFiltroGrupo(e.target.value)}
-                className={styles.select}
-              >
-                <option value="">Todos os grupos</option>
-                <option value="PEITO">Peito</option>
-                <option value="COSTAS">Costas</option>
-                <option value="OMBROS">Ombros</option>
-                <option value="BICEPS">Bíceps</option>
-                <option value="TRICEPS">Tríceps</option>
-                <option value="PERNAS">Pernas</option>
-                <option value="GLUTEOS">Glúteos</option>
-                <option value="ABDOMEN">Abdômen</option>
-                <option value="PANTURRILHA">Panturrilha</option>
-              </select>
-            </div>
-
-            <div className={styles.modalField}>
-              <label>Exercício *</label>
-              <select
-                value={novoExercicio.exercicioId}
-                onChange={(e) =>
-                  setNovoExercicio({
-                    ...novoExercicio,
-                    exercicioId: e.target.value,
-                  })
-                }
-                className={styles.select}
-                required
-              >
-                <option value="">Selecione...</option>
-                {exerciciosFiltrados.map((ex) => (
-                  <option key={ex.id} value={ex.id}>
-                    {ex.nome} - {getGrupoMuscularLabel(ex.grupoMuscular)}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className={styles.modalField}>
-              <label>Séries *</label>
-              <input
-                type="number"
-                min="1"
-                value={novoExercicio.series}
-                onChange={(e) =>
-                  setNovoExercicio({
-                    ...novoExercicio,
-                    series: parseInt(e.target.value),
-                  })
-                }
-                className={styles.input}
-                required
-              />
-            </div>
-
-            <div className={styles.modalField}>
-              <label>Repetições *</label>
-              <input
-                type="text"
-                placeholder="Ex: 10-12, 15, até a falha"
-                value={novoExercicio.repeticoes}
-                onChange={(e) =>
-                  setNovoExercicio({
-                    ...novoExercicio,
-                    repeticoes: e.target.value,
-                  })
-                }
-                className={styles.input}
-                required
-              />
-            </div>
-
-            <div className={styles.modalField}>
-              <label>Carga</label>
-              <input
-                type="text"
-                placeholder="Ex: 20kg, peso corporal"
-                value={novoExercicio.carga}
-                onChange={(e) =>
-                  setNovoExercicio({ ...novoExercicio, carga: e.target.value })
-                }
-                className={styles.input}
-              />
-            </div>
-
-            <div className={styles.modalField}>
-              <label>Descanso (segundos)</label>
-              <input
-                type="number"
-                min="0"
-                step="5"
-                placeholder="Ex: 60, 90, 120"
-                value={novoExercicio.descanso}
-                onChange={(e) =>
-                  setNovoExercicio({
-                    ...novoExercicio,
-                    descanso: parseInt(e.target.value) || 0,
-                  })
-                }
-                className={styles.input}
-              />
-            </div>
-
-            <div className={styles.modalFieldFull}>
-              <label>Observações</label>
-              <textarea
-                placeholder="Informações adicionais sobre a execução..."
-                value={novoExercicio.observacoes}
-                onChange={(e) =>
-                  setNovoExercicio({
-                    ...novoExercicio,
-                    observacoes: e.target.value,
-                  })
-                }
-                className={styles.textarea}
-                rows={3}
-              />
-            </div>
-          </div>
-
-          <div className={styles.modalActions}>
-            <Button
-              variant="outline"
-              onClick={() => setModalAddExercicio(false)}
-              disabled={loading}
-            >
-              Cancelar
-            </Button>
-            <Button onClick={handleAddExercicio} disabled={loading}>
-              {loading ? "Adicionando..." : "Adicionar"}
-            </Button>
-          </div>
-        </div>
-      </Modal>
-
-      {/* Modal Editar Exercício */}
-      <Modal
-        isOpen={modalEditExercicio}
-        onClose={() => {
-          setModalEditExercicio(false);
-          setExercicioEditando(null);
-        }}
-        title="Editar Exercício"
-        size="large"
-      >
-        {exercicioEditando && (
+      {permissoesEditar && (
+        <Modal
+          isOpen={modalAddExercicio}
+          onClose={() => setModalAddExercicio(false)}
+          title="Adicionar Exercício"
+          size="large"
+        >
           <div className={styles.modalContent}>
             <div className={styles.modalGrid}>
+              <div className={styles.modalField}>
+                <label>Filtrar por grupo</label>
+                <select
+                  value={filtroGrupo}
+                  onChange={(e) => setFiltroGrupo(e.target.value)}
+                  className={styles.select}
+                >
+                  <option value="">Todos os grupos</option>
+                  <option value="PEITO">Peito</option>
+                  <option value="COSTAS">Costas</option>
+                  <option value="OMBROS">Ombros</option>
+                  <option value="BICEPS">Bíceps</option>
+                  <option value="TRICEPS">Tríceps</option>
+                  <option value="PERNAS">Pernas</option>
+                  <option value="GLUTEOS">Glúteos</option>
+                  <option value="ABDOMEN">Abdômen</option>
+                  <option value="PANTURRILHA">Panturrilha</option>
+                </select>
+              </div>
+
+              <div className={styles.modalField}>
+                <label>Exercício *</label>
+                <select
+                  value={novoExercicio.exercicioId}
+                  onChange={(e) =>
+                    setNovoExercicio({
+                      ...novoExercicio,
+                      exercicioId: e.target.value,
+                    })
+                  }
+                  className={styles.select}
+                  required
+                >
+                  <option value="">Selecione...</option>
+                  {exerciciosFiltrados.map((ex) => (
+                    <option key={ex.id} value={ex.id}>
+                      {ex.nome} - {getGrupoMuscularLabel(ex.grupoMuscular)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               <div className={styles.modalField}>
                 <label>Séries *</label>
                 <input
                   type="number"
                   min="1"
-                  value={exercicioEditando.series}
+                  value={novoExercicio.series}
                   onChange={(e) =>
-                    setExercicioEditando({
-                      ...exercicioEditando,
+                    setNovoExercicio({
+                      ...novoExercicio,
                       series: parseInt(e.target.value),
                     })
                   }
@@ -698,10 +624,10 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
                 <input
                   type="text"
                   placeholder="Ex: 10-12, 15, até a falha"
-                  value={exercicioEditando.repeticoes}
+                  value={novoExercicio.repeticoes}
                   onChange={(e) =>
-                    setExercicioEditando({
-                      ...exercicioEditando,
+                    setNovoExercicio({
+                      ...novoExercicio,
                       repeticoes: e.target.value,
                     })
                   }
@@ -715,10 +641,10 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
                 <input
                   type="text"
                   placeholder="Ex: 20kg, peso corporal"
-                  value={exercicioEditando.carga}
+                  value={novoExercicio.carga}
                   onChange={(e) =>
-                    setExercicioEditando({
-                      ...exercicioEditando,
+                    setNovoExercicio({
+                      ...novoExercicio,
                       carga: e.target.value,
                     })
                   }
@@ -733,10 +659,10 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
                   min="0"
                   step="5"
                   placeholder="Ex: 60, 90, 120"
-                  value={exercicioEditando.descanso}
+                  value={novoExercicio.descanso}
                   onChange={(e) =>
-                    setExercicioEditando({
-                      ...exercicioEditando,
+                    setNovoExercicio({
+                      ...novoExercicio,
                       descanso: parseInt(e.target.value) || 0,
                     })
                   }
@@ -748,10 +674,10 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
                 <label>Observações</label>
                 <textarea
                   placeholder="Informações adicionais sobre a execução..."
-                  value={exercicioEditando.observacoes}
+                  value={novoExercicio.observacoes}
                   onChange={(e) =>
-                    setExercicioEditando({
-                      ...exercicioEditando,
+                    setNovoExercicio({
+                      ...novoExercicio,
                       observacoes: e.target.value,
                     })
                   }
@@ -764,21 +690,137 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({ treino }) => {
             <div className={styles.modalActions}>
               <Button
                 variant="outline"
-                onClick={() => {
-                  setModalEditExercicio(false);
-                  setExercicioEditando(null);
-                }}
+                onClick={() => setModalAddExercicio(false)}
                 disabled={loading}
               >
                 Cancelar
               </Button>
-              <Button onClick={handleEditExercicio} disabled={loading}>
-                {loading ? "Salvando..." : "Salvar Alterações"}
+              <Button onClick={handleAddExercicio} disabled={loading}>
+                {loading ? "Adicionando..." : "Adicionar"}
               </Button>
             </div>
           </div>
-        )}
-      </Modal>
+        </Modal>
+      )}
+
+      {/* Modal Editar Exercício */}
+      {permissoesEditar && (
+        <Modal
+          isOpen={modalEditExercicio}
+          onClose={() => {
+            setModalEditExercicio(false);
+            setExercicioEditando(null);
+          }}
+          title="Editar Exercício"
+          size="large"
+        >
+          {exercicioEditando && (
+            <div className={styles.modalContent}>
+              <div className={styles.modalGrid}>
+                <div className={styles.modalField}>
+                  <label>Séries *</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={exercicioEditando.series}
+                    onChange={(e) =>
+                      setExercicioEditando({
+                        ...exercicioEditando,
+                        series: parseInt(e.target.value),
+                      })
+                    }
+                    className={styles.input}
+                    required
+                  />
+                </div>
+
+                <div className={styles.modalField}>
+                  <label>Repetições *</label>
+                  <input
+                    type="text"
+                    placeholder="Ex: 10-12, 15, até a falha"
+                    value={exercicioEditando.repeticoes}
+                    onChange={(e) =>
+                      setExercicioEditando({
+                        ...exercicioEditando,
+                        repeticoes: e.target.value,
+                      })
+                    }
+                    className={styles.input}
+                    required
+                  />
+                </div>
+
+                <div className={styles.modalField}>
+                  <label>Carga</label>
+                  <input
+                    type="text"
+                    placeholder="Ex: 20kg, peso corporal"
+                    value={exercicioEditando.carga}
+                    onChange={(e) =>
+                      setExercicioEditando({
+                        ...exercicioEditando,
+                        carga: e.target.value,
+                      })
+                    }
+                    className={styles.input}
+                  />
+                </div>
+
+                <div className={styles.modalField}>
+                  <label>Descanso (segundos)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="5"
+                    placeholder="Ex: 60, 90, 120"
+                    value={exercicioEditando.descanso}
+                    onChange={(e) =>
+                      setExercicioEditando({
+                        ...exercicioEditando,
+                        descanso: parseInt(e.target.value) || 0,
+                      })
+                    }
+                    className={styles.input}
+                  />
+                </div>
+
+                <div className={styles.modalFieldFull}>
+                  <label>Observações</label>
+                  <textarea
+                    placeholder="Informações adicionais sobre a execução..."
+                    value={exercicioEditando.observacoes}
+                    onChange={(e) =>
+                      setExercicioEditando({
+                        ...exercicioEditando,
+                        observacoes: e.target.value,
+                      })
+                    }
+                    className={styles.textarea}
+                    rows={3}
+                  />
+                </div>
+              </div>
+
+              <div className={styles.modalActions}>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setModalEditExercicio(false);
+                    setExercicioEditando(null);
+                  }}
+                  disabled={loading}
+                >
+                  Cancelar
+                </Button>
+                <Button onClick={handleEditExercicio} disabled={loading}>
+                  {loading ? "Salvando..." : "Salvar Alterações"}
+                </Button>
+              </div>
+            </div>
+          )}
+        </Modal>
+      )}
     </div>
   );
 };

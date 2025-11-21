@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./styles.module.scss";
 import { Button } from "../ui/Button/Button";
+import { Toast } from "../ui/Toast/Toast";
 
 interface Usuario {
   id: string;
@@ -68,12 +69,21 @@ const RECURSOS = [
 export const PermissoesManager = () => {
   const router = useRouter();
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
-  const [todosUsuarios, setTodosUsuarios] = useState<Usuario[]>([]);
   const [usuarioSelecionado, setUsuarioSelecionado] = useState<string>("");
   const [permissoes, setPermissoes] = useState<Record<string, Permissao>>({});
   const [loading, setLoading] = useState(false);
   const [loadingSave, setLoadingSave] = useState(false);
   const [error, setError] = useState<string>("");
+
+  const [toast, setToast] = useState<{
+    show: boolean;
+    message: string;
+    type: "success" | "error" | "info" | "warning";
+  }>({
+    show: false,
+    message: "",
+    type: "success",
+  });
 
   useEffect(() => {
     fetchUsuarios();
@@ -88,8 +98,6 @@ export const PermissoesManager = () => {
   const fetchUsuarios = async () => {
     try {
       setError("");
-      console.log("🔍 Buscando usuários...");
-
       const response = await fetch("/api/usuarios");
 
       if (!response.ok) {
@@ -97,27 +105,9 @@ export const PermissoesManager = () => {
       }
 
       const data = await response.json();
-      console.log("📦 Usuários recebidos da API:", data);
-      console.log("📊 Total de usuários:", data.length);
-
-      setTodosUsuarios(data);
-
       const usuariosFiltrados = data.filter(
         (u: Usuario) => u.ativo && (u.role === "ADMIN" || u.role === "USER")
       );
-
-      console.log(
-        "✅ Usuários filtrados (ADMIN/USER ativos):",
-        usuariosFiltrados
-      );
-      console.log("📊 Total filtrado:", usuariosFiltrados.length);
-
-      const superAdmins = data.filter(
-        (u: Usuario) => u.role === "SUPERADMIN"
-      ).length;
-      const inativos = data.filter((u: Usuario) => !u.ativo).length;
-      console.log(`🔒 ${superAdmins} SuperAdmins filtrados`);
-      console.log(`❌ ${inativos} usuários inativos filtrados`);
 
       setUsuarios(usuariosFiltrados);
 
@@ -177,7 +167,7 @@ export const PermissoesManager = () => {
 
   const handleSalvar = async () => {
     if (!usuarioSelecionado) {
-      alert("Selecione um usuário");
+      showToast("Selecione um usuário", "warning");
       return;
     }
 
@@ -207,57 +197,31 @@ export const PermissoesManager = () => {
       });
 
       await Promise.all(promises);
-      alert("Permissões salvas com sucesso!");
+      showToast("Permissões salvas com sucesso!", "success");
       router.refresh();
     } catch (error) {
-      alert("Erro ao salvar permissões");
+      showToast("Erro ao salvar permissões", "error");
       console.error(error);
     } finally {
       setLoadingSave(false);
     }
   };
 
+  const showToast = (
+    message: string,
+    type: "success" | "error" | "info" | "warning"
+  ) => {
+    setToast({ show: true, message, type });
+  };
+
+  const closeToast = () => {
+    setToast({ ...toast, show: false });
+  };
+
   const usuarioInfo = usuarios.find((u) => u.id === usuarioSelecionado);
 
   return (
     <div className={styles.container}>
-      <div className={styles.debugInfo}>
-        <h4>🔍 Informações de Debug:</h4>
-        <p>
-          <strong>Total de usuários na API:</strong> {todosUsuarios.length}
-        </p>
-        <p>
-          <strong>Usuários disponíveis para seleção:</strong> {usuarios.length}
-        </p>
-
-        {todosUsuarios.length > 0 && (
-          <details style={{ marginTop: "10px" }}>
-            <summary style={{ cursor: "pointer", fontWeight: "bold" }}>
-              Ver todos os usuários (clique para expandir)
-            </summary>
-            <ul style={{ marginTop: "10px" }}>
-              {todosUsuarios.map((u) => (
-                <li key={u.id}>
-                  <strong>{u.nome}</strong> ({u.email}) - Role:{" "}
-                  <span
-                    style={{ color: u.role === "SUPERADMIN" ? "red" : "green" }}
-                  >
-                    {u.role}
-                  </span>{" "}
-                  - Status: {u.ativo ? "✅ Ativo" : "❌ Inativo"}
-                </li>
-              ))}
-            </ul>
-          </details>
-        )}
-
-        {error && (
-          <p style={{ color: "red", marginTop: "10px" }}>
-            <strong>Erro:</strong> {error}
-          </p>
-        )}
-      </div>
-
       <div className={styles.selectSection}>
         <label className={styles.label}>Selecione o Usuário</label>
         <select
@@ -319,8 +283,7 @@ export const PermissoesManager = () => {
                         onChange={() => handleTogglePermissao(recurso, "criar")}
                         className={styles.checkbox}
                       />
-                      <span>Novo</span>{" "}
-                      {/* ✅ ALTERADO DE "Criar" PARA "Novo" */}
+                      <span>Novo</span>
                     </label>
 
                     <label className={styles.checkboxLabel}>
@@ -374,6 +337,16 @@ export const PermissoesManager = () => {
           <h3>Selecione um usuário</h3>
           <p>Escolha um usuário acima para configurar suas permissões</p>
         </div>
+      )}
+
+      {/* Toast para mensagens */}
+      {toast.show && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={closeToast}
+          duration={3000}
+        />
       )}
     </div>
   );

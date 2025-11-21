@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import styles from "./cronogramaStyles.module.scss";
 import { Button } from "../ui/Button/Button";
 import { Modal } from "../ui/Modal/Modal";
+import { Toast } from "../ui/Toast/Toast";
+import { ConfirmModal } from "../ui/ConfirmModal/ConfirmModal";
 import { DiaSemana } from "@/types";
 
 interface Cronograma {
@@ -17,11 +19,13 @@ interface Cronograma {
 interface CronogramaSectionProps {
   treinoId: string;
   cronogramas: Cronograma[];
+  permissoesEditar?: boolean;
 }
 
 export const CronogramaSection: React.FC<CronogramaSectionProps> = ({
   treinoId,
   cronogramas: initialCronogramas,
+  permissoesEditar = true,
 }) => {
   const router = useRouter();
   const [modalAddDia, setModalAddDia] = useState(false);
@@ -31,6 +35,28 @@ export const CronogramaSection: React.FC<CronogramaSectionProps> = ({
     diaSemana: "",
     horaInicio: "",
     horaFim: "",
+  });
+
+  const [toast, setToast] = useState<{
+    show: boolean;
+    message: string;
+    type: "success" | "error" | "info" | "warning";
+  }>({
+    show: false,
+    message: "",
+    type: "success",
+  });
+
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    cronogramaId: string;
+    diaNome: string;
+    loading: boolean;
+  }>({
+    isOpen: false,
+    cronogramaId: "",
+    diaNome: "",
+    loading: false,
   });
 
   const diasSemana = [
@@ -43,9 +69,25 @@ export const CronogramaSection: React.FC<CronogramaSectionProps> = ({
     { value: "DOMINGO", label: "Domingo", emoji: "📅" },
   ];
 
+  const showToast = (
+    message: string,
+    type: "success" | "error" | "info" | "warning"
+  ) => {
+    setToast({ show: true, message, type });
+  };
+
+  const closeToast = () => {
+    setToast({ ...toast, show: false });
+  };
+
   const handleAddDia = async () => {
+    if (!permissoesEditar) {
+      showToast("⛔ Você não tem permissão para alterar o cronograma", "error");
+      return;
+    }
+
     if (!novoDia.diaSemana) {
-      alert("Selecione um dia da semana");
+      showToast("Selecione um dia da semana", "warning");
       return;
     }
 
@@ -66,27 +108,50 @@ export const CronogramaSection: React.FC<CronogramaSectionProps> = ({
       router.refresh();
       setModalAddDia(false);
       setNovoDia({ diaSemana: "", horaInicio: "", horaFim: "" });
+      showToast("✅ Dia adicionado ao cronograma com sucesso!", "success");
     } catch (error: any) {
-      alert(error.message || "Erro ao adicionar dia");
+      showToast(error.message || "❌ Erro ao adicionar dia", "error");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleRemoveDia = async (cronogramaId: string) => {
-    if (!confirm("Deseja remover este dia do cronograma?")) return;
+  const handleRemoveDia = async (cronogramaId: string, diaNome: string) => {
+    if (!permissoesEditar) {
+      showToast("⛔ Você não tem permissão para alterar o cronograma", "error");
+      return;
+    }
+
+    setConfirmModal({
+      isOpen: true,
+      cronogramaId,
+      diaNome,
+      loading: false,
+    });
+  };
+
+  const confirmRemoveDia = async () => {
+    setConfirmModal((prev) => ({ ...prev, loading: true }));
 
     try {
       const response = await fetch(
-        `/api/treinos/${treinoId}/cronograma?cronogramaId=${cronogramaId}`,
+        `/api/treinos/${treinoId}/cronograma?cronogramaId=${confirmModal.cronogramaId}`,
         { method: "DELETE" }
       );
 
       if (!response.ok) throw new Error("Erro ao remover dia");
 
+      setConfirmModal({
+        isOpen: false,
+        cronogramaId: "",
+        diaNome: "",
+        loading: false,
+      });
+      showToast("✅ Dia removido do cronograma com sucesso!", "success");
       router.refresh();
     } catch (error) {
-      alert("Erro ao remover dia do cronograma");
+      setConfirmModal((prev) => ({ ...prev, loading: false }));
+      showToast("❌ Erro ao remover dia do cronograma", "error");
     }
   };
 
@@ -106,9 +171,11 @@ export const CronogramaSection: React.FC<CronogramaSectionProps> = ({
     <div className={styles.container}>
       <div className={styles.header}>
         <h2 className={styles.title}>Cronograma Semanal</h2>
-        <Button onClick={() => setModalAddDia(true)} size="small">
-          + Adicionar Dia
-        </Button>
+        {permissoesEditar && (
+          <Button onClick={() => setModalAddDia(true)} size="small">
+            + Adicionar Dia
+          </Button>
+        )}
       </div>
 
       {initialCronogramas.length === 0 ? (
@@ -130,13 +197,20 @@ export const CronogramaSection: React.FC<CronogramaSectionProps> = ({
                     {getDiaLabel(cronograma.diaSemana)}
                   </span>
                 </div>
-                <button
-                  onClick={() => handleRemoveDia(cronograma.id)}
-                  className={styles.removeButton}
-                  title="Remover"
-                >
-                  ✕
-                </button>
+                {permissoesEditar && (
+                  <button
+                    onClick={() =>
+                      handleRemoveDia(
+                        cronograma.id,
+                        getDiaLabel(cronograma.diaSemana)
+                      )
+                    }
+                    className={styles.removeButton}
+                    title="Remover"
+                  >
+                    ✕
+                  </button>
+                )}
               </div>
 
               {(cronograma.horaInicio || cronograma.horaFim) && (
@@ -159,68 +233,100 @@ export const CronogramaSection: React.FC<CronogramaSectionProps> = ({
       )}
 
       {/* Modal Adicionar Dia */}
-      <Modal
-        isOpen={modalAddDia}
-        onClose={() => setModalAddDia(false)}
-        title="Adicionar Dia ao Cronograma"
-        size="small"
-      >
-        <div className={styles.modalContent}>
-          <div className={styles.modalField}>
-            <label>Dia da Semana *</label>
-            <select
-              value={novoDia.diaSemana}
-              onChange={(e) =>
-                setNovoDia({ ...novoDia, diaSemana: e.target.value })
-              }
-              className={styles.select}
-              required
-            >
-              <option value="">Selecione...</option>
-              {diasDisponiveis.map((dia) => (
-                <option key={dia.value} value={dia.value}>
-                  {dia.emoji} {dia.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className={styles.modalRow}>
+      {permissoesEditar && (
+        <Modal
+          isOpen={modalAddDia}
+          onClose={() => setModalAddDia(false)}
+          title="Adicionar Dia ao Cronograma"
+          size="small"
+        >
+          <div className={styles.modalContent}>
             <div className={styles.modalField}>
-              <label>Horário Início (opcional)</label>
-              <input
-                type="time"
-                value={novoDia.horaInicio}
+              <label>Dia da Semana *</label>
+              <select
+                value={novoDia.diaSemana}
                 onChange={(e) =>
-                  setNovoDia({ ...novoDia, horaInicio: e.target.value })
+                  setNovoDia({ ...novoDia, diaSemana: e.target.value })
                 }
-                className={styles.input}
-              />
+                className={styles.select}
+                required
+              >
+                <option value="">Selecione...</option>
+                {diasDisponiveis.map((dia) => (
+                  <option key={dia.value} value={dia.value}>
+                    {dia.emoji} {dia.label}
+                  </option>
+                ))}
+              </select>
             </div>
 
-            <div className={styles.modalField}>
-              <label>Horário Fim (opcional)</label>
-              <input
-                type="time"
-                value={novoDia.horaFim}
-                onChange={(e) =>
-                  setNovoDia({ ...novoDia, horaFim: e.target.value })
-                }
-                className={styles.input}
-              />
+            <div className={styles.modalRow}>
+              <div className={styles.modalField}>
+                <label>Horário Início (opcional)</label>
+                <input
+                  type="time"
+                  value={novoDia.horaInicio}
+                  onChange={(e) =>
+                    setNovoDia({ ...novoDia, horaInicio: e.target.value })
+                  }
+                  className={styles.input}
+                />
+              </div>
+
+              <div className={styles.modalField}>
+                <label>Horário Fim (opcional)</label>
+                <input
+                  type="time"
+                  value={novoDia.horaFim}
+                  onChange={(e) =>
+                    setNovoDia({ ...novoDia, horaFim: e.target.value })
+                  }
+                  className={styles.input}
+                />
+              </div>
+            </div>
+
+            <div className={styles.modalActions}>
+              <Button variant="outline" onClick={() => setModalAddDia(false)}>
+                Cancelar
+              </Button>
+              <Button onClick={handleAddDia} disabled={loading}>
+                {loading ? "Adicionando..." : "Adicionar"}
+              </Button>
             </div>
           </div>
+        </Modal>
+      )}
 
-          <div className={styles.modalActions}>
-            <Button variant="outline" onClick={() => setModalAddDia(false)}>
-              Cancelar
-            </Button>
-            <Button onClick={handleAddDia} disabled={loading}>
-              {loading ? "Adicionando..." : "Adicionar"}
-            </Button>
-          </div>
-        </div>
-      </Modal>
+      {/* ConfirmModal para remover dia */}
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={() =>
+          setConfirmModal({
+            isOpen: false,
+            cronogramaId: "",
+            diaNome: "",
+            loading: false,
+          })
+        }
+        onConfirm={confirmRemoveDia}
+        title="Remover Dia"
+        message={`Tem certeza que deseja remover "${confirmModal.diaNome}" do cronograma?`}
+        confirmText="Sim, remover"
+        cancelText="Cancelar"
+        type="danger"
+        loading={confirmModal.loading}
+      />
+
+      {/* Toast para mensagens */}
+      {toast.show && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={closeToast}
+          duration={3000}
+        />
+      )}
     </div>
   );
 };

@@ -12,6 +12,25 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
     }
 
+    // Verificar permissão de ler treinos (se não for SUPERADMIN)
+    if (session.user.role !== "SUPERADMIN") {
+      const permissao = await prisma.permissao.findUnique({
+        where: {
+          usuarioId_recurso: {
+            usuarioId: session.user.id,
+            recurso: "treinos",
+          },
+        },
+      });
+
+      if (!permissao || !permissao.ler) {
+        return NextResponse.json(
+          { error: "Sem permissão para listar treinos" },
+          { status: 403 }
+        );
+      }
+    }
+
     const { searchParams } = new URL(request.url);
     const alunoId = searchParams.get("alunoId");
 
@@ -56,6 +75,25 @@ export async function POST(request: NextRequest) {
 
     if (!session) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+    }
+
+    // Verificar permissão de criar treinos (se não for SUPERADMIN)
+    if (session.user.role !== "SUPERADMIN") {
+      const permissao = await prisma.permissao.findUnique({
+        where: {
+          usuarioId_recurso: {
+            usuarioId: session.user.id,
+            recurso: "treinos",
+          },
+        },
+      });
+
+      if (!permissao || !permissao.criar) {
+        return NextResponse.json(
+          { error: "Sem permissão para criar treinos" },
+          { status: 403 }
+        );
+      }
     }
 
     const body = await request.json();

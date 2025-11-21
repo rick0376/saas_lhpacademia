@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import styles from "./styles.module.scss";
 import { Button } from "../ui/Button/Button";
 import { Modal } from "../ui/Modal/Modal";
@@ -21,11 +22,20 @@ interface Treino {
   };
 }
 
+interface Permissao {
+  recurso: string;
+  criar: boolean;
+  ler: boolean;
+  editar: boolean;
+  deletar: boolean;
+}
+
 interface TreinoTableProps {
   alunoId?: string;
 }
 
 export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
+  const { data: session, status } = useSession();
   const [treinos, setTreinos] = useState<Treino[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -33,19 +43,74 @@ export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
     isOpen: boolean;
     treino?: Treino;
   }>({ isOpen: false });
+  const [permissoes, setPermissoes] = useState<Permissao>({
+    recurso: "treinos",
+    criar: false,
+    ler: false,
+    editar: false,
+    deletar: false,
+  });
+  const [permissoesCarregadas, setPermissoesCarregadas] = useState(false);
+
+  const fetchPermissoes = async () => {
+    try {
+      if (session?.user?.role === "SUPERADMIN") {
+        setPermissoes({
+          recurso: "treinos",
+          criar: true,
+          ler: true,
+          editar: true,
+          deletar: true,
+        });
+        setPermissoesCarregadas(true);
+        return;
+      }
+
+      const response = await fetch("/api/permissoes/usuario");
+      if (!response.ok) throw new Error("Erro ao buscar permissões");
+      const data = await response.json();
+
+      const permissaoTreinos = data.find(
+        (p: Permissao) => p.recurso === "treinos"
+      );
+
+      if (permissaoTreinos) {
+        setPermissoes(permissaoTreinos);
+      } else {
+        setPermissoes({
+          recurso: "treinos",
+          criar: false,
+          ler: false,
+          editar: false,
+          deletar: false,
+        });
+      }
+      setPermissoesCarregadas(true);
+    } catch (error) {
+      console.error("Erro ao carregar permissões:", error);
+      setPermissoes({
+        recurso: "treinos",
+        criar: false,
+        ler: false,
+        editar: false,
+        deletar: false,
+      });
+      setPermissoesCarregadas(true);
+    }
+  };
 
   const fetchTreinos = async () => {
     try {
       setLoading(true);
+      if (!permissoesCarregadas || !permissoes.ler) return;
+
       const url = alunoId ? `/api/treinos?alunoId=${alunoId}` : "/api/treinos";
       const response = await fetch(url);
 
-      if (!response.ok) {
-        throw new Error("Erro ao buscar treinos");
-      }
-
+      if (!response.ok) throw new Error("Erro ao buscar treinos");
       const data = await response.json();
       setTreinos(data);
+      setError("");
     } catch (err) {
       setError("Erro ao carregar treinos");
       console.error(err);
@@ -55,19 +120,29 @@ export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
   };
 
   useEffect(() => {
-    fetchTreinos();
-  }, [alunoId]);
+    if (permissoesCarregadas && permissoes.ler) {
+      fetchTreinos();
+    }
+  }, [alunoId, permissoesCarregadas, permissoes.ler]);
+
+  useEffect(() => {
+    if (status === "authenticated" && session) {
+      fetchPermissoes();
+    }
+  }, [status, session]);
 
   const handleDelete = async (id: string) => {
+    if (!permissoes.deletar) {
+      alert("⛔ Você não tem permissão para excluir treinos");
+      return;
+    }
+
     try {
       const response = await fetch(`/api/treinos/${id}`, {
         method: "DELETE",
       });
 
-      if (!response.ok) {
-        throw new Error("Erro ao excluir treino");
-      }
-
+      if (!response.ok) throw new Error("Erro ao excluir treino");
       setTreinos(treinos.filter((t) => t.id !== id));
       setDeleteModal({ isOpen: false });
     } catch (err) {
@@ -81,7 +156,7 @@ export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
     return date.toLocaleDateString("pt-BR");
   };
 
-  if (loading) {
+  if (!permissoesCarregadas || loading) {
     return (
       <div className={styles.loading}>
         <div className={styles.spinner}></div>
@@ -90,11 +165,14 @@ export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
     );
   }
 
-  if (error) {
+  if (!permissoes.ler && session?.user?.role !== "SUPERADMIN") {
     return (
       <div className={styles.error}>
-        <p>{error}</p>
-        <button onClick={fetchTreinos} className={styles.retryButton}>
+        <p>⛔ Você não tem permissão para visualizar treinos</p>
+        <button
+          onClick={() => window.location.reload()}
+          className={styles.retryButton}
+        >
           Tentar novamente
         </button>
       </div>
@@ -113,6 +191,16 @@ export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
 
   return (
     <>
+      {/* Botão Novo Treino - Só aparece se tiver permissão */}
+      {permissoes.criar && !alunoId && (
+        <div className={styles.topActions}>
+          <Link href="/dashboard/treinos/novo" className={styles.addButton}>
+            <span className={styles.icon}>+</span>
+            Novo Treino
+          </Link>
+        </div>
+      )}
+
       <div className={styles.grid}>
         {treinos.map((treino) => (
           <div key={treino.id} className={styles.card}>
@@ -170,18 +258,22 @@ export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
               >
                 👁️ Ver Detalhes
               </Link>
-              <Link
-                href={`/dashboard/treinos/${treino.id}/editar`}
-                className={styles.editButton}
-              >
-                ✏️ Editar
-              </Link>
-              <button
-                onClick={() => setDeleteModal({ isOpen: true, treino })}
-                className={styles.deleteButton}
-              >
-                🗑️
-              </button>
+              {permissoes.editar && (
+                <Link
+                  href={`/dashboard/treinos/${treino.id}/editar`}
+                  className={styles.editButton}
+                >
+                  ✏️ Editar
+                </Link>
+              )}
+              {permissoes.deletar && (
+                <button
+                  onClick={() => setDeleteModal({ isOpen: true, treino })}
+                  className={styles.deleteButton}
+                >
+                  🗑️
+                </button>
+              )}
             </div>
           </div>
         ))}
