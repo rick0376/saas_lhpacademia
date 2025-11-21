@@ -79,6 +79,7 @@ export const PermissoesManager = () => {
   const [loading, setLoading] = useState(false);
   const [loadingSave, setLoadingSave] = useState(false);
   const [error, setError] = useState<string>("");
+  const [mostrarTodos, setMostrarTodos] = useState(false);
 
   const [toast, setToast] = useState<{
     show: boolean;
@@ -94,6 +95,11 @@ export const PermissoesManager = () => {
     fetchUsuarios();
   }, []);
 
+  // ✅ CORREÇÃO: Adicionado dependência para recarregar quando o toggle muda
+  useEffect(() => {
+    fetchUsuarios();
+  }, [mostrarTodos]);
+
   useEffect(() => {
     if (usuarioSelecionado) {
       fetchPermissoes(usuarioSelecionado);
@@ -104,21 +110,24 @@ export const PermissoesManager = () => {
     try {
       setError("");
       const response = await fetch("/api/usuarios");
-
-      if (!response.ok) {
-        throw new Error(`Erro HTTP: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
 
       const data = await response.json();
-      const usuariosFiltrados = data.filter(
-        (u: Usuario) => u.ativo && (u.role === "ADMIN" || u.role === "USER")
-      );
+
+      // ✅ LÓGICA CORRETA DO FILTRO
+      const usuariosFiltrados = mostrarTodos
+        ? data.filter((u: Usuario) => u.ativo) // Todos ativos
+        : data.filter(
+            (u: Usuario) => u.ativo && (u.role === "ADMIN" || u.role === "USER")
+          ); // Só ADMIN/USER
 
       setUsuarios(usuariosFiltrados);
 
       if (usuariosFiltrados.length === 0) {
         setError(
-          "Nenhum usuário ADMIN ou USER ativo encontrado. Cadastre usuários com essas roles."
+          mostrarTodos
+            ? "Nenhum usuário ativo encontrado."
+            : "Nenhum usuário ADMIN ou USER ativo encontrado. Cadastre usuários com essas roles ou marque 'Mostrar todos os usuários'."
         );
       }
     } catch (error) {
@@ -299,6 +308,18 @@ export const PermissoesManager = () => {
 
   return (
     <div className={styles.container}>
+      {/* ✅ TOGGLE MOVIDO PARA O TOPO */}
+      <div className={styles.filterToggle}>
+        <label>
+          <input
+            type="checkbox"
+            checked={mostrarTodos}
+            onChange={(e) => setMostrarTodos(e.target.checked)}
+          />
+          <span>Mostrar todos os usuários</span>
+        </label>
+      </div>
+
       <div className={styles.selectSection}>
         <label className={styles.label}>Selecione o Usuário</label>
         <select
@@ -308,7 +329,7 @@ export const PermissoesManager = () => {
         >
           <option value="">
             {usuarios.length === 0
-              ? "⚠️ Nenhum usuário ADMIN/USER ativo disponível"
+              ? "⚠️ Nenhum usuário disponível"
               : "Escolha um usuário..."}
           </option>
           {usuarios.map((usuario) => (
@@ -361,7 +382,7 @@ export const PermissoesManager = () => {
                         className={styles.checkbox}
                         title="Marcar/Desmarcar todos os tipos deste recurso"
                       />
-                      <span>Geral</span>
+                      <span>Total</span>
                     </label>
 
                     <label className={styles.checkboxLabel}>
@@ -381,7 +402,7 @@ export const PermissoesManager = () => {
                         onChange={() => handleTogglePermissao(recurso, "ler")}
                         className={styles.checkbox}
                       />
-                      <span>Ler</span>
+                      <span>Visualizar</span>
                     </label>
 
                     <label className={styles.checkboxLabel}>

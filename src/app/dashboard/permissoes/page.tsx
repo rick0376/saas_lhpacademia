@@ -32,10 +32,10 @@ export default async function PermissoesPage() {
             <h3>📋 Como funciona:</h3>
             <ul>
               <li>
-                <strong>Criar:</strong> Permite adicionar novos registros
+                <strong>Novo:</strong> Permite adicionar novos registros
               </li>
               <li>
-                <strong>Ler:</strong> Permite visualizar informações
+                <strong>Visualizar:</strong> Permite visualizar informações
               </li>
               <li>
                 <strong>Editar:</strong> Permite modificar registros existentes
