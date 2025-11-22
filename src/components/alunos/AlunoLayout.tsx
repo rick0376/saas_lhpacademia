@@ -231,7 +231,7 @@ export const AlunoLayout: React.FC<Props> = ({ children }) => {
   const Footer = (
     <footer className={styles.footer}>
       <div className={styles.footerContent}>
-        <span>© {new Date().getFullYear()} — PCW - Treino</span>
+        <span>© {new Date().getFullYear()} — LHP - Treino</span>
         <span className={styles.dot} />
         <span className={styles.footerMuted}>Todos os direitos reservados</span>
       </div>

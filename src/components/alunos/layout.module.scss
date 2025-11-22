@@ -2,7 +2,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(135deg, #714797 0%, #5d2691 50%, #5a0f9b 100%);
+  background: linear-gradient(90deg, #6a11cb 0%, #2575fc 50%, #29abe2 100%);
   color: #1e293b;
   font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
   position: relative;
@@ -113,11 +113,13 @@
     margin-right: 1rem;
     width: 48px;
     height: 48px;
-    background: linear-gradient(
+    /*background: linear-gradient(
       135deg,
       rgba(255, 255, 255, 0.2),
       rgba(255, 255, 255, 0.1)
     );
+    */
+    background: linear-gradient(135deg, #5b0ecc 0%, #1f5efb 60%, #218be6 100%);
     border-radius: 12px;
     backdrop-filter: blur(10px);
     justify-content: center;

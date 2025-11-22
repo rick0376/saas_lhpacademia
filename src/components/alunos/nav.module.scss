@@ -90,7 +90,8 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #714797, #5d2691);
+  //background: linear-gradient(135deg, #714797, #5d2691);
+  background: linear-gradient(135deg, #5b0ecc 0%, #1f5efb 60%, #218be6 100%);
   color: white !important;
   display: flex;
   align-items: center;
@@ -171,7 +172,7 @@
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #714797, #5d2691);
+  background: linear-gradient(135deg, #5b0ecc 0%, #1f5efb 60%, #218be6 100%);
   border: 2px solid #714797;
   color: white;
   display: flex;

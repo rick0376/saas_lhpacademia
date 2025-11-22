@@ -633,6 +633,9 @@ export default function ConfiguracoesPage() {
                       type="button"
                       className={styles.eyeButton}
                       onClick={() => setMostrarSenha(!mostrarSenha)}
+                      aria-label={
+                        mostrarSenha ? "Ocultar senha" : "Mostrar senha"
+                      }
                     >
                       {mostrarSenha ? <EyeOff size={20} /> : <Eye size={20} />}
                     </button>

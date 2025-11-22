@@ -1,7 +1,3 @@
-// ============================================
-// ALUNO DASHBOARD - 4 CARDS PREMIUM (CORES DIFERENTES)
-// ============================================
-
 // ANIMAÇÕES
 @keyframes spin {
   to {
@@ -232,9 +228,8 @@
   }
 }
 
-// 🔥 CARD PREMIUM - CORES ESCURAS (AZUL MARINHO/ROXO)
 .premiumCard {
-  background: rgba(30, 30, 50, 0.95); // Fundo escuro
+  background: rgba(30, 30, 50, 0.95);
   border-radius: 24px;
   padding: 2.5rem 2rem;
   box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
@@ -255,12 +250,7 @@
     left: -2px;
     right: -2px;
     bottom: -2px;
-    background: linear-gradient(
-      90deg,
-      #5d2691,
-      #4a1f6b,
-      #00a8cc
-    ); // Roxo escuro + azul petróleo
+    background: linear-gradient(90deg, #c7bebe, #f8f9fa, #d7e0e9);
     background-size: 200% 200%;
     animation: gradientShift 4s ease infinite;
     z-index: -1;
@@ -295,11 +285,11 @@
     }
 
     .premiumCardNumber {
-      background: linear-gradient(135deg, #5d2691, #00a8cc);
+      background: #034a5a;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      text-shadow: 0 0 30px rgba(93, 38, 145, 0.5);
+      text-shadow: 0 0 30px rgba(209, 195, 223, 0.5);
     }
   }
 
@@ -312,11 +302,7 @@
   width: 64px;
   height: 64px;
   padding: 16px;
-  background: linear-gradient(
-    135deg,
-    #5d2691,
-    #00a8cc
-  ); // Roxo escuro + azul petróleo
+  background: linear-gradient(135deg, #5d2691, #00a8cc);
   color: white;
   border-radius: 20px;
   margin-bottom: 1.5rem;
@@ -330,7 +316,7 @@
   margin: 0 0 0.75rem 0;
   font-size: 0.9375rem;
   font-weight: 800;
-  color: #e2e8f0;
+  color: #0c819b;
   text-transform: uppercase;
   letter-spacing: 0.15em;
   position: relative;
@@ -341,7 +327,7 @@
 .premiumCardNumber {
   font-size: 3.5rem;
   font-weight: 900;
-  background: linear-gradient(135deg, #00a8cc, #10b981);
+  background-color: #0c819b;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -356,11 +342,7 @@
 }
 
 .premiumCardButton {
-  background: linear-gradient(
-    135deg,
-    #5d2691,
-    #00a8cc
-  ); // Roxo escuro + azul petróleo
+  background: linear-gradient(135deg, #5d2691, #00a8cc);
   color: white;
   border: none;
   padding: 16px 32px;
@@ -384,7 +366,7 @@
     width: 0;
     height: 0;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.4);
+    //background: rgba(255, 255, 255, 0.4);
     transform: translate(-50%, -50%);
     transition: width 0.5s, height 0.5s;
   }
@@ -394,6 +376,7 @@
     height: 400px;
   }
   &:hover {
+    background: linear-gradient(135deg, #300a53, #05687e, #025061);
     transform: translateY(-4px);
     box-shadow: 0 12px 40px rgba(93, 38, 145, 0.6);
   }

@@ -1,6 +1,6 @@
 .container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #06b6d4 0%, #0284c7 50%, #0369a1 100%);
+  background: linear-gradient(90deg, #6a11cb 0%, #2575fc 50%, #29abe2 100%);
   padding: 2rem;
   font-family: system-ui, -apple-system, sans-serif;
   position: relative;
@@ -221,7 +221,8 @@
   }
 
   .treinoCard {
-    background: white;
+    //background: white;
+    background: linear-gradient(90deg, #d6cfcf, #f8f9fa, #cedae4);
     border-radius: 24px;
     padding: 2rem;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
