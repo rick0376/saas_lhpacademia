@@ -9,7 +9,7 @@ import { KPICard } from "@/components/dashboard/KPICard/KPICard";
 import { ChartCard } from "@/components/dashboard/ChartCard/ChartCard";
 import { TopAlunosTable } from "@/components/dashboard/TopAlunosTable/TopAlunosTable";
 import { AlunosInativosTable } from "@/components/dashboard/AlunosInativosTable/AlunosInativosTable";
-import { Button } from "@/components/ui/Button/Button"; // ✅ IMPORTE AQUI
+import { Button } from "@/components/ui/Button/Button";
 import styles from "./styles.module.scss";
 import Link from "next/link";
 
@@ -31,7 +31,6 @@ export default async function DashboardPage() {
       },
     });
 
-    // ✅ CORRETO - renderiza mensagem
     if (!permissao || !permissao.ler) {
       return (
         <div className={styles.container}>
@@ -63,7 +62,6 @@ export default async function DashboardPage() {
   primeiroDiaMes.setDate(1);
   primeiroDiaMes.setHours(0, 0, 0, 0);
 
-  // Usando 'createdAt' em vez de 'dataCadastro'
   const novosAlunos = await prisma.aluno.count({
     where: {
       ...clienteWhere,
@@ -82,28 +80,26 @@ export default async function DashboardPage() {
   let alunos6Meses: any[] = [];
 
   if (session.user.role !== "SUPERADMIN" && session.user.clienteId) {
-    // Query com filtro de cliente
     alunos6Meses = await prisma.$queryRaw`
-    SELECT 
-      TO_CHAR("createdAt", 'YYYY-MM') as mes,
-      COUNT(*) as total
-    FROM "alunos"
-    WHERE "createdAt" >= ${dataInicio}
-      AND "clienteId" = ${session.user.clienteId}
-    GROUP BY TO_CHAR("createdAt", 'YYYY-MM')
-    ORDER BY mes ASC
-  `;
+      SELECT 
+        TO_CHAR("createdAt", 'YYYY-MM') as mes,
+        COUNT(*) as total
+      FROM "alunos"
+      WHERE "createdAt" >= ${dataInicio}
+        AND "clienteId" = ${session.user.clienteId}
+      GROUP BY TO_CHAR("createdAt", 'YYYY-MM')
+      ORDER BY mes ASC
+    `;
   } else {
-    // Query sem filtro (SUPERADMIN)
     alunos6Meses = await prisma.$queryRaw`
-    SELECT 
-      TO_CHAR("createdAt", 'YYYY-MM') as mes,
-      COUNT(*) as total
-    FROM "alunos"
-    WHERE "createdAt" >= ${dataInicio}
-    GROUP BY TO_CHAR("createdAt", 'YYYY-MM')
-    ORDER BY mes ASC
-  `;
+      SELECT 
+        TO_CHAR("createdAt", 'YYYY-MM') as mes,
+        COUNT(*) as total
+      FROM "alunos"
+      WHERE "createdAt" >= ${dataInicio}
+      GROUP BY TO_CHAR("createdAt", 'YYYY-MM')
+      ORDER BY mes ASC
+    `;
   }
 
   // Top alunos
@@ -173,7 +169,7 @@ export default async function DashboardPage() {
     _count: { treinos: aluno._count.treinos },
   }));
 
-  // Menu de acesso rápido
+  // ✅ Menu de acesso rápido (com verificação de permissão)
   const dashboardItems = [
     {
       id: "clientes",
@@ -182,7 +178,7 @@ export default async function DashboardPage() {
       icon: "🏢",
       href: "/dashboard/clientes",
       color: "#f59e0b",
-      superAdminOnly: false,
+      superAdminOnly: true,
     },
     {
       id: "usuarios",
@@ -191,6 +187,7 @@ export default async function DashboardPage() {
       icon: "👥",
       href: "/dashboard/usuarios",
       color: "#6366f1",
+      recurso: "usuarios",
     },
     {
       id: "alunos",
@@ -199,6 +196,7 @@ export default async function DashboardPage() {
       icon: "👤",
       href: "/dashboard/alunos",
       color: "#10b981",
+      recurso: "alunos",
     },
     {
       id: "avaliacoes",
@@ -207,7 +205,7 @@ export default async function DashboardPage() {
       icon: "📊",
       href: "/dashboard/avaliacoes",
       color: "#60daf0ff",
-      adminOnly: true,
+      recurso: "avaliacoes",
     },
     {
       id: "exercicios",
@@ -216,6 +214,7 @@ export default async function DashboardPage() {
       icon: "💪",
       href: "/dashboard/exercicios",
       color: "#ef4444",
+      recurso: "exercicios",
     },
     {
       id: "treinos",
@@ -224,6 +223,7 @@ export default async function DashboardPage() {
       icon: "📋",
       href: "/dashboard/treinos",
       color: "#8b5cf6",
+      recurso: "treinos",
     },
     {
       id: "permissoes",
@@ -234,23 +234,55 @@ export default async function DashboardPage() {
       color: "#ec4899",
       superAdminOnly: true,
     },
+    {
+      id: "configuracoes",
+      title: "Configurações",
+      description: "Backup e configurações do sistema",
+      icon: "⚙️",
+      href: "/dashboard/configuracoes",
+      color: "#64748b",
+      recurso: "configuracoes",
+    },
   ];
 
-  const filteredItems = dashboardItems.filter((item) => {
-    if (item.superAdminOnly) {
-      return session.user.role === "SUPERADMIN";
-    }
-    if (item.adminOnly) {
-      return (
-        session.user.role === "SUPERADMIN" || session.user.role === "ADMIN"
-      );
-    }
-    return true;
-  });
+  // ✅ FILTRAR CARDS BASEADO EM PERMISSÕES
+  const filteredItems = await Promise.all(
+    dashboardItems.map(async (item) => {
+      // SUPERADMIN vê tudo
+      if (session.user.role === "SUPERADMIN") {
+        return item;
+      }
+
+      // Items exclusivos de SUPERADMIN
+      if (item.superAdminOnly) {
+        return null;
+      }
+
+      // Verificar permissão no banco
+      if (item.recurso) {
+        const permissao = await prisma.permissao.findUnique({
+          where: {
+            usuarioId_recurso: {
+              usuarioId: session.user.id,
+              recurso: item.recurso,
+            },
+          },
+        });
+
+        return permissao?.ler ? item : null;
+      }
+
+      return item;
+    })
+  );
+
+  // Remover nulls
+  const filteredCardsItems = filteredItems.filter(
+    Boolean
+  ) as typeof dashboardItems;
 
   return (
     <div className={styles.container}>
-      {/* Alerta de permissão negada */}
       <AlertaSemPermissao />
 
       {/* Welcome Section */}
@@ -259,7 +291,6 @@ export default async function DashboardPage() {
         <p className={styles.subtitle}>Bem-vindo ao painel de controle</p>
       </div>
 
-      {/* Dashboard Stats */}
       <DashboardStats />
 
       {/* KPI Cards */}
@@ -309,7 +340,7 @@ export default async function DashboardPage() {
       <section className={styles.menuSection}>
         <h2 className={styles.sectionTitle}>Acesso Rápido</h2>
         <div className={styles.cardsGrid}>
-          {filteredItems.map((item) => (
+          {filteredCardsItems.map((item) => (
             <Link
               key={item.id}
               href={item.href}
