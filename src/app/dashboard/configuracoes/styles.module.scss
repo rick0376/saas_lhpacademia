@@ -2,6 +2,8 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
+  background: linear-gradient(90deg, #6a11cb 0%, #2575fc 50%, #29abe2 100%);
+  border-radius: 12px;
 }
 
 .header {
@@ -10,12 +12,12 @@
   .title {
     font-size: 2rem;
     font-weight: 700;
-    color: var(--text-primary);
+    color: white;
     margin-bottom: 0.5rem;
   }
 
   .subtitle {
-    color: var(--text-secondary);
+    color: rgb(230, 218, 218);
     font-size: 1rem;
   }
 }
