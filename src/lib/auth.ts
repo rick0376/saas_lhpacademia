@@ -41,7 +41,6 @@ export const authOptions: NextAuthOptions = {
             throw new Error("Usuário não encontrado ou inativo");
           }
 
-          // Valida clienteId só se enviado E role !== ADMIN/SUPERADMIN
           const clienteId = credentials.clienteId as string | undefined;
           if (
             clienteId &&
@@ -76,14 +75,61 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user && user.id) {
         token.id = user.id;
         token.role = user.role;
         (token as any).clienteId = user.clienteId;
         (token as any).cliente = user.cliente;
         (token as any).aluno = user.aluno;
+
+        // ✅ Buscar permissões do usuário (exceto SUPERADMIN e ALUNO)
+        if (user.role !== "SUPERADMIN" && user.role !== "ALUNO") {
+          try {
+            const permissoes = await prisma.permissao.findMany({
+              where: { usuarioId: user.id },
+              select: {
+                recurso: true,
+                ler: true,
+                criar: true,
+                editar: true,
+                deletar: true,
+              },
+            });
+            (token as any).permissoes = permissoes;
+          } catch (error) {
+            console.error("❌ Erro ao buscar permissões no login:", error);
+            (token as any).permissoes = [];
+          }
+        } else {
+          (token as any).permissoes = null;
+        }
       }
+
+      // ✅ Recarregar permissões quando session.update() for chamado
+      if (
+        trigger === "update" &&
+        token.id &&
+        token.role !== "SUPERADMIN" &&
+        token.role !== "ALUNO"
+      ) {
+        try {
+          const permissoes = await prisma.permissao.findMany({
+            where: { usuarioId: token.id as string },
+            select: {
+              recurso: true,
+              ler: true,
+              criar: true,
+              editar: true,
+              deletar: true,
+            },
+          });
+          (token as any).permissoes = permissoes;
+        } catch (error) {
+          console.error("❌ Erro ao recarregar permissões:", error);
+        }
+      }
+
       return token;
     },
     async session({ session, token }) {
@@ -93,6 +139,7 @@ export const authOptions: NextAuthOptions = {
         (session.user as any).clienteId = token.clienteId;
         (session.user as any).cliente = token.cliente;
         (session.user as any).aluno = token.aluno;
+        (session.user as any).permissoes = token.permissoes;
       }
       return session;
     },

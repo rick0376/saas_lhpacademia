@@ -69,6 +69,11 @@ const RECURSOS = [
     label: "✅ Execuções",
     description: "Registro de treinos realizados",
   },
+  {
+    value: "configuracoes",
+    label: "⚙️ Configurações",
+    description: "Acessar configurações do sistema",
+  },
 ];
 
 export const PermissoesManager = () => {

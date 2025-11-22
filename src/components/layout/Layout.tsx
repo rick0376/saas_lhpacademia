@@ -18,6 +18,7 @@ import {
   Ruler,
   Calendar,
   FileText,
+  Shield,
 } from "lucide-react";
 import styles from "./styles.module.scss";
 import nav from "./nav.module.scss";
@@ -28,6 +29,14 @@ type Props = {
 
 type Role = "USER" | "PERSONAL" | "ALUNO" | "ADMIN" | "SUPERADMIN";
 
+interface Permissao {
+  recurso: string;
+  ler: boolean;
+  criar: boolean;
+  editar: boolean;
+  deletar: boolean;
+}
+
 export const Layout: React.FC<Props> = ({ children }) => {
   const pathname = usePathname();
   const { data: session, status } = useSession();
@@ -37,16 +46,22 @@ export const Layout: React.FC<Props> = ({ children }) => {
   const clienteNome = (session?.user as any)?.cliente || "Academia Pro";
   const usuarioNome = session?.user?.name || session?.user?.email || "Usuário";
 
+  // ✅ Pegar permissões direto da sessão (já vem do NextAuth)
+  const permissoes: Permissao[] = (session?.user as any)?.permissoes || [];
+
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const burgerRef = useRef<HTMLButtonElement | null>(null);
 
   const [logoutOpen, setLogoutOpen] = useState(false);
+
   const openLogout = () => {
     setMenuOpen(false);
     setLogoutOpen(true);
   };
+
   const closeLogout = () => setLogoutOpen(false);
+
   const confirmLogout = () => {
     const callbackUrl = role === "ALUNO" ? "/aluno/login" : "/";
     signOut({ callbackUrl });
@@ -87,19 +102,22 @@ export const Layout: React.FC<Props> = ({ children }) => {
     if (href === "/alunos/dashboard") {
       return pathname === "/alunos/dashboard";
     }
-    // compara exato ou subrotas
     return pathname === href || pathname?.startsWith(href + "/");
   };
 
-  const can = {
-    manageUsers: role === "ADMIN" || role === "SUPERADMIN",
-    superOnly: role === "SUPERADMIN",
-    personal: role === "PERSONAL" || role === "ADMIN" || role === "SUPERADMIN",
-    aluno: role === "ALUNO",
+  // ✅ FUNÇÃO PARA VERIFICAR PERMISSÃO (mesma lógica do dashboard/page.tsx)
+  const podeAcessar = (recurso: string): boolean => {
+    // SUPERADMIN tem acesso a tudo
+    if (role === "SUPERADMIN") return true;
+
+    // Buscar permissão específica do recurso
+    const permissao = permissoes.find((p) => p.recurso === recurso);
+    return permissao ? permissao.ler : false;
   };
 
+  // ✅ MENU COM VERIFICAÇÃO DE PERMISSÕES
   const groupedNav = useMemo(() => {
-    if (can.aluno) {
+    if (role === "ALUNO") {
       return [
         {
           group: "Meu Portal",
@@ -115,12 +133,12 @@ export const Layout: React.FC<Props> = ({ children }) => {
               icon: <Dumbbell size={18} />,
             },
             {
-              href: "/dashboard/avaliacoes",
+              href: "/alunos/avaliacoes",
               label: "Avaliações",
               icon: <FileText size={18} />,
             },
             {
-              href: "/dashboard/medidas",
+              href: "/alunos/medidas",
               label: "Medidas",
               icon: <Ruler size={18} />,
             },
@@ -134,56 +152,80 @@ export const Layout: React.FC<Props> = ({ children }) => {
       ];
     }
 
-    return [
+    const menuGroups = [
       {
         group: "Início",
         items: [
-          { href: "/dashboard", label: "Dashboard", icon: <Home size={18} /> },
+          ...(podeAcessar("dashboard")
+            ? [
+                {
+                  href: "/dashboard",
+                  label: "Dashboard",
+                  icon: <Home size={18} />,
+                },
+              ]
+            : []),
         ],
       },
-      ...(can.personal
-        ? [
-            {
-              group: "Gestão de Alunos",
-              items: [
+      {
+        group: "Gestão de Alunos",
+        items: [
+          ...(podeAcessar("alunos")
+            ? [
                 {
                   href: "/dashboard/alunos",
                   label: "Alunos",
                   icon: <Users size={18} />,
                 },
+              ]
+            : []),
+          ...(podeAcessar("avaliacoes")
+            ? [
                 {
                   href: "/dashboard/avaliacoes",
                   label: "Avaliações",
                   icon: <FileText size={18} />,
                 },
+              ]
+            : []),
+          ...(podeAcessar("medidas")
+            ? [
                 {
                   href: "/dashboard/medidas",
                   label: "Medidas",
                   icon: <Ruler size={18} />,
                 },
-              ],
-            },
-            {
-              group: "Treinos",
-              items: [
+              ]
+            : []),
+        ],
+      },
+      {
+        group: "Treinos",
+        items: [
+          ...(podeAcessar("treinos")
+            ? [
                 {
                   href: "/dashboard/treinos",
                   label: "Treinos",
                   icon: <ClipboardList size={18} />,
                 },
+              ]
+            : []),
+          ...(podeAcessar("exercicios")
+            ? [
                 {
                   href: "/dashboard/exercicios",
                   label: "Exercícios",
                   icon: <Dumbbell size={18} />,
                 },
-              ],
-            },
-          ]
-        : []),
+              ]
+            : []),
+        ],
+      },
       {
         group: "Cadastros",
         items: [
-          ...(can.superOnly
+          ...(role === "SUPERADMIN"
             ? [
                 {
                   href: "/dashboard/clientes",
@@ -192,7 +234,7 @@ export const Layout: React.FC<Props> = ({ children }) => {
                 },
               ]
             : []),
-          ...(can.manageUsers
+          ...(podeAcessar("usuarios")
             ? [
                 {
                   href: "/dashboard/usuarios",
@@ -201,17 +243,27 @@ export const Layout: React.FC<Props> = ({ children }) => {
                 },
               ]
             : []),
+          ...(role === "SUPERADMIN"
+            ? [
+                {
+                  href: "/dashboard/permissoes",
+                  label: "Permissões",
+                  icon: <Shield size={18} />,
+                },
+              ]
+            : []),
         ],
       },
-    ].filter((g) => g.items.length > 0);
-  }, [can.personal, can.manageUsers, can.superOnly, can.aluno]);
+    ];
 
-  const brandTitle = can.aluno ? "LHP - Meu Treino" : clienteNome;
-  const brandSub = can.aluno ? "Portal do Aluno" : usuarioNome;
+    return menuGroups.filter((group) => group.items.length > 0);
+  }, [role, permissoes]);
+
+  const brandTitle = role === "ALUNO" ? "LHP - Meu Treino" : clienteNome;
 
   const getBreadcrumb = () => {
     const parts = pathname.split("/").filter(Boolean);
-    if (parts[0] === "aluno") {
+    if (parts[0] === "aluno" || parts[0] === "alunos") {
       return parts.slice(1).map((part, i) => (
         <span key={i} className={styles.breadcrumbItem}>
           <Link
@@ -233,8 +285,8 @@ export const Layout: React.FC<Props> = ({ children }) => {
       <div className={styles.headerContent}>
         <Link
           href={
-            isAuthed && can.aluno
-              ? "/aluno/dashboard"
+            isAuthed && role === "ALUNO"
+              ? "/alunos/dashboard"
               : isAuthed
               ? "/dashboard"
               : "/"
@@ -278,8 +330,8 @@ export const Layout: React.FC<Props> = ({ children }) => {
               <div className={nav.actions}>
                 <Link
                   href={
-                    can.aluno
-                      ? "/aluno/configuracoes"
+                    role === "ALUNO"
+                      ? "/alunos/configuracoes"
                       : "/dashboard/configuracoes"
                   }
                   className={nav.actionBtn}
@@ -355,12 +407,14 @@ export const Layout: React.FC<Props> = ({ children }) => {
           <div className={styles.navGroup}>
             <Link
               href={
-                can.aluno ? "/aluno/configuracoes" : "/dashboard/configuracoes"
+                role === "ALUNO"
+                  ? "/alunos/configuracoes"
+                  : "/dashboard/configuracoes"
               }
               className={`${styles.navItem} ${
                 isActive(
-                  can.aluno
-                    ? "/aluno/configuracoes"
+                  role === "ALUNO"
+                    ? "/alunos/configuracoes"
                     : "/dashboard/configuracoes"
                 )
                   ? styles.navItemActive

@@ -78,8 +78,6 @@ export default async function DashboardPage() {
     },
   });
 
-  // ✅ CORREÇÃO: Usar Prisma.sql para build condicional da query
-  // app/dashboard/page.tsx (trecho das queries)
   const dataInicio = new Date(Date.now() - 180 * 24 * 60 * 60 * 1000);
   let alunos6Meses: any[] = [];
 
@@ -207,7 +205,7 @@ export default async function DashboardPage() {
       title: "Avaliações",
       description: "Gerenciar avaliações de alunos",
       icon: "📊",
-      href: "/alunos/avaliacoes",
+      href: "/dashboard/avaliacoes",
       color: "#60daf0ff",
       adminOnly: true,
     },
