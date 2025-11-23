@@ -12,8 +12,8 @@ import Link from "next/link";
 export default function LoginSuperAdminPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    email: "henrique@lhp.com",
-    senha: "123456",
+    email: "",
+    senha: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
