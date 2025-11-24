@@ -125,6 +125,7 @@ export async function POST(request: NextRequest) {
     ativo,
     telefone,
     dataNascimento,
+    objetivo, // ✅ ADICIONE AQUI
   } = body;
 
   let dataNascimentoValid = null;
@@ -190,6 +191,7 @@ export async function POST(request: NextRequest) {
       ativo: usuarioAtivo,
       telefone,
       dataNascimento: dataNascimento ? new Date(dataNascimento) : null,
+      objetivo, // ✅ ADICIONE
     },
     select: {
       id: true,
@@ -197,6 +199,7 @@ export async function POST(request: NextRequest) {
       email: true,
       telefone: true,
       dataNascimento: true,
+      objetivo: true, // ✅ ADICIONE
       role: true,
       ativo: true,
       createdAt: true,

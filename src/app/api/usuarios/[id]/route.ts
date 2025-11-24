@@ -87,6 +87,9 @@ export async function PUT(
       email,
       role,
       ativo,
+      telefone, // ✅ ADICIONE
+      dataNascimento: dataNascimento ? new Date(dataNascimento) : null, // ✅ ADICIONE
+      objetivo, // ✅ ADICIONE
     };
 
     if (senha && senha.trim() !== "") {

@@ -43,7 +43,7 @@ export default async function TreinosPage() {
               Crie e gerencie as fichas de treino dos alunos
             </p>
           </div>
-          <Link href="/dashboard/treinos/novo" className={styles.novoTreinoBtn}>
+          <Link href="/dashboard/treinos/novo" className={styles.addButton}>
             Novo Treino
           </Link>
         </div>

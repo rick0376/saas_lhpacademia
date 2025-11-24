@@ -29,8 +29,9 @@ model Usuario {
   role           Role      @default(USER)
   ativo          Boolean   @default(false)
   clienteId      String
-  telefone       String?   // novo campo telefone
-  dataNascimento DateTime? // novo campo data de nascimento
+  telefone       String?
+  dataNascimento DateTime?
+  objetivo       String?   // ✅ ADICIONE ESTA LINHA
   cliente        Cliente   @relation(fields: [clienteId], references: [id], onDelete: Cascade)
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt

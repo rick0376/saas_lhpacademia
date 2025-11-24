@@ -5,6 +5,31 @@
   flex-wrap: wrap;
 }
 
+.addButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
+  color: white;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  user-select: none;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+
+  &:hover,
+  &:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    outline: none;
+  }
+}
+
 .searchInput {
   flex: 1;
   min-width: 250px;

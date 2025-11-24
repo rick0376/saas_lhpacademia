@@ -20,13 +20,16 @@ export default async function EditarUsuarioPage({ params }: Props) {
   const { id } = await params;
 
   const usuario = await prisma.usuario.findUnique({
-    where: { id }, // ✅ Usa id resolvido (em vez de params.id)
+    where: { id },
     select: {
       id: true,
       nome: true,
       email: true,
       role: true,
       ativo: true,
+      telefone: true,
+      dataNascimento: true,
+      objetivo: true,
     },
   });
 
@@ -45,7 +48,15 @@ export default async function EditarUsuarioPage({ params }: Props) {
             </p>
           </div>
 
-          <UserForm initialData={usuario} isEdit={true} />
+          <UserForm
+            initialData={{
+              ...usuario,
+              dataNascimento: usuario.dataNascimento
+                ?.toISOString()
+                .split("T")[0],
+            }}
+            isEdit={true}
+          />
         </div>
       </main>
     </>

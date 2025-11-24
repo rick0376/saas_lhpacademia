@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 import styles from "./styles.module.scss";
 import { Input } from "../ui/Input/Input";
 import { Button } from "../ui/Button/Button";
-import { Toast } from "../ui/Toast/Toast"; // importe toast
+import { Toast } from "../ui/Toast/Toast";
 import {
   validateEmail,
   validatePassword,

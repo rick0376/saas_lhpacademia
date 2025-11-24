@@ -193,14 +193,6 @@ export const AlunoTable = () => {
 
   return (
     <div className={styles.container}>
-      {/* Botão Novo Aluno - Só aparece se tiver permissão */}
-      {permissoes.criar && (
-        <Link href="/dashboard/alunos/novo" className={styles.addButton}>
-          <Plus size={20} />
-          Novo Aluno
-        </Link>
-      )}
-
       <form onSubmit={handleSearch} className={styles.searchForm}>
         <input
           type="text"

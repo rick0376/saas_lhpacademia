@@ -2,6 +2,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { UserTable } from "@/components/usuarios/UserTable";
+import { prisma } from "@/lib/prisma";
+import Link from "next/link";
+import { Plus } from "lucide-react";
 import styles from "./styles.module.scss";
 
 export default async function UsuariosPage() {
@@ -15,9 +18,23 @@ export default async function UsuariosPage() {
     redirect("/alunos/dashboard");
   }
 
-  // Só ADMIN e SUPERADMIN acessam a tela de usuários
   if (session.user.role !== "SUPERADMIN" && session.user.role !== "ADMIN") {
     redirect("/dashboard");
+  }
+
+  let canCreate = false;
+  if (session.user.role === "SUPERADMIN") {
+    canCreate = true;
+  } else {
+    const permissao = await prisma.permissao.findUnique({
+      where: {
+        usuarioId_recurso: {
+          usuarioId: session.user.id,
+          recurso: "usuarios",
+        },
+      },
+    });
+    canCreate = permissao?.criar ?? false;
   }
 
   return (
@@ -30,6 +47,12 @@ export default async function UsuariosPage() {
               Cadastre e gerencie todos os usuários do sistema
             </p>
           </div>
+          {canCreate && (
+            <Link href="/dashboard/usuarios/novo" className={styles.addButton}>
+              <Plus size={20} />
+              Novo Usuário
+            </Link>
+          )}
         </header>
 
         <UserTable />
