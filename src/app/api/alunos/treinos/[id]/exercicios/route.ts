@@ -67,10 +67,10 @@ export async function GET(
       nome: ex.exercicio.nome,
       series: ex.series,
       reps: ex.repeticoes,
-      carga: ex.carga ?? undefined, // ✅ NOVO
+      carga: ex.carga ?? undefined,
       descanso: ex.descanso ?? "N/A",
-      descricao: ex.exercicio.descricao, // ✅ CORRIGIDO - Só da biblioteca
-      observacao: ex.observacoes ?? undefined, // ✅ NOVO - Observações DO TREINO
+      descricao: ex.exercicio.descricao,
+      observacao: ex.observacoes ?? undefined,
       fotoExecucao: ex.exercicio.imagem ?? undefined,
     })),
   };

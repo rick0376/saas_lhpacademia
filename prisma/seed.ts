@@ -1,121 +1,159 @@
-// prisma/seed.ts
-// Seed: 1 Avaliação Completa com TODOS os campos
-// EDITE APENAS OS CAMPOS DESTACADOS COM 🔴 ABAIXO
-
 import { PrismaClient } from "@prisma/client";
+import { hash } from "bcryptjs";
 
 const prisma = new PrismaClient();
 
 async function main() {
-  // 🔴 EDITE AQUI - INFORMAÇÕES DO ALUNO E CLIENTE
-  const alunoId = "cmhc93tkv00060geg4u6r8jzs"; // ✅ ID do aluno que já existe
-  const clienteId = "cmhc8ypx100000gegcf4hgtr0"; // ✅ ID do cliente (pra validar relação)
+  console.log("🌱 Iniciando seed do banco de dados...");
 
-  console.log("🌱 Criando avaliação completa...");
-
-  // Verifica se o aluno existe
-  const aluno = await prisma.aluno.findUnique({
-    where: { id: alunoId },
-    include: { cliente: true },
+  // 1. Criar Cliente
+  const cliente = await prisma.cliente.upsert({
+    where: { id: "cliente-inicial-001" },
+    update: {},
+    create: {
+      id: "cliente-inicial-001",
+      nome: "Academia Modelo",
+      ativo: true,
+    },
   });
 
-  if (!aluno) {
-    console.log(`❌ Aluno com ID "${alunoId}" não encontrado!`);
-    return;
-  }
+  console.log("✅ Cliente criado:", cliente.nome);
 
-  // Verifica se o aluno pertence ao cliente correto (opcional, só pra segurança)
-  if (aluno.clienteId !== clienteId) {
-    console.log(
-      `⚠️ Aviso: Aluno pertence ao cliente "${aluno.clienteId}", não "${clienteId}"`
-    );
-    console.log(`   Continuando mesmo assim...`);
-  }
+  // 2. Hash da senha do SuperAdmin
+  const senhaHash = await hash("admin123", 10);
 
-  console.log(
-    "✅ Aluno encontrado:",
-    aluno.nome,
-    `(Cliente: ${aluno.cliente.nome})`
-  );
-
-  // 🔴 EDITE AQUI - DADOS DA AVALIAÇÃO (ANAMNESE)
-  const avaliacaoData = {
-    // Tipo e Data
-    tipo: "Avaliação Inicial Física",
-    data: new Date("2025-10-15T10:00:00.000Z"),
-
-    // === ANAMNESE ===
-    historicoMedico:
-      "Sem doenças crônicas graves. Artrite leve no joelho esquerdo.",
-    objetivos:
-      "Perda de peso (5kg em 3 meses), ganho de massa muscular e melhoria cardiovascular.",
-    praticaAnterior:
-      "Musculação 2x/semana há 6 meses (irregular). Caminhadas ocasionais.",
-    fumante: false,
-    diabetes: false,
-    doencasArticulares: true,
-    cirurgias: "Apendicite em 2018. Sem lesões recentes.",
-
-    // === ANTROPOMETRIA ===
-    peso: 75.5, // kg
-    altura: 175.0, // cm
-    imc: 24.6, // calculado automaticamente: peso / (altura/100)^2
-    percentualGordura: 22.3, // %
-    circunferenciaCintura: 85.2, // cm
-    circunferenciaQuadril: 98.5, // cm
-    dobrasCutaneas: {
-      // Medidas em mm (método de 7 pontos)
-      subescapular: 12.5,
-      triceps: 15.2,
-      peitoral: 8.7,
-      axilar: 10.1,
-      suprailiaca: 18.3,
-      abdominal: 20.4,
-      femural: 14.6,
+  // 3. Criar SuperAdmin
+  const superAdmin = await prisma.usuario.upsert({
+    where: { email: "admin@academia.com" },
+    update: {},
+    create: {
+      nome: "Super Administrador",
+      email: "admin@academia.com",
+      senha: senhaHash,
+      role: "SUPERADMIN",
+      ativo: true,
+      clienteId: cliente.id,
     },
+  });
 
-    // === CARDIORRESPIRATÓRIA ===
-    vo2Max: 42.5, // ml/kg/min
-    testeCooper: 2400.0, // metros (teste de 12 min)
+  console.log("✅ SuperAdmin criado:", superAdmin.email);
 
-    // === MUSCULAR ===
-    forcaSupino: 60.0, // 1RM em kg (supino)
-    repeticoesFlexoes: 25, // número de flexões até falha
-    pranchaTempo: 85, // segundos (core)
+  // 4. Criar Exercícios de Exemplo
+  const exercicios = [
+    {
+      nome: "Supino Reto",
+      grupoMuscular: "PEITO",
+      descricao: "Exercício básico para peitoral",
+      equipamento: "Barra",
+    },
+    {
+      nome: "Agachamento Livre",
+      grupoMuscular: "PERNAS",
+      descricao: "Exercício completo para pernas",
+      equipamento: "Barra",
+    },
+    {
+      nome: "Remada Curvada",
+      grupoMuscular: "COSTAS",
+      descricao: "Exercício para costas",
+      equipamento: "Barra",
+    },
+    {
+      nome: "Desenvolvimento",
+      grupoMuscular: "OMBROS",
+      descricao: "Exercício para ombros",
+      equipamento: "Barra",
+    },
+    {
+      nome: "Rosca Direta",
+      grupoMuscular: "BICEPS",
+      descricao: "Exercício para bíceps",
+      equipamento: "Barra",
+    },
+    {
+      nome: "Tríceps Testa",
+      grupoMuscular: "TRICEPS",
+      descricao: "Exercício para tríceps",
+      equipamento: "Barra",
+    },
+    {
+      nome: "Abdominal Supra",
+      grupoMuscular: "ABDOMEN",
+      descricao: "Exercício para abdômen",
+      equipamento: "Livre",
+    },
+    {
+      nome: "Esteira",
+      grupoMuscular: "CARDIO",
+      descricao: "Exercício cardiovascular",
+      equipamento: "Esteira",
+    },
+  ];
 
-    // === FLEXIBILIDADE ===
-    testeSentarEsticar: 25.5, // cm (sentar e esticar)
+  for (const ex of exercicios) {
+    await prisma.exercicio.upsert({
+      where: {
+        id: `exercicio-${ex.nome.toLowerCase().replace(/\s/g, "-")}`,
+      },
+      update: {},
+      create: {
+        id: `exercicio-${ex.nome.toLowerCase().replace(/\s/g, "-")}`,
+        nome: ex.nome,
+        grupoMuscular: ex.grupoMuscular as any,
+        descricao: ex.descricao,
+        equipamento: ex.equipamento,
+        clienteId: cliente.id,
+      },
+    });
+  }
 
-    // === RESUMO E OBSERVAÇÕES ===
-    resultado:
-      "Avaliação normal. Condicionamento moderado. Recomendar treino 4x/semana.",
-    observacoes:
-      "Motivado. Aquecimento obrigatório para joelho. Dieta hipocalórica (2000kcal/dia). Monitorar progressão.",
-    arquivo: null, // ou '/uploads/avaliacao-pdf.pdf' se tiver arquivo
-  };
+  console.log("✅ Exercícios criados:", exercicios.length);
 
-  // Cria a avaliação
-  const avaliacao = await prisma.avaliacao.create({
+  // 5. Criar Aluno de Exemplo
+  const aluno = await prisma.aluno.upsert({
+    where: { id: "aluno-exemplo-001" },
+    update: {},
+    create: {
+      id: "aluno-exemplo-001",
+      nome: "João Silva",
+      email: "joao@exemplo.com",
+      telefone: "(11) 98765-4321",
+      dataNascimento: new Date("1990-05-15"),
+      objetivo: "Hipertrofia",
+      ativo: true,
+      clienteId: cliente.id,
+    },
+  });
+
+  console.log("✅ Aluno criado:", aluno.nome);
+
+  // 6. Criar Medida Inicial
+  await prisma.medida.create({
     data: {
       alunoId: aluno.id,
-      ...avaliacaoData,
+      peso: 75.5,
+      altura: 1.75,
+      peito: 95,
+      cintura: 85,
+      quadril: 98,
+      bracoDireito: 35,
+      bracoEsquerdo: 35,
     },
   });
 
-  console.log("\n✅ Avaliação Criada com Sucesso!");
-  console.log("   ID:", avaliacao.id);
-  console.log("   Aluno:", aluno.nome);
-  console.log("   Tipo:", avaliacao.tipo);
-  console.log("   Data:", avaliacao.data);
-  console.log("   Peso:", avaliacao.peso, "kg");
-  console.log("   IMC:", avaliacao.imc);
-  console.log("   VO2 Max:", avaliacao.vo2Max, "ml/kg/min");
-  console.log("\n🎉 Seed finalizado!");
+  console.log("✅ Medida inicial criada");
+
+  console.log("\n📌 CREDENCIAIS DE ACESSO:");
+  console.log("═══════════════════════════════════");
+  console.log("Email: admin@academia.com");
+  console.log("Senha: admin123");
+  console.log("═══════════════════════════════════");
+  console.log("\n⚠️  IMPORTANTE: Altere a senha após o primeiro login!\n");
 }
 
 main()
   .catch((e) => {
-    console.error("❌ Erro:", e.message);
+    console.error("❌ Erro no seed:", e);
     process.exit(1);
   })
   .finally(async () => {

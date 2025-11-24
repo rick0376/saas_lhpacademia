@@ -485,7 +485,9 @@ ${execucao.observacoes ? `*Observações:* ${execucao.observacoes}` : ""}
             <Calendar size={32} className={styles.premiumCardIcon} />
             <div>
               <h3 className={styles.premiumCardTitle}>Próximo Treino</h3>
-              <p className={styles.premiumCardNumber}>
+              <p
+                className={`${styles.premiumCardNumber} ${styles.premiumCardNumberSmall}`}
+              >
                 {alunoData.proximoTreino?.data || "Sem agendamento"}
               </p>
             </div>

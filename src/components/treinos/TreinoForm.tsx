@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import styles from "./formStyles.module.scss";
 import { Input } from "../ui/Input/Input";
 import { Button } from "../ui/Button/Button";
+import Link from "next/link";
 
 interface Aluno {
   id: string;
@@ -51,6 +52,7 @@ export const TreinoForm: React.FC<TreinoFormProps> = ({
 
   const fetchAlunos = async () => {
     try {
+      // Ajuste da API para trazer todos os alunos com acesso (filtrar ativos)
       const response = await fetch("/api/alunos");
       const data = await response.json();
       setAlunos(data.filter((a: any) => a.ativo));
@@ -120,11 +122,7 @@ export const TreinoForm: React.FC<TreinoFormProps> = ({
 
       const treino = await response.json();
 
-      if (isEdit) {
-        router.push(`/dashboard/treinos/${treino.id}`);
-      } else {
-        router.push(`/dashboard/treinos/${treino.id}`);
-      }
+      router.push(`/dashboard/treinos/${treino.id}`);
       router.refresh();
     } catch (error: any) {
       alert(error.message || "Erro ao salvar treino");
@@ -166,6 +164,9 @@ export const TreinoForm: React.FC<TreinoFormProps> = ({
           {errors.alunoId && (
             <span className={styles.errorText}>{errors.alunoId}</span>
           )}
+          <Link href="/dashboard/alunos/novo" className={styles.linkNovoAluno}>
+            + Cadastrar novo aluno
+          </Link>
         </div>
 
         <div className={styles.selectWrapper}>

@@ -1,3 +1,5 @@
+// File: src/app/api/usuarios/[id]/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -7,14 +9,13 @@ import { hashPassword } from "@/utils/bcrypt";
 // GET - Buscar usuário por ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> } // ✅ Next.js 15: Params como Promise
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const resolvedParams = await params; // ✅ Await resolve o Promise
-    const id = resolvedParams.id; // Agora síncrono após await
+    const resolvedParams = await params;
+    const id = resolvedParams.id;
 
     const session = await getServerSession(authOptions);
-
     if (!session) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
     }
@@ -28,11 +29,11 @@ export async function GET(
         role: true,
         ativo: true,
         clienteId: true,
-        createdAt: true,
-        updatedAt: true,
-        cliente: {
+        aluno: {
           select: {
-            nome: true,
+            telefone: true,
+            dataNascimento: true,
+            objetivo: true,
           },
         },
       },
@@ -55,23 +56,31 @@ export async function GET(
   }
 }
 
-// PUT - Atualizar usuário
+// PUT - Atualizar usuário + aluno
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> } // ✅ Next.js 15: Params como Promise
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const resolvedParams = await params; // ✅ Await resolve o Promise
-    const id = resolvedParams.id; // Agora síncrono após await
+    const resolvedParams = await params;
+    const id = resolvedParams.id;
 
     const session = await getServerSession(authOptions);
-
     if (!session) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
     }
 
     const body = await request.json();
-    const { nome, email, senha, role, ativo } = body;
+    const {
+      nome,
+      email,
+      senha,
+      role,
+      ativo,
+      telefone,
+      dataNascimento,
+      objetivo,
+    } = body;
 
     const dataToUpdate: any = {
       nome,
@@ -80,11 +89,11 @@ export async function PUT(
       ativo,
     };
 
-    // Se senha foi fornecida, fazer hash
     if (senha && senha.trim() !== "") {
       dataToUpdate.senha = await hashPassword(senha);
     }
 
+    // Atualiza usuário
     const usuarioAtualizado = await prisma.usuario.update({
       where: { id },
       data: dataToUpdate,
@@ -98,6 +107,35 @@ export async function PUT(
       },
     });
 
+    // Atualiza ou cria dados do aluno relacionados
+    const usuarioAluno = await prisma.aluno.findUnique({
+      where: { usuarioId: id },
+    });
+
+    if (usuarioAluno) {
+      await prisma.aluno.update({
+        where: { id: usuarioAluno.id },
+        data: {
+          telefone,
+          dataNascimento: dataNascimento ? new Date(dataNascimento) : null,
+          objetivo,
+        },
+      });
+    } else {
+      await prisma.aluno.create({
+        data: {
+          usuarioId: id,
+          clienteId: session.user.clienteId,
+          nome,
+          email,
+          telefone,
+          dataNascimento: dataNascimento ? new Date(dataNascimento) : null,
+          objetivo,
+          ativo,
+        },
+      });
+    }
+
     return NextResponse.json(usuarioAtualizado);
   } catch (error) {
     console.error("Erro ao atualizar usuário:", error);
@@ -108,7 +146,7 @@ export async function PUT(
   }
 }
 
-// DELETE - Excluir usuário
+// DELETE permanece igual
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }

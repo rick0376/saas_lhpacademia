@@ -22,20 +22,20 @@ model Cliente {
 }
 
 model Usuario {
-  id         String      @id @default(cuid())
-  nome       String
-  email      String      @unique
-  senha      String
-  role       Role        @default(USER)
-  ativo      Boolean     @default(false)
-  clienteId  String
-  cliente    Cliente     @relation(fields: [clienteId], references: [id], onDelete: Cascade)
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  permissoes Permissao[]
-  aluno      Aluno?
-
-  @@map("usuarios")
+  id             String    @id @default(cuid())
+  nome           String
+  email          String    @unique
+  senha          String
+  role           Role      @default(USER)
+  ativo          Boolean   @default(false)
+  clienteId      String
+  telefone       String?   // novo campo telefone
+  dataNascimento DateTime? // novo campo data de nascimento
+  cliente        Cliente   @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  permissoes     Permissao[]
+  aluno          Aluno?
 }
 
 model Permissao {

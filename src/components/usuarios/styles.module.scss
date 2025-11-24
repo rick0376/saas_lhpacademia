@@ -260,15 +260,12 @@
   }
 }
 
-// ... (mantenha todos os estilos anteriores da tabela)
-
-// Adicione estes estilos no final do arquivo:
-
 .form {
   background: white;
   border-radius: 12px;
   padding: 32px;
   box-shadow: var(--shadow);
+  background: linear-gradient(90deg, #c7bebe, #e5eaf0, #c9d3dd);
 }
 
 .formGrid {

@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import styles from "./styles.module.scss";
 import { Input } from "../ui/Input/Input";
 import { Button } from "../ui/Button/Button";
+import { Toast } from "../ui/Toast/Toast"; // importe toast
 import {
   validateEmail,
   validatePassword,
@@ -17,6 +18,9 @@ interface UserFormProps {
     id?: string;
     nome: string;
     email: string;
+    telefone?: string;
+    dataNascimento?: string;
+    objetivo?: string;
     role: string;
     ativo: boolean;
   };
@@ -32,14 +36,48 @@ export const UserForm: React.FC<UserFormProps> = ({
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // Estado para controlar toast
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "error";
+    visible: boolean;
+  }>({
+    message: "",
+    type: "success",
+    visible: false,
+  });
+
   const [formData, setFormData] = useState({
     nome: initialData?.nome || "",
     email: initialData?.email || "",
+    telefone: initialData?.telefone || "",
+    dataNascimento: initialData?.dataNascimento || "",
+    objetivo: initialData?.objetivo || "",
     senha: "",
     confirmarSenha: "",
     role: initialData?.role || "USER",
     ativo: initialData?.ativo ?? false,
   });
+
+  // Função para formatação do telefone
+  const formatTelefone = (value: string) => {
+    const digits = value.replace(/\D/g, "");
+
+    if (digits.length <= 2) return digits;
+
+    if (digits.length <= 7) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+
+    if (digits.length <= 11)
+      return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(
+        7,
+        11
+      )}`;
+
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(
+      7,
+      11
+    )}`; // limita a 11 dígitos
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -47,9 +85,26 @@ export const UserForm: React.FC<UserFormProps> = ({
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
 
+    let newValue = value;
+
+    if (name === "telefone") {
+      newValue = formatTelefone(value);
+      if (newValue.length > 15) return; // limita telefone formatado a 15 caracteres
+    }
+
+    if (name === "dataNascimento") {
+      // limita a 10 caracteres (ano, mês e dia: YYYY-MM-DD)
+      if (value.length > 10) return;
+      // opcional: impedir avanço se o ano estiver com mais de 4 dígitos
+      if (value.length >= 5) {
+        const yearPart = value.slice(0, 4);
+        if (!/^\d{0,4}$/.test(yearPart)) return;
+      }
+    }
+
     setFormData({
       ...formData,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: type === "checkbox" ? checked : newValue,
     });
 
     if (errors[name]) {
@@ -60,28 +115,45 @@ export const UserForm: React.FC<UserFormProps> = ({
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
 
-    const nomeValidation = validateNome(formData.nome);
-    if (!nomeValidation.valid) {
-      newErrors.nome = nomeValidation.message || "";
+    if (!validateNome(formData.nome).valid) {
+      newErrors.nome = "Nome inválido";
     }
 
     if (!validateEmail(formData.email)) {
       newErrors.email = "Email inválido";
     }
 
+    // Validar telefone: deve ter 10 ou 11 dígitos (removendo máscara)
+    const telefoneDigits = formData.telefone.replace(/\D/g, "");
+    if (telefoneDigits.length !== 10 && telefoneDigits.length !== 11) {
+      newErrors.telefone = "Telefone deve conter 10 ou 11 dígitos";
+    }
+
+    // Validar dataNascimento se preenchida
+    if (formData.dataNascimento) {
+      // Verifica comprimento do texto (deve ter 10 caracteres no formato YYYY-MM-DD)
+      if (formData.dataNascimento.length !== 10) {
+        newErrors.dataNascimento = "Data de nascimento inválida";
+      } else {
+        // Verifica validamente o ano da data
+        const ano = new Date(formData.dataNascimento).getFullYear();
+        if (ano.toString().length !== 4) {
+          newErrors.dataNascimento = "Ano da data de nascimento inválido";
+        }
+      }
+    }
+
     if (!isEdit) {
-      const senhaValidation = validatePassword(formData.senha);
-      if (!senhaValidation.valid) {
-        newErrors.senha = senhaValidation.message || "";
+      if (!validatePassword(formData.senha).valid) {
+        newErrors.senha = "Senha inválida";
       }
 
       if (formData.senha !== formData.confirmarSenha) {
         newErrors.confirmarSenha = "As senhas não coincidem";
       }
     } else if (formData.senha) {
-      const senhaValidation = validatePassword(formData.senha);
-      if (!senhaValidation.valid) {
-        newErrors.senha = senhaValidation.message || "";
+      if (!validatePassword(formData.senha).valid) {
+        newErrors.senha = "Senha inválida";
       }
 
       if (formData.senha !== formData.confirmarSenha) {
@@ -97,11 +169,15 @@ export const UserForm: React.FC<UserFormProps> = ({
     e.preventDefault();
 
     if (!validate()) {
+      setToast({
+        message: "Preencha os campos corretamente",
+        type: "error",
+        visible: true,
+      });
       return;
     }
 
     setLoading(true);
-
     try {
       const url = isEdit ? `/api/usuarios/${initialData?.id}` : "/api/usuarios";
       const method = isEdit ? "PUT" : "POST";
@@ -109,6 +185,9 @@ export const UserForm: React.FC<UserFormProps> = ({
       const body: any = {
         nome: formData.nome,
         email: formData.email,
+        telefone: formData.telefone,
+        dataNascimento: formData.dataNascimento,
+        objetivo: formData.objetivo,
         role: formData.role,
         ativo: formData.ativo,
       };
@@ -130,15 +209,23 @@ export const UserForm: React.FC<UserFormProps> = ({
         throw new Error(error.error || "Erro ao salvar usuário");
       }
 
+      setToast({
+        message: "Usuário salvo com sucesso!",
+        type: "success",
+        visible: true,
+      });
       router.push("/dashboard/usuarios");
       router.refresh();
     } catch (error: any) {
-      alert(error.message || "Erro ao salvar usuário");
+      setToast({
+        message: error.message || "Erro ao salvar usuário",
+        type: "error",
+        visible: true,
+      });
       setLoading(false);
     }
   };
 
-  // ✅ ADMIN só vê USER e ADMIN (não SUPERADMIN)
   const roleOptions =
     session?.user?.role === "ADMIN"
       ? [
@@ -152,104 +239,134 @@ export const UserForm: React.FC<UserFormProps> = ({
         ];
 
   return (
-    <form onSubmit={handleSubmit} className={styles.form}>
-      <div className={styles.formGrid}>
-        <Input
-          label="Nome completo"
-          type="text"
-          name="nome"
-          placeholder="Digite o nome completo"
-          value={formData.nome}
-          onChange={handleChange}
-          error={errors.nome}
-          required
+    <>
+      {toast.visible && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast((prev) => ({ ...prev, visible: false }))}
         />
-
-        <Input
-          label="Email"
-          type="email"
-          name="email"
-          placeholder="usuario@email.com"
-          value={formData.email}
-          onChange={handleChange}
-          error={errors.email}
-          required
-        />
-
-        <Input
-          label={
-            isEdit ? "Nova senha (deixe em branco para não alterar)" : "Senha"
-          }
-          type="password"
-          name="senha"
-          placeholder="••••••••"
-          value={formData.senha}
-          onChange={handleChange}
-          error={errors.senha}
-          required={!isEdit}
-        />
-
-        <Input
-          label="Confirmar senha"
-          type="password"
-          name="confirmarSenha"
-          placeholder="••••••••"
-          value={formData.confirmarSenha}
-          onChange={handleChange}
-          error={errors.confirmarSenha}
-          required={!isEdit || !!formData.senha}
-        />
-
-        <div className={styles.selectWrapper}>
-          <label className={styles.label}>Perfil de acesso</label>
-          <select
-            name="role"
-            value={formData.role}
+      )}
+      <form onSubmit={handleSubmit} className={styles.form}>
+        <div className={styles.formGrid}>
+          <Input
+            label="Nome completo"
+            type="text"
+            name="nome"
+            placeholder="Digite o nome completo"
+            value={formData.nome}
             onChange={handleChange}
-            className={styles.select}
-          >
-            {roleOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className={styles.checkboxWrapper}>
-          <label className={styles.checkboxLabel}>
-            <input
-              type="checkbox"
-              name="ativo"
-              checked={formData.ativo}
+            error={errors.nome}
+            required
+          />
+          <Input
+            label="Email"
+            type="email"
+            name="email"
+            placeholder="usuario@email.com"
+            value={formData.email}
+            onChange={handleChange}
+            error={errors.email}
+            required
+          />
+          <Input
+            label="Telefone"
+            type="text"
+            name="telefone"
+            placeholder="(11) 99999-9999"
+            value={formData.telefone}
+            onChange={handleChange}
+            error={errors.telefone}
+          />
+          <Input
+            label="Data de nascimento"
+            type="date"
+            name="dataNascimento"
+            value={formData.dataNascimento}
+            onChange={handleChange}
+            error={errors.dataNascimento}
+          />
+          <Input
+            label="Objetivo"
+            type="text"
+            name="objetivo"
+            placeholder="Objetivo do usuário"
+            value={formData.objetivo}
+            onChange={handleChange}
+          />
+          <Input
+            label={
+              isEdit ? "Nova senha (deixe em branco para não alterar)" : "Senha"
+            }
+            type="password"
+            name="senha"
+            placeholder="••••••••"
+            value={formData.senha}
+            onChange={handleChange}
+            error={errors.senha}
+            required={!isEdit}
+          />
+          <Input
+            label="Confirmar senha"
+            type="password"
+            name="confirmarSenha"
+            placeholder="••••••••"
+            value={formData.confirmarSenha}
+            onChange={handleChange}
+            error={errors.confirmarSenha}
+            required={!isEdit || !!formData.senha}
+          />
+          <div className={styles.selectWrapper}>
+            <label className={styles.label}>Perfil de acesso</label>
+            <select
+              name="role"
+              value={formData.role}
               onChange={handleChange}
-              className={styles.checkbox}
-            />
-            <span>Usuário ativo</span>
-          </label>
-          <p className={styles.checkboxHelp}>
-            Usuários inativos não poderão fazer login no sistema
-          </p>
+              className={styles.select}
+            >
+              {roleOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className={styles.checkboxWrapper}>
+            <label className={styles.checkboxLabel}>
+              <input
+                type="checkbox"
+                name="ativo"
+                checked={formData.ativo}
+                onChange={handleChange}
+                className={styles.checkbox}
+              />
+              <span>Usuário ativo</span>
+            </label>
+            <p className={styles.checkboxHelp}>
+              Usuários inativos não poderão fazer login no sistema
+            </p>
+          </div>
         </div>
-      </div>
-
-      <div className={styles.formActions}>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => router.back()}
-          disabled={loading}
-        >
-          Cancelar
-        </Button>
-        <Button type="submit" disabled={loading}>
-          {loading
-            ? "Salvando..."
-            : isEdit
-            ? "Atualizar Usuário"
-            : "Criar Usuário"}
-        </Button>
-      </div>
-    </form>
+        <div className={styles.formActions}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => router.back()}
+            disabled={loading}
+          >
+            Cancelar
+          </Button>
+          <Button type="submit" disabled={loading}>
+            {loading
+              ? isEdit
+                ? "Atualizando..."
+                : "Salvando..."
+              : isEdit
+              ? "Atualizar Usuário"
+              : "Criar Usuário"}
+          </Button>
+        </div>
+      </form>
+    </>
   );
 };

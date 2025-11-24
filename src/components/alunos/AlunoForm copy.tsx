@@ -1,24 +1,12 @@
-// Componente React AlunoForm.tsx completo com preenchimento automático dos campos
-
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation"; // Importando useSearchParams
 import styles from "./alunoForm.module.scss";
 import { Input } from "../ui/Input/Input";
 import { Button } from "../ui/Button/Button";
 import { ImageUpload } from "../ui/ImageUpload/ImageUpload";
 import { Toast } from "../ui/Toast/Toast";
-
-interface Usuario {
-  id: string;
-  nome: string;
-  email: string;
-  telefone?: string;
-  dataNascimento?: string;
-  objetivo?: string;
-  role: string;
-}
 
 interface AlunoFormProps {
   clienteId?: string | null;
@@ -43,21 +31,21 @@ export const AlunoForm: React.FC<AlunoFormProps> = ({
   isEdit = false,
 }) => {
   const router = useRouter();
-  const searchParams = useSearchParams();
-
+  const searchParams = useSearchParams(); // Hook para capturar os parâmetros da URL
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [clientes, setClientes] = useState<any[]>([]);
-  const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [toastData, setToastData] = useState<{
     message: string;
     type: "success" | "error";
   } | null>(null);
+
   const [fotoFile, setFotoFile] = useState<File | null>(null);
   const [fotoPreview, setFotoPreview] = useState<string>(
     initialData?.foto || ""
   );
 
+  // Usando o clienteId da URL ou o inicial do aluno (caso esteja editando)
   const [formData, setFormData] = useState({
     nome: initialData?.nome || "",
     email: initialData?.email || "",
@@ -68,10 +56,10 @@ export const AlunoForm: React.FC<AlunoFormProps> = ({
     ativo: initialData?.ativo ?? true,
     darAcessoApp: false,
     senhaInicial: "",
+    // Modificado para pegar o clienteId da URL ou usar o clienteId inicial
     clienteIdSelecionado: isEdit
       ? initialData?.clienteId || searchParams.get("clienteId") || ""
       : clienteId || "",
-    usuarioSelecionadoId: "",
   });
 
   useEffect(() => {
@@ -79,12 +67,6 @@ export const AlunoForm: React.FC<AlunoFormProps> = ({
       fetchClientes();
     }
   }, [clienteId, isEdit]);
-
-  useEffect(() => {
-    if (formData.clienteIdSelecionado) {
-      fetchUsuarios(formData.clienteIdSelecionado);
-    }
-  }, [formData.clienteIdSelecionado]);
 
   async function fetchClientes() {
     try {
@@ -98,67 +80,26 @@ export const AlunoForm: React.FC<AlunoFormProps> = ({
     }
   }
 
-  async function fetchUsuarios(clienteId: string) {
-    try {
-      const response = await fetch(`/api/usuarios?clienteId=${clienteId}`);
-      if (response.ok) {
-        const data = await response.json();
-        setUsuarios(data);
-      }
-    } catch (error) {
-      console.error("Erro ao buscar usuários:", error);
-    }
-  }
-
-  const handleChange = (
+  function handleChange(
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
-  ) => {
+  ) {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
-
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
-
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
+  }
 
-    if (name === "usuarioSelecionadoId") {
-      if (value === "") {
-        setFormData((prev) => ({
-          ...prev,
-          nome: "",
-          email: "",
-          telefone: "",
-          dataNascimento: "",
-          objetivo: "",
-          usuarioSelecionadoId: "",
-        }));
-      } else {
-        const usuario = usuarios.find((u) => u.id === value);
-        if (usuario) {
-          setFormData((prev) => ({
-            ...prev,
-            nome: usuario.nome,
-            email: usuario.email,
-            telefone: usuario.telefone || "",
-            dataNascimento: usuario.dataNascimento || "",
-            objetivo: usuario.objetivo || "",
-            usuarioSelecionadoId: value,
-          }));
-        }
-      }
-    }
-  };
-
-  const handleFotoChange = (file: File | null, previewUrl: string) => {
+  function handleFotoChange(file: File | null, previewUrl: string) {
     setFotoFile(file);
     setFotoPreview(previewUrl);
-  };
+  }
 
-  const validate = (): boolean => {
+  function validate(): boolean {
     const newErrors: Record<string, string> = {};
 
     if (!formData.nome || formData.nome.trim().length < 3) {
@@ -170,24 +111,19 @@ export const AlunoForm: React.FC<AlunoFormProps> = ({
     if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = "Email inválido";
     }
-    if (!formData.usuarioSelecionadoId && !formData.email) {
-      newErrors.email = "Informe um email ou selecione um usuário";
-    }
-    if (
-      formData.darAcessoApp &&
-      (!formData.senhaInicial || formData.senhaInicial.length < 6)
-    ) {
-      newErrors.senhaInicial =
-        "A senha inicial deve ter no mínimo 6 caracteres";
-    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
+  }
+
+  function closeToast() {
+    setToastData(null);
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
+    // Validação do formulário
     if (!validate()) {
       return;
     }
@@ -206,8 +142,10 @@ export const AlunoForm: React.FC<AlunoFormProps> = ({
       formDataToSend.append("objetivo", formData.objetivo || "");
       formDataToSend.append("observacoes", formData.observacoes || "");
       formDataToSend.append("ativo", String(formData.ativo));
-      formDataToSend.append("clienteId", formData.clienteIdSelecionado);
-      formDataToSend.append("usuarioId", formData.usuarioSelecionadoId);
+
+      const clienteFinal = formData.clienteIdSelecionado;
+
+      formDataToSend.append("clienteId", clienteFinal);
 
       if (!isEdit) {
         formDataToSend.append("darAcessoApp", String(formData.darAcessoApp));
@@ -243,8 +181,6 @@ export const AlunoForm: React.FC<AlunoFormProps> = ({
     }
   }
 
-  const closeToast = () => setToastData(null);
-
   return (
     <>
       <form onSubmit={handleSubmit} className={styles.form} noValidate>
@@ -261,7 +197,7 @@ export const AlunoForm: React.FC<AlunoFormProps> = ({
               >
                 <option value="">Selecione o cliente...</option>
                 {clientes.map((c) => (
-                  <option key={c.id} value={c.id}>
+                  <option value={c.id} key={c.id}>
                     {c.nome}
                   </option>
                 ))}
@@ -273,23 +209,6 @@ export const AlunoForm: React.FC<AlunoFormProps> = ({
               )}
             </div>
           )}
-
-          <div className={styles.selectWrapper}>
-            <label className={styles.label}>Selecionar usuário existente</label>
-            <select
-              className={styles.select}
-              name="usuarioSelecionadoId"
-              value={formData.usuarioSelecionadoId}
-              onChange={handleChange}
-            >
-              <option value="">Nenhum</option>
-              {usuarios.map((u) => (
-                <option key={u.id} value={u.id}>
-                  {u.nome} ({u.email} - {u.role})
-                </option>
-              ))}
-            </select>
-          </div>
 
           <Input
             label="Nome completo *"

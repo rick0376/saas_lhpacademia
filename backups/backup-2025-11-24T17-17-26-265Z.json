@@ -1,0 +1,652 @@
+{
+  "timestamp": "2025-11-24T17:17:26.265Z",
+  "data": {
+    "clientes": [
+      {
+        "id": "cmhc8ypx100000gegcf4hgtr0",
+        "nome": "Academia LHP",
+        "logo": "https://res.cloudinary.com/dih8izeaa/image/upload/v1761757560/saas_academia/clientes/yzcmlgxbqjuo7uhto7sj.png",
+        "ativo": true,
+        "createdAt": "2025-10-29T17:06:00.756Z",
+        "updatedAt": "2025-10-29T17:06:00.756Z"
+      },
+      {
+        "id": "cmi6q9svx0000l804l6nnqctf",
+        "nome": "Academia LHPSYSTEMS",
+        "logo": "https://res.cloudinary.com/dih8izeaa/image/upload/v1763600615/saas_academia/clientes/g5bfzxowakxtikcmbw9o.jpg",
+        "ativo": true,
+        "createdAt": "2025-11-20T01:03:36.573Z",
+        "updatedAt": "2025-11-20T01:03:36.573Z"
+      }
+    ],
+    "usuarios": [
+      {
+        "id": "cmhc93s5p00040gegia2gw2nz",
+        "nome": "Rick Pereira",
+        "email": "rickpereira@lhp.com",
+        "senha": "$2b$10$dGfeMw2VKXLVpLq/f2K1vOhMKbXFqA6gpZaXolijMF0l2RV4E5.QS",
+        "role": "ALUNO",
+        "ativo": true,
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "createdAt": "2025-10-29T17:09:56.941Z",
+        "updatedAt": "2025-11-24T01:18:41.508Z"
+      },
+      {
+        "id": "cmide5yy500010g5c1rhh2km5",
+        "nome": "Fernando",
+        "email": "fernando@lhp.com",
+        "senha": "$2b$10$JHbtTunSVvidJnLFDqRO6eUORNa5r/FykijSdGumeyDSC7q8bxHT6",
+        "role": "USER",
+        "ativo": true,
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "createdAt": "2025-11-24T16:59:05.646Z",
+        "updatedAt": "2025-11-24T17:00:55.772Z"
+      },
+      {
+        "id": "cmheupgzv00010gtk7of5p0sx",
+        "nome": "Henrique Pereira",
+        "email": "henrique@lhp.com",
+        "senha": "$2b$10$yAQwSOGd2VUOldG3pNMbcurnnyNIN6Cw7M5UM.PSuz32DJwsg2sya",
+        "role": "SUPERADMIN",
+        "ativo": true,
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "createdAt": "2025-10-31T12:50:13.195Z",
+        "updatedAt": "2025-11-10T10:22:51.862Z"
+      },
+      {
+        "id": "cmhc8yq6700020gegum0q3szh",
+        "nome": "LHPSYSTEMS",
+        "email": "lhpsystems@lhp.com",
+        "senha": "$2b$10$vtwQ7qBwLUwY917vwFu73O2AtOrRHv.97gJJXrWiEGwGfLa50tXEG",
+        "role": "ADMIN",
+        "ativo": true,
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "createdAt": "2025-10-29T17:06:01.087Z",
+        "updatedAt": "2025-11-10T10:23:14.067Z"
+      }
+    ],
+    "permissoes": [
+      {
+        "id": "cmid95ndv00010gk8jmuogbb0",
+        "usuarioId": "cmheupgzv00010gtk7of5p0sx",
+        "recurso": "dashboard",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmid95nf100030gk8tjb5lbw0",
+        "usuarioId": "cmheupgzv00010gtk7of5p0sx",
+        "recurso": "clientes",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmid95nf200050gk8gzm5tpze",
+        "usuarioId": "cmheupgzv00010gtk7of5p0sx",
+        "recurso": "usuarios",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmid95nf300070gk8zg3o5hkw",
+        "usuarioId": "cmheupgzv00010gtk7of5p0sx",
+        "recurso": "alunos",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmid95o0t000j0gk8a8yd474o",
+        "usuarioId": "cmheupgzv00010gtk7of5p0sx",
+        "recurso": "avaliacoes",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmid95nf400090gk8yp81deft",
+        "usuarioId": "cmheupgzv00010gtk7of5p0sx",
+        "recurso": "exercicios",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmid95nmf000b0gk89lml2sy7",
+        "usuarioId": "cmheupgzv00010gtk7of5p0sx",
+        "recurso": "treinos",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmid95nnw000d0gk84bn9kzvv",
+        "usuarioId": "cmheupgzv00010gtk7of5p0sx",
+        "recurso": "medidas",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmid95not000f0gk8josedtd7",
+        "usuarioId": "cmheupgzv00010gtk7of5p0sx",
+        "recurso": "execucoes",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmid95nou000h0gk86mawqi3s",
+        "usuarioId": "cmheupgzv00010gtk7of5p0sx",
+        "recurso": "configuracoes",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmi98rovd00090gz8t6xal21z",
+        "usuarioId": "cmhc8yq6700020gegum0q3szh",
+        "recurso": "dashboard",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmi7d44z100010gvg4zrypufk",
+        "usuarioId": "cmhc8yq6700020gegum0q3szh",
+        "recurso": "clientes",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmi8rw70z000f0g34bm6j6x81",
+        "usuarioId": "cmhc8yq6700020gegum0q3szh",
+        "recurso": "usuarios",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmi8sdedd001b0g34c645f3f2",
+        "usuarioId": "cmhc8yq6700020gegum0q3szh",
+        "recurso": "avaliacoes",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmi7d45oq00050gvgr38mwbal",
+        "usuarioId": "cmhc8yq6700020gegum0q3szh",
+        "recurso": "alunos",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmi7d45oq00070gvgm0coar1z",
+        "usuarioId": "cmhc8yq6700020gegum0q3szh",
+        "recurso": "exercicios",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmi7d45or00090gvgdxtxagfg",
+        "usuarioId": "cmhc8yq6700020gegum0q3szh",
+        "recurso": "treinos",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmi7d45op00030gvgi7ga3q8i",
+        "usuarioId": "cmhc8yq6700020gegum0q3szh",
+        "recurso": "medidas",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmi7d45os000b0gvgellakxhk",
+        "usuarioId": "cmhc8yq6700020gegum0q3szh",
+        "recurso": "execucoes",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmia95b4d00090gtcumhav4kp",
+        "usuarioId": "cmhc8yq6700020gegum0q3szh",
+        "recurso": "configuracoes",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      }
+    ],
+    "alunos": [
+      {
+        "id": "cmibz2qyl0003jp047krf1dng",
+        "nome": "Rick Pereira",
+        "email": "rick@lhp.com",
+        "telefone": "12991890682",
+        "dataNascimento": null,
+        "foto": "https://res.cloudinary.com/dih8izeaa/image/upload/v1763917733/saas_academia/alunos/atotr4s0mpodm7poliqe.jpg",
+        "objetivo": "Hipertrofia",
+        "observacoes": "Inciando novos exercícios. ",
+        "ativo": true,
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "usuarioId": null,
+        "createdAt": "2025-11-23T17:08:54.910Z",
+        "updatedAt": "2025-11-23T17:08:54.910Z"
+      },
+      {
+        "id": "cmide5yy500030g5cbpb36not",
+        "nome": "Fernando",
+        "email": null,
+        "telefone": "12991890682",
+        "dataNascimento": "1976-02-03T00:00:00.000Z",
+        "foto": null,
+        "objetivo": "testa",
+        "observacoes": null,
+        "ativo": true,
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "usuarioId": "cmide5yy500010g5c1rhh2km5",
+        "createdAt": "2025-11-24T16:59:05.646Z",
+        "updatedAt": "2025-11-24T17:00:56.425Z"
+      }
+    ],
+    "medidas": [],
+    "avaliacoes": [],
+    "exercicios": [
+      {
+        "id": "cmhc9kyx4000k0gegp0j7wx16",
+        "nome": "Remada Baixa Triângulo",
+        "grupoMuscular": "COSTAS",
+        "descricao": "deixar a coluna um pouco inclinada para trás - trazer de encontro ao umbigo - empurra o cotovelo para baixo.\r\n",
+        "video": null,
+        "imagem": "https://res.cloudinary.com/dih8izeaa/image/upload/v1761758599/saas_academia/exercicios/u1sv0sdyikpdwf7h5hsa.png",
+        "equipamento": "Máquina Puxador",
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "createdAt": "2025-10-29T17:23:18.729Z",
+        "updatedAt": "2025-10-29T17:23:18.729Z"
+      },
+      {
+        "id": "cmhdkpjgk0001jv041fnrykrz",
+        "nome": "Supino Maquina",
+        "grupoMuscular": "PEITO",
+        "descricao": "- Ajustar na linha da axila. \r\n- Estender com uma leve flexão. \r\n- Manter as escápulas apoiada no banco. \r\n- Ombro sempre baixo. \r\n- Descer e parar um pouco antes. \r\n- Fazer o movimento apertando tipo fechando.\r\n",
+        "video": null,
+        "imagem": "https://res.cloudinary.com/dih8izeaa/image/upload/v1761837752/saas_academia/exercicios/ys71gau9hjw765gmowud.png",
+        "equipamento": "Maquina",
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "createdAt": "2025-10-30T15:22:34.047Z",
+        "updatedAt": "2025-10-30T15:22:34.047Z"
+      },
+      {
+        "id": "cmhdjvt0l0001jp0497297ffk",
+        "nome": "Rosca Scott Barra Curvada",
+        "grupoMuscular": "BICEPS",
+        "descricao": "- Encaixe as axilas no banco. \r\n- Corpo inteiro para frente. \r\n- Subir 90º não chegar até o final. Não deixar afastar os braços. \r\n- Fazer mais forças no mindinho como se fosse empurrar para cima.",
+        "video": null,
+        "imagem": "https://res.cloudinary.com/dih8izeaa/image/upload/v1761836365/saas_academia/exercicios/amkacmuzameesjjgmipj.png",
+        "equipamento": "Banco Scott Barra",
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "createdAt": "2025-10-30T14:59:26.752Z",
+        "updatedAt": "2025-10-30T14:59:26.752Z"
+      },
+      {
+        "id": "cmhdjbhro0001ib044ys8q9kt",
+        "nome": "Rosca Direta Polia Baixa",
+        "grupoMuscular": "BICEPS",
+        "descricao": "- Ficar um pouquinho para trás da polia. \r\n- Braço colocado ao corpo. \r\n- Colocar braço um pouquinho para frente. \r\n- No final do movimento levante um pouquinho o braço.\r\n\r\n",
+        "video": null,
+        "imagem": "https://res.cloudinary.com/dih8izeaa/image/upload/v1761835417/saas_academia/exercicios/ajoskmbvvrm5eig2x49n.png",
+        "equipamento": "Polia Alta",
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "createdAt": "2025-10-30T14:43:39.058Z",
+        "updatedAt": "2025-10-30T15:00:09.120Z"
+      },
+      {
+        "id": "cmhc9etm6000e0geg2qldf39g",
+        "nome": "Tríceps Frances Unilateral Halteres",
+        "grupoMuscular": "TRICEPS",
+        "descricao": "- Sentar no banco apoiado baixo. \r\n- Cotovelo apontando para teto.\r\n- Não deixar o braço afastar.\r\n",
+        "video": null,
+        "imagem": "https://res.cloudinary.com/dih8izeaa/image/upload/v1761758312/saas_academia/exercicios/woncrzfilqaytyu0zecu.png",
+        "equipamento": "Halteres",
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "createdAt": "2025-10-29T17:18:31.921Z",
+        "updatedAt": "2025-10-30T15:34:49.344Z"
+      },
+      {
+        "id": "cmhdkfp180005jp04k1lal4vg",
+        "nome": "Rosca 45º",
+        "grupoMuscular": "BICEPS",
+        "descricao": "- Posicionar banco 45º. \r\n- Apoia as costas e deixe os braços para baixo. \r\n- Ao precionar a mão chega próximo ao peitoral",
+        "video": null,
+        "imagem": "https://res.cloudinary.com/dih8izeaa/image/upload/v1761837294/saas_academia/exercicios/nxuk5mhnan7en8psjcx7.png",
+        "equipamento": "Banco com Halteres",
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "createdAt": "2025-10-30T15:14:54.712Z",
+        "updatedAt": "2025-10-30T15:14:54.712Z"
+      },
+      {
+        "id": "cmhdkuy5i0003jv04dyga2jzf",
+        "nome": "Dumbell Press Reto",
+        "grupoMuscular": "PEITO",
+        "descricao": "- Começar carga baixa.  \r\n- Começar o movimento em cima. \r\n- Fechar as escápulas. \r\n- Colocar o braço um pouco mais baixo na linha das axilas. \r\n- Não tocar os pesos.\r\n",
+        "video": null,
+        "imagem": "https://res.cloudinary.com/dih8izeaa/image/upload/v1761838006/saas_academia/exercicios/rxefamaqkcdxu8i8ewem.png",
+        "equipamento": "Banco Reto",
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "createdAt": "2025-10-30T15:26:46.372Z",
+        "updatedAt": "2025-10-30T15:26:46.372Z"
+      },
+      {
+        "id": "cmhdkzcrc0005jv04hdxfatkw",
+        "nome": "Crucifixo Maquina",
+        "grupoMuscular": "PEITO",
+        "descricao": "- Regular o banco altura no ombro ou um pouquinho mais baixo. \r\n- Alongar o maximo possivel. \r\n- Quando fechar tocar os dedos e empurra um pouco mais para frente.\r\n",
+        "video": null,
+        "imagem": "https://res.cloudinary.com/dih8izeaa/image/upload/v1761838211/saas_academia/exercicios/vvken8hxnjyka3ozvko3.png",
+        "equipamento": "Maquina Crucifixo",
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "createdAt": "2025-10-30T15:30:11.900Z",
+        "updatedAt": "2025-10-30T15:30:11.900Z"
+      },
+      {
+        "id": "cmhc9m018000m0gegojou73jf",
+        "nome": "Crucifixo Inverso",
+        "grupoMuscular": "COSTAS",
+        "descricao": "- Posicionar abdomen na maquina e não o peitoral.\r\n- Não voltar demais os braços.\r\n- Não segurar a manopla.\r\n",
+        "video": null,
+        "imagem": "https://res.cloudinary.com/dih8izeaa/image/upload/v1761758647/saas_academia/exercicios/i2vvkztxodn1lyqpwbzt.png",
+        "equipamento": "Maquina Crucifixo",
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "createdAt": "2025-10-29T17:24:06.830Z",
+        "updatedAt": "2025-10-30T15:31:56.153Z"
+      },
+      {
+        "id": "cmhc9h4gy000g0gegke1gxa6d",
+        "nome": "Pulley Frente Supinado",
+        "grupoMuscular": "COSTAS",
+        "descricao": "- Banco ajustado.\r\n- Pegada em cima da curva.\r\n- Cotovelo 90º. \r\n- Leve inclinação para trás. \r\n- Barra direção ao peitoral e cotovelo direção do chão. \r\n- Colocar peitoral para cima e empurrar com mais força o cotovelo para baixo.\r\n- Não fazer balanço.\r\n\r\n",
+        "video": null,
+        "imagem": "https://res.cloudinary.com/dih8izeaa/image/upload/v1761758419/saas_academia/exercicios/rgb7ganiuhmkf3bahtw5.png",
+        "equipamento": "Puxador Supinado",
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "createdAt": "2025-10-29T17:20:18.475Z",
+        "updatedAt": "2025-10-30T15:33:13.024Z"
+      },
+      {
+        "id": "cmhc9iqfu000i0geg0cfivlhc",
+        "nome": "Pulley Frente Triângulo",
+        "grupoMuscular": "COSTAS",
+        "descricao": "- Pegada mais lateral. \r\n- Descer até tocar abdomen e dar um cotovelada para baixo.  \r\n- Subir até alongar bem.\r\n",
+        "video": null,
+        "imagem": "https://res.cloudinary.com/dih8izeaa/image/upload/v1761758495/saas_academia/exercicios/q4ehuyyiajlsypbvsbmg.png",
+        "equipamento": "Puxador Triângulo",
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "createdAt": "2025-10-29T17:21:34.427Z",
+        "updatedAt": "2025-10-30T15:33:54.084Z"
+      },
+      {
+        "id": "cmhdkbyiz0003jp04klt3b2ul",
+        "nome": "Rosca Scott Maquina",
+        "grupoMuscular": "BICEPS",
+        "descricao": "- Não deixar o cotovelo afastado. ",
+        "video": null,
+        "imagem": "https://res.cloudinary.com/dih8izeaa/image/upload/v1761837119/saas_academia/exercicios/hogokve9qebq0uiq8x5p.png",
+        "equipamento": "Maquina Scott",
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "createdAt": "2025-10-30T15:11:59.966Z",
+        "updatedAt": "2025-10-30T15:34:09.561Z"
+      },
+      {
+        "id": "cmhdjiaxc0003ib04tg64wg6d",
+        "nome": "Rosca Simultânea",
+        "grupoMuscular": "BICEPS",
+        "descricao": "- Braço colado e movendo apenas o braço. \r\n- Colocar o braço um pouco para frente e leve inclinação nas mãos.\r\n",
+        "video": null,
+        "imagem": "https://res.cloudinary.com/dih8izeaa/image/upload/v1761835736/saas_academia/exercicios/vvxbkjldjtlizernfcem.png",
+        "equipamento": "Halteres",
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "createdAt": "2025-10-30T14:48:56.745Z",
+        "updatedAt": "2025-10-30T15:34:18.212Z"
+      },
+      {
+        "id": "cmhc98gra00080gegwy6yyxon",
+        "nome": "Tríceps Pulley Unilateral",
+        "grupoMuscular": "TRICEPS",
+        "descricao": "- Cotovelo mais proximo.\r\n- Uma leve inclinação do corpo.\r\n- No final do movimento virar o cotovelo ao contrário.",
+        "video": null,
+        "imagem": "https://res.cloudinary.com/dih8izeaa/image/upload/v1761758016/saas_academia/exercicios/fxr6ivbzg1up9rjo6lao.png",
+        "equipamento": "Máquina - Polia Alta",
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "createdAt": "2025-10-29T17:13:35.319Z",
+        "updatedAt": "2025-10-30T15:35:17.448Z"
+      },
+      {
+        "id": "cmhc9d5c1000c0geg0d0gwjga",
+        "nome": "Tríceps Pulley com Barra",
+        "grupoMuscular": "TRICEPS",
+        "descricao": "- Deixar os cotovelos mais próximos possíveis.\r\n- Leve inclinação do corpo.\r\n- Deixar o braço um pouco a frente.\r\n",
+        "video": null,
+        "imagem": "https://res.cloudinary.com/dih8izeaa/image/upload/v1761758234/saas_academia/exercicios/cupvbmet0lbot6oux4yk.png",
+        "equipamento": "Máquina - polia alta - barra",
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "createdAt": "2025-10-29T17:17:13.795Z",
+        "updatedAt": "2025-10-30T15:35:51.101Z"
+      },
+      {
+        "id": "cmhc9aiak000a0gegnl36wlqv",
+        "nome": "Tríceps Testa com Corda Polia Alta",
+        "grupoMuscular": "TRICEPS",
+        "descricao": "- Inclinar 45º.\r\n- Manter os cotovelos fechados.\r\n- Estender completamente forçando os polegares para fora e retornar fechando a mão.\r\n- Deixa a cabeça baixa.\r\n",
+        "video": null,
+        "imagem": "https://res.cloudinary.com/dih8izeaa/image/upload/v1761758109/saas_academia/exercicios/cm1aab01horcmttb4ylv.png",
+        "equipamento": "Máquina - Polia Alta ",
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "createdAt": "2025-10-29T17:15:09.170Z",
+        "updatedAt": "2025-10-30T15:36:52.039Z"
+      },
+      {
+        "id": "cmhdmudjw0001jr04yp1hnbrq",
+        "nome": "Agachamento Livre",
+        "grupoMuscular": "PERNAS",
+        "descricao": "- Ponta do pé e pernas confortável. \r\n- Barra apoia em cima do trapézio. \r\n- Descer mantendo o cotovelo para baixo e o peito para fora frente. \r\n- Descer até o limite de manter a postura. \r\n- Subir até manter uma leve flexão de joelho e quadril.\r\n",
+        "video": null,
+        "imagem": "https://res.cloudinary.com/dih8izeaa/image/upload/v1761841338/saas_academia/exercicios/v5gtmndywgdyp2ebrpgc.png",
+        "equipamento": "Livre com barra",
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "createdAt": "2025-10-30T16:22:18.902Z",
+        "updatedAt": "2025-10-30T16:22:18.902Z"
+      },
+      {
+        "id": "cmhdmx8870003jr04q2qtxs02",
+        "nome": "Leg Press 45º",
+        "grupoMuscular": "PERNAS",
+        "descricao": "- Pés e pernas de uma forma confortáveis. \r\n- Descer até o momento que o quadril fique apoiado no banco.\r\n- Subir até o momento em que os joelhos fiquem alinhados a ponta do pé. \r\n- Subir até uma leve flexão dos joelhos. \r\n- Manter sempre força nos calcanhares.",
+        "video": null,
+        "imagem": "https://res.cloudinary.com/dih8izeaa/image/upload/v1761841471/saas_academia/exercicios/wz8vgyd5yjqefijhgisx.png",
+        "equipamento": "Leg Press 45º",
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "createdAt": "2025-10-30T16:24:31.972Z",
+        "updatedAt": "2025-10-30T16:24:31.972Z"
+      },
+      {
+        "id": "cmhdmy8ck0005jr044zk53n1o",
+        "nome": "Cadeira Extensora",
+        "grupoMuscular": "PERNAS",
+        "descricao": "- Ajustar o banco com a lombar apoiada e joelho envolvendo o banco. \r\n- Ajustar o rolete de baixo na curva da canela. \r\n- Desce o máximo puder e eleva o máximo. \r\n- Voltar a ponta do pé para cima.",
+        "video": null,
+        "imagem": "https://res.cloudinary.com/dih8izeaa/image/upload/v1761841518/saas_academia/exercicios/gccqas6kvxdwatezppq3.png",
+        "equipamento": "Cadeira Extensora",
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "createdAt": "2025-10-30T16:25:18.785Z",
+        "updatedAt": "2025-10-30T16:25:18.785Z"
+      },
+      {
+        "id": "cmhdmz8gm0007jr044mz5vfox",
+        "nome": "Mesa Flexora",
+        "grupoMuscular": "PERNAS",
+        "descricao": "- Não levantar o quadril. \r\n- Precione contra o banco a pélvia. \r\n- Posição Plantar pé para cima.\r\n",
+        "video": null,
+        "imagem": "https://res.cloudinary.com/dih8izeaa/image/upload/v1761841564/saas_academia/exercicios/sf3yygfhtfz0i7b6t5sf.png",
+        "equipamento": "Mesa Flexora",
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "createdAt": "2025-10-30T16:26:05.588Z",
+        "updatedAt": "2025-10-30T16:26:05.588Z"
+      },
+      {
+        "id": "cmhdn2zsf000bjr042vxwjjwz",
+        "nome": "Panturrilha Sentado Banco",
+        "grupoMuscular": "PANTURRILHA",
+        "descricao": "- Posicionar próximo do joelho confortável. \r\n- Manter a postura. \r\n- Subir força no dedão do pé e descer empurrando o calcanhar para baixo.",
+        "video": null,
+        "imagem": "https://res.cloudinary.com/dih8izeaa/image/upload/v1761841740/saas_academia/exercicios/gzrlwtbggmvbvnuon6qe.png",
+        "equipamento": "Banco Panturrilha",
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "createdAt": "2025-10-30T16:29:00.973Z",
+        "updatedAt": "2025-10-30T16:29:00.973Z"
+      },
+      {
+        "id": "cmhdn14e20009jr04q2ji8w8e",
+        "nome": "Panturrilha em Pé no Leg",
+        "grupoMuscular": "PANTURRILHA",
+        "descricao": "- Deixar o banco para trás. \r\n- Posicionar o pé com joelho flexionado. \r\n- Estender o joelho e estica o pé com força no dedão do pé.",
+        "video": null,
+        "imagem": "https://res.cloudinary.com/dih8izeaa/image/upload/v1761841653/saas_academia/exercicios/ccmgc0eoxqjiaujvzwok.png",
+        "equipamento": "Leg Press Reto",
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "createdAt": "2025-10-30T16:27:33.593Z",
+        "updatedAt": "2025-10-30T16:29:17.266Z"
+      },
+      {
+        "id": "cmhezauev000f0gfke8cigjh6",
+        "nome": "Rosca Concentrada ",
+        "grupoMuscular": "BICEPS",
+        "descricao": "- Colocar o cotovelo ao lado da perna, apoia a mão na perna. \r\n- Estender o máximo e não deixar pegar embalo para subir. \r\n- Inclinar a mão com a parte do polegar para baixo.",
+        "video": null,
+        "imagem": "https://res.cloudinary.com/dih8izeaa/image/upload/v1761922728/saas_academia/exercicios/zk4n9gsoi0xifnwemfqg.png",
+        "equipamento": "Halter",
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "createdAt": "2025-10-31T14:58:48.696Z",
+        "updatedAt": "2025-10-31T14:58:48.696Z"
+      },
+      {
+        "id": "cmhezbx6u000h0gfki1mh07q5",
+        "nome": "Dumbell Press Inclinado 45º",
+        "grupoMuscular": "PEITO",
+        "descricao": "- Levantar halteres mas não encostar um ao outro. \r\n- Cotovelos eles também mantenha uma leve flexão. \r\n- Dar uma leve inclinada nas mãos. ",
+        "video": null,
+        "imagem": "https://res.cloudinary.com/dih8izeaa/image/upload/v1761922778/saas_academia/exercicios/pfty6txqu2uqfu6m203i.png",
+        "equipamento": null,
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "createdAt": "2025-10-31T14:59:38.951Z",
+        "updatedAt": "2025-10-31T14:59:38.951Z"
+      },
+      {
+        "id": "cmhezk4ht000l0gfkf11bnbgy",
+        "nome": "Rosca Direta Barra Curvada",
+        "grupoMuscular": "BICEPS",
+        "descricao": "- Deixar tudo estabilizado e não mexer o cotovelo. Ir com o cotovelo um pouco para frente estabilizado.\r\n",
+        "video": null,
+        "imagem": "https://res.cloudinary.com/dih8izeaa/image/upload/v1761923160/saas_academia/exercicios/hatkgglgf4irx2zgiaka.png",
+        "equipamento": "Barra Curvada",
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "createdAt": "2025-10-31T15:06:01.667Z",
+        "updatedAt": "2025-10-31T15:06:01.667Z"
+      },
+      {
+        "id": "cmhh12j5900010gsosn0av2qq",
+        "nome": "Tríceps Frânces",
+        "grupoMuscular": "TRICEPS",
+        "descricao": "- Apoiar a costa. \r\n- Colocar o peso acima da cabeça com as mãos passando sobre ela.\r\n- Manter os cotovelos fechados descendo o máximo possível.",
+        "video": null,
+        "imagem": "https://res.cloudinary.com/dih8izeaa/image/upload/v1762046632/saas_academia/exercicios/vdfbi6j1lhcuh6geawah.png",
+        "equipamento": "Halteres",
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "createdAt": "2025-11-02T01:23:52.430Z",
+        "updatedAt": "2025-11-02T01:23:52.430Z"
+      },
+      {
+        "id": "cmhh13jtp00030gsos17q1csw",
+        "nome": "Remada Curvada Aberta com Halteres",
+        "grupoMuscular": "COSTAS",
+        "descricao": "- Inclinar coluna 45º. \r\n- Levantar tipo dando cotovelada para cima mantendo a coluna posicionada. \r\n- Ao levantar o cotovelo para cima fechar o máximo o meio das costas e jogar o peitoral para fora.",
+        "video": null,
+        "imagem": "https://res.cloudinary.com/dih8izeaa/image/upload/v1762046680/saas_academia/exercicios/othynjql7ayujbrs0ipx.png",
+        "equipamento": "Halteres",
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "createdAt": "2025-11-02T01:24:39.966Z",
+        "updatedAt": "2025-11-02T01:24:39.966Z"
+      },
+      {
+        "id": "cmhh1vq97000z0gsoivnu6dzj",
+        "nome": "Cadeira Flexora",
+        "grupoMuscular": "PERNAS",
+        "descricao": "Cadeira Flexora - Ajustar máquina mantendo a lombar e quadril apoiada no banco. - Flexona o máximo o joelho e levantar um pouco antes de final. - Colocar o pé apontado para baixo.",
+        "video": null,
+        "imagem": "https://res.cloudinary.com/dih8izeaa/image/upload/v1762047994/saas_academia/exercicios/dp8vayvubfnzritwyfe2.png",
+        "equipamento": "Cadeira Flexora",
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "createdAt": "2025-11-02T01:46:34.670Z",
+        "updatedAt": "2025-11-02T01:46:34.670Z"
+      },
+      {
+        "id": "cmhh24zxd00110gso6igk9e79",
+        "nome": "Stiff",
+        "grupoMuscular": "PERNAS",
+        "descricao": "- Desce o corpo mantendo a curvatura da coluna. \r\n- Não deixar arredondar a coluna e bumbum empinado. \r\n- Ao subir parar antes de levantar completamente.\r\n",
+        "video": null,
+        "imagem": "https://res.cloudinary.com/dih8izeaa/image/upload/v1762048426/saas_academia/exercicios/vlc7jiptflhddwoyqwnj.png",
+        "equipamento": "Barra",
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "createdAt": "2025-11-02T01:53:45.937Z",
+        "updatedAt": "2025-11-02T01:53:45.937Z"
+      },
+      {
+        "id": "cmhh269zq00130gsokk0qi1dl",
+        "nome": "Cadeira Abdutora",
+        "grupoMuscular": "PERNAS",
+        "descricao": "- Manter sempre a lombar e o quadril apoiado no banco. \r\n- Abrir o máximo e ao voltar não fechar totalmente. \r\n- Deixar o corpo um pouco alto.",
+        "video": null,
+        "imagem": "https://res.cloudinary.com/dih8izeaa/image/upload/v1762048487/saas_academia/exercicios/nkejmh9laltyqgzv6iwm.png",
+        "equipamento": "Cadeira Abdutora",
+        "clienteId": "cmhc8ypx100000gegcf4hgtr0",
+        "createdAt": "2025-11-02T01:54:46.807Z",
+        "updatedAt": "2025-11-02T01:54:46.807Z"
+      }
+    ],
+    "treinos": [],
+    "treinoExercicios": [],
+    "cronogramas": [],
+    "execucoesTreino": [],
+    "execucoesExercicio": []
+  }
+}

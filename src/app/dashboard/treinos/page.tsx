@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { TreinoTable } from "@/components/treinos/TreinoTable";
 import { prisma } from "@/lib/prisma";
 import styles from "./styles.module.scss";
+import Link from "next/link";
 
 export default async function TreinosPage() {
   const session = await getServerSession(authOptions);
@@ -42,7 +43,11 @@ export default async function TreinosPage() {
               Crie e gerencie as fichas de treino dos alunos
             </p>
           </div>
+          <Link href="/dashboard/treinos/novo" className={styles.novoTreinoBtn}>
+            Novo Treino
+          </Link>
         </div>
+
         <TreinoTable />
       </div>
     </main>

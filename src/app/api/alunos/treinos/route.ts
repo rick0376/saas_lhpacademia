@@ -21,7 +21,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log("🔍 API /api/alunos/treinos: Aluno ID:", alunoId);
+    // Removidos logs sensíveis
+    // console.log("🔍 API /api/alunos/treinos: Aluno ID:", alunoId);
 
     const treinos = await prisma.treino.findMany({
       where: {
@@ -38,12 +39,12 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    console.log(
-      "✅ Treinos carregados:",
-      treinos.length,
-      "para aluno",
-      alunoId
-    );
+    // console.log(
+    //   "✅ Treinos carregados:",
+    //   treinos.length,
+    //   "para aluno",
+    //   alunoId
+    // );
 
     return NextResponse.json(treinos);
   } catch (error) {

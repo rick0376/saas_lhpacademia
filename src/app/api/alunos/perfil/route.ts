@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
     }
 
-    console.log("🔍 Buscando perfil do aluno:", alunoId);
+    // console.log("🔍 Buscando perfil do aluno:", alunoId);
 
     // ✅ Buscar dados do aluno com usuario relacionado
     const aluno = await prisma.aluno.findUnique({
@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log("✅ Perfil carregado:", aluno.nome);
+    //console.log("✅ Perfil carregado:", aluno.nome);
 
     // ✅ Formata resposta
     const response = {
@@ -113,7 +113,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
     }
 
-    console.log("🔄 Atualizando perfil do aluno:", alunoId);
+    //console.log("🔄 Atualizando perfil do aluno:", alunoId);
 
     // ✅ Atualizar aluno
     const alunoAtualizado = await prisma.aluno.update({

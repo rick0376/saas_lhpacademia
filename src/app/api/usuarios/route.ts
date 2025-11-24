@@ -1,3 +1,5 @@
+// File: src/app/api/usuarios/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -65,6 +67,8 @@ export async function GET(request: NextRequest) {
       id: true,
       nome: true,
       email: true,
+      telefone: true,
+      dataNascimento: true,
       role: true,
       ativo: true,
       clienteId: true,
@@ -112,7 +116,28 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { nome, email, senha, role, clienteId, ativo } = body;
+  const {
+    nome,
+    email,
+    senha,
+    role,
+    clienteId,
+    ativo,
+    telefone,
+    dataNascimento,
+  } = body;
+
+  let dataNascimentoValid = null;
+  if (dataNascimento) {
+    const parsedDate = new Date(dataNascimento);
+    if (
+      !isNaN(parsedDate.getTime()) &&
+      parsedDate.getFullYear() > 1900 &&
+      parsedDate.getFullYear() < 2100
+    ) {
+      dataNascimentoValid = parsedDate;
+    }
+  }
 
   if (!nome || !email || !senha) {
     return NextResponse.json(
@@ -146,7 +171,9 @@ export async function POST(request: NextRequest) {
   const senhaHash = await hashPassword(senha);
 
   const usuarioAtivo =
-    session.user.role === "SUPERADMIN" ? ativo ?? true : false;
+    session.user.role === "SUPERADMIN" || session.user.role === "ADMIN"
+      ? ativo ?? false
+      : false;
 
   const clienteIdFinal =
     session.user.role === "ADMIN"
@@ -161,11 +188,15 @@ export async function POST(request: NextRequest) {
       role: role || "USER",
       clienteId: clienteIdFinal,
       ativo: usuarioAtivo,
+      telefone,
+      dataNascimento: dataNascimento ? new Date(dataNascimento) : null,
     },
     select: {
       id: true,
       nome: true,
       email: true,
+      telefone: true,
+      dataNascimento: true,
       role: true,
       ativo: true,
       createdAt: true,
