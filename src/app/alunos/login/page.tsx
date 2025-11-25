@@ -3,8 +3,9 @@
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Activity, LogIn, Mail, Lock } from "lucide-react";
+import { Activity, LogIn, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import styles from "./styles.module.scss";
+import { Input } from "@/components/ui/Input/Input";
 
 export default function AlunoLoginPage() {
   const router = useRouter();
@@ -15,6 +16,14 @@ export default function AlunoLoginPage() {
     email: "",
     password: "",
   });
+
+  /*controlar senha*/
+  const [showPassword, setShowPassword] = useState(false);
+
+  const toggleShowPassword = () => {
+    setShowPassword((prev) => !prev);
+  };
+  /*---------------------*/
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,42 +73,42 @@ export default function AlunoLoginPage() {
             </div>
           )}
 
-          <div className={styles.inputGroup}>
-            <label htmlFor="email" className={styles.label}>
-              <Mail size={16} />
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              className={styles.input}
-              placeholder="seu@email.com"
-              value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
-              required
-              autoComplete="email"
-            />
-          </div>
+          {/* Email */}
+          <Input
+            label="Email"
+            type="email"
+            name="email"
+            placeholder="admin@academia.com"
+            value={formData.email}
+            onChange={(e) =>
+              setFormData({ ...formData, email: e.target.value })
+            }
+            required
+            icon={<Mail size={18} />}
+          />
 
-          <div className={styles.inputGroup}>
-            <label htmlFor="password" className={styles.label}>
-              <Lock size={16} />
-              Senha
-            </label>
-            <input
-              id="password"
-              type="password"
-              className={styles.input}
+          {/* Senha com olhinho */}
+          <div className={styles.passwordWrapper}>
+            <Input
+              label="Senha"
+              type={showPassword ? "text" : "password"}
+              name="password" // se quiser idêntico ao outro, pode usar "senha"
               placeholder="••••••••"
-              value={formData.password}
+              value={formData.password} // se mudar o name para "senha", mude aqui também
               onChange={(e) =>
                 setFormData({ ...formData, password: e.target.value })
               }
               required
-              autoComplete="current-password"
+              icon={<Lock size={18} />}
             />
+
+            <button
+              type="button"
+              onClick={toggleShowPassword}
+              className={styles.eyeButton}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
           </div>
 
           <button

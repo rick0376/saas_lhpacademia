@@ -9,6 +9,7 @@ import styles from "./styles.module.scss";
 import { Input } from "@/components/ui/Input/Input";
 import { Button } from "@/components/ui/Button/Button";
 import Link from "next/link";
+import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -22,6 +23,14 @@ export default function LoginPage() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  /*controlar senha*/
+  const [showPassword, setShowPassword] = useState(false);
+
+  const toggleShowPassword = () => {
+    setShowPassword((prev) => !prev);
+  };
+  /*---------------------*/
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,71 +99,33 @@ export default function LoginPage() {
             label="Email"
             type="email"
             name="email"
-            placeholder="seu@email.com"
+            placeholder="admin@academia.com"
             value={formData.email}
             onChange={handleChange}
             required
-            icon={
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M3 5L10 10L17 5"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <rect
-                  x="2"
-                  y="4"
-                  width="16"
-                  height="12"
-                  rx="2"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                />
-              </svg>
-            }
+            icon={<Mail size={18} />}
           />
 
-          <Input
-            label="Senha"
-            type="password"
-            name="senha"
-            placeholder="••••••••"
-            value={formData.senha}
-            onChange={handleChange}
-            required
-            icon={
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <rect
-                  x="3"
-                  y="9"
-                  width="14"
-                  height="9"
-                  rx="2"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                />
-                <path
-                  d="M6 9V6C6 3.79086 7.79086 2 10 2C12.2091 2 14 3.79086 14 6V9"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                />
-              </svg>
-            }
-          />
+          <div className={styles.passwordWrapper}>
+            <Input
+              label="Senha"
+              type={showPassword ? "text" : "password"}
+              name="senha"
+              placeholder="••••••••"
+              value={formData.senha}
+              onChange={handleChange}
+              required
+              icon={<Lock size={18} />}
+            />
+
+            <button
+              type="button"
+              onClick={toggleShowPassword}
+              className={styles.eyeButton}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
 
           <Button type="submit" fullWidth disabled={loading}>
             {loading ? "Entrando..." : "Entrar"}

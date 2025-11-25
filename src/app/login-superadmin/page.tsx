@@ -8,6 +8,7 @@ import styles from "./styles.module.scss";
 import { Input } from "@/components/ui/Input/Input";
 import { Button } from "@/components/ui/Button/Button";
 import Link from "next/link";
+import { Mail, Eye, EyeOff, Lock } from "lucide-react";
 
 export default function LoginSuperAdminPage() {
   const router = useRouter();
@@ -17,6 +18,13 @@ export default function LoginSuperAdminPage() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  /*controlar senha*/
+  const [showPassword, setShowPassword] = useState(false);
+
+  const toggleShowPassword = () => {
+    setShowPassword((prev) => !prev);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,17 +82,29 @@ export default function LoginSuperAdminPage() {
             value={formData.email}
             onChange={handleChange}
             required
+            icon={<Mail size={18} />}
           />
 
-          <Input
-            label="Senha"
-            type="password"
-            name="senha"
-            placeholder="••••••••"
-            value={formData.senha}
-            onChange={handleChange}
-            required
-          />
+          <div className={styles.passwordWrapper}>
+            <Input
+              label="Senha"
+              type={showPassword ? "text" : "password"}
+              name="senha"
+              placeholder="••••••••"
+              value={formData.senha}
+              onChange={handleChange}
+              required
+              icon={<Lock size={18} />}
+            />
+
+            <button
+              type="button"
+              onClick={toggleShowPassword}
+              className={styles.eyeButton}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
 
           <Button type="submit" fullWidth disabled={loading}>
             {loading ? "Entrando..." : "Entrar como SuperAdmin"}
