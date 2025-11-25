@@ -1,8 +1,8 @@
 .main {
-  max-width: 1400px;
+  //max-width: 1400px;
   min-height: calc(100vh - 140px);
   padding: 40px 24px;
-  background: linear-gradient(90deg, #6a11cb 0%, #2575fc 50%, #29abe2 100%);
+  // background: linear-gradient(90deg, #c7bebe, #e5eaf0, #c9d3dd);
   color: #2f2f6d;
   border-radius: 8px;
 
@@ -13,12 +13,14 @@
 }
 
 .container {
+  background: linear-gradient(90deg, #6a11cb 0%, #2575fc 50%, #29abe2 100%);
+  border-radius: 12px;
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 32px;
-  padding: 0 16px;
+  padding: 20px;
 }
 
 .profileHeader {
@@ -46,7 +48,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #ffffff;
+  background: linear-gradient(90deg, #e4dddd, #f8f9fa, #d7e0e9);
   box-shadow: 0 4px 12px rgba(106, 17, 203, 0.15);
   padding: 24px 32px;
   border-radius: 16px;
@@ -211,7 +213,7 @@
 }
 
 .statCard {
-  background: #ffffff;
+  background: linear-gradient(90deg, #e4dddd, #f8f9fa, #d7e0e9);
   box-shadow: 0 4px 12px rgba(106, 17, 203, 0.15);
   border-radius: 16px;
   padding: 28px;
@@ -247,7 +249,7 @@
 
 /* Informações contato */
 .contactCard {
-  background: #ffffff;
+  background: linear-gradient(90deg, #e4dddd, #f8f9fa, #d7e0e9);
   box-shadow: 0 4px 12px rgba(106, 17, 203, 0.15);
   padding: 28px;
   border-radius: 16px;
@@ -379,7 +381,7 @@
 
 /* Observações */
 .observacoesCard {
-  background: #ffffff;
+  background: linear-gradient(90deg, #e4dddd, #f8f9fa, #d7e0e9);
   box-shadow: 0 4px 12px rgba(106, 17, 203, 0.15);
   padding: 28px;
   border-radius: 16px;

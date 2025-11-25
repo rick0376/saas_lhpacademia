@@ -1,5 +1,5 @@
 .container {
-  background: white;
+  background: linear-gradient(90deg, #e4dddd, #f8f9fa, #d7e0e9);
   border-radius: 12px;
   padding: 32px;
   box-shadow: var(--shadow);
@@ -83,7 +83,7 @@
 }
 
 .medidaCard {
-  background: #e2edf7ff;
+  background: white;
   border-radius: 12px;
   padding: 20px;
   border: 2px solid var(--border-color);

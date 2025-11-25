@@ -64,7 +64,7 @@ export async function PUT(
 
     const { id } = await params;
 
-    // ✅ Receber FormData
+    // Receber FormData
     const formData = await request.formData();
 
     const nome = formData.get("nome") as string;
@@ -76,13 +76,6 @@ export async function PUT(
     const ativo = formData.get("ativo") === "true";
     const fotoFile = formData.get("foto") as File | null;
     const fotoExistente = formData.get("fotoExistente") as string | null;
-
-    console.log("📝 Atualizando aluno:", {
-      id,
-      nome,
-      temNovoArquivo: !!fotoFile,
-      manterFotoExistente: !!fotoExistente,
-    });
 
     // Buscar aluno atual
     const alunoAtual = await prisma.aluno.findUnique({
@@ -99,37 +92,31 @@ export async function PUT(
 
     let novaFotoUrl: string | null = null;
 
-    // ✅ SE TEM NOVO ARQUIVO, FAZER UPLOAD
+    // Se tem novo arquivo, fazer upload
     if (fotoFile) {
-      console.log("📤 Fazendo upload da nova foto...");
-
       const arrayBuffer = await fotoFile.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
 
       try {
         novaFotoUrl = await uploadToCloudinary(buffer, "saas_academia/alunos");
-        console.log("✅ Nova foto enviada:", novaFotoUrl);
 
-        // ✅ DELETAR FOTO ANTIGA DO CLOUDINARY
+        // Deletar foto antiga do Cloudinary
         if (alunoAtual.foto) {
-          console.log("🗑️ Deletando foto antiga do Cloudinary...");
           await deleteImage(alunoAtual.foto);
         }
       } catch (uploadError) {
-        console.error("❌ Erro ao fazer upload:", uploadError);
+        console.error("Erro ao fazer upload:", uploadError);
         return NextResponse.json(
           { error: "Erro ao fazer upload da foto" },
           { status: 500 }
         );
       }
     } else if (fotoExistente) {
-      // ✅ Manter foto existente
+      // Manter foto existente
       novaFotoUrl = fotoExistente;
-      console.log("📌 Mantendo foto existente");
     } else {
-      // ✅ Removeu a foto, deletar do Cloudinary
+      // Removeu a foto, deletar do Cloudinary
       if (alunoAtual.foto) {
-        console.log("🗑️ Foto removida, deletando do Cloudinary...");
         await deleteImage(alunoAtual.foto);
       }
     }
@@ -149,14 +136,9 @@ export async function PUT(
       },
     });
 
-    console.log("✅ Aluno atualizado com sucesso:", {
-      id: alunoAtualizado.id,
-      fotoAtualizada: alunoAtualizado.foto ? "SIM ✅" : "NÃO ❌",
-    });
-
     return NextResponse.json(alunoAtualizado);
   } catch (error) {
-    console.error("❌ Erro ao atualizar aluno:", error);
+    console.error("Erro ao atualizar aluno:", error);
     return NextResponse.json(
       { error: "Erro ao atualizar aluno" },
       { status: 500 }
@@ -178,7 +160,7 @@ export async function DELETE(
 
     const { id } = await params;
 
-    // ✅ Buscar aluno para pegar a URL da foto
+    // Buscar aluno para pegar a URL da foto
     const aluno = await prisma.aluno.findUnique({
       where: { id },
       select: {
@@ -194,28 +176,19 @@ export async function DELETE(
       );
     }
 
-    console.log("🗑️ Deletando aluno:", {
-      id,
-      nome: aluno.nome,
-      temFoto: !!aluno.foto,
-    });
-
-    // ✅ Deletar do banco primeiro
+    // Deletar do banco primeiro
     await prisma.aluno.delete({
       where: { id },
     });
 
-    // ✅ Deletar foto do Cloudinary (se existir)
+    // Deletar foto do Cloudinary (se existir)
     if (aluno.foto) {
-      console.log("🗑️ Deletando foto do Cloudinary:", aluno.foto);
       await deleteImage(aluno.foto);
     }
 
-    console.log("✅ Aluno e foto deletados com sucesso!");
-
     return NextResponse.json({ message: "Aluno excluído com sucesso" });
   } catch (error) {
-    console.error("❌ Erro ao excluir aluno:", error);
+    console.error("Erro ao excluir aluno:", error);
     return NextResponse.json(
       { error: "Erro ao excluir aluno" },
       { status: 500 }

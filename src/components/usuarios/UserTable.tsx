@@ -207,16 +207,6 @@ export const UserTable = () => {
 
   return (
     <>
-      {/* Botão Novo Usuário controlado por permissão */}
-      {permissoes.criar && (
-        <div className={styles.topActions}>
-          <Link href="/dashboard/usuarios/novo" className={styles.addButton}>
-            <Plus size={20} />
-            Novo Usuário
-          </Link>
-        </div>
-      )}
-
       <form onSubmit={handleSearch} className={styles.searchForm}>
         <input
           type="text"

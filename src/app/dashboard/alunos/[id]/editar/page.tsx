@@ -31,6 +31,7 @@ export default async function EditarAlunoPage({ params }: Props) {
       objetivo: true,
       observacoes: true,
       ativo: true,
+      clienteId: true, // <-- ADICIONAR ISSO
     },
   });
 
