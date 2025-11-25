@@ -1,5 +1,5 @@
 .container {
-  background: white;
+  background: linear-gradient(90deg, #e4dddd, #f8f9fa, #d7e0e9);
   border-radius: 12px;
   padding: 32px;
   box-shadow: var(--shadow);
@@ -154,7 +154,7 @@
 .viewButton {
   width: 100%;
   padding: 10px;
-  background-color: white;
+  background: linear-gradient(90deg, #e4dddd, #f8f9fa, #d7e0e9);
   border: 2px solid var(--success-color);
   border-radius: var(--border-radius);
   color: var(--success-color);
@@ -163,14 +163,10 @@
   transition: var(--transition);
 
   &:hover {
-    background-color: var(--success-color);
-    color: white;
+    background-color: #065f46;
+    color: rgb(13, 33, 214);
+    border: 2px solid rgb(13, 33, 214);
   }
-}
-
-// Modal Styles
-.modalContent {
-  padding: 8px 0;
 }
 
 // ✅ CAMPO DE INTENSIDADE
@@ -324,9 +320,15 @@
   border-top: 1px solid var(--border-color);
 }
 
+.modalContent {
+  background: linear-gradient(90deg, #e4dddd, #f8f9fa, #d7e0e9);
+  border-radius: 12px;
+}
+
 // Details Modal
 .detailsContent {
-  padding: 8px 0;
+  padding: 20px;
+  border-radius: 12px;
 }
 
 .detailsHeader {

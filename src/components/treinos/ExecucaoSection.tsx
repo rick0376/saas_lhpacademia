@@ -452,52 +452,54 @@ export const ExecucaoSection: React.FC<ExecucaoSectionProps> = ({
         title="Detalhes da Execução"
         size="medium"
       >
-        {modalVerExecucao.execucao && (
-          <div className={styles.detailsContent}>
-            <div className={styles.detailsHeader}>
-              <span className={styles.detailsDate}>
-                📅 {formatDate(modalVerExecucao.execucao.data)}
-              </span>
-              {modalVerExecucao.execucao.completo && (
-                <span className={styles.completoBadge}>✓ Completo</span>
-              )}
-              {modalVerExecucao.execucao.intensidade && (
-                <span className={styles.intensidadeBadge}>
-                  {
-                    getIntensidadeLabel(modalVerExecucao.execucao.intensidade)
-                      .emoji
-                  }{" "}
-                  {
-                    getIntensidadeLabel(modalVerExecucao.execucao.intensidade)
-                      .text
-                  }
+        <div className={styles.modalContent}>
+          {modalVerExecucao.execucao && (
+            <div className={styles.detailsContent}>
+              <div className={styles.detailsHeader}>
+                <span className={styles.detailsDate}>
+                  📅 {formatDate(modalVerExecucao.execucao.data)}
                 </span>
+                {modalVerExecucao.execucao.completo && (
+                  <span className={styles.completoBadge}>✓ Completo</span>
+                )}
+                {modalVerExecucao.execucao.intensidade && (
+                  <span className={styles.intensidadeBadge}>
+                    {
+                      getIntensidadeLabel(modalVerExecucao.execucao.intensidade)
+                        .emoji
+                    }{" "}
+                    {
+                      getIntensidadeLabel(modalVerExecucao.execucao.intensidade)
+                        .text
+                    }
+                  </span>
+                )}
+              </div>
+
+              <div className={styles.exerciciosList}>
+                <h4>Exercícios:</h4>
+                {modalVerExecucao.execucao.exercicios.map((ex, index) => (
+                  <div key={index} className={styles.exercicioDetail}>
+                    <strong>{ex.exercicioNome}</strong>
+                    <div className={styles.exercicioInfo}>
+                      <span>
+                        {ex.series}x{ex.repeticoes}
+                      </span>
+                      {ex.carga && <span>• {ex.carga}</span>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {modalVerExecucao.execucao.observacoes && (
+                <div className={styles.observacoesBox}>
+                  <strong>Observações:</strong>
+                  <p>{modalVerExecucao.execucao.observacoes}</p>
+                </div>
               )}
             </div>
-
-            <div className={styles.exerciciosList}>
-              <h4>Exercícios:</h4>
-              {modalVerExecucao.execucao.exercicios.map((ex, index) => (
-                <div key={index} className={styles.exercicioDetail}>
-                  <strong>{ex.exercicioNome}</strong>
-                  <div className={styles.exercicioInfo}>
-                    <span>
-                      {ex.series}x{ex.repeticoes}
-                    </span>
-                    {ex.carga && <span>• {ex.carga}</span>}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {modalVerExecucao.execucao.observacoes && (
-              <div className={styles.observacoesBox}>
-                <strong>Observações:</strong>
-                <p>{modalVerExecucao.execucao.observacoes}</p>
-              </div>
-            )}
-          </div>
-        )}
+          )}
+        </div>
       </Modal>
 
       {/* ✅ TOAST DE NOTIFICAÇÃO */}

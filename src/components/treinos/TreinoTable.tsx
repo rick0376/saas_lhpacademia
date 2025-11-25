@@ -191,16 +191,6 @@ export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
 
   return (
     <>
-      {/* Botão Novo Treino - Só aparece se tiver permissão */}
-      {permissoes.criar && !alunoId && (
-        <div className={styles.topActions}>
-          <Link href="/dashboard/treinos/novo" className={styles.addButton}>
-            <span className={styles.icon}>+</span>
-            Novo Treino
-          </Link>
-        </div>
-      )}
-
       <div className={styles.grid}>
         {treinos.map((treino) => (
           <div key={treino.id} className={styles.card}>

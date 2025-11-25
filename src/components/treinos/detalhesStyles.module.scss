@@ -11,7 +11,8 @@
 // HEADER
 // ========================================
 .header {
-  background: white;
+  //background: white;
+  background: linear-gradient(90deg, #e4dddd, #f8f9fa, #d7e0e9);
   border-radius: 12px;
   padding: 2rem;
   box-shadow: var(--shadow);
@@ -115,7 +116,7 @@
 // LISTA DE EXERCÍCIOS
 // ========================================
 .exerciciosList {
-  background: white;
+  background: linear-gradient(90deg, #e4dddd, #f8f9fa, #d7e0e9);
   border-radius: 12px;
   padding: 2rem;
   box-shadow: var(--shadow);
@@ -372,7 +373,7 @@
   gap: 0.75rem;
   margin-bottom: 0.75rem;
   padding: 1rem;
-  background: white;
+  background: linear-gradient(90deg, #e4dddd, #f8f9fa, #d7e0e9);
   border-radius: 8px;
 }
 
@@ -416,6 +417,9 @@
 // ========================================
 .modalContent {
   padding: 0.5rem 0;
+  background: linear-gradient(90deg, #e4dddd, #f8f9fa, #d7e0e9);
+  padding: 20px;
+  border-radius: 12px;
 }
 
 .modalGrid {

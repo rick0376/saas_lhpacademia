@@ -42,8 +42,6 @@ export default async function TreinoDetalhesPage({ params }: Props) {
     redirect("/dashboard/treinos");
   }
 
-  // Verificar permissão de editar treinos (se não for SUPERADMIN)
-  // Isso controla a visibilidade dos botões de editar/excluir exercícios
   let podeEditar = true;
   if (session.user.role !== "SUPERADMIN") {
     const permissao = await prisma.permissao.findUnique({

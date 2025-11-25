@@ -36,6 +36,15 @@ interface TreinoDetalhesProps {
   permissoesEditar: boolean;
 }
 
+const DEFAULT_NOVO_EXERCICIO = {
+  exercicioId: "",
+  series: 3,
+  repeticoes: "12-15",
+  carga: "20",
+  descanso: 40,
+  observacoes: "",
+};
+
 export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
   treino,
   permissoesEditar,
@@ -54,14 +63,7 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
   const [loading, setLoading] = useState(false);
   const [filtroGrupo, setFiltroGrupo] = useState("");
 
-  const [novoExercicio, setNovoExercicio] = useState({
-    exercicioId: "",
-    series: 3,
-    repeticoes: "10-12",
-    carga: "",
-    descanso: 60,
-    observacoes: "",
-  });
+  const [novoExercicio, setNovoExercicio] = useState(DEFAULT_NOVO_EXERCICIO);
 
   const [exercicioEditando, setExercicioEditando] = useState<{
     id: string;
@@ -188,14 +190,7 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
       if (!response.ok) throw new Error("Erro ao adicionar exercício");
       await refresh();
       setModalAddExercicio(false);
-      setNovoExercicio({
-        exercicioId: "",
-        series: 3,
-        repeticoes: "10-12",
-        carga: "",
-        descanso: 60,
-        observacoes: "",
-      });
+      setNovoExercicio(DEFAULT_NOVO_EXERCICIO);
       setToast({
         show: true,
         message: "✅ Exercício adicionado com sucesso!",
