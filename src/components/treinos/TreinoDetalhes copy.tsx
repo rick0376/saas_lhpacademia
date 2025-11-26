@@ -1,11 +1,10 @@
+// components/treinos/TreinoDetalhes.tsx (COMPLETO COM PERMISSÕES)
 "use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { jsPDF } from "jspdf"; // Novo
-import { FileText, Share2 } from "lucide-react"; // Novos ícones
 import styles from "./detalhesStyles.module.scss";
 import { Button } from "../ui/Button/Button";
 import { Modal } from "../ui/Modal/Modal";
@@ -110,185 +109,6 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
       console.error("Erro ao carregar exercícios:", error);
     }
   };
-
-  // ============================================================
-  // 🚀 GERAR PDF DA FICHA
-  // ============================================================
-  const gerarPdfFicha = async () => {
-    if (!treino) return;
-
-    const nomeCliente = session?.user?.name || "SaaS Academia";
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.width;
-    const pageHeight = doc.internal.pageSize.height;
-    const margin = 10;
-    let y = 50;
-
-    const getLogoBase64 = async () => {
-      try {
-        const origin =
-          typeof window !== "undefined" ? window.location.origin : "";
-        const resp = await fetch(`${origin}/imagens/logo.png`, {
-          cache: "no-store",
-        });
-        if (!resp.ok) return "";
-        const blob = await resp.blob();
-        return await new Promise<string>((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () =>
-            resolve(typeof reader.result === "string" ? reader.result : "");
-          reader.onerror = () => resolve("");
-          reader.readAsDataURL(blob);
-        });
-      } catch {
-        return "";
-      }
-    };
-
-    const logoDataUri = await getLogoBase64();
-
-    const printHeader = () => {
-      doc.setFillColor(25, 35, 55);
-      doc.rect(0, 0, pageWidth, 40, "F");
-      doc.setFillColor(218, 165, 32);
-      doc.rect(0, 35, pageWidth, 5, "F");
-
-      if (logoDataUri) {
-        try {
-          doc.addImage(logoDataUri, "PNG", 10, 7, 18, 18);
-        } catch {}
-      }
-
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(18);
-      doc.setTextColor(255, 255, 255);
-      doc.text("FICHA DE TREINO", pageWidth / 2, 18, { align: "center" });
-
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(12);
-      doc.setTextColor(218, 165, 32); // <--- AQUI ELE DEFINE DOURADO
-      doc.text(`Aluno: ${treino.aluno.nome}`, margin, 30);
-      doc.text(`Treino: ${treino.nome}`, pageWidth - margin, 30, {
-        align: "right",
-      });
-    };
-
-    const printFooter = () => {
-      const totalPages = doc.getNumberOfPages();
-      const footerY = pageHeight - 10;
-
-      for (let i = 1; i <= totalPages; i++) {
-        doc.setPage(i);
-        doc.setDrawColor(200, 200, 200);
-        doc.setLineWidth(0.5);
-        doc.line(margin, footerY - 5, pageWidth - margin, footerY - 5);
-
-        doc.setFontSize(8);
-        doc.setTextColor(100, 100, 100);
-        doc.text(nomeCliente, margin, footerY);
-        doc.text(`Página ${i} de ${totalPages}`, pageWidth - margin, footerY, {
-          align: "right",
-        });
-      }
-    };
-
-    // --- CORREÇÃO AQUI ---
-    const checkPageBreak = (heightNeeded: number) => {
-      if (y + heightNeeded > pageHeight - 20) {
-        doc.addPage();
-        y = 50;
-        printHeader();
-
-        // RESETAR A COR PARA PRETO APÓS O CABEÇALHO DA NOVA PÁGINA
-        doc.setTextColor(0, 0, 0);
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(10); // Garante o tamanho da fonte correto
-      }
-    };
-
-    printHeader();
-
-    // Info do Treino
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
-    doc.setTextColor(0, 0, 0); // Preto na primeira página
-    doc.text(`Objetivo: ${treino.objetivo || "-"}`, margin, y);
-    doc.text(
-      `Status: ${treino.ativo ? "Ativo" : "Inativo"}`,
-      pageWidth - margin,
-      y,
-      { align: "right" }
-    );
-    y += 10;
-
-    // Tabela de Exercícios (Cabeçalho)
-    doc.setFillColor(240, 240, 240);
-    doc.rect(margin, y, pageWidth - margin * 2, 8, "F");
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(9);
-    doc.setTextColor(0, 0, 0); // Garante preto para os títulos
-    doc.text("EXERCÍCIO", margin + 2, y + 5);
-    doc.text("SÉRIES", 90, y + 5);
-    doc.text("REPS", 110, y + 5);
-    doc.text("CARGA", 130, y + 5);
-    doc.text("DESC.", 150, y + 5);
-    doc.text("OBS", 170, y + 5);
-    y += 10;
-
-    doc.setFont("helvetica", "normal");
-
-    treino.exercicios.forEach((te: TreinoExercicio) => {
-      checkPageBreak(15);
-
-      const nome = doc.splitTextToSize(`${te.ordem}. ${te.exercicio.nome}`, 75);
-      const obs = doc.splitTextToSize(te.observacoes || "-", 30);
-      const height = Math.max(nome.length * 4, obs.length * 4, 6);
-
-      doc.text(nome, margin + 2, y);
-      doc.text(String(te.series), 90, y);
-      doc.text(te.repeticoes, 110, y);
-      doc.text(te.carga || "-", 130, y);
-      doc.text(te.descanso || "-", 150, y);
-      doc.text(obs, 170, y);
-
-      doc.setDrawColor(230, 230, 230);
-      doc.line(margin, y + height + 2, pageWidth - margin, y + height + 2);
-      y += height + 6;
-    });
-
-    printFooter();
-    doc.save(`ficha-${treino.nome.replace(/\s+/g, "-").toLowerCase()}.pdf`);
-  };
-
-  // ============================================================
-  // 🚀 WHATSAPP DA FICHA
-  // ============================================================
-  const enviarWhatsAppFicha = () => {
-    const nomeCliente = session?.user?.name || "SaaS Academia";
-
-    let texto = `💪 *FICHA DE TREINO*\n`;
-    texto += `👤 Aluno: ${treino.aluno.nome}\n`;
-    texto += `📄 Treino: ${treino.nome}\n`;
-    if (treino.objetivo) texto += `🎯 Objetivo: ${treino.objetivo}\n`;
-    texto += `\n`;
-
-    treino.exercicios.forEach((te: TreinoExercicio) => {
-      texto += `✅ *${te.ordem}. ${te.exercicio.nome}*\n`;
-      texto += `   ${te.series} x ${te.repeticoes}`;
-      if (te.carga) texto += ` | ⚖️ ${te.carga}`;
-      if (te.descanso) texto += ` | ⏱️ ${te.descanso}`;
-      if (te.observacoes) texto += `\n   ⚠️ Obs: ${te.observacoes}`;
-      texto += `\n\n`;
-    });
-
-    texto += `------------------------------\n`;
-    texto += `📌 *${nomeCliente}*`;
-
-    const url = `https://wa.me/?text=${encodeURIComponent(texto)}`;
-    window.open(url, "_blank");
-  };
-
-  // ============================================================
 
   const handleReordenar = async (
     exercicioId: string,
@@ -546,46 +366,6 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
           </div>
         </div>
         <div className={styles.headerActions}>
-          {/* NOVOS BOTÕES AQUI */}
-          <div style={{ display: "flex", gap: "10px", marginRight: "10px" }}>
-            <button
-              onClick={gerarPdfFicha}
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                color: "#f59e0b",
-                display: "flex",
-                alignItems: "center",
-                gap: "5px",
-              }}
-              title="Baixar PDF"
-            >
-              <FileText size={20} />{" "}
-              <span style={{ fontSize: "0.9rem", fontWeight: "bold" }}>
-                PDF
-              </span>
-            </button>
-            <button
-              onClick={enviarWhatsAppFicha}
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                color: "#25d366",
-                display: "flex",
-                alignItems: "center",
-                gap: "5px",
-              }}
-              title="Enviar WhatsApp"
-            >
-              <Share2 size={20} />{" "}
-              <span style={{ fontSize: "0.9rem", fontWeight: "bold" }}>
-                Whats
-              </span>
-            </button>
-          </div>
-
           {permissoesEditar && (
             <Button
               variant="primary"

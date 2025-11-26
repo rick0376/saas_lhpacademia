@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { jsPDF } from "jspdf"; // Novo
+import { FileText, Share2 } from "lucide-react"; // Novos Ícones
 import styles from "./styles.module.scss";
 import { Button } from "../ui/Button/Button";
 import { Modal } from "../ui/Modal/Modal";
@@ -156,6 +158,203 @@ export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
     return date.toLocaleDateString("pt-BR");
   };
 
+  // ============================================================
+  // 🚀 ORDENAÇÃO ALFABÉTICA
+  // ============================================================
+  const treinosOrdenados = [...treinos].sort((a, b) =>
+    a.nome.localeCompare(b.nome)
+  );
+
+  // ============================================================
+  // 🚀 PDF DE LISTA DE TREINOS
+  // ============================================================
+
+  // ============================================================
+  // 🚀 PDF DE LISTA DE TREINOS (AJUSTADO)
+  // ============================================================
+  const gerarPdfLista = async () => {
+    if (treinosOrdenados.length === 0) return;
+
+    const nomeCliente = session?.user?.name || "SaaS Academia";
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+    const margin = 10;
+    let y = 50;
+
+    const getLogoBase64 = async () => {
+      try {
+        const origin =
+          typeof window !== "undefined" ? window.location.origin : "";
+        const resp = await fetch(`${origin}/imagens/logo.png`, {
+          cache: "no-store",
+        });
+        if (!resp.ok) return "";
+        const blob = await resp.blob();
+        return await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () =>
+            resolve(typeof reader.result === "string" ? reader.result : "");
+          reader.onerror = () => resolve("");
+          reader.readAsDataURL(blob);
+        });
+      } catch {
+        return "";
+      }
+    };
+
+    const logoDataUri = await getLogoBase64();
+
+    const printHeader = () => {
+      doc.setFillColor(25, 35, 55);
+      doc.rect(0, 0, pageWidth, 40, "F");
+      doc.setFillColor(218, 165, 32);
+      doc.rect(0, 35, pageWidth, 5, "F");
+
+      if (logoDataUri) {
+        try {
+          doc.addImage(logoDataUri, "PNG", 10, 7, 18, 18);
+        } catch {}
+      }
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(18);
+      doc.setTextColor(255, 255, 255);
+      doc.text("RELATÓRIO DE FICHAS", pageWidth / 2, 18, { align: "center" });
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.text(
+        `Total de Fichas: ${treinosOrdenados.length}`,
+        pageWidth / 2,
+        28,
+        { align: "center" }
+      );
+    };
+
+    // --- CABEÇALHO DA TABELA ATUALIZADO ---
+    const printTableHeader = () => {
+      doc.setFontSize(8); // Diminuí um pouco a fonte para caber mais colunas
+      doc.setTextColor(100, 100, 100);
+      doc.setFont("helvetica", "bold");
+
+      doc.text("NOME DA FICHA", margin, y);
+      doc.text("ALUNO", 75, y);
+      doc.text("OBJETIVO", 110, y); // Nova Coluna
+      doc.text("TOTAL EXER.", 140, y); // Nova Coluna (Qtd)
+      doc.text("STATUS", 165, y);
+      doc.text("DATA", 185, y);
+
+      doc.setDrawColor(200, 200, 200);
+      doc.line(margin, y + 2, pageWidth - margin, y + 2);
+      y += 8;
+    };
+
+    const printFooter = () => {
+      const totalPages = doc.getNumberOfPages();
+      const footerY = pageHeight - 10;
+
+      for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        doc.setDrawColor(200, 200, 200);
+        doc.setLineWidth(0.5);
+        doc.line(margin, footerY - 5, pageWidth - margin, footerY - 5);
+
+        doc.setFontSize(8);
+        doc.setTextColor(100, 100, 100);
+        doc.text(nomeCliente, margin, footerY);
+        doc.text(`Página ${i} de ${totalPages}`, pageWidth - margin, footerY, {
+          align: "right",
+        });
+      }
+    };
+
+    const checkPageBreak = (heightNeeded: number) => {
+      if (y + heightNeeded > pageHeight - 20) {
+        doc.addPage();
+        y = 50;
+        printHeader();
+        printTableHeader();
+      }
+    };
+
+    printHeader();
+    printTableHeader();
+
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(0, 0, 0);
+
+    treinosOrdenados.forEach((t) => {
+      checkPageBreak(10);
+
+      // Ajustei tamanhos para caber na linha
+      const nome = doc.splitTextToSize(t.nome, 48);
+      const aluno = doc.splitTextToSize(t.aluno.nome, 40);
+      const objetivo = doc.splitTextToSize(t.objetivo || "-", 40); // Trata objetivo vazio
+      const qtdExercicios = String(t._count.exercicios);
+      const status = t.ativo ? "Ativo" : "Inativo";
+      const data = formatDate(t.dataInicio);
+
+      // Calcula altura baseado na maior quebra de linha das 3 colunas de texto
+      const height = Math.max(
+        nome.length * 4,
+        aluno.length * 4,
+        objetivo.length * 4,
+        6
+      );
+
+      doc.setFontSize(8); // Fonte levemente menor para os dados
+
+      doc.text(nome, margin, y);
+      doc.text(aluno, 70, y);
+      doc.text(objetivo, 110, y); // Coluna Objetivo
+      doc.text(qtdExercicios, 145, y); // Coluna Qtd
+
+      // Status colorido
+      if (t.ativo) doc.setTextColor(0, 128, 0);
+      else doc.setTextColor(255, 0, 0);
+      doc.text(status, 165, y);
+
+      doc.setTextColor(0, 0, 0);
+      doc.text(data, 185, y);
+
+      doc.setDrawColor(245, 245, 245);
+      doc.line(margin, y + height, pageWidth - margin, y + height);
+
+      y += height + 4;
+    });
+
+    printFooter();
+    doc.save("relatorio-treinos.pdf");
+  };
+
+  // ============================================================
+  // 🚀 WHATSAPP DE LISTA DE TREINOS
+  // ============================================================
+  const enviarWhatsAppLista = () => {
+    if (treinosOrdenados.length === 0) return;
+
+    const nomeCliente = session?.user?.name || "SaaS Academia";
+
+    let texto = `📋 *RELATÓRIO DE TREINOS*\n\n`;
+
+    treinosOrdenados.forEach((t) => {
+      const status = t.ativo ? "✅ Ativo" : "🛑 Inativo";
+      texto += `*${t.nome}*\n`;
+      texto += `👤 Aluno: ${t.aluno.nome}\n`;
+      texto += `📅 Data: ${formatDate(t.dataInicio)} | ${status}\n`;
+      texto += `📊 Ex: ${t._count.exercicios} | Dias: ${t._count.cronogramas}\n`;
+      texto += `------------------------------\n`;
+    });
+
+    texto += `📌 *${nomeCliente}*`;
+
+    const url = `https://wa.me/?text=${encodeURIComponent(texto)}`;
+    window.open(url, "_blank");
+  };
+
+  // ============================================================
+
   if (!permissoesCarregadas || loading) {
     return (
       <div className={styles.loading}>
@@ -191,8 +390,59 @@ export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
 
   return (
     <>
+      {/* Botões de Ação no Topo */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: "10px",
+          marginBottom: "20px",
+        }}
+      >
+        <button
+          onClick={gerarPdfLista}
+          className={styles.actionButton}
+          style={{
+            backgroundColor: "#f59e0b",
+            color: "#fff",
+            border: "none",
+            padding: "0.6rem 1rem",
+            borderRadius: "6px",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: "5px",
+          }}
+          title="Baixar PDF de Fichas"
+        >
+          <FileText size={18} />
+          <span className={styles.hideMobile}>Relatório PDF</span>
+        </button>
+
+        <button
+          onClick={enviarWhatsAppLista}
+          className={styles.actionButton}
+          style={{
+            backgroundColor: "#25d366",
+            color: "#fff",
+            border: "none",
+            padding: "0.6rem 1rem",
+            borderRadius: "6px",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: "5px",
+          }}
+          title="Enviar Relatório WhatsApp"
+        >
+          <Share2 size={18} />
+          <span className={styles.hideMobile}>Relatório Whats</span>
+        </button>
+      </div>
+
+      {/* Grid de Cards (Usando a lista ORDENADA) */}
       <div className={styles.grid}>
-        {treinos.map((treino) => (
+        {treinosOrdenados.map((treino) => (
           <div key={treino.id} className={styles.card}>
             <div className={styles.cardHeader}>
               <h3 className={styles.cardTitle}>{treino.nome}</h3>
