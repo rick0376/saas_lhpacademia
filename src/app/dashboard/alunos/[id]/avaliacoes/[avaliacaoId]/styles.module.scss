@@ -2,7 +2,7 @@
   max-width: 960px;
   margin: 3rem auto;
   padding: 2.5rem 2rem;
-  background: #e2edf7ff;
+  background: linear-gradient(90deg, #c7bebe, #f8f9fa, #d7e0e9);
   border-radius: 18px;
   box-shadow: 0 12px 48px rgba(50, 50, 93, 0.15);
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -106,7 +106,7 @@
 
 .buttonBase {
   flex: 1;
-  min-width: 180px;
+  min-width: 140px;
   max-width: 220px;
   display: inline-flex;
   align-items: center;
@@ -123,12 +123,22 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   text-transform: uppercase;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-
-  svg {
-    width: 20px;
-    height: 20px;
-  }
+  text-decoration: none;
 }
+
+/* NOVA CLASSE PARA ÍCONES */
+.iconBtn {
+  width: 20px;
+  height: 20px;
+  transition: all 0.2s ease;
+}
+
+/* NOVA CLASSE PARA TEXTO DO BOTÃO */
+.btnText {
+  display: inline;
+  transition: all 0.2s ease;
+}
+
 /* Estilos específicos para cada tipo de botão */
 .submitButton {
   background: linear-gradient(90deg, #f97316 0%, #ea580c 55%, #c2410c 100%);
@@ -287,15 +297,12 @@
 .toast.success {
   background-color: #4caf50;
 }
-
 .toast.error {
   background-color: #e53935;
 }
-
 .toast.info {
   background-color: #2196f3;
 }
-
 .toast.warning {
   background-color: #fbc02d;
 }
@@ -313,31 +320,39 @@
   .container {
     max-width: 100%;
     padding: 1.5rem 1rem;
-    margin: 2rem auto;
+    margin: 1rem auto;
   }
 
   .title {
-    font-size: 2.1rem;
+    font-size: 1.8rem;
   }
 
   .card {
-    padding: 1.2rem 1.5rem;
+    padding: 1.2rem 1rem;
   }
 
   .formActions {
-    flex-direction: column;
-    gap: 1.2rem;
-    align-items: center;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 0.8rem;
+    justify-content: space-between;
   }
 
-  /* Para ocupar 100% da largura disponível e manter botão grande */
-  .buttonBase,
-  .submitButton,
-  .deleteButton,
-  .whatsappButton,
-  .pdfButton {
-    width: 100%;
+  .buttonBase {
+    flex: 1;
+    width: auto;
     min-width: unset;
     max-width: none;
+    padding: 0.8rem;
+    height: 50px;
+  }
+
+  .btnText {
+    display: none;
+  }
+
+  .iconBtn {
+    width: 24px;
+    height: 24px;
   }
 }

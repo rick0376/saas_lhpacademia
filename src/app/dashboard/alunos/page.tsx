@@ -4,8 +4,6 @@ import { redirect } from "next/navigation";
 import { AlunoTable } from "@/components/alunos/AlunoTable";
 import { prisma } from "@/lib/prisma";
 import styles from "./styles.module.scss";
-import Link from "next/link";
-import { Plus } from "lucide-react";
 
 export default async function AlunosPage() {
   const session = await getServerSession(authOptions);
@@ -43,15 +41,10 @@ export default async function AlunosPage() {
               Cadastre e acompanhe todos os alunos da academia
             </p>
           </div>
-          {canCreate && (
-            <Link href="/dashboard/alunos/novo" className={styles.addButton}>
-              <Plus size={20} />
-              Novo Aluno
-            </Link>
-          )}
         </div>
 
-        <AlunoTable />
+        {/* Passamos a permissão para o componente filho gerenciar o botão */}
+        <AlunoTable canCreate={canCreate} />
       </div>
     </main>
   );

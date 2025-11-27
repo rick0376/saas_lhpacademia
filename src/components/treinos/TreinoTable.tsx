@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { jsPDF } from "jspdf"; // Novo
-import { FileText, Share2 } from "lucide-react"; // Novos Ícones
+import { jsPDF } from "jspdf";
+import { FileText, Share2 } from "lucide-react";
 import styles from "./styles.module.scss";
 import { Button } from "../ui/Button/Button";
 import { Modal } from "../ui/Modal/Modal";
@@ -168,14 +168,17 @@ export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
   // ============================================================
   // 🚀 PDF DE LISTA DE TREINOS
   // ============================================================
-
-  // ============================================================
-  // 🚀 PDF DE LISTA DE TREINOS (AJUSTADO)
-  // ============================================================
   const gerarPdfLista = async () => {
     if (treinosOrdenados.length === 0) return;
 
     const nomeCliente = session?.user?.name || "SaaS Academia";
+
+    // Se existe alunoId e temos treinos, pegamos o nome do aluno do primeiro treino
+    const nomeAlunoFiltro =
+      alunoId && treinosOrdenados.length > 0
+        ? treinosOrdenados[0].aluno.nome
+        : null;
+
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.width;
     const pageHeight = doc.internal.pageSize.height;
@@ -224,6 +227,12 @@ export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
 
       doc.setFont("helvetica", "normal");
       doc.setFontSize(10);
+
+      // Se estiver filtrado por aluno, exibe o nome dele
+      if (nomeAlunoFiltro) {
+        doc.text(`Aluno: ${nomeAlunoFiltro}`, margin, 30);
+      }
+
       doc.text(
         `Total de Fichas: ${treinosOrdenados.length}`,
         pageWidth / 2,
@@ -232,16 +241,15 @@ export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
       );
     };
 
-    // --- CABEÇALHO DA TABELA ATUALIZADO ---
     const printTableHeader = () => {
-      doc.setFontSize(8); // Diminuí um pouco a fonte para caber mais colunas
+      doc.setFontSize(8);
       doc.setTextColor(100, 100, 100);
       doc.setFont("helvetica", "bold");
 
       doc.text("NOME DA FICHA", margin, y);
       doc.text("ALUNO", 75, y);
-      doc.text("OBJETIVO", 110, y); // Nova Coluna
-      doc.text("TOTAL EXER.", 140, y); // Nova Coluna (Qtd)
+      doc.text("OBJETIVO", 110, y);
+      doc.text("TOTAL EXER.", 140, y);
       doc.text("STATUS", 165, y);
       doc.text("DATA", 185, y);
 
@@ -275,6 +283,8 @@ export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
         y = 50;
         printHeader();
         printTableHeader();
+        // Força a cor preta ao iniciar nova página
+        doc.setTextColor(0, 0, 0);
       }
     };
 
@@ -287,15 +297,13 @@ export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
     treinosOrdenados.forEach((t) => {
       checkPageBreak(10);
 
-      // Ajustei tamanhos para caber na linha
       const nome = doc.splitTextToSize(t.nome, 48);
       const aluno = doc.splitTextToSize(t.aluno.nome, 40);
-      const objetivo = doc.splitTextToSize(t.objetivo || "-", 40); // Trata objetivo vazio
+      const objetivo = doc.splitTextToSize(t.objetivo || "-", 40);
       const qtdExercicios = String(t._count.exercicios);
       const status = t.ativo ? "Ativo" : "Inativo";
       const data = formatDate(t.dataInicio);
 
-      // Calcula altura baseado na maior quebra de linha das 3 colunas de texto
       const height = Math.max(
         nome.length * 4,
         aluno.length * 4,
@@ -303,14 +311,13 @@ export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
         6
       );
 
-      doc.setFontSize(8); // Fonte levemente menor para os dados
+      doc.setFontSize(8);
 
       doc.text(nome, margin, y);
       doc.text(aluno, 70, y);
-      doc.text(objetivo, 110, y); // Coluna Objetivo
-      doc.text(qtdExercicios, 145, y); // Coluna Qtd
+      doc.text(objetivo, 110, y);
+      doc.text(qtdExercicios, 145, y);
 
-      // Status colorido
       if (t.ativo) doc.setTextColor(0, 128, 0);
       else doc.setTextColor(255, 0, 0);
       doc.text(status, 165, y);
@@ -407,7 +414,7 @@ export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
             color: "#fff",
             border: "none",
             padding: "0.6rem 1rem",
-            borderRadius: "6px",
+            borderRadius: "12px",
             cursor: "pointer",
             display: "flex",
             alignItems: "center",
@@ -427,7 +434,7 @@ export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
             color: "#fff",
             border: "none",
             padding: "0.6rem 1rem",
-            borderRadius: "6px",
+            borderRadius: "12px",
             cursor: "pointer",
             display: "flex",
             alignItems: "center",

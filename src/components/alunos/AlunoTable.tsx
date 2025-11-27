@@ -4,11 +4,21 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { jsPDF } from "jspdf";
 import styles from "./alunoTable.module.scss";
 import { Button } from "../ui/Button/Button";
 import { Modal } from "../ui/Modal/Modal";
-import { FaEnvelope, FaPhone, FaBullseye } from "react-icons/fa";
-import { User, Edit, ClipboardCheck, Ruler, Trash2, Plus } from "lucide-react";
+import { FaEnvelope, FaPhone, FaBullseye, FaWhatsapp } from "react-icons/fa";
+import {
+  User,
+  Edit,
+  ClipboardCheck,
+  Ruler,
+  Trash2,
+  Plus,
+  FileText,
+  Share2,
+} from "lucide-react";
 
 interface Aluno {
   id: string;
@@ -33,7 +43,11 @@ interface Permissao {
   deletar: boolean;
 }
 
-export const AlunoTable = () => {
+interface AlunoTableProps {
+  canCreate: boolean;
+}
+
+export const AlunoTable = ({ canCreate }: AlunoTableProps) => {
   const router = useRouter();
   const { data: session, status } = useSession();
   const [alunos, setAlunos] = useState<Aluno[]>([]);
@@ -55,10 +69,8 @@ export const AlunoTable = () => {
   });
   const [permissoesCarregadas, setPermissoesCarregadas] = useState(false);
 
-  // Busca permissões do usuário logado
   const fetchPermissoes = async () => {
     try {
-      // SUPERADMIN tem acesso total automaticamente
       if (session?.user?.role === "SUPERADMIN") {
         setPermissoes({
           recurso: "alunos",
@@ -71,7 +83,6 @@ export const AlunoTable = () => {
         return;
       }
 
-      // Se não for SUPERADMIN, busca do banco
       const response = await fetch("/api/permissoes/usuario");
       if (!response.ok) throw new Error("Erro ao buscar permissões");
       const data = await response.json();
@@ -118,7 +129,6 @@ export const AlunoTable = () => {
     }
   }, [debouncedTerm, permissoesCarregadas, permissoes.ler]);
 
-  // Carrega permissões quando o session está disponível
   useEffect(() => {
     if (status === "authenticated" && session) {
       fetchPermissoes();
@@ -172,7 +182,180 @@ export const AlunoTable = () => {
     }
   };
 
-  // Verifica se tem permissão de ler
+  const gerarPdfAlunos = async () => {
+    if (alunosOrdenados.length === 0) return;
+
+    const nomeCliente = session?.user?.name || "SaaS Academia";
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+    const margin = 10;
+    let y = 50;
+
+    const getLogoBase64 = async () => {
+      try {
+        const origin =
+          typeof window !== "undefined" ? window.location.origin : "";
+        const resp = await fetch(`${origin}/imagens/logo.png`, {
+          cache: "no-store",
+        });
+        if (!resp.ok) return "";
+        const blob = await resp.blob();
+        return await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () =>
+            resolve(typeof reader.result === "string" ? reader.result : "");
+          reader.onerror = () => resolve("");
+          reader.readAsDataURL(blob);
+        });
+      } catch {
+        return "";
+      }
+    };
+
+    const logoDataUri = await getLogoBase64();
+
+    const printHeader = () => {
+      doc.setFillColor(25, 35, 55);
+      doc.rect(0, 0, pageWidth, 40, "F");
+      doc.setFillColor(218, 165, 32);
+      doc.rect(0, 35, pageWidth, 5, "F");
+
+      if (logoDataUri) {
+        try {
+          doc.addImage(logoDataUri, "PNG", 10, 7, 18, 18);
+        } catch {}
+      }
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(18);
+      doc.setTextColor(255, 255, 255);
+      doc.text("RELATÓRIO DE ALUNOS", pageWidth / 2, 18, { align: "center" });
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.text(
+        `Total de Alunos: ${alunosOrdenados.length}`,
+        pageWidth / 2,
+        28,
+        { align: "center" }
+      );
+    };
+
+    const printTableHeader = () => {
+      doc.setFontSize(8);
+      doc.setTextColor(100, 100, 100);
+      doc.setFont("helvetica", "bold");
+
+      doc.text("NOME", margin, y);
+      doc.text("EMAIL", 60, y);
+      doc.text("TELEFONE", 110, y);
+      doc.text("OBJETIVO", 140, y);
+      doc.text("STATUS", 175, y);
+
+      doc.setDrawColor(200, 200, 200);
+      doc.line(margin, y + 2, pageWidth - margin, y + 2);
+      y += 8;
+    };
+
+    const printFooter = () => {
+      const totalPages = doc.getNumberOfPages();
+      const footerY = pageHeight - 10;
+
+      for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        doc.setDrawColor(200, 200, 200);
+        doc.setLineWidth(0.5);
+        doc.line(margin, footerY - 5, pageWidth - margin, footerY - 5);
+
+        doc.setFontSize(8);
+        doc.setTextColor(100, 100, 100);
+        doc.text(nomeCliente, margin, footerY);
+        doc.text(`Página ${i} de ${totalPages}`, pageWidth - margin, footerY, {
+          align: "right",
+        });
+      }
+    };
+
+    const checkPageBreak = (heightNeeded: number) => {
+      if (y + heightNeeded > pageHeight - 20) {
+        doc.addPage();
+        y = 50;
+        printHeader();
+        printTableHeader();
+        doc.setTextColor(0, 0, 0);
+      }
+    };
+
+    printHeader();
+    printTableHeader();
+
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(0, 0, 0);
+
+    alunosOrdenados.forEach((a) => {
+      checkPageBreak(10);
+
+      const nome = doc.splitTextToSize(a.nome, 45);
+      const email = doc.splitTextToSize(a.email || "-", 45);
+      const telefone = a.telefone || "-";
+      const objetivo = doc.splitTextToSize(a.objetivo || "-", 30);
+      const status = a.ativo ? "Ativo" : "Inativo";
+
+      const height = Math.max(
+        nome.length * 4,
+        email.length * 4,
+        objetivo.length * 4,
+        6
+      );
+
+      doc.setFontSize(8);
+
+      doc.text(nome, margin, y);
+      doc.text(email, 60, y);
+      doc.text(telefone, 110, y);
+      doc.text(objetivo, 140, y);
+
+      if (a.ativo) doc.setTextColor(0, 128, 0);
+      else doc.setTextColor(255, 0, 0);
+      doc.text(status, 175, y);
+
+      doc.setTextColor(0, 0, 0);
+
+      doc.setDrawColor(245, 245, 245);
+      doc.line(margin, y + height, pageWidth - margin, y + height);
+
+      y += height + 4;
+    });
+
+    printFooter();
+    doc.save("relatorio-alunos.pdf");
+  };
+
+  const enviarWhatsAppAlunos = () => {
+    if (alunosOrdenados.length === 0) return;
+
+    const nomeCliente = session?.user?.name || "SaaS Academia";
+
+    let texto = `👥 *RELATÓRIO DE ALUNOS*\n\n`;
+
+    alunosOrdenados.forEach((a) => {
+      const status = a.ativo ? "✅ Ativo" : "🛑 Inativo";
+      texto += `*${a.nome}*\n`;
+      if (a.email) texto += `📧 ${a.email}\n`;
+      if (a.telefone) texto += `📱 ${a.telefone}\n`;
+      if (a.objetivo) texto += `🎯 ${a.objetivo}\n`;
+      texto += `📊 Treinos: ${a._count.treinos} | Medidas: ${a._count.medidas}\n`;
+      texto += `Status: ${status}\n`;
+      texto += `------------------------------\n`;
+    });
+
+    texto += `📌 *${nomeCliente}*`;
+
+    const url = `https://wa.me/?text=${encodeURIComponent(texto)}`;
+    window.open(url, "_blank");
+  };
+
   if (
     permissoesCarregadas &&
     !permissoes.ler &&
@@ -193,20 +376,57 @@ export const AlunoTable = () => {
 
   return (
     <div className={styles.container}>
-      <form onSubmit={handleSearch} className={styles.searchForm}>
-        <input
-          type="text"
-          placeholder="Buscar por nome, email ou telefone..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className={styles.searchInput}
-          aria-label="Buscar alunos"
-          autoFocus
-        />
-        <button type="submit" className={styles.searchButton}>
-          🔍 Buscar
-        </button>
-      </form>
+      {/* --- NOVA BARRA DE AÇÕES (Alinhada via CSS) --- */}
+      <div className={styles.toolbar}>
+        {/* Lado Esquerdo: Busca */}
+        <form onSubmit={handleSearch} className={styles.searchGroup}>
+          <input
+            type="text"
+            placeholder="Buscar aluno..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className={styles.searchInput}
+            autoFocus
+          />
+          <button type="submit" className={styles.searchButton}>
+            🔍 Buscar
+          </button>
+        </form>
+
+        {/* Lado Direito: Ações */}
+        <div className={styles.actionsGroup}>
+          {canCreate && (
+            <Link
+              href="/dashboard/alunos/novo"
+              className={`${styles.actionBtn} ${styles.btnNovo}`}
+              title="Novo Aluno"
+            >
+              <Plus className={styles.iconBtn} />
+              <span className={styles.hideMobile}>Novo</span>
+            </Link>
+          )}
+
+          <button
+            onClick={gerarPdfAlunos}
+            className={`${styles.actionBtn} ${styles.btnPdf}`}
+            disabled={alunosOrdenados.length === 0}
+            title="Baixar PDF"
+          >
+            <FileText className={styles.iconBtn} />
+            <span className={styles.hideMobile}>PDF</span>
+          </button>
+
+          <button
+            onClick={enviarWhatsAppAlunos}
+            className={`${styles.actionBtn} ${styles.btnWhats}`}
+            disabled={alunosOrdenados.length === 0}
+            title="Enviar WhatsApp"
+          >
+            <FaWhatsapp className={styles.iconBtn} />
+            <span className={styles.hideMobile}>Whats</span>
+          </button>
+        </div>
+      </div>
 
       {loading && (
         <div className={styles.loading}>

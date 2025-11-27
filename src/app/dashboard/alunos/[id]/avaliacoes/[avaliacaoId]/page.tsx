@@ -4,7 +4,8 @@ import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { ArrowLeft, Edit, Delete, Share2 } from "lucide-react";
+import { ArrowLeft, Edit, Delete, FileText, Trash2 } from "lucide-react";
+import { FaEnvelope, FaPhone, FaBullseye, FaWhatsapp } from "react-icons/fa";
 import { jsPDF } from "jspdf";
 import styles from "./styles.module.scss";
 import { Toast } from "@/components/ui/Toast/Toast";
@@ -681,8 +682,10 @@ ${divisor}
           <Link
             href={`/dashboard/alunos/${alunoId}/avaliacoes/editar/${avaliacaoId}`}
             className={`${styles.buttonBase} ${styles.submitButton}`}
+            title="Editar Avaliação" // Adicionado title para acessibilidade no mobile
           >
-            <Edit size={20} /> Editar
+            <Edit className={styles.iconBtn} />
+            <span className={styles.btnText}>Editar</span>
           </Link>
         )}
 
@@ -691,8 +694,10 @@ ${divisor}
             type="button"
             className={`${styles.buttonBase} ${styles.whatsappButton}`}
             onClick={enviarWhatsApp}
+            title="Enviar WhatsApp"
           >
-            <Share2 size={20} /> WhatsApp
+            <FaWhatsapp className={styles.iconBtn} />
+            <span className={styles.btnText}>WhatsApp</span>
           </button>
         )}
 
@@ -701,8 +706,10 @@ ${divisor}
             type="button"
             className={`${styles.buttonBase} ${styles.pdfButton}`}
             onClick={gerarPdf}
+            title="Gerar PDF"
           >
-            Gerar PDF
+            <FileText className={styles.iconBtn} />
+            <span className={styles.btnText}>PDF</span>
           </button>
         )}
 
@@ -711,8 +718,10 @@ ${divisor}
             type="button"
             className={`${styles.buttonBase} ${styles.deleteButton}`}
             onClick={openConfirm}
+            title="Excluir Avaliação"
           >
-            <Delete size={20} /> Excluir
+            <Trash2 className={styles.iconBtn} />
+            <span className={styles.btnText}>Excluir</span>
           </button>
         )}
       </div>

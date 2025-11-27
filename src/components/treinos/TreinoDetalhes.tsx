@@ -547,7 +547,7 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
         </div>
         <div className={styles.headerActions}>
           {/* NOVOS BOTÕES AQUI */}
-          <div style={{ display: "flex", gap: "10px", marginRight: "10px" }}>
+          <div style={{ display: "flex", gap: "12px", marginRight: "10px" }}>
             <button
               onClick={gerarPdfFicha}
               style={{
