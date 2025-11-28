@@ -9,7 +9,7 @@
   box-sizing: border-box;
 }
 
-/* --- BARRA DE FERRAMENTAS (Busca + Botões) --- */
+/* --- BARRA DE FERRAMENTAS (Toolbar) --- */
 .toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -21,56 +21,46 @@
   padding: 16px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: stretch;
-  }
 }
 
 /* Grupo de Busca */
 .searchGroup {
   display: flex;
-  flex: 1; /* Ocupa o espaço restante na linha */
+  flex: 1;
   gap: 8px;
   min-width: 280px;
-
-  @media (max-width: 768px) {
-    width: 100%;
-    min-width: 0;
-  }
 }
 
 .searchInput {
   flex: 1;
-  height: 42px; /* Altura Fixa */
+  height: 42px;
+  min-height: 42px;
   padding: 0 16px;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
+  border: 2px solid #a78bfa;
+  border-radius: 12px;
   font-size: 14px;
   font-weight: 500;
   color: #1f2937;
   background-color: white;
-  transition: all 0.2s ease;
-  box-sizing: border-box;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 
   &::placeholder {
-    color: #9ca3af;
+    color: #a5b4fc;
   }
   &:focus {
     outline: none;
     border-color: #7c3aed;
-    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+    box-shadow: 0 0 8px #7c3aed88;
   }
 }
 
 .searchButton {
-  height: 42px; /* Altura Fixa */
+  height: 42px;
   padding: 0 20px;
   font-size: 14px;
   font-weight: 600;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6d2ed4 0%, #9167e4 100%);
   color: white;
   border: none;
   cursor: pointer;
@@ -82,24 +72,18 @@
   transition: all 0.2s ease;
 
   &:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2);
+    background: linear-gradient(135deg, #714797 0%, #5d2691 100%);
+    box-shadow: 0 0 10px #6d2ed488;
   }
 }
 
-/* Grupo de Botões de Ação */
+/* Grupo de Ações (Botões PDF/Whats) */
 .actionsGroup {
   display: flex;
   gap: 10px;
   align-items: center;
-
-  @media (max-width: 768px) {
-    width: 100%;
-    justify-content: space-between;
-  }
 }
 
-/* Estilo Unificado para Botões (Link e Button) */
 .actionBtn {
   height: 42px;
   display: flex;
@@ -123,7 +107,6 @@
     filter: brightness(1.1);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
-
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -142,37 +125,14 @@
   background-color: #25d366;
 }
 
+/* Ícone base para botões da toolbar */
 .iconBtn {
   width: 18px;
   height: 18px;
   transition: all 0.2s ease;
-
-  @media (max-width: 640px) {
-    width: 24px;
-    height: 24px;
-  }
 }
 
-@media (max-width: 640px) {
-  .hideMobile {
-    display: none;
-  }
-
-  .actionBtn {
-    padding: 0 12px;
-    width: 40%;
-  }
-}
-
-/*////////*/
-@media (max-width: 640px) {
-  .hideMobile {
-    display: none;
-  }
-}
-
-/* --- RESTANTE DO LAYOUT (Cards, Loading, Erro) --- */
-
+/* --- STATUS (Loading, Error, Empty) --- */
 .loading,
 .error,
 .empty {
@@ -206,6 +166,10 @@
   font-weight: 600;
   cursor: pointer;
   margin-top: 12px;
+  transition: background-color 0.3s ease;
+  &:hover {
+    background-color: #4f46e5;
+  }
 }
 
 .emptyIcon {
@@ -224,27 +188,33 @@
   font-size: 14px;
 }
 
-/* Cards Container */
+/* --- CARDS --- */
 .cardsContainer {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.8rem;
+  width: 100%;
 }
 
-/* Card Style */
 .card {
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  overflow: hidden;
-  transition: all 0.3s ease;
+  flex: 1 1 360px;
+  width: 100%;
+  min-width: 200px;
+  background: rgb(241, 246, 250);
+  padding: 1.4rem 1.6rem;
+  border-radius: 14px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+  color: #2f2f6d;
   display: flex;
   flex-direction: column;
+  gap: 0.8rem;
+  user-select: none;
+  transition: box-shadow 0.3s ease;
 
   &:hover {
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 12px 30px rgba(122, 79, 237, 0.4);
     transform: translateY(-4px);
-    border-color: #a78bfa;
   }
 }
 
@@ -253,6 +223,7 @@
   align-items: center;
   gap: 12px;
   padding: 16px;
+  border-radius: 12px;
   background: linear-gradient(90deg, #c7bebe, #e5eaf0, #c9d3dd);
   border-bottom: 1px solid #e5e7eb;
 }
@@ -279,7 +250,6 @@
   gap: 6px;
   min-width: 0;
 }
-
 .cardName {
   font-size: 17px;
   font-weight: 700;
@@ -300,22 +270,21 @@
   display: inline-block;
   width: fit-content;
 }
-
 .ativo {
   background-color: #d1fae5;
   color: #065f46;
 }
 .inativo {
   background-color: #fee2e2;
-  color: #991b1b;
+  color: #b91c1c;
 }
 
 .cardContent {
-  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   flex: 1;
+  padding: 16px;
 }
 
 .infoItem {
@@ -325,7 +294,6 @@
   font-size: 14px;
   font-weight: 500;
   color: #374151;
-
   span {
     white-space: nowrap;
     overflow: hidden;
@@ -334,6 +302,7 @@
   }
 }
 
+/* Cores dos ícones do card */
 .iconEmail {
   color: #3b82f6;
   flex-shrink: 0;
@@ -354,7 +323,6 @@
   padding-top: 12px;
   border-top: 1px solid #e5e7eb;
 }
-
 .statItem {
   flex: 1;
   display: flex;
@@ -362,14 +330,12 @@
   align-items: center;
   gap: 4px;
 }
-
 .statNumber {
   font-size: 22px;
   font-weight: 700;
   color: #7c3aed;
   line-height: 1;
 }
-
 .statLabel {
   font-size: 12px;
   color: #6b7280;
@@ -378,6 +344,7 @@
   font-weight: 600;
 }
 
+/* Ações do Card */
 .actions {
   display: flex;
   gap: 6px;
@@ -385,8 +352,10 @@
   background: linear-gradient(90deg, #c7bebe, #e5eaf0, #c9d3dd);
   border-top: 1px solid #e5e7eb;
   justify-content: center;
+  border-radius: 12px;
 }
 
+/* Botões de Ação dentro do Card (Perfil, Editar, etc) */
 .iconPerfil,
 .iconEditar,
 .iconAvaliar,
@@ -411,7 +380,6 @@
     color: #eff6ff;
   }
 }
-
 .iconEditar {
   background-color: #fffbeb;
   color: #f59e0b;
@@ -420,7 +388,6 @@
     color: #fffbeb;
   }
 }
-
 .iconAvaliar {
   background-color: #d1fae5;
   color: #10b981;
@@ -429,7 +396,6 @@
     color: #d1fae5;
   }
 }
-
 .iconMedidas {
   background-color: #cffafe;
   color: #06b6d4;
@@ -438,7 +404,6 @@
     color: #cffafe;
   }
 }
-
 .iconButtonDelete {
   background-color: #fee2e2;
   color: #ef4444;
@@ -458,7 +423,6 @@
     line-height: 1.6;
   }
 }
-
 .warning {
   color: #dc2626;
   font-weight: 600;
@@ -469,4 +433,45 @@
   gap: 12px;
   justify-content: flex-end;
   margin-top: 8px;
+}
+
+/* --- RESPONSIVIDADE --- */
+@media (max-width: 768px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .searchGroup {
+    width: 100%;
+    min-width: 0;
+    flex-direction: column;
+  }
+  .actionsGroup {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .actionBtn {
+    padding: 0 12px;
+    width: 48%;
+  }
+}
+
+@media (max-width: 640px) {
+  .hideMobile {
+    display: none;
+  }
+  .iconBtn {
+    width: 24px;
+    height: 24px;
+  }
+  .actionBtn {
+    padding: 0 12px;
+    width: 48%;
+  }
+  .searchButton {
+    width: 100%;
+  }
+  .cardsContainer {
+    grid-template-columns: 1fr;
+  } /* Garante 1 coluna no mobile */
 }

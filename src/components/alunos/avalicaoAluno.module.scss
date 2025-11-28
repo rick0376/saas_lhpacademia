@@ -9,7 +9,7 @@
   box-sizing: border-box;
 }
 
-/* ----- Barra Superior: Busca + Botões PDF/Whats ----- */
+/* --- BARRA DE FERRAMENTAS (Toolbar) --- */
 .toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -21,26 +21,20 @@
   padding: 16px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: stretch;
-  }
 }
+
+/* Grupo de Busca */
 .searchGroup {
   display: flex;
   flex: 1;
   gap: 8px;
   min-width: 280px;
-
-  @media (max-width: 768px) {
-    width: 100%;
-    min-width: 0;
-  }
 }
+
 .searchInput {
   flex: 1;
   height: 42px;
+  min-height: 42px;
   padding: 0 16px;
   border: 2px solid #a78bfa;
   border-radius: 12px;
@@ -59,6 +53,7 @@
     box-shadow: 0 0 8px #7c3aed88;
   }
 }
+
 .searchButton {
   height: 42px;
   padding: 0 20px;
@@ -75,22 +70,20 @@
   gap: 8px;
   white-space: nowrap;
   transition: all 0.2s ease;
+
   &:hover {
     background: linear-gradient(135deg, #714797 0%, #5d2691 100%);
     box-shadow: 0 0 10px #6d2ed488;
   }
 }
 
-/* Botões PDF/Whats (Grupo de ação superior) */
+/* Grupo de Ações (Botões PDF/Whats) */
 .actionsGroup {
   display: flex;
   gap: 10px;
   align-items: center;
-  @media (max-width: 768px) {
-    width: 100%;
-    justify-content: space-between;
-  }
 }
+
 .actionBtn {
   height: 42px;
   display: flex;
@@ -108,15 +101,20 @@
   color: white;
   white-space: nowrap;
   box-sizing: border-box;
+
   &:hover {
+    transform: translateY(-1px);
     filter: brightness(1.1);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
   }
 }
+
 .btnPdf {
   background-color: #f59e0b;
 }
@@ -124,27 +122,40 @@
   background-color: #25d366;
 }
 
+.btnAvaliar {
+  height: 42px;
+  min-height: 42px;
+  padding: 0 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 12px;
+  background-color: #acbcf0;
+  color: #3730a3;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #3730a3;
+    color: white;
+
+    //background-color: #acbcf0;
+    //color: #3730a3;
+  }
+}
+/* Estilo base para ícones dentro de botões */
 .iconBtn {
   width: 18px;
   height: 18px;
   transition: all 0.2s ease;
-  @media (max-width: 640px) {
-    width: 24px;
-    height: 24px;
-  }
-}
-/* Esconde texto nos botões no mobile */
-@media (max-width: 640px) {
-  .hideMobile {
-    display: none;
-  }
-  .actionBtn {
-    padding: 0 12px;
-    width: auto;
-  }
 }
 
-/* ----- Loading/Error/Empty ----- */
+/* --- STATUS DE CARREGAMENTO E ERROS --- */
 .loading,
 .error,
 .empty {
@@ -158,6 +169,7 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   text-align: center;
 }
+
 .spinner {
   width: 48px;
   height: 48px;
@@ -167,6 +179,7 @@
   animation: spin 0.8s linear infinite;
   margin-bottom: 16px;
 }
+
 .retryButton {
   padding: 10px 20px;
   background-color: #6366f1;
@@ -181,6 +194,7 @@
     background-color: #4f46e5;
   }
 }
+
 .emptyIcon {
   font-size: 64px;
   margin-bottom: 16px;
@@ -197,6 +211,7 @@
   font-size: 14px;
 }
 
+/* --- CARDS --- */
 .cardsContainer {
   display: flex;
   flex-wrap: wrap;
@@ -206,13 +221,9 @@
 }
 
 .card {
-  /* Estratégia de tamanho */
-  flex: 0 1 360px;
+  flex: 1 1 360px;
   width: 100%;
-  max-width: 400px;
-  min-width: 300px;
-
-  /* Estilos visuais (Mantidos) */
+  min-width: 200px;
   background: rgb(241, 246, 250);
   padding: 1.4rem 1.6rem;
   border-radius: 14px;
@@ -240,6 +251,7 @@
   margin: -1.4rem -1.6rem 0.8rem -1.6rem;
   border-radius: 14px 14px 0 0;
 }
+
 .avatar {
   background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
   width: 60px;
@@ -254,6 +266,7 @@
   flex-shrink: 0;
   box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
 }
+
 .headerInfo {
   flex: 1;
   display: flex;
@@ -261,6 +274,7 @@
   gap: 4px;
   min-width: 0;
 }
+
 .cardName {
   font-size: 1.4rem;
   font-weight: 900;
@@ -270,6 +284,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .statusBadge {
   padding: 4px 12px;
   border-radius: 30px;
@@ -279,6 +294,7 @@
   display: inline-block;
   width: fit-content;
 }
+
 .ativo {
   background-color: #dcfce7;
   color: #15803d;
@@ -287,12 +303,14 @@
   background-color: #fee2e2;
   color: #b91c1c;
 }
+
 .cardContent {
   display: flex;
   flex-direction: column;
   gap: 10px;
   flex: 1;
 }
+
 .infoItem {
   display: flex;
   align-items: center;
@@ -300,12 +318,15 @@
   font-weight: 500;
   color: #374151;
   font-size: 0.95rem;
+
   span {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 }
+
+/* Ícones coloridos do card */
 .iconEmail {
   color: #3b82f6;
   flex-shrink: 0;
@@ -318,6 +339,7 @@
   color: #8b5cf6;
   flex-shrink: 0;
 }
+
 .statsRow {
   display: flex;
   gap: 12px;
@@ -325,6 +347,7 @@
   padding-top: 12px;
   border-top: 1px solid #e5e7eb;
 }
+
 .statItem {
   flex: 1;
   display: flex;
@@ -332,6 +355,7 @@
   align-items: center;
   gap: 4px;
 }
+
 .statNumber {
   font-size: 20px;
   font-weight: 700;
@@ -344,6 +368,7 @@
   text-transform: uppercase;
   font-weight: 600;
 }
+
 .actions {
   display: flex;
   gap: 8px;
@@ -352,43 +377,50 @@
   padding-top: 12px;
   border-top: 1px solid #e5e7eb;
 }
-.iconBtn {
-  cursor: pointer;
-  border-radius: 8px;
-  padding: 8px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: all 0.2s ease;
-  border: 1px solid transparent;
-  background: white;
-  color: #555;
-  text-decoration: none;
-  font-size: 0.9rem;
-  font-weight: 600;
-  gap: 6px;
-  &:hover {
-    transform: scale(1.05);
+
+/* --- RESPONSIVIDADE UNIFICADA --- */
+/* Mobile: Telas menores que 768px e 640px */
+@media (max-width: 768px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
   }
-}
-.btnAvaliar {
-  background-color: #e0e7ff;
-  color: #3730a3;
-  &:hover {
-    background-color: #3730a3;
-    color: white;
+
+  .searchGroup {
+    width: 100%;
+    min-width: 0;
+    flex-direction: column; /* Input em cima, botão embaixo se necessário, ou ajuste conforme gosto */
+  }
+
+  .actionsGroup {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .actionBtn {
+    padding: 0 12px;
+    width: 48%; /* Divide a linha em dois */
   }
 }
 
-/* Responsividade */
 @media (max-width: 640px) {
-  .cardsContainer {
-    grid-template-columns: 1fr;
+  /* Esconde texto dos botões PDF/Whats */
+  .hideMobile {
+    display: none;
   }
-  .searchForm,
-  .searchGroup {
-    flex-direction: column;
+
+  /* Aumenta ícone para compensar a falta de texto */
+  .iconBtn {
+    width: 24px;
+    height: 24px;
   }
+
+  /* Ajusta botões para ocupar espaço */
+  .actionBtn {
+    padding: 0 12px;
+    width: 48%; /* Divide a linha em dois */
+  }
+
+  /* Busca ocupa largura total */
   .searchButton {
     width: 100%;
   }

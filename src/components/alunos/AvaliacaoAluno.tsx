@@ -131,6 +131,13 @@ export const AvaliacaoAluno = () => {
     }
   }
 
+  // ============================================================
+  // 🚀 ORDENAÇÃO ALFABÉTICA
+  // ============================================================
+  const alunosOrdenados = [...alunos].sort((a, b) =>
+    a.nome.localeCompare(b.nome, "pt-BR", { sensitivity: "base" })
+  );
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setDebouncedTerm(searchTerm);
@@ -140,7 +147,7 @@ export const AvaliacaoAluno = () => {
   // 🚀 GERAR PDF (LISTA DE ALUNOS PARA AVALIAÇÃO)
   // ============================================================
   const gerarPdfLista = async () => {
-    if (alunos.length === 0) return;
+    if (alunosOrdenados.length === 0) return; // Alterado para usar alunosOrdenados
 
     const nomeCliente = session?.user?.name || "SaaS Academia";
     const doc = new jsPDF();
@@ -192,7 +199,7 @@ export const AvaliacaoAluno = () => {
 
       doc.setFont("helvetica", "normal");
       doc.setFontSize(10);
-      doc.text(`Total Listado: ${alunos.length}`, pageWidth / 2, 28, {
+      doc.text(`Total Listado: ${alunosOrdenados.length}`, pageWidth / 2, 28, {
         align: "center",
       });
     };
@@ -243,7 +250,7 @@ export const AvaliacaoAluno = () => {
     doc.setFont("helvetica", "normal");
     doc.setTextColor(0, 0, 0);
 
-    alunos.forEach((aluno) => {
+    alunosOrdenados.forEach((aluno) => {
       checkPageBreak(10);
       const nome = doc.splitTextToSize(aluno.nome, 45);
       const email = doc.splitTextToSize(aluno.email || "-", 45);
@@ -274,11 +281,11 @@ export const AvaliacaoAluno = () => {
   // 🚀 WHATSAPP (LISTA)
   // ============================================================
   const enviarWhatsAppLista = () => {
-    if (alunos.length === 0) return;
+    if (alunosOrdenados.length === 0) return; // Alterado para usar alunosOrdenados
     const nomeCliente = session?.user?.name || "SaaS Academia";
     let texto = `📋 *ALUNOS PARA AVALIAÇÃO*\n\n`;
 
-    alunos.forEach((a) => {
+    alunosOrdenados.forEach((a) => {
       texto += `👤 *${a.nome}*\n`;
       if (a.telefone) texto += `📱 ${a.telefone}\n`;
       texto += `📊 Medidas Cadastradas: ${a._count.medidas}\n`;
@@ -331,7 +338,7 @@ export const AvaliacaoAluno = () => {
           <button
             onClick={gerarPdfLista}
             className={`${styles.actionBtn} ${styles.btnPdf}`}
-            disabled={alunos.length === 0}
+            disabled={alunosOrdenados.length === 0}
             title="Baixar PDF"
           >
             <FileText className={styles.iconBtn} />
@@ -341,7 +348,7 @@ export const AvaliacaoAluno = () => {
           <button
             onClick={enviarWhatsAppLista}
             className={`${styles.actionBtn} ${styles.btnWhats}`}
-            disabled={alunos.length === 0}
+            disabled={alunosOrdenados.length === 0}
             title="Enviar WhatsApp"
           >
             <FaWhatsapp className={styles.iconBtn} />
@@ -376,7 +383,7 @@ export const AvaliacaoAluno = () => {
 
       {!loading && alunos.length > 0 && (
         <div className={styles.cardsContainer}>
-          {alunos.map((aluno) => (
+          {alunosOrdenados.map((aluno) => (
             <div key={aluno.id} className={styles.card}>
               <div className={styles.cardHeader}>
                 <div className={styles.avatar}>
@@ -426,7 +433,7 @@ export const AvaliacaoAluno = () => {
 
               <div className={styles.actions}>
                 <Link
-                  href={`/dashboard/avaliacoes/${aluno.id}`}
+                  href={`/dashboard/alunos/${aluno.id}/avaliacoes`}
                   className={`${styles.iconBtn} ${styles.btnAvaliar}`}
                   title="Ver Avaliações"
                   style={{
