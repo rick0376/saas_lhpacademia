@@ -1,3 +1,4 @@
+// ==================== CONTAINER PRINCIPAL ====================
 .container {
   background: linear-gradient(90deg, #e4dddd, #f8f9fa, #d7e0e9);
   border-radius: 12px;
@@ -5,6 +6,7 @@
   box-shadow: var(--shadow);
 }
 
+// ==================== HEADER ====================
 .header {
   display: flex;
   justify-content: space-between;
@@ -25,6 +27,7 @@
   color: var(--gray-color);
 }
 
+// ==================== LOADING ====================
 .loading {
   display: flex;
   flex-direction: column;
@@ -49,6 +52,7 @@
   }
 }
 
+// ==================== EMPTY STATE ====================
 .empty {
   display: flex;
   flex-direction: column;
@@ -76,12 +80,14 @@
   font-size: 14px;
 }
 
+// ==================== GRID DE MEDIDAS ====================
 .medidasGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
 }
 
+// ==================== CARD DE MEDIDA ====================
 .medidaCard {
   background: white;
   border-radius: 12px;
@@ -126,6 +132,46 @@
   }
 }
 
+// ==================== FOTOS NO CARD ====================
+.fotosPreview {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 8px;
+  background-color: var(--background-color);
+  border-radius: 8px;
+}
+
+.fotoThumb {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid var(--border-color);
+  background-color: white;
+}
+
+.thumbImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.morePhotos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  background-color: var(--primary-color);
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+// ==================== STATS DO CARD ====================
 .mainStats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -180,7 +226,7 @@
   }
 }
 
-// Modal Styles
+// ==================== MODAL ADICIONAR/EDITAR ====================
 .modalContent {
   padding: 8px 0;
 }
@@ -190,7 +236,7 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
   margin-bottom: 24px;
-  background: #e2edf7ff;
+  background: linear-gradient(90deg, #c7bebe, #f8f9fa, #d7e0e9);
   border-radius: 12px;
   padding: 20px;
 }
@@ -236,116 +282,106 @@
   border-top: 1px solid var(--border-color);
 }
 
-// Detalhes Modal
+// ==================== MODAL DELETAR ====================
+.deleteModalContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 20px 0;
+
+  .modalActions button:last-child {
+    background-color: #ef4444 !important;
+
+    &:hover:not(:disabled) {
+      background-color: #dc2626 !important;
+    }
+  }
+}
+
+.deleteIcon {
+  font-size: 64px;
+}
+
+.deleteMessage {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--dark-color);
+  text-align: center;
+  margin: 0;
+}
+
+.deleteWarning {
+  font-size: 14px;
+  color: var(--gray-color);
+  text-align: center;
+  margin: 0;
+}
+
+.deleteConfirmButton {
+  background-color: #ef4444 !important;
+
+  &:hover:not(:disabled) {
+    background-color: #dc2626 !important;
+  }
+}
+
+// ==================== MODAL DETALHES ====================
 .detailsContent {
   padding: 8px 0;
-  background: #e2edf7ff;
+  background: linear-gradient(90deg, #884fd8 0%, #2255f7 55%, #559deb 100%);
   padding: 20px;
   border-radius: 12px;
 }
 
-.detailsGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+// Botões de ação (PDF e WhatsApp)
+.detailsActions {
+  display: flex;
+  gap: 12px;
   margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e5e7eb;
 }
 
-.detailItem {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 12px;
-  background-color: var(--light-color);
-  border-radius: 8px;
-}
-
-.detailLabel {
-  font-size: 12px;
-  color: var(--gray-color);
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.detailValue {
-  font-size: 18px;
-  color: var(--dark-color);
-  font-weight: 700;
-}
-
-.observacoes {
-  padding: 16px;
-  background-color: var(--light-color);
-  border-radius: 8px;
-
-  strong {
-    color: var(--primary-color);
-    display: block;
-    margin-bottom: 8px;
-  }
-
-  p {
-    color: var(--text-color);
-    line-height: 1.6;
-    margin: 0;
-  }
-}
-
-@media (max-width: 768px) {
-  .header {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .medidasGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .modalGrid,
-  .detailsGrid {
-    grid-template-columns: 1fr;
-  }
-}
-// ✅ Estilos para fotos no card
-.fotosPreview {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
-  padding: 8px;
-  background-color: var(--background-color);
-  border-radius: 8px;
-}
-
-.fotoThumb {
-  position: relative;
-  width: 60px;
-  height: 60px;
-  border-radius: 8px;
-  overflow: hidden;
-  border: 2px solid var(--border-color);
-  background-color: white;
-}
-
-.thumbImage {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.morePhotos {
+.actionBtnDetail {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 60px;
-  height: 60px;
+  gap: 8px;
+  padding: 10px 16px;
+  border: none;
   border-radius: 8px;
-  background-color: var(--primary-color);
-  color: white;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
 }
 
-// ✅ Estilos para galeria de fotos no modal
+.btnPdfDetail {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+
+  &:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  }
+}
+
+.btnWhatsDetail {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+
+  &:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  }
+}
+
+// Galeria de fotos no modal
 .fotosGallery {
   margin-bottom: 24px;
   padding-bottom: 24px;
@@ -388,48 +424,69 @@
   font-weight: 600;
   color: var(--gray-color);
 }
-// ✅ Botão de confirmar exclusão (vermelho)
-.deleteConfirmButton {
-  background-color: #ef4444 !important;
 
-  &:hover:not(:disabled) {
-    background-color: #dc2626 !important;
-  }
+// Grid de detalhes
+.detailsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
 }
 
-// ✅ Estilizar o botão de confirmar dentro do modal de exclusão
-.deleteModalContent {
+.detailItem {
+  background: linear-gradient(90deg, #c7bebe, #f8f9fa, #d7e0e9);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  padding: 20px 0;
+  gap: 4px;
+  padding: 12px;
+  border-radius: 8px;
+}
 
-  // ✅ Estilizar o último botão (botão de confirmação)
-  .modalActions button:last-child {
-    background-color: #ef4444 !important;
+.detailLabel {
+  font-size: 12px;
+  color: var(--gray-color);
+  font-weight: 600;
+  text-transform: uppercase;
+}
 
-    &:hover:not(:disabled) {
-      background-color: #dc2626 !important;
-    }
+.detailValue {
+  font-size: 18px;
+  color: var(--dark-color);
+  font-weight: 700;
+}
+
+// Observações
+.observacoes {
+  padding: 16px;
+  background-color: var(--light-color);
+  border-radius: 8px;
+
+  strong {
+    color: var(--primary-color);
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  p {
+    color: var(--text-color);
+    line-height: 1.6;
+    margin: 0;
   }
 }
 
-.deleteIcon {
-  font-size: 64px;
-}
+// ==================== RESPONSIVO ====================
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
 
-.deleteMessage {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--dark-color);
-  text-align: center;
-  margin: 0;
-}
+  .medidasGrid {
+    grid-template-columns: 1fr;
+  }
 
-.deleteWarning {
-  font-size: 14px;
-  color: var(--gray-color);
-  text-align: center;
-  margin: 0;
+  .modalGrid,
+  .detailsGrid {
+    grid-template-columns: 1fr;
+  }
 }

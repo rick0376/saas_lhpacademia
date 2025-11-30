@@ -2,12 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { jsPDF } from "jspdf";
 import styles from "./styles.module.scss";
 import { Button } from "../ui/Button/Button";
 import { Modal } from "../ui/Modal/Modal";
 import { Input } from "../ui/Input/Input";
 import { MultipleImageUpload } from "../ui/MultipleImageUpload/MultipleImageUpload";
 import Image from "next/image";
+import { FaWhatsapp } from "react-icons/fa";
+import { FileText } from "lucide-react";
 
 interface Medida {
   id: string;
@@ -37,6 +41,7 @@ export const MedidasList: React.FC<MedidasListProps> = ({
   alunoNome,
 }) => {
   const router = useRouter();
+  const { data: session } = useSession();
   const [medidas, setMedidas] = useState<Medida[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalAddMedida, setModalAddMedida] = useState(false);
@@ -45,7 +50,6 @@ export const MedidasList: React.FC<MedidasListProps> = ({
     medida?: Medida;
   }>({ isOpen: false });
 
-  // ✅ Modal de confirmação de exclusão
   const [modalDeleteMedida, setModalDeleteMedida] = useState<{
     isOpen: boolean;
     medidaId?: string;
@@ -168,12 +172,10 @@ export const MedidasList: React.FC<MedidasListProps> = ({
     }
   };
 
-  // ✅ Abrir modal de confirmação
   const handleOpenDeleteModal = (medidaId: string) => {
     setModalDeleteMedida({ isOpen: true, medidaId });
   };
 
-  // ✅ Confirmar exclusão
   const handleConfirmDelete = async () => {
     if (!modalDeleteMedida.medidaId) return;
 
@@ -229,6 +231,234 @@ export const MedidasList: React.FC<MedidasListProps> = ({
       month: "2-digit",
       year: "numeric",
     });
+  };
+
+  // ✅ Gerar PDF da medida específica
+  const gerarPdfMedida = async (medida: Medida) => {
+    const nomeCliente = session?.user?.name || "SaaS Academia";
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+    const margin = 10;
+    let y = 50;
+
+    // Função para obter logo
+    const getLogoBase64 = async () => {
+      try {
+        const origin =
+          typeof window !== "undefined" ? window.location.origin : "";
+        const resp = await fetch(`${origin}/imagens/logo.png`, {
+          cache: "no-store",
+        });
+        if (!resp.ok) return "";
+        const blob = await resp.blob();
+        return await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () =>
+            resolve(typeof reader.result === "string" ? reader.result : "");
+          reader.onerror = () => resolve("");
+          reader.readAsDataURL(blob);
+        });
+      } catch {
+        return "";
+      }
+    };
+
+    const logoDataUri = await getLogoBase64();
+
+    // Cabeçalho
+    doc.setFillColor(25, 35, 55);
+    doc.rect(0, 0, pageWidth, 40, "F");
+    doc.setFillColor(218, 165, 32);
+    doc.rect(0, 35, pageWidth, 5, "F");
+
+    if (logoDataUri) {
+      try {
+        doc.addImage(logoDataUri, "PNG", 10, 7, 18, 18);
+      } catch {}
+    }
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.setTextColor(255, 255, 255);
+    doc.text("FICHA DE MEDIDAS", pageWidth / 2, 18, { align: "center" });
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text(`Aluno: ${alunoNome}`, pageWidth / 2, 28, { align: "center" });
+
+    // Informações principais
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    doc.text("Dados da Medida", margin, y);
+    y += 8;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text(`Data: ${formatDate(medida.data)}`, margin, y);
+    y += 7;
+    doc.text(`Peso: ${medida.peso} kg`, margin, y);
+    y += 7;
+    doc.text(`Altura: ${medida.altura} m`, margin, y);
+    y += 7;
+
+    const imc = calcularIMC(medida.peso, medida.altura);
+    const imcCategoria = getIMCCategoria(parseFloat(imc));
+    doc.text(`IMC: ${imc} (${imcCategoria.label})`, margin, y);
+    y += 12;
+
+    // Medidas corporais
+    if (
+      medida.peito ||
+      medida.cintura ||
+      medida.quadril ||
+      medida.bracoDireito ||
+      medida.bracoEsquerdo ||
+      medida.coxaDireita ||
+      medida.coxaEsquerda ||
+      medida.panturrilhaDireita ||
+      medida.panturrilhaEsquerda
+    ) {
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(12);
+      doc.text("Medidas Corporais", margin, y);
+      y += 8;
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+
+      if (medida.peito) {
+        doc.text(`Peito: ${medida.peito} cm`, margin, y);
+        y += 7;
+      }
+      if (medida.cintura) {
+        doc.text(`Cintura: ${medida.cintura} cm`, margin, y);
+        y += 7;
+      }
+      if (medida.quadril) {
+        doc.text(`Quadril: ${medida.quadril} cm`, margin, y);
+        y += 7;
+      }
+      if (medida.bracoDireito) {
+        doc.text(`Braço Direito: ${medida.bracoDireito} cm`, margin, y);
+        y += 7;
+      }
+      if (medida.bracoEsquerdo) {
+        doc.text(`Braço Esquerdo: ${medida.bracoEsquerdo} cm`, margin, y);
+        y += 7;
+      }
+      if (medida.coxaDireita) {
+        doc.text(`Coxa Direita: ${medida.coxaDireita} cm`, margin, y);
+        y += 7;
+      }
+      if (medida.coxaEsquerda) {
+        doc.text(`Coxa Esquerda: ${medida.coxaEsquerda} cm`, margin, y);
+        y += 7;
+      }
+      if (medida.panturrilhaDireita) {
+        doc.text(
+          `Panturrilha Direita: ${medida.panturrilhaDireita} cm`,
+          margin,
+          y
+        );
+        y += 7;
+      }
+      if (medida.panturrilhaEsquerda) {
+        doc.text(
+          `Panturrilha Esquerda: ${medida.panturrilhaEsquerda} cm`,
+          margin,
+          y
+        );
+        y += 7;
+      }
+      y += 5;
+    }
+
+    // Observações
+    if (medida.observacoes) {
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(12);
+      doc.text("Observações", margin, y);
+      y += 8;
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      const observacoesLines = doc.splitTextToSize(
+        medida.observacoes,
+        pageWidth - 2 * margin
+      );
+      doc.text(observacoesLines, margin, y);
+    }
+
+    // Rodapé
+    const footerY = pageHeight - 10;
+    doc.setDrawColor(200, 200, 200);
+    doc.setLineWidth(0.5);
+    doc.line(margin, footerY - 5, pageWidth - margin, footerY - 5);
+
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
+    doc.text(nomeCliente, margin, footerY);
+    doc.text(`Página 1 de 1`, pageWidth - margin, footerY, {
+      align: "right",
+    });
+
+    doc.save(`medida-${alunoNome}-${formatDate(medida.data)}.pdf`);
+  };
+
+  // ✅ Enviar medida via WhatsApp
+  const enviarWhatsAppMedida = (medida: Medida) => {
+    const nomeCliente = session?.user?.name || "SaaS Academia";
+    const imc = calcularIMC(medida.peso, medida.altura);
+    const imcCategoria = getIMCCategoria(parseFloat(imc));
+
+    let texto = `📏 *FICHA DE MEDIDAS*\n\n`;
+    texto += `👤 *Aluno:* ${alunoNome}\n`;
+    texto += `🏢 *Academia:* ${nomeCliente}\n\n`;
+    texto += `📅 *Data:* ${formatDate(medida.data)}\n\n`;
+    texto += `*Dados Principais*\n`;
+    texto += `⚖️ Peso: ${medida.peso} kg\n`;
+    texto += `📏 Altura: ${medida.altura} m\n`;
+    texto += `📊 IMC: ${imc} (${imcCategoria.label})\n\n`;
+
+    if (
+      medida.peito ||
+      medida.cintura ||
+      medida.quadril ||
+      medida.bracoDireito ||
+      medida.bracoEsquerdo ||
+      medida.coxaDireita ||
+      medida.coxaEsquerda ||
+      medida.panturrilhaDireita ||
+      medida.panturrilhaEsquerda
+    ) {
+      texto += `*Medidas Corporais*\n`;
+      if (medida.peito) texto += `💪 Peito: ${medida.peito} cm\n`;
+      if (medida.cintura) texto += `📐 Cintura: ${medida.cintura} cm\n`;
+      if (medida.quadril) texto += `🍑 Quadril: ${medida.quadril} cm\n`;
+      if (medida.bracoDireito)
+        texto += `💪 Braço Direito: ${medida.bracoDireito} cm\n`;
+      if (medida.bracoEsquerdo)
+        texto += `💪 Braço Esquerdo: ${medida.bracoEsquerdo} cm\n`;
+      if (medida.coxaDireita)
+        texto += `🦵 Coxa Direita: ${medida.coxaDireita} cm\n`;
+      if (medida.coxaEsquerda)
+        texto += `🦵 Coxa Esquerda: ${medida.coxaEsquerda} cm\n`;
+      if (medida.panturrilhaDireita)
+        texto += `🦵 Panturrilha Direita: ${medida.panturrilhaDireita} cm\n`;
+      if (medida.panturrilhaEsquerda)
+        texto += `🦵 Panturrilha Esquerda: ${medida.panturrilhaEsquerda} cm\n`;
+      texto += `\n`;
+    }
+
+    if (medida.observacoes) {
+      texto += `*Observações*\n${medida.observacoes}\n\n`;
+    }
+
+    texto += `📌 *${nomeCliente}*`;
+
+    window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, "_blank");
   };
 
   if (loading) {
@@ -491,7 +721,7 @@ export const MedidasList: React.FC<MedidasListProps> = ({
         </div>
       </Modal>
 
-      {/* ✅ Modal de Confirmação de Exclusão */}
+      {/* Modal de Confirmação de Exclusão */}
       <Modal
         isOpen={modalDeleteMedida.isOpen}
         onClose={() => setModalDeleteMedida({ isOpen: false })}
@@ -522,7 +752,7 @@ export const MedidasList: React.FC<MedidasListProps> = ({
         </div>
       </Modal>
 
-      {/* Modal Ver Detalhes */}
+      {/* ✅ Modal Ver Detalhes COM BOTÕES PDF E WHATSAPP */}
       <Modal
         isOpen={modalViewMedida.isOpen}
         onClose={() => setModalViewMedida({ isOpen: false })}
@@ -531,6 +761,26 @@ export const MedidasList: React.FC<MedidasListProps> = ({
       >
         {modalViewMedida.medida && (
           <div className={styles.detailsContent}>
+            {/* ✅ Botões de Ação no topo */}
+            <div className={styles.detailsActions}>
+              <button
+                onClick={() => gerarPdfMedida(modalViewMedida.medida!)}
+                className={`${styles.actionBtnDetail} ${styles.btnPdfDetail}`}
+                title="Baixar PDF"
+              >
+                <FileText size={18} />
+                <span>PDF</span>
+              </button>
+              <button
+                onClick={() => enviarWhatsAppMedida(modalViewMedida.medida!)}
+                className={`${styles.actionBtnDetail} ${styles.btnWhatsDetail}`}
+                title="Enviar WhatsApp"
+              >
+                <FaWhatsapp size={18} />
+                <span>WhatsApp</span>
+              </button>
+            </div>
+
             {modalViewMedida.medida.fotos &&
               modalViewMedida.medida.fotos.length > 0 && (
                 <div className={styles.fotosGallery}>
