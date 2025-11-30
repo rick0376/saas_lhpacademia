@@ -403,7 +403,7 @@ export default function MedidasClient() {
                 <div className={styles.cardContent}>
                   <div className={styles.infoItem}>
                     <Weight
-                      size={16}
+                      size={22}
                       className={`${styles.iconInfo} ${styles.iconPeso}`}
                     />
                     <span className={styles.label}>Peso:</span>
@@ -413,7 +413,7 @@ export default function MedidasClient() {
                   </div>
                   <div className={styles.infoItem}>
                     <Ruler
-                      size={16}
+                      size={22}
                       className={`${styles.iconInfo} ${styles.iconAltura}`}
                     />
                     <span className={styles.label}>Altura:</span>
@@ -423,7 +423,7 @@ export default function MedidasClient() {
                   </div>
                   <div className={styles.infoItem}>
                     <TrendingUp
-                      size={16}
+                      size={22}
                       className={`${styles.iconInfo} ${styles.iconTotal}`}
                     />
                     <span className={styles.label}>Total de Medidas:</span>

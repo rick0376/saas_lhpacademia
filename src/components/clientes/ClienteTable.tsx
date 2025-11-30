@@ -4,16 +4,12 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { jsPDF } from "jspdf";
 import styles from "./styles.module.scss";
 import { Button } from "../ui/Button/Button";
 import { Modal } from "../ui/Modal/Modal";
-import {
-  FaEnvelope,
-  FaPhone,
-  FaBuilding,
-  FaMapMarkerAlt,
-} from "react-icons/fa";
-import { Edit, Trash2, Plus } from "lucide-react";
+import { Edit, Trash2, Plus, FileText, Users, Calendar } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
 
 interface Cliente {
   id: string;
@@ -53,10 +49,8 @@ export const ClienteTable = () => {
   });
   const [permissoesCarregadas, setPermissoesCarregadas] = useState(false);
 
-  // Busca permissões do usuário logado
   const fetchPermissoes = async () => {
     try {
-      // SUPERADMIN tem acesso total automaticamente
       if (session?.user?.role === "SUPERADMIN") {
         setPermissoes({
           recurso: "clientes",
@@ -69,7 +63,6 @@ export const ClienteTable = () => {
         return;
       }
 
-      // Se não for SUPERADMIN, busca do banco
       const response = await fetch("/api/permissoes/usuario");
       if (!response.ok) throw new Error("Erro ao buscar permissões");
       const data = await response.json();
@@ -80,7 +73,6 @@ export const ClienteTable = () => {
       if (permissaoCliente) {
         setPermissoes(permissaoCliente);
       } else {
-        // Se não encontrar permissão no banco, nega tudo
         setPermissoes({
           recurso: "clientes",
           criar: false,
@@ -122,17 +114,14 @@ export const ClienteTable = () => {
     }
   };
 
-  // EFEITO 1: Carrega permissões quando o session está disponível
   useEffect(() => {
     if (status === "authenticated" && session) {
       fetchPermissoes();
     }
   }, [status, session]);
 
-  // EFEITO 2: Só busca clientes QUANDO as permissões estiverem carregadas
   useEffect(() => {
     if (status === "authenticated" && permissoesCarregadas) {
-      // Se não tiver permissão de ler, mostra erro e não busca
       if (!permissoes.ler && session?.user?.role !== "SUPERADMIN") {
         setError("⛔ Você não tem permissão para visualizar clientes");
         setLoading(false);
@@ -176,6 +165,172 @@ export const ClienteTable = () => {
     });
   };
 
+  // ✅ Gerar PDF dos Clientes
+  const gerarPdfClientes = async () => {
+    if (clientes.length === 0) return;
+
+    const nomeUsuario = session?.user?.name || "Sistema";
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+    const margin = 10;
+    let y = 50;
+
+    // Função para obter logo
+    const getLogoBase64 = async () => {
+      try {
+        const origin =
+          typeof window !== "undefined" ? window.location.origin : "";
+        const resp = await fetch(`${origin}/imagens/logo.png`, {
+          cache: "no-store",
+        });
+        if (!resp.ok) return "";
+        const blob = await resp.blob();
+        return await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () =>
+            resolve(typeof reader.result === "string" ? reader.result : "");
+          reader.onerror = () => resolve("");
+          reader.readAsDataURL(blob);
+        });
+      } catch {
+        return "";
+      }
+    };
+
+    const logoDataUri = await getLogoBase64();
+
+    // Cabeçalho
+    const printHeader = () => {
+      doc.setFillColor(25, 35, 55);
+      doc.rect(0, 0, pageWidth, 40, "F");
+      doc.setFillColor(218, 165, 32);
+      doc.rect(0, 35, pageWidth, 5, "F");
+
+      if (logoDataUri) {
+        try {
+          doc.addImage(logoDataUri, "PNG", 10, 7, 18, 18);
+        } catch {}
+      }
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(18);
+      doc.setTextColor(255, 255, 255);
+      doc.text("RELATÓRIO DE CLIENTES", pageWidth / 2, 18, {
+        align: "center",
+      });
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.text(`Total de Clientes: ${clientes.length}`, pageWidth / 2, 28, {
+        align: "center",
+      });
+    };
+
+    // Cabeçalho da tabela
+    const printTableHeader = () => {
+      doc.setFontSize(8);
+      doc.setTextColor(100, 100, 100);
+      doc.setFont("helvetica", "bold");
+
+      doc.text("CLIENTE", margin, y);
+      doc.text("STATUS", 90, y);
+      doc.text("USUÁRIOS", 130, y);
+      doc.text("CADASTRO", 165, y);
+
+      doc.setDrawColor(200, 200, 200);
+      doc.line(margin, y + 2, pageWidth - margin, y + 2);
+      y += 8;
+    };
+
+    // Rodapé
+    const printFooter = () => {
+      const totalPages = doc.getNumberOfPages();
+      const footerY = pageHeight - 10;
+
+      for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        doc.setDrawColor(200, 200, 200);
+        doc.setLineWidth(0.5);
+        doc.line(margin, footerY - 5, pageWidth - margin, footerY - 5);
+
+        doc.setFontSize(8);
+        doc.setTextColor(100, 100, 100);
+        doc.text(nomeUsuario, margin, footerY);
+        doc.text(`Página ${i} de ${totalPages}`, pageWidth - margin, footerY, {
+          align: "right",
+        });
+      }
+    };
+
+    // Verificar quebra de página
+    const checkPageBreak = (heightNeeded: number) => {
+      if (y + heightNeeded > pageHeight - 20) {
+        doc.addPage();
+        y = 50;
+        printHeader();
+        printTableHeader();
+        doc.setTextColor(0, 0, 0);
+      }
+    };
+
+    printHeader();
+    printTableHeader();
+
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(0, 0, 0);
+
+    clientes.forEach((cliente) => {
+      checkPageBreak(10);
+
+      doc.setFontSize(8);
+      const nome = doc.splitTextToSize(cliente.nome, 75);
+      doc.text(nome, margin, y);
+
+      // Status
+      if (cliente.ativo) doc.setTextColor(0, 128, 0);
+      else doc.setTextColor(255, 0, 0);
+      doc.text(cliente.ativo ? "Ativo" : "Inativo", 90, y);
+      doc.setTextColor(0, 0, 0);
+
+      // Usuários
+      doc.text(`${cliente._count.usuarios}`, 140, y);
+
+      // Data
+      doc.text(formatDate(cliente.createdAt), 165, y);
+
+      doc.setDrawColor(245, 245, 245);
+      doc.line(margin, y + 5, pageWidth - margin, y + 5);
+
+      y += 10;
+    });
+
+    printFooter();
+    doc.save("relatorio-clientes.pdf");
+  };
+
+  // ✅ Enviar WhatsApp
+  const enviarWhatsAppClientes = () => {
+    if (clientes.length === 0) return;
+
+    const nomeUsuario = session?.user?.name || "Sistema";
+
+    let texto = `🏢 *RELATÓRIO DE CLIENTES*\n\n`;
+
+    clientes.forEach((cliente) => {
+      const status = cliente.ativo ? "✅ Ativo" : "🛑 Inativo";
+      texto += `*${cliente.nome}*\n`;
+      texto += `Status: ${status}\n`;
+      texto += `👥 Usuários: ${cliente._count.usuarios}\n`;
+      texto += `📅 Cadastro: ${formatDate(cliente.createdAt)}\n`;
+      texto += `------------------------------\n`;
+    });
+
+    texto += `\n📌 *${nomeUsuario}*`;
+
+    window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, "_blank");
+  };
+
   if (loading) {
     return (
       <div className={styles.loading}>
@@ -210,145 +365,127 @@ export const ClienteTable = () => {
   }
 
   return (
-    <>
-      {/* Botão Novo - Só aparece se tiver permissão */}
-      {permissoes.criar && (
-        <Link href="/dashboard/clientes/novo" className={styles.addButton}>
-          <Plus size={20} />
-          Novo Cliente
-        </Link>
-      )}
+    <div className={styles.container}>
+      {/* ✅ Toolbar com botões */}
+      <div className={styles.toolbar}>
+        <div className={styles.toolbarLeft}>
+          <h2 className={styles.toolbarTitle}>Clientes</h2>
+          <span className={styles.toolbarCount}>{clientes.length} total</span>
+        </div>
 
-      <div className={styles.tableContainer}>
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>Cliente</th>
-              <th>Status</th>
-              <th>Usuários</th>
-              <th>Cadastro</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {clientes.map((cliente) => (
-              <tr key={cliente.id}>
-                <td>
-                  <div className={styles.clienteCell}>
-                    {cliente.logo ? (
-                      <img
-                        src={cliente.logo}
-                        alt={cliente.nome}
-                        className={styles.logo}
-                      />
-                    ) : (
-                      <div className={styles.logoPlaceholder}>
-                        {cliente.nome.charAt(0).toUpperCase()}
-                      </div>
-                    )}
-                    <div className={styles.clienteInfo}>
-                      <span className={styles.clienteNome}>{cliente.nome}</span>
-                      <span className={styles.clienteId}>{cliente.id}</span>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <span
-                    className={`${styles.statusBadge} ${
-                      cliente.ativo ? styles.ativo : styles.inativo
-                    }`}
-                  >
-                    {cliente.ativo ? "Ativo" : "Inativo"}
-                  </span>
-                </td>
-                <td>
-                  <span className={styles.usuariosCount}>
-                    {cliente._count.usuarios}{" "}
-                    {cliente._count.usuarios === 1 ? "usuário" : "usuários"}
-                  </span>
-                </td>
-                <td>{formatDate(cliente.createdAt)}</td>
-                <td>
-                  <div className={styles.actions}>
-                    {/* Botão Criar Aluno - Usa permissão de ALUNOS, não CLIENTES */}
-                    <button
-                      onClick={() =>
-                        router.push(
-                          `/dashboard/alunos/novo?clienteId=${cliente.id}`
-                        )
-                      }
-                      className={styles.manageButton}
-                      title="Criar Aluno"
-                      // A permissão de criar ALUNOS será verificada na página de Alunos
-                    >
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                        <circle cx="9" cy="7" r="4" />
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                      </svg>
-                    </button>
+        <div className={styles.actionsGroup}>
+          {permissoes.criar && (
+            <Link href="/dashboard/clientes/novo" className={styles.addButton}>
+              <Plus size={18} />
+              <span className={styles.hideMobile}>Novo</span>
+            </Link>
+          )}
 
-                    {/* Botão Editar Cliente - Usa permissão EDITAR de clientes */}
-                    {permissoes.editar && (
-                      <Link
-                        href={`/dashboard/clientes/${cliente.id}/editar`}
-                        className={styles.editButton}
-                        title="Editar Cliente"
-                      >
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                        >
-                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                        </svg>
-                      </Link>
-                    )}
+          <button
+            onClick={gerarPdfClientes}
+            className={`${styles.actionBtn} ${styles.btnPdf}`}
+            title="Baixar PDF"
+          >
+            <FileText className={styles.iconBtn} />
+            <span className={styles.hideMobile}>PDF</span>
+          </button>
 
-                    {/* Botão Deletar Cliente - Usa permissão DELETAR de clientes */}
-                    {permissoes.deletar && (
-                      <button
-                        onClick={() =>
-                          setDeleteModal({ isOpen: true, cliente })
-                        }
-                        className={styles.deleteButton}
-                        title="Excluir Cliente"
-                      >
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                        >
-                          <polyline points="3 6 5 6 21 6" />
-                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                          <line x1="10" y1="11" x2="10" y2="17" />
-                          <line x1="14" y1="11" x2="14" y2="17" />
-                        </svg>
-                      </button>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+          <button
+            onClick={enviarWhatsAppClientes}
+            className={`${styles.actionBtn} ${styles.btnWhats}`}
+            title="Enviar WhatsApp"
+          >
+            <FaWhatsapp className={styles.iconBtn} />
+            <span className={styles.hideMobile}>Whats</span>
+          </button>
+        </div>
       </div>
 
+      {/* ✅ Cards Container */}
+      <div className={styles.cardsContainer}>
+        {clientes.map((cliente) => (
+          <div key={cliente.id} className={styles.card}>
+            <div className={styles.cardHeader}>
+              {cliente.logo ? (
+                <img
+                  src={cliente.logo}
+                  alt={cliente.nome}
+                  className={styles.logo}
+                />
+              ) : (
+                <div className={styles.logoPlaceholder}>
+                  {cliente.nome.charAt(0).toUpperCase()}
+                </div>
+              )}
+              <div className={styles.headerInfo}>
+                <h3 className={styles.cardName}>{cliente.nome}</h3>
+                <span
+                  className={`${styles.statusBadge} ${
+                    cliente.ativo ? styles.ativo : styles.inativo
+                  }`}
+                >
+                  {cliente.ativo ? "Ativo" : "Inativo"}
+                </span>
+              </div>
+            </div>
+
+            <div className={styles.cardContent}>
+              <div className={styles.infoItem}>
+                <Users
+                  size={16}
+                  className={`${styles.iconInfo} ${styles.iconUsuarios}`}
+                />
+                <span className={styles.label}>Usuários:</span>
+                <span className={styles.value}>{cliente._count.usuarios}</span>
+              </div>
+              <div className={styles.infoItem}>
+                <Calendar
+                  size={16}
+                  className={`${styles.iconInfo} ${styles.iconCadastro}`}
+                />
+                <span className={styles.label}>Cadastro:</span>
+                <span className={styles.value}>
+                  {formatDate(cliente.createdAt)}
+                </span>
+              </div>
+            </div>
+
+            <div className={styles.actions}>
+              <button
+                onClick={() =>
+                  router.push(`/dashboard/alunos/novo?clienteId=${cliente.id}`)
+                }
+                className={styles.manageButton}
+                title="Criar Aluno"
+              >
+                <Users size={18} />
+              </button>
+
+              {permissoes.editar && (
+                <Link
+                  href={`/dashboard/clientes/${cliente.id}/editar`}
+                  className={styles.editButton}
+                  title="Editar"
+                >
+                  <Edit size={18} />
+                </Link>
+              )}
+
+              {permissoes.deletar && (
+                <button
+                  onClick={() => setDeleteModal({ isOpen: true, cliente })}
+                  className={styles.deleteButton}
+                  title="Excluir"
+                >
+                  <Trash2 size={18} />
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Modal de Exclusão */}
       <Modal
         isOpen={deleteModal.isOpen}
         onClose={() => setDeleteModal({ isOpen: false })}
@@ -383,6 +520,6 @@ export const ClienteTable = () => {
           </div>
         </div>
       </Modal>
-    </>
+    </div>
   );
 };

@@ -1,9 +1,144 @@
+// ==================== ANIMAÇÕES ====================
 @keyframes spin {
   to {
     transform: rotate(360deg);
   }
 }
 
+// ==================== CONTAINER ====================
+.container {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+// ==================== TOOLBAR ====================
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  background: white;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.searchGroup {
+  display: flex;
+  flex: 1;
+  gap: 8px;
+  min-width: 280px;
+}
+
+.searchInput {
+  flex: 1;
+  height: 42px;
+  padding: 0 16px;
+  border: 2px solid #a78bfa;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1f2937;
+  transition: all 0.2s ease;
+
+  &::placeholder {
+    color: #a5b4fc;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: #7c3aed;
+    box-shadow: 0 0 8px #7c3aed88;
+  }
+}
+
+.searchButton {
+  height: 42px;
+  padding: 0 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6d2ed4 0%, #9167e4 100%);
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  &:hover {
+    background: linear-gradient(135deg, #714797 0%, #5d2691 100%);
+  }
+}
+
+.actionsGroup {
+  display: flex;
+  gap: 10px;
+}
+
+.addButton {
+  height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
+  color: white;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+  }
+}
+
+.actionBtn {
+  height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: white;
+
+  &:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.1);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.btnPdf {
+  background-color: #f59e0b;
+}
+
+.btnWhats {
+  background-color: #25d366;
+}
+
+.iconBtn {
+  width: 22px;
+  height: 22px;
+}
+
+// ==================== LOADING ====================
 .loading {
   display: flex;
   flex-direction: column;
@@ -14,6 +149,11 @@
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   text-align: center;
+
+  p {
+    color: #6b7280;
+    font-size: 16px;
+  }
 }
 
 .spinner {
@@ -26,6 +166,7 @@
   margin-bottom: 16px;
 }
 
+// ==================== ERROR ====================
 .error {
   display: flex;
   flex-direction: column;
@@ -36,6 +177,12 @@
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   text-align: center;
+
+  p {
+    color: #ef4444;
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
 }
 
 .retryButton {
@@ -48,12 +195,13 @@
   cursor: pointer;
   margin-top: 12px;
   transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #4f46e5;
+  }
 }
 
-.retryButton:hover {
-  background-color: #4f46e5;
-}
-
+// ==================== EMPTY ====================
 .empty {
   display: flex;
   flex-direction: column;
@@ -64,6 +212,18 @@
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   text-align: center;
+
+  h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #374151;
+    margin-bottom: 8px;
+  }
+
+  p {
+    color: #6b7280;
+    font-size: 14px;
+  }
 }
 
 .emptyIcon {
@@ -72,88 +232,13 @@
   opacity: 0.5;
 }
 
-.empty h3 {
-  font-size: 20px;
-  font-weight: 700;
-  color: #374151;
-  margin-bottom: 8px;
-}
-
-.empty p {
-  color: #6b7280;
-  font-size: 14px;
-}
-
-/* Busca */
-.searchForm {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 24px;
-  max-width: 600px;
-}
-
-.searchInput {
-  flex: 1;
-  padding: 12px 16px;
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
-  font-size: 15px;
-  font-weight: 500;
-  color: #1f2937;
-  background: white;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.searchInput::placeholder {
-  color: #9ca3af;
-}
-
-.searchInput:focus {
-  outline: none;
-  border-color: #7c3aed;
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
-}
-
-.searchButton {
-  padding: 12px 24px;
-  font-size: 15px;
-  font-weight: 600;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
-  color: white;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  white-space: nowrap;
-}
-
-.searchButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(124, 58, 237, 0.3);
-}
-
-@media (max-width: 640px) {
-  .searchForm {
-    flex-direction: column;
-    gap: 8px;
-  }
-  .searchButton {
-    width: 100%;
-  }
-}
-
-/* Cards Container */
+// ==================== CARDS ====================
 .cardsContainer {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.25rem;
 }
 
-/* Card */
 .card {
   background: white;
   border: 1px solid #e5e7eb;
@@ -162,12 +247,12 @@
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
-}
 
-.card:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  transform: translateY(-4px);
-  border-color: #a78bfa;
+  &:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    transform: translateY(-4px);
+    border-color: #a78bfa;
+  }
 }
 
 .cardHeader {
@@ -221,16 +306,16 @@
   letter-spacing: 0.5px;
   display: inline-block;
   width: fit-content;
-}
 
-.ativo {
-  background-color: #d1fae5;
-  color: #065f46;
-}
+  &.ativo {
+    background-color: #d1fae5;
+    color: #065f46;
+  }
 
-.inativo {
-  background-color: #fee2e2;
-  color: #991b1c;
+  &.inativo {
+    background-color: #fee2e2;
+    color: #991b1c;
+  }
 }
 
 .cardContent {
@@ -258,22 +343,40 @@
     align-items: center;
     gap: 8px;
   }
+
+  &:hover .iconInfo {
+    transform: scale(1.1);
+  }
 }
 
-// 🎨 Ícones coloridos
+.label {
+  flex-shrink: 0;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.value {
+  margin-left: auto;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+// Ícones coloridos
+.iconInfo {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
 .iconEmail {
   color: #3b82f6; // Azul
-  flex-shrink: 0;
 }
 
 .iconRole {
   color: #8b5cf6; // Roxo
-  flex-shrink: 0;
 }
 
 .iconDate {
   color: #10b981; // Verde
-  flex-shrink: 0;
 }
 
 // Badges de perfil
@@ -283,34 +386,35 @@
   font-weight: 600;
   font-size: 12px;
   display: inline-block;
-}
 
-.superadmin {
-  background-color: #fef3c7;
-  color: #92400e;
-}
+  &.superadmin {
+    background-color: #fef3c7;
+    color: #92400e;
+  }
 
-.admin {
-  background-color: #dbeafe;
-  color: #1e40af;
-}
+  &.admin {
+    background-color: #dbeafe;
+    color: #1e40af;
+  }
 
-.user {
-  background-color: #e5e7eb;
-  color: #374151;
+  &.user {
+    background-color: #e5e7eb;
+    color: #374151;
+  }
 }
 
 .clienteBadge {
   margin-top: 8px;
   padding: 8px 12px;
-  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  background: linear-gradient(90deg, #aaa1a1, #f8f9fa, #9ea7af);
   border-radius: 8px;
   font-size: 12px;
   font-weight: 600;
-  color: #6b7280;
+  color: #5c6370;
   text-align: center;
 }
 
+// ==================== ACTIONS ====================
 .actions {
   display: flex;
   gap: 6px;
@@ -320,7 +424,6 @@
   justify-content: center;
 }
 
-/* Ícones */
 .iconEditar,
 .iconButtonDelete {
   cursor: pointer;
@@ -354,7 +457,7 @@
   }
 }
 
-/* Modal */
+// ==================== MODAL ====================
 .modalContent {
   display: flex;
   flex-direction: column;
@@ -377,6 +480,30 @@
   gap: 12px;
   justify-content: flex-end;
   margin-top: 8px;
+}
+
+// ==================== RESPONSIVIDADE ====================
+@media (max-width: 768px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .searchGroup {
+    width: 100%;
+  }
+
+  .actionsGroup {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  // Botões ocupam espaço proporcional
+  .addButton,
+  .actionBtn {
+    flex: 1;
+    min-width: 0;
+  }
 }
 
 @media (max-width: 640px) {
