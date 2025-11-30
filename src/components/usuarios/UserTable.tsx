@@ -203,7 +203,7 @@ export const UserTable = () => {
     });
   };
 
-  // ✅ Gerar PDF dos Usuários
+  // ✅ Gerar PDF de TODOS os Usuários
   const gerarPdfUsuarios = async () => {
     if (usuariosOrdenados.length === 0) return;
 
@@ -214,7 +214,6 @@ export const UserTable = () => {
     const margin = 10;
     let y = 50;
 
-    // Função para obter logo
     const getLogoBase64 = async () => {
       try {
         const origin =
@@ -238,7 +237,6 @@ export const UserTable = () => {
 
     const logoDataUri = await getLogoBase64();
 
-    // Cabeçalho
     const printHeader = () => {
       doc.setFillColor(25, 35, 55);
       doc.rect(0, 0, pageWidth, 40, "F");
@@ -268,7 +266,6 @@ export const UserTable = () => {
       );
     };
 
-    // Cabeçalho da tabela
     const printTableHeader = () => {
       doc.setFontSize(8);
       doc.setTextColor(100, 100, 100);
@@ -285,7 +282,6 @@ export const UserTable = () => {
       y += 8;
     };
 
-    // Rodapé
     const printFooter = () => {
       const totalPages = doc.getNumberOfPages();
       const footerY = pageHeight - 10;
@@ -305,7 +301,6 @@ export const UserTable = () => {
       }
     };
 
-    // Verificar quebra de página
     const checkPageBreak = (heightNeeded: number) => {
       if (y + heightNeeded > pageHeight - 20) {
         doc.addPage();
@@ -333,13 +328,11 @@ export const UserTable = () => {
       doc.text(email, 60, y);
       doc.text(getRoleText(usuario.role), 120, y);
 
-      // Status
       if (usuario.ativo) doc.setTextColor(0, 128, 0);
       else doc.setTextColor(255, 0, 0);
       doc.text(usuario.ativo ? "Ativo" : "Inativo", 150, y);
       doc.setTextColor(0, 0, 0);
 
-      // Data
       doc.text(formatDate(usuario.createdAt), 175, y);
 
       doc.setDrawColor(245, 245, 245);
@@ -352,7 +345,7 @@ export const UserTable = () => {
     doc.save("relatorio-usuarios.pdf");
   };
 
-  // ✅ Enviar WhatsApp
+  // ✅ Enviar WhatsApp de TODOS os Usuários
   const enviarWhatsAppUsuarios = () => {
     if (usuariosOrdenados.length === 0) return;
 
@@ -372,6 +365,144 @@ export const UserTable = () => {
       texto += `📅 Cadastro: ${formatDate(usuario.createdAt)}\n`;
       texto += `------------------------------\n`;
     });
+
+    texto += `\n📌 *${nomeUsuario}*`;
+
+    window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, "_blank");
+  };
+
+  // ✅ Gerar PDF de UM Usuário Específico
+  const gerarPdfUsuario = async (usuario: Usuario) => {
+    const nomeUsuario = session?.user?.name || "Sistema";
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+    const margin = 10;
+    let y = 50;
+
+    const getLogoBase64 = async () => {
+      try {
+        const origin =
+          typeof window !== "undefined" ? window.location.origin : "";
+        const resp = await fetch(`${origin}/imagens/logo.png`, {
+          cache: "no-store",
+        });
+        if (!resp.ok) return "";
+        const blob = await resp.blob();
+        return await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () =>
+            resolve(typeof reader.result === "string" ? reader.result : "");
+          reader.onerror = () => resolve("");
+          reader.readAsDataURL(blob);
+        });
+      } catch {
+        return "";
+      }
+    };
+
+    const logoDataUri = await getLogoBase64();
+
+    // Cabeçalho
+    doc.setFillColor(25, 35, 55);
+    doc.rect(0, 0, pageWidth, 40, "F");
+    doc.setFillColor(218, 165, 32);
+    doc.rect(0, 35, pageWidth, 5, "F");
+
+    if (logoDataUri) {
+      try {
+        doc.addImage(logoDataUri, "PNG", 10, 7, 18, 18);
+      } catch {}
+    }
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.setTextColor(255, 255, 255);
+    doc.text("FICHA DO USUÁRIO", pageWidth / 2, 18, { align: "center" });
+
+    // Dados do usuário
+    y = 60;
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.setTextColor(0, 0, 0);
+    doc.text("DADOS PESSOAIS", margin, y);
+
+    y += 10;
+    doc.setFontSize(11);
+
+    doc.setFont("helvetica", "bold");
+    doc.text("Nome:", margin, y);
+    doc.setFont("helvetica", "normal");
+    doc.text(usuario.nome, margin + 25, y);
+
+    y += 8;
+    doc.setFont("helvetica", "bold");
+    doc.text("Email:", margin, y);
+    doc.setFont("helvetica", "normal");
+    doc.text(usuario.email, margin + 25, y);
+
+    y += 8;
+    doc.setFont("helvetica", "bold");
+    doc.text("Perfil:", margin, y);
+    doc.setFont("helvetica", "normal");
+    doc.text(getRoleText(usuario.role), margin + 25, y);
+
+    y += 8;
+    doc.setFont("helvetica", "bold");
+    doc.text("Status:", margin, y);
+    doc.setFont("helvetica", "normal");
+    if (usuario.ativo) doc.setTextColor(0, 128, 0);
+    else doc.setTextColor(255, 0, 0);
+    doc.text(usuario.ativo ? "Ativo" : "Inativo", margin + 25, y);
+    doc.setTextColor(0, 0, 0);
+
+    y += 8;
+    doc.setFont("helvetica", "bold");
+    doc.text("Cadastro:", margin, y);
+    doc.setFont("helvetica", "normal");
+    doc.text(formatDate(usuario.createdAt), margin + 25, y);
+
+    if (usuario.cliente) {
+      y += 8;
+      doc.setFont("helvetica", "bold");
+      doc.text("Cliente:", margin, y);
+      doc.setFont("helvetica", "normal");
+      doc.text(usuario.cliente.nome, margin + 25, y);
+    }
+
+    // Rodapé
+    const footerY = pageHeight - 10;
+    doc.setDrawColor(200, 200, 200);
+    doc.setLineWidth(0.5);
+    doc.line(margin, footerY - 5, pageWidth - margin, footerY - 5);
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
+    doc.text(nomeUsuario, margin, footerY);
+    doc.text(
+      new Date().toLocaleDateString("pt-BR"),
+      pageWidth - margin,
+      footerY,
+      { align: "right" }
+    );
+
+    doc.save(`usuario-${usuario.nome.replace(/\s+/g, "-").toLowerCase()}.pdf`);
+  };
+
+  // ✅ Enviar WhatsApp de UM Usuário Específico
+  const enviarWhatsAppUsuario = (usuario: Usuario) => {
+    const nomeUsuario = session?.user?.name || "Sistema";
+    const status = usuario.ativo ? "✅ Ativo" : "🛑 Inativo";
+
+    let texto = `👤 *FICHA DO USUÁRIO*\n\n`;
+    texto += `*${usuario.nome}*\n`;
+    texto += `📧 Email: ${usuario.email}\n`;
+    texto += `🔐 Perfil: ${getRoleText(usuario.role)}\n`;
+    texto += `Status: ${status}\n`;
+    texto += `📅 Cadastro: ${formatDate(usuario.createdAt)}\n`;
+
+    if (usuario.cliente) {
+      texto += `🏢 Cliente: ${usuario.cliente.nome}\n`;
+    }
 
     texto += `\n📌 *${nomeUsuario}*`;
 
@@ -529,22 +660,43 @@ export const UserTable = () => {
               </div>
 
               <div className={styles.actions}>
+                {/* ✅ PDF do usuário */}
+                <button
+                  onClick={() => gerarPdfUsuario(usuario)}
+                  className={styles.actionBtnCard}
+                  title="PDF do Usuário"
+                >
+                  <FileText size={18} />
+                </button>
+
+                {/* ✅ WhatsApp do usuário */}
+                <button
+                  onClick={() => enviarWhatsAppUsuario(usuario)}
+                  className={styles.actionBtnCardWhats}
+                  title="WhatsApp do Usuário"
+                >
+                  <FaWhatsapp size={18} />
+                </button>
+
+                {/* Editar */}
                 {permissoes.editar && (
                   <Link
                     href={`/dashboard/usuarios/${usuario.id}/editar`}
                     title="Editar"
                     className={styles.iconEditar}
                   >
-                    <Edit size={20} />
+                    <Edit size={18} />
                   </Link>
                 )}
+
+                {/* Excluir */}
                 {permissoes.deletar && (
                   <button
                     onClick={() => setDeleteModal({ isOpen: true, usuario })}
                     title="Excluir"
                     className={styles.iconButtonDelete}
                   >
-                    <Trash2 size={20} />
+                    <Trash2 size={18} />
                   </button>
                 )}
               </div>
