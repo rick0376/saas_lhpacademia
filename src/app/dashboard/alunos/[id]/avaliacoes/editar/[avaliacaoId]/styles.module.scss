@@ -42,10 +42,10 @@
 /* Títulos de seção */
 .section {
   border: 1px solid #ddd;
-  border-radius: 6px;
+  border-radius: 12px;
   padding: 1rem 1.5rem;
   margin-bottom: 2rem;
-  background-color: #fff;
+  background: linear-gradient(90deg, #c7bebe, #f8f9fa, #d7e0e9);
 }
 
 /* Título das seções com ícones alinhados */
@@ -257,6 +257,42 @@
   font-size: 0.9rem;
   color: #666;
   margin-top: 0.25rem;
+}
+
+.uploadButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #7c3aed;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: #6d28d9;
+    transform: scale(1.1);
+  }
+}
+
+.fileName {
+  color: #10b981; // Verde para arquivo selecionado
+  font-weight: 600;
+}
+
+.currentFile {
+  color: #3b82f6; // Azul para link do arquivo atual
+  font-weight: 600;
+  text-decoration: underline;
+
+  &:hover {
+    color: #2563eb;
+  }
+}
+
+.noFile {
+  color: #7d8491; // Cinza para "Nenhum arquivo"
+  font-style: italic;
 }
 
 /* Estilos responsivos simples */

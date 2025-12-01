@@ -630,19 +630,22 @@ export default function EditarAvaliacaoPage() {
             <label>Arquivo PDF (Opcional)</label>
             <div className={styles.fileInput}>
               <input type="file" accept=".pdf" onChange={handleFileChange} />
-              <Upload size={20} />
+              <button type="button" className={styles.uploadButton}>
+                <Upload size={20} />
+              </button>
               {form.arquivo ? (
-                <span>{form.arquivo.name}</span>
+                <span className={styles.fileName}>{form.arquivo.name}</span>
               ) : form.arquivoUrl ? (
                 <a
                   href={form.arquivoUrl}
                   target="_blank"
                   rel="noopener noreferrer"
+                  className={styles.currentFile}
                 >
                   Arquivo atual (clicar para abrir)
                 </a>
               ) : (
-                <span>Nenhum arquivo</span>
+                <span className={styles.noFile}>Nenhum arquivo</span>
               )}
             </div>
           </div>

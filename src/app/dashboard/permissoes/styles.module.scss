@@ -1,7 +1,8 @@
 .main {
   min-height: calc(100vh - 140px);
   padding: 40px 24px;
-  background-color: var(--light-color);
+  background: linear-gradient(90deg, #c7bebe, #f8f9fa, #d7e0e9);
+  border-radius: 12px;
 }
 
 .container {

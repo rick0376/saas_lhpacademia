@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Aluno } from "@/types";
 import { AlunoLayout } from "@/components/alunos/AlunoLayout";
@@ -20,6 +20,7 @@ import {
   ChevronUp,
   Edit,
   MessageCircle,
+  LogOut,
 } from "lucide-react";
 import { Modal } from "@/components/ui/Modal/Modal";
 import { Button } from "@/components/ui/Button/Button";
@@ -91,7 +92,7 @@ export default function AlunoDashboard() {
     useState<any[]>([]);
   const [loadingTreino, setLoadingTreino] = useState(false);
 
-  // ✅ NOVO - Toast
+  // ✅ Toast
   const [toast, setToast] = useState<{
     show: boolean;
     message: string;
@@ -102,12 +103,17 @@ export default function AlunoDashboard() {
     type: "success",
   });
 
-  // ✅ NOVO - Função para mostrar toast
+  // ✅ Função para mostrar toast
   const showToast = (
     message: string,
     type: "success" | "error" | "info" | "warning" = "success"
   ) => {
     setToast({ show: true, message, type });
+  };
+
+  // ✅ Função para logout
+  const handleLogout = async () => {
+    await signOut({ redirect: true, callbackUrl: "/alunos/login" });
   };
 
   useEffect(() => {
@@ -235,7 +241,6 @@ export default function AlunoDashboard() {
     setEditingExecucao(execucao);
     setModalEditOpen(true);
 
-    // Busca os exercícios disponíveis do treino
     setLoadingTreino(true);
     try {
       const response = await fetch(`/api/treinos/${execucao.treino.id}`);
@@ -367,20 +372,33 @@ ${execucao.observacoes ? `*Observações:* ${execucao.observacoes}` : ""}
     );
   }
 
+  // ✅ MELHOR TRATAMENTO DE ERRO COM LOGOUT
   if (error) {
     return (
       <div className={styles.errorContainer}>
-        <p className="text-red-500 mb-4">{error}</p>
-        <button
-          onClick={() => {
-            const user = session?.user as CustomUser;
-            const id = user?.aluno?.id;
-            if (id) fetchAlunoData(id);
-          }}
-          className={styles.retryButton}
-        >
-          Tentar novamente
-        </button>
+        <div className={styles.errorIcon}>⚠️</div>
+        <h2 className={styles.errorTitle}>Acesso Negado</h2>
+        <p className={styles.errorMessage}>{error}</p>
+        <p className={styles.errorDescription}>
+          Parece que sua conta não está vinculada a um perfil de aluno. Entre em
+          contato com seu personal trainer para resolver isso.
+        </p>
+        <div className={styles.errorActions}>
+          <button onClick={handleLogout} className={styles.logoutButton}>
+            <LogOut size={20} />
+            Sair da Conta
+          </button>
+          <button
+            onClick={() => {
+              const user = session?.user as CustomUser;
+              const id = user?.aluno?.id;
+              if (id) fetchAlunoData(id);
+            }}
+            className={styles.retryButton}
+          >
+            Tentar Novamente
+          </button>
+        </div>
       </div>
     );
   }
@@ -657,7 +675,7 @@ ${execucao.observacoes ? `*Observações:* ${execucao.observacoes}` : ""}
                           Editar
                         </button>
 
-                        {/* ✅ NOVO - BOTÃO WHATSAPP */}
+                        {/* ✅ BOTÃO WHATSAPP */}
                         <button
                           className={styles.whatsappButtonAction}
                           onClick={() => handleShareWhatsApp(execucao)}
@@ -705,7 +723,7 @@ ${execucao.observacoes ? `*Observações:* ${execucao.observacoes}` : ""}
                 </div>
               </div>
 
-              {/* ✅ NOVO - Campo de Data */}
+              {/* ✅ Campo de Data */}
               <div className={styles.modalFieldEdit}>
                 <label className={styles.modalLabel}>
                   <Calendar size={16} />
@@ -838,7 +856,7 @@ ${execucao.observacoes ? `*Observações:* ${execucao.observacoes}` : ""}
                   </label>
                 </div>
 
-                {/* ✅ Lista de Exercícios Realizados (Removíveis) */}
+                {/* ✅ Lista de Exercícios Realizados */}
                 <div className={styles.exerciciosEditSection}>
                   <div className={styles.exerciciosEditHeader}>
                     <h4>

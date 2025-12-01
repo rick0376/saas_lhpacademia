@@ -297,11 +297,10 @@
     grid-template-columns: 1fr;
   }
 }
-// ... (mantenha os estilos anteriores)
 
 // Estilos do Formulário
 .form {
-  background: white;
+  background: linear-gradient(90deg, #c7bebe, #e1e3e6, #d7e0e9);
   border-radius: 12px;
   padding: 32px;
   box-shadow: var(--shadow);
