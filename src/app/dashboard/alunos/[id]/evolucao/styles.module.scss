@@ -203,3 +203,190 @@
   color: #92400e;
   font-weight: 600;
 }
+
+.activeFilter {
+  border: 1px solid #8b5cf6;
+  background-color: #f5f3ff;
+}
+
+/* Visão por Treino */
+.treinoViewContainer {
+  margin-top: 1rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.sectionTitle {
+  font-size: 1.4rem;
+  color: #334155;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid #8b5cf6;
+  padding-left: 1rem;
+}
+
+.exerciciosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.exercicioMiniCard {
+  background: white;
+  border-radius: 12px;
+  padding: 1.2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s;
+  border: 1px solid #f1f5f9;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+    border-color: #e2e8f0;
+  }
+}
+
+.miniCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+
+  h4 {
+    margin: 0;
+    font-size: 1rem;
+    color: #1e293b;
+    font-weight: 700;
+    max-width: 60%;
+  }
+}
+
+.miniStats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.badgeMax {
+  font-size: 0.75rem;
+  background: #fffbeb;
+  color: #d97706;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  border: 1px solid #fcd34d;
+}
+
+.badgeEvo {
+  font-size: 0.75rem;
+  font-weight: 700;
+
+  &.pos {
+    color: #10b981;
+  }
+  &.neg {
+    color: #ef4444;
+  }
+}
+
+.miniChartWrapper {
+  width: 100%;
+  height: 100px; /* Altura fixa para os mini gráficos */
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.headerTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 10px;
+}
+
+.btnAction {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #374151;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: #e5e7eb;
+    transform: translateY(-1px);
+  }
+}
+
+.btnWhats {
+  color: #128c7e;
+  background-color: #e7fceb;
+  border-color: #bbf7d0;
+
+  &:hover {
+    background-color: #dcfce7;
+  }
+}
+
+.btnText {
+  @media (max-width: 480px) {
+    display: none; // Esconde texto no mobile para economizar espaço
+  }
+}
+/* --- BOTÕES DE AÇÃO (NOVO) --- */
+.actionButtonsInline {
+  display: flex;
+  gap: 8px;
+  margin-left: 12px;
+  padding-left: 12px;
+  border-left: 1px solid #e5e7eb;
+  align-items: center;
+}
+
+.iconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background-color: #fff;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #f3f4f6;
+    border-color: #9ca3af;
+    transform: translateY(-2px);
+  }
+}
+
+.whatsButton {
+  color: #25d366; /* Verde WhatsApp */
+  border-color: #86efac;
+  background-color: #f0fdf4;
+
+  &:hover {
+    background-color: #dcfce7;
+    border-color: #22c55e;
+  }
+}
