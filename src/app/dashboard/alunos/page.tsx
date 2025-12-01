@@ -43,7 +43,6 @@ export default async function AlunosPage() {
           </div>
         </div>
 
-        {/* Passamos a permissão para o componente filho gerenciar o botão */}
         <AlunoTable canCreate={canCreate} />
       </div>
     </main>

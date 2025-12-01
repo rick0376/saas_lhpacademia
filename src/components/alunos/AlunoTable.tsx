@@ -18,6 +18,7 @@ import {
   Plus,
   FileText,
   Share2,
+  TrendingUp, // ✅ NOVO ÍCONE IMPORTADO
 } from "lucide-react";
 
 interface Aluno {
@@ -510,6 +511,15 @@ export const AlunoTable = ({ canCreate }: AlunoTableProps) => {
                 >
                   <User size={24} />
                 </Link>
+
+                <Link
+                  href={`/dashboard/alunos/${aluno.id}/evolucao`}
+                  title="Ver Evolução"
+                  className={styles.iconEvolucao}
+                >
+                  <TrendingUp size={24} />
+                </Link>
+
                 {permissoes.editar && (
                   <Link
                     href={`/dashboard/alunos/${aluno.id}/editar`}

@@ -357,6 +357,7 @@
 
 /* Botões de Ação dentro do Card (Perfil, Editar, etc) */
 .iconPerfil,
+.iconEvolucao,
 .iconEditar,
 .iconAvaliar,
 .iconMedidas,
@@ -378,6 +379,18 @@
   &:hover {
     background-color: #2563eb;
     color: #eff6ff;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 6px rgba(139, 92, 246, 0.25);
+  }
+}
+.iconEvolucao {
+  background-color: #f3e8ff;
+  color: #8b5cf6;
+  &:hover {
+    background-color: #8b5cf6;
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 6px rgba(139, 92, 246, 0.25);
   }
 }
 .iconEditar {
@@ -386,6 +399,8 @@
   &:hover {
     background-color: #f59e0b;
     color: #fffbeb;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 6px rgba(139, 92, 246, 0.25);
   }
 }
 .iconAvaliar {
@@ -394,6 +409,8 @@
   &:hover {
     background-color: #10b981;
     color: #d1fae5;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 6px rgba(139, 92, 246, 0.25);
   }
 }
 .iconMedidas {
@@ -402,6 +419,8 @@
   &:hover {
     background-color: #06b6d4;
     color: #cffafe;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 6px rgba(139, 92, 246, 0.25);
   }
 }
 .iconButtonDelete {
@@ -410,6 +429,8 @@
   &:hover {
     background-color: #ef4444;
     color: #fee2e2;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 6px rgba(139, 92, 246, 0.25);
   }
 }
 

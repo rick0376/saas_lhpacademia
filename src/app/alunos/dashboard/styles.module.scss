@@ -69,6 +69,27 @@
   }
 }
 
+// ✨ NOVA ANIMAÇÃO - Brilho rotativo
+@keyframes rotateGlow {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+// ✨ NOVA ANIMAÇÃO - Pulso suave
+@keyframes softPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
 // ==================== CONTAINER PRINCIPAL ====================
 .container {
   min-height: 100vh;
@@ -346,7 +367,7 @@
   }
 }
 
-// ==================== CARDS GRID ====================
+// ==================== CARDS GRID MELHORADOS ====================
 .cardsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -362,34 +383,41 @@
 }
 
 .premiumCard {
-  background: rgba(30, 30, 50, 0.95);
-  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.98);
+  border-radius: 28px;
   padding: 2.5rem 2rem;
-  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(20px);
+  border: 2px solid rgba(255, 255, 255, 0.8);
 
+  // ✨ Borda animada rotativa
   &::before {
     content: "";
     position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    background: linear-gradient(90deg, #c7bebe, #f8f9fa, #d7e0e9);
-    background-size: 200% 200%;
-    animation: gradientShift 4s ease infinite;
-    z-index: -1;
-    border-radius: 26px;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(
+      from 0deg,
+      transparent 0deg,
+      rgba(124, 58, 237, 0.4) 45deg,
+      rgba(59, 130, 246, 0.6) 90deg,
+      rgba(16, 185, 129, 0.4) 180deg,
+      transparent 360deg
+    );
+    animation: rotateGlow 4s linear infinite;
+    opacity: 0;
+    transition: opacity 0.5s ease;
   }
 
+  // ✨ Overlay de brilho
   &::after {
     content: "";
     position: absolute;
@@ -398,31 +426,44 @@
     right: 0;
     bottom: 0;
     background: radial-gradient(
-      circle at 30% 30%,
-      rgba(113, 71, 151, 0.3) 0%,
-      transparent 40%
+      circle at 50% 0%,
+      rgba(255, 255, 255, 0.3) 0%,
+      transparent 60%
     );
+    opacity: 0;
+    transition: opacity 0.5s ease;
     pointer-events: none;
-    z-index: 1;
   }
 
   &:hover {
-    transform: translateY(-20px) scale(1.05);
-    box-shadow: 0 30px 80px rgba(93, 38, 145, 0.5);
-    animation: glow 3s ease infinite;
+    transform: translateY(-15px) scale(1.03);
+    box-shadow: 0 35px 90px rgba(124, 58, 237, 0.35);
+    border-color: rgba(124, 58, 237, 0.5);
+
+    &::before {
+      opacity: 1;
+    }
+
+    &::after {
+      opacity: 1;
+    }
 
     .premiumCardIcon {
-      transform: scale(1.4) rotate(15deg);
-      animation: float 1.5s ease-in-out infinite;
-      filter: drop-shadow(0 0 20px rgba(93, 38, 145, 0.6));
+      transform: scale(1.25) rotate(10deg);
+      animation: float 2s ease-in-out infinite;
     }
 
     .premiumCardNumber {
-      background: #034a5a;
+      background: linear-gradient(135deg, #7c3aed, #3b82f6, #10b981);
+      background-size: 200% 200%;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      text-shadow: 0 0 30px rgba(209, 195, 223, 0.5);
+      animation: gradientShift 3s ease infinite;
+    }
+
+    .premiumCardTitle {
+      color: #7c3aed;
     }
   }
 
@@ -432,64 +473,87 @@
 }
 
 .premiumCardIcon {
-  width: 64px;
-  height: 64px;
-  padding: 16px;
-  background: linear-gradient(135deg, #5d2691, #00a8cc);
+  width: 80px;
+  height: 80px;
+  padding: 20px;
+  background: linear-gradient(135deg, #7c3aed, #3b82f6);
   color: white;
-  border-radius: 20px;
+  border-radius: 24px;
   margin-bottom: 1.5rem;
-  box-shadow: 0 15px 40px rgba(93, 38, 145, 0.5);
-  transition: all 0.4s ease;
+  box-shadow: 0 15px 40px rgba(124, 58, 237, 0.4);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   z-index: 2;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    background: linear-gradient(135deg, #7c3aed, #3b82f6, #10b981);
+    border-radius: 27px;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  .premiumCard:hover & {
+    &::before {
+      opacity: 0.6;
+      animation: softPulse 2s ease-in-out infinite;
+    }
+  }
 }
 
 .premiumCardTitle {
-  margin: 0 0 0.75rem 0;
-  font-size: 0.9375rem;
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
   font-weight: 800;
-  color: #0c819b;
+  color: #64748b;
   text-transform: uppercase;
   letter-spacing: 0.15em;
   position: relative;
   z-index: 2;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s ease;
 }
 
 .premiumCardNumber {
-  font-size: 3.5rem;
+  font-size: 4rem;
   font-weight: 900;
-  background-color: #0c819b;
+  background: linear-gradient(135deg, #1e293b, #475569);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   margin: 0.5rem 0 1.5rem 0;
-  transition: all 0.4s ease;
+  transition: all 0.5s ease;
   position: relative;
   z-index: 2;
+  line-height: 1;
 
   @media (max-width: 768px) {
-    font-size: 2.5rem;
+    font-size: 3rem;
   }
 }
 
 .premiumCardNumberSmall {
-  font-size: 2.5rem;
+  font-size: 2rem;
+
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+  }
 }
 
 .premiumCardButton {
-  background: linear-gradient(135deg, #5d2691, #00a8cc);
+  background: linear-gradient(135deg, #7c3aed, #3b82f6);
   color: white;
   border: none;
-  padding: 16px 32px;
+  padding: 16px 36px;
   border-radius: 16px;
-  font-size: 0.9375rem;
+  font-size: 1rem;
   font-weight: 800;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   margin-top: auto;
-  box-shadow: 0 8px 25px rgba(93, 38, 145, 0.4);
+  box-shadow: 0 10px 30px rgba(124, 58, 237, 0.3);
   position: relative;
   z-index: 2;
   overflow: hidden;
@@ -503,27 +567,33 @@
     width: 0;
     height: 0;
     border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
     transform: translate(-50%, -50%);
-    transition: width 0.5s, height 0.5s;
-  }
-
-  &:hover::before {
-    width: 400px;
-    height: 400px;
+    transition: width 0.6s ease, height 0.6s ease;
   }
 
   &:hover {
-    background: linear-gradient(135deg, #300a53, #05687e, #025061);
-    transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(93, 38, 145, 0.6);
+    background: linear-gradient(135deg, #6d28d9, #2563eb);
+    transform: translateY(-3px);
+    box-shadow: 0 15px 45px rgba(124, 58, 237, 0.5);
+
+    &::before {
+      width: 500px;
+      height: 500px;
+    }
+  }
+
+  &:active {
+    transform: translateY(-1px);
   }
 
   @media (max-width: 768px) {
-    padding: 12px 24px;
+    padding: 14px 28px;
+    font-size: 0.9375rem;
   }
 }
 
-// ==================== HISTÓRICO ====================
+// ==================== HISTÓRICO (mantém como está) ====================
 .historicoSection {
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(20px);

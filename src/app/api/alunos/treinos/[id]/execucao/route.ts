@@ -3,7 +3,13 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-// POST - Criar nova execução COM exercícios realizados
+// Interface auxiliar para tipar o body
+interface ExercicioRealizadoInput {
+  id: string;
+  carga: string | null;
+}
+
+// POST - Criar nova execução
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -43,7 +49,7 @@ export async function POST(
     }
 
     const body = await req.json();
-    const { intensidade, observacoes, data, exerciciosRealizadosIds } = body;
+    const { intensidade, observacoes, data, exerciciosRealizados } = body;
 
     const intensidadesValidas = ["LEVE", "MODERADO", "PESADO", "MUITO_PESADO"];
     if (!intensidade || !intensidadesValidas.includes(intensidade)) {
@@ -55,13 +61,36 @@ export async function POST(
 
     const dataExecucao = data ? new Date(data) : new Date();
     const totalExercicios = treino.exercicios.length;
-    const exerciciosRealizados = exerciciosRealizadosIds || [];
-    const completo = exerciciosRealizados.length === totalExercicios;
 
-    // ✅ FILTRAR POR ID DO TREINOEXERCICIO
-    const exerciciosParaSalvar = treino.exercicios.filter((te) =>
-      exerciciosRealizados.includes(te.id)
+    // ✅ CORREÇÃO 1: Tipagem explícita da entrada
+    const exerciciosRealizadosArray = (exerciciosRealizados ||
+      []) as ExercicioRealizadoInput[];
+    const completo = exerciciosRealizadosArray.length === totalExercicios;
+
+    // ✅ CORREÇÃO 2: Tipagem explícita do Map
+    const cargasMap = new Map<string, string | null>(
+      exerciciosRealizadosArray.map((ex) => [ex.id, ex.carga])
     );
+
+    const exerciciosParaSalvar = treino.exercicios
+      .filter((te) => cargasMap.has(te.id))
+      .map((te) => {
+        const cargaCustomizada = cargasMap.get(te.id);
+
+        // ✅ CORREÇÃO 3: Lógica segura para definir a carga final
+        // Se cargaCustomizada não for undefined, usa ela. Senão, usa a do treino. Por fim, null.
+        const cargaFinal =
+          cargaCustomizada !== undefined ? cargaCustomizada : te.carga;
+
+        return {
+          treinoExercicioId: te.id,
+          exercicioNome: te.exercicio.nome,
+          series: te.series,
+          repeticoes: te.repeticoes,
+          carga: (cargaFinal || null) as string | null, // Cast explícito para acalmar o TS
+          observacoes: te.observacoes || null,
+        };
+      });
 
     const execucao = await prisma.execucaoTreino.create({
       data: {
@@ -72,14 +101,7 @@ export async function POST(
         completo,
         data: dataExecucao,
         exercicios: {
-          create: exerciciosParaSalvar.map((te) => ({
-            treinoExercicioId: te.id, // ✅ SALVA O ID
-            exercicioNome: te.exercicio.nome,
-            series: te.series,
-            repeticoes: te.repeticoes,
-            carga: te.carga || null,
-            observacoes: te.observacoes || null,
-          })),
+          create: exerciciosParaSalvar,
         },
       },
       include: {
@@ -92,12 +114,16 @@ export async function POST(
       },
     });
 
+    // ✅ CORREÇÃO 4: Cast para 'any' para acessar _count sem erro de tipo
+    // O TypeScript às vezes não infere corretamente o retorno do create com include
+    const execucaoComCount = execucao as any;
+
     return NextResponse.json(
       {
         message: "Execução registrada com sucesso!",
         execucao: {
           ...execucao,
-          totalExerciciosRealizados: execucao._count.exercicios,
+          totalExerciciosRealizados: execucaoComCount._count?.exercicios || 0,
         },
       },
       { status: 201 }
@@ -148,7 +174,7 @@ export async function GET(
         exercicios: {
           select: {
             id: true,
-            treinoExercicioId: true, // ✅ RETORNA O ID
+            treinoExercicioId: true,
             exercicioNome: true,
             series: true,
             repeticoes: true,
@@ -233,7 +259,7 @@ export async function PUT(
       );
     }
 
-    // ✅ SE NÃO ENVIOU exerciciosRealizadosIds, atualiza só campos básicos
+    // Se não enviou exerciciosRealizadosIds, atualiza só campos básicos
     if (exerciciosRealizadosIds === undefined) {
       const execucaoAtualizada = await prisma.execucaoTreino.update({
         where: { id: execucaoId },
@@ -252,19 +278,22 @@ export async function PUT(
         },
       });
 
+      const execucaoAtualizadaAny = execucaoAtualizada as any;
+
       return NextResponse.json(
         {
           message: "Execução atualizada com sucesso!",
           execucao: {
             ...execucaoAtualizada,
-            totalExerciciosRealizados: execucaoAtualizada._count.exercicios,
+            totalExerciciosRealizados:
+              execucaoAtualizadaAny._count?.exercicios || 0,
           },
         },
         { status: 200 }
       );
     }
 
-    // ✅ SE ENVIOU exerciciosRealizadosIds, busca treino e atualiza tudo
+    // Se enviou exerciciosRealizadosIds, busca treino e atualiza tudo
     const treino = await prisma.treino.findFirst({
       where: { id: treinoId, alunoId },
       include: {
@@ -303,7 +332,7 @@ export async function PUT(
           completo,
           exercicios: {
             create: exerciciosParaSalvar.map((te) => ({
-              treinoExercicioId: te.id, // ✅ SALVA O ID
+              treinoExercicioId: te.id,
               exercicioNome: te.exercicio.nome,
               series: te.series,
               repeticoes: te.repeticoes,
@@ -321,7 +350,7 @@ export async function PUT(
           exercicios: {
             select: {
               id: true,
-              treinoExercicioId: true, // ✅ RETORNA O ID
+              treinoExercicioId: true,
               exercicioNome: true,
               series: true,
               repeticoes: true,
@@ -333,12 +362,15 @@ export async function PUT(
       });
     });
 
+    const execucaoAtualizadaAny = execucaoAtualizada as any;
+
     return NextResponse.json(
       {
         message: "Execução atualizada com sucesso!",
         execucao: {
           ...execucaoAtualizada,
-          totalExerciciosRealizados: execucaoAtualizada._count.exercicios,
+          totalExerciciosRealizados:
+            execucaoAtualizadaAny._count?.exercicios || 0,
         },
       },
       { status: 200 }

@@ -95,6 +95,20 @@ export default function TreinoDetalhesPage() {
     return {};
   });
 
+  // ✅ NOVO - Estado para armazenar cargas customizadas por exercício
+  const [cargasCustomizadas, setCargasCustomizadas] = useState<
+    Record<string, string>
+  >(() => {
+    if (typeof window !== "undefined" && id) {
+      const saved = localStorage.getItem(`treino_${id}_cargas`);
+      return saved ? JSON.parse(saved) : {};
+    }
+    return {};
+  });
+
+  // ✅ NOVO - Estado para a carga sendo editada no modal
+  const [cargaAtual, setCargaAtual] = useState("");
+
   const [cronometroExecucao, setCronometroExecucao] = useState<{
     exercicioId: string | null;
     tempo: number;
@@ -177,6 +191,20 @@ export default function TreinoDetalhesPage() {
       );
     }
   }, [seriesRestantes, id]);
+
+  // ✅ NOVO - Salvar cargas customizadas no localStorage
+  useEffect(() => {
+    if (
+      typeof window !== "undefined" &&
+      id &&
+      Object.keys(cargasCustomizadas).length > 0
+    ) {
+      localStorage.setItem(
+        `treino_${id}_cargas`,
+        JSON.stringify(cargasCustomizadas)
+      );
+    }
+  }, [cargasCustomizadas, id]);
 
   useEffect(() => {
     if (!cronometroExecucao.exercicioId) return;
@@ -389,6 +417,10 @@ export default function TreinoDetalhesPage() {
     setExercicioAtivo(exercicio);
     setCronometroModalType("execucao");
     setShowCronometroModal(true);
+
+    // ✅ NOVO - Inicializar carga atual (usa customizada se existir, senão usa a original)
+    const cargaSalva = cargasCustomizadas[exercicioId];
+    setCargaAtual(cargaSalva || exercicio.carga || "");
   };
 
   const vibrate = (pattern: number | number[]) => {
@@ -406,10 +438,19 @@ export default function TreinoDetalhesPage() {
     setShowCronometroModal(false);
     setExercicioAtivo(null);
     setShowConfirmCancelSerie(false);
+    setCargaAtual(""); // ✅ Limpar carga
     showToast("❌ Série cancelada", "warning");
   };
 
   const concluirSerie = (exercicioId: string, exercicio: Exercício) => {
+    // ✅ NOVO - Salvar a carga customizada se foi alterada
+    if (cargaAtual && cargaAtual.trim() !== "") {
+      setCargasCustomizadas((prev) => ({
+        ...prev,
+        [exercicioId]: cargaAtual,
+      }));
+    }
+
     const restantes = seriesRestantes[exercicioId];
     if (restantes > 1) {
       setSeriesRestantes((prev) => ({ ...prev, [exercicioId]: restantes - 1 }));
@@ -452,6 +493,7 @@ export default function TreinoDetalhesPage() {
     setCronometroAtivo(null);
     setTempoRestante(0);
     setExercicioAtivo(null);
+    setCargaAtual(""); // ✅ Limpar carga
   };
 
   const resetarSeries = (exercicioId: string, seriesOriginais: number) => {
@@ -536,6 +578,19 @@ export default function TreinoDetalhesPage() {
     }
     setSalvando(true);
     try {
+      // ✅ NOVO - Montar exercícios com cargas customizadas
+      const exerciciosComCargas = Array.from(exerciciosConcluidos).map(
+        (exercicioId) => {
+          const exercicio = detalhes?.exercicios.find(
+            (ex) => ex.id === exercicioId
+          );
+          return {
+            id: exercicioId,
+            carga: cargasCustomizadas[exercicioId] || exercicio?.carga || null,
+          };
+        }
+      );
+
       const response = await fetch(`/api/alunos/treinos/${id}/execucao`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -544,7 +599,7 @@ export default function TreinoDetalhesPage() {
           intensidade,
           observacoes: observacoes || null,
           data: dataExecucao || undefined,
-          exerciciosRealizadosIds: Array.from(exerciciosConcluidos),
+          exerciciosRealizados: exerciciosComCargas, // ✅ Enviar array com objetos {id, carga}
         }),
       });
       if (!response.ok) {
@@ -554,9 +609,11 @@ export default function TreinoDetalhesPage() {
       closeRegistroModal();
       setExerciciosConcluidos(new Set());
       setSeriesRestantes({});
+      setCargasCustomizadas({}); // ✅ Limpar cargas
       if (typeof window !== "undefined") {
         localStorage.removeItem(`treino_${id}_concluidos`);
         localStorage.removeItem(`treino_${id}_series`);
+        localStorage.removeItem(`treino_${id}_cargas`); // ✅ Limpar do localStorage
       }
       showToast("✅ Treino registrado com sucesso!", "success");
     } catch (err: any) {
@@ -802,6 +859,9 @@ export default function TreinoDetalhesPage() {
                 const isCronometroAtivo = cronometroAtivo === ex.id;
                 const isExecutando = cronometroExecucao.exercicioId === ex.id;
                 const restantes = seriesRestantes[ex.id] ?? ex.series;
+                // ✅ NOVO - Mostrar carga customizada se existir
+                const cargaExibida =
+                  cargasCustomizadas[ex.id] || ex.carga || "Livre";
 
                 return (
                   <div
@@ -937,7 +997,12 @@ export default function TreinoDetalhesPage() {
                       <div className={styles.cardItem}>
                         <span className={styles.cardLabel}>Carga</span>
                         <span className={styles.cardValue}>
-                          {ex.carga || "Livre"}
+                          {cargaExibida}
+                          {/* ✅ NOVO - Indicador visual se carga foi alterada */}
+                          {cargasCustomizadas[ex.id] &&
+                            cargasCustomizadas[ex.id] !== ex.carga && (
+                              <span className={styles.cargaAlterada}> ✏️</span>
+                            )}
                         </span>
                       </div>
 
@@ -1114,6 +1179,7 @@ export default function TreinoDetalhesPage() {
           </div>
         )}
 
+        {/* ✅ MODAL DE CRONÔMETRO ATUALIZADO COM INPUT DE CARGA */}
         {showCronometroModal && exercicioAtivo && (
           <div className={styles.cronometroModalOverlay}>
             <div className={styles.cronometroModalContent}>
@@ -1152,12 +1218,28 @@ export default function TreinoDetalhesPage() {
                     <span>
                       Repetições: <strong>{exercicioAtivo.reps}</strong>
                     </span>
-                    {exercicioAtivo.carga && (
-                      <span>
-                        Carga: <strong>{exercicioAtivo.carga}</strong>
-                      </span>
-                    )}
                   </div>
+
+                  {/* ✅ NOVO - INPUT EDITÁVEL DE CARGA */}
+                  <div className={styles.cargaInputWrapper}>
+                    <label className={styles.cargaLabel}>
+                      💪 Carga utilizada:
+                    </label>
+                    <input
+                      type="text"
+                      className={styles.cargaInput}
+                      value={cargaAtual}
+                      onChange={(e) => setCargaAtual(e.target.value)}
+                      placeholder="Ex: 20kg, 15kg, Livre"
+                    />
+                    {exercicioAtivo.carga &&
+                      cargaAtual !== exercicioAtivo.carga && (
+                        <span className={styles.cargaHint}>
+                          Original: {exercicioAtivo.carga}
+                        </span>
+                      )}
+                  </div>
+
                   <div className={styles.cronometroModalActions}>
                     <button
                       className={styles.btnModalCancelar}
