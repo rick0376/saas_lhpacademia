@@ -2,7 +2,7 @@
   max-width: 1050px;
   margin: 3rem auto;
   padding: 2rem 1.5rem;
-  background: #e2edf7ff;
+  background: linear-gradient(90deg, #c7bebe, #f8f9fa, #d7e0e9);
   border-radius: 20px;
   box-shadow: 0 12px 40px rgba(100, 100, 111, 0.18);
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -31,7 +31,7 @@
   background: linear-gradient(90deg, #6a11cb, #2575fc);
   color: white;
   padding: 0.6rem 1.8rem;
-  border-radius: 30px;
+  border-radius: 12px;
   font-weight: 700;
   font-size: 1.1rem;
   text-decoration: none;
@@ -105,7 +105,7 @@
   text-align: center;
   padding: 0.7rem 1rem;
   background: linear-gradient(90deg, #6a11cb, #2575fc);
-  border-radius: 28px;
+  border-radius: 12px;
   color: white;
   font-weight: 700;
   font-size: 1.1rem;
@@ -167,7 +167,7 @@
 }
 
 .iconAvaliar {
-  color: #10b981; /* verde */
+  color: white; /* verde */
   cursor: pointer;
   transition: color 0.3s ease;
 }

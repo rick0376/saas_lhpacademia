@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import styles from "./styles.module.scss";
+import styles from "./userform.module.scss";
 import { Input } from "../ui/Input/Input";
 import { Button } from "../ui/Button/Button";
 import { Toast } from "../ui/Toast/Toast";
+import { Eye, EyeOff } from "lucide-react";
 import {
   validateEmail,
   validatePassword,
@@ -35,6 +36,10 @@ export const UserForm: React.FC<UserFormProps> = ({
   const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // ✅ Estados para mostrar/ocultar senhas
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Estado para controlar toast
   const [toast, setToast] = useState<{
@@ -76,7 +81,7 @@ export const UserForm: React.FC<UserFormProps> = ({
     return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(
       7,
       11
-    )}`; // limita a 11 dígitos
+    )}`;
   };
 
   const handleChange = (
@@ -89,13 +94,11 @@ export const UserForm: React.FC<UserFormProps> = ({
 
     if (name === "telefone") {
       newValue = formatTelefone(value);
-      if (newValue.length > 15) return; // limita telefone formatado a 15 caracteres
+      if (newValue.length > 15) return;
     }
 
     if (name === "dataNascimento") {
-      // limita a 10 caracteres (ano, mês e dia: YYYY-MM-DD)
       if (value.length > 10) return;
-      // opcional: impedir avanço se o ano estiver com mais de 4 dígitos
       if (value.length >= 5) {
         const yearPart = value.slice(0, 4);
         if (!/^\d{0,4}$/.test(yearPart)) return;
@@ -123,19 +126,15 @@ export const UserForm: React.FC<UserFormProps> = ({
       newErrors.email = "Email inválido";
     }
 
-    // Validar telefone: deve ter 10 ou 11 dígitos (removendo máscara)
     const telefoneDigits = formData.telefone.replace(/\D/g, "");
     if (telefoneDigits.length !== 10 && telefoneDigits.length !== 11) {
       newErrors.telefone = "Telefone deve conter 10 ou 11 dígitos";
     }
 
-    // Validar dataNascimento se preenchida
     if (formData.dataNascimento) {
-      // Verifica comprimento do texto (deve ter 10 caracteres no formato YYYY-MM-DD)
       if (formData.dataNascimento.length !== 10) {
         newErrors.dataNascimento = "Data de nascimento inválida";
       } else {
-        // Verifica validamente o ano da data
         const ano = new Date(formData.dataNascimento).getFullYear();
         if (ano.toString().length !== 4) {
           newErrors.dataNascimento = "Ano da data de nascimento inválido";
@@ -294,28 +293,55 @@ export const UserForm: React.FC<UserFormProps> = ({
             value={formData.objetivo}
             onChange={handleChange}
           />
-          <Input
-            label={
-              isEdit ? "Nova senha (deixe em branco para não alterar)" : "Senha"
-            }
-            type="password"
-            name="senha"
-            placeholder="••••••••"
-            value={formData.senha}
-            onChange={handleChange}
-            error={errors.senha}
-            required={!isEdit}
-          />
-          <Input
-            label="Confirmar senha"
-            type="password"
-            name="confirmarSenha"
-            placeholder="••••••••"
-            value={formData.confirmarSenha}
-            onChange={handleChange}
-            error={errors.confirmarSenha}
-            required={!isEdit || !!formData.senha}
-          />
+
+          {/* ✅ Campo de Senha com toggle */}
+          <div className={styles.passwordWrapper}>
+            <Input
+              label={
+                isEdit
+                  ? "Nova senha (deixe em branco para não alterar)"
+                  : "Senha"
+              }
+              type={showPassword ? "text" : "password"}
+              name="senha"
+              placeholder="••••••••"
+              value={formData.senha}
+              onChange={handleChange}
+              error={errors.senha}
+              required={!isEdit}
+            />
+            <button
+              type="button"
+              className={styles.togglePassword}
+              onClick={() => setShowPassword(!showPassword)}
+              tabIndex={-1}
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
+          </div>
+
+          {/* ✅ Campo de Confirmar Senha com toggle */}
+          <div className={styles.passwordWrapper}>
+            <Input
+              label="Confirmar senha"
+              type={showConfirmPassword ? "text" : "password"}
+              name="confirmarSenha"
+              placeholder="••••••••"
+              value={formData.confirmarSenha}
+              onChange={handleChange}
+              error={errors.confirmarSenha}
+              required={!isEdit || !!formData.senha}
+            />
+            <button
+              type="button"
+              className={styles.togglePassword}
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              tabIndex={-1}
+            >
+              {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
+          </div>
+
           <div className={styles.selectWrapper}>
             <label className={styles.label}>Perfil de acesso</label>
             <select
