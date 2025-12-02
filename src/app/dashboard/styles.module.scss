@@ -1,3 +1,6 @@
+/* =========================================
+   1. ANIMAÇÕES GLOBAIS
+   ========================================= */
 @keyframes slideDown {
   from {
     opacity: 0;
@@ -20,14 +23,20 @@
   }
 }
 
+/* =========================================
+   2. CONTAINER PRINCIPAL & BACKGROUND
+   ========================================= */
 .container {
   min-height: 100vh;
   background: linear-gradient(90deg, #6a11cb 0%, #2575fc 50%, #29abe2 100%);
   padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   position: relative;
   border-radius: 16px;
 
+  /* Efeito de bolhas de luz */
   &::before {
     content: "";
     position: fixed;
@@ -64,8 +73,11 @@
   }
 }
 
+/* =========================================
+   3. HEADER (BEM-VINDO)
+   ========================================= */
 .header {
-  background: linear-gradient(135deg, #9882ee 0%, #7a5fca 50%, #856de2 100%);
+  background: linear-gradient(90deg, #c7bebe, #f8f9fa, #d7e0e9);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 24px;
@@ -74,18 +86,18 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   animation: slideDown 0.5s ease;
 
-  h1 {
+  .title {
     margin: 0;
     font-size: 2rem;
     font-weight: 800;
-    color: white;
+    color: #222425;
     text-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   }
 
-  p {
+  .subtitle {
     margin-top: 0.5rem;
     font-size: 1.125rem;
-    color: rgba(255, 255, 255, 0.9);
+    color: #3f4246;
     font-weight: 500;
   }
 
@@ -93,16 +105,83 @@
     padding: 1.5rem;
     margin-bottom: 2rem;
 
-    h1 {
+    .title {
       font-size: 1.5rem;
     }
 
-    p {
+    .subtitle {
       font-size: 1rem;
     }
   }
 }
 
+/* =========================================
+   4. SEÇÕES GERAIS (KPI, GRÁFICOS, TABELAS)
+   ========================================= */
+.kpiSection,
+.chartsSection,
+.tablesSection {
+  margin-bottom: 3rem;
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+/* =========================================
+   5. KPI GRID (MÉTRICAS PRINCIPAIS)
+   ========================================= */
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================
+   6. GRÁFICOS (TENDÊNCIAS)
+   ========================================= */
+.chartsSection {
+  .chartsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+  }
+}
+
+/* =========================================
+   7. TABELAS (RANKING & ALERTAS)
+   ========================================= */
+.tablesSection {
+  .tablesGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+/* =========================================
+   8. MENU DE ACESSO RÁPIDO
+   ========================================= */
 .menuSection {
   margin-top: 2rem;
 
@@ -113,20 +192,23 @@
     margin-bottom: 1.5rem;
     text-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
   }
-}
 
-.cardsGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
-  animation: fadeInUp 0.6s ease 0.2s both;
+  .cardsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    animation: fadeInUp 0.6s ease 0.2s both;
 
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
   }
 }
 
+/* =========================================
+   9. CARDS DE ACESSO (ESTILO GLASSMORPHISM)
+   ========================================= */
 .card {
   background: #e2edf7ff;
   border-radius: 24px;
@@ -137,8 +219,10 @@
   text-decoration: none;
   color: #1e293b;
   position: relative;
+  border-top: 6px solid;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 
+  /* Barra animada no hover */
   &::before {
     content: "";
     position: absolute;
@@ -147,7 +231,7 @@
     right: 0;
     height: 6px;
     border-top: 6px solid;
-    border-top-color: inherit; // herdará a cor definida inline no borderTopColor
+    border-top-color: inherit;
     transform: scaleX(0);
     transition: transform 0.4s ease;
     transform-origin: left;
@@ -164,182 +248,72 @@
     .cardIcon {
       transform: scale(1.2) rotate(10deg);
     }
+
+    .cardArrow {
+      transform: translateX(6px);
+    }
   }
 }
 
 .cardIcon {
   font-size: 2.5rem;
-  margin-bottom: 1rem;
-  display: inline-block;
-  padding: 1rem;
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 16px;
+  padding: 1rem;
   color: white;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   transition: all 0.4s ease;
-  /* backgroundColor será setado via style inline no componente */
+  /* backgroundColor será setado via style inline */
 }
 
 .cardTitle {
   font-weight: 700;
   font-size: 1.125rem;
-  margin-bottom: 0.25rem;
+  color: #1e293b;
+  margin-bottom: 0.5rem;
 }
 
 .cardDescription {
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   color: #64748b;
   margin-bottom: 1rem;
 }
 
 .cardArrow {
+  position: absolute;
+  bottom: 1rem;
+  right: 1.5rem;
   font-size: 1.5rem;
   font-weight: 800;
-  color: inherit; /* herda cor do card */
+  color: #64748b;
   transition: transform 0.3s ease;
 }
 
-.card:hover .cardArrow {
-  transform: translateX(6px);
-}
-/* SEÇÕES NOVAS */
-.kpiSection,
-.chartsSection,
-.tablesSection {
-  margin-bottom: 3rem;
-}
+/* =========================================
+   10. SEM PERMISSÃO (FALLBACK)
+   ========================================= */
+.semPermissao {
+  text-align: center;
+  padding: 3rem;
+  background: white;
+  border-radius: 16px;
+  margin-top: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 
-.sectionTitle {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: white;
-  margin-bottom: 1.5rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid #e2e8f0;
-}
-
-.kpiGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-.chartsGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-  gap: 2rem;
-  margin-bottom: 2rem;
-}
-
-.tablesGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
+  h1 {
+    font-size: 1.8rem;
+    color: #ef4444;
+    margin-bottom: 1rem;
   }
-}
 
-.container {
-  padding: 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
-
-  .header {
-    margin-bottom: 2rem;
-
-    .title {
-      font-size: 2rem;
-      font-weight: bold;
-      color: white;
-    }
-
-    .subtitle {
-      color: #c4cad3;
-    }
-  }
-}
-
-.menuSection {
-  .cardsGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1.5rem;
-
-    .card {
-      background: linear-gradient(90deg, #e4dddd, #f8f9fa, #d7e0e9);
-      border-radius: 12px;
-      padding: 1.5rem;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      border: 1px solid #e2e8f0;
-      border-top: 4px solid;
-      text-decoration: none;
-      transition: all 0.2s;
-      position: relative;
-
-      &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      }
-
-      .cardIcon {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
-      }
-
-      .cardTitle {
-        font-size: 1.125rem;
-        font-weight: 600;
-        color: #1e293b;
-        margin-bottom: 0.5rem;
-      }
-
-      .cardDescription {
-        color: #64748b;
-        font-size: 0.875rem;
-        margin-bottom: 1rem;
-      }
-
-      .cardArrow {
-        position: absolute;
-        bottom: 1rem;
-        right: 1.5rem;
-        color: #64748b;
-        font-size: 1.25rem;
-      }
-    }
-  }
-}
-/* SEÇÃO DE GRÁFICOS - AGORA RESPONSIVA */
-.chartsSection {
-  margin-bottom: 3rem;
-
-  .sectionTitle {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: white;
+  p {
+    font-size: 1.1rem;
+    color: #64748b;
     margin-bottom: 1.5rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid #e2e8f0;
-  }
-
-  .chartsGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-    gap: 2rem;
-    margin-bottom: 2rem;
-
-    /* ✅ RESPONSIVO: Em mobile, empilha tudo */
-    @media (max-width: 768px) {
-      grid-template-columns: 1fr;
-      gap: 1rem;
-    }
   }
 }
