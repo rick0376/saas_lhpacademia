@@ -1,5 +1,5 @@
 // ========================================
-// CONTAINER PRINCIPAL
+// LAYOUT PRINCIPAL
 // ========================================
 .container {
   display: flex;
@@ -7,11 +7,27 @@
   gap: 2rem;
 }
 
+.exerciciosList {
+  background: linear-gradient(90deg, #e4dddd, #f8f9fa, #d7e0e9);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: var(--shadow);
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--dark-color);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 // ========================================
 // HEADER
 // ========================================
 .header {
-  //background: white;
   background: linear-gradient(90deg, #e4dddd, #f8f9fa, #d7e0e9);
   border-radius: 12px;
   padding: 2rem;
@@ -22,8 +38,22 @@
   gap: 1.5rem;
 }
 
-.headerInfo {
+.headerLeft {
   flex: 1;
+  min-width: 0;
+}
+
+.headerRight {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.primaryAction {
+  width: 100%;
+  max-width: 280px;
 }
 
 .backButton {
@@ -96,43 +126,145 @@
   animation: pulse 1.5s ease-in-out infinite;
 }
 
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.6;
-  }
-}
-
-.headerActions {
-  display: flex;
-  gap: 0.75rem;
-  flex-shrink: 0;
-}
-
 // ========================================
-// LISTA DE EXERCÍCIOS
+// BOTÕES DE AÇÃO
 // ========================================
-.exerciciosList {
-  background: linear-gradient(90deg, #e4dddd, #f8f9fa, #d7e0e9);
-  border-radius: 12px;
-  padding: 2rem;
-  box-shadow: var(--shadow);
-}
 
-.sectionTitle {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--dark-color);
-  margin-bottom: 1.5rem;
+.addBtn {
+  height: 42px;
+  width: 180px;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 16px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: white;
+  white-space: nowrap;
+  box-sizing: border-box;
+
+  &:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
 }
 
-// Empty State
+.actionsGroup {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: right;
+}
+
+.actionBtn {
+  height: 42px;
+  width: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 16px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: white;
+  white-space: nowrap;
+  box-sizing: border-box;
+
+  &:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.addButton {
+  background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
+  color: #fff;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    background: linear-gradient(135deg, #3a0497 0%, #6033e7 100%);
+  }
+}
+
+.btnPdf {
+  background-color: #f59e0b;
+  color: #fff;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    background-color: #d97706;
+  }
+}
+
+.btnWhats {
+  background-color: #25d366;
+  color: #fff;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    background-color: #128c7e;
+  }
+}
+
+.btnEditar {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #fff;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  }
+}
+
+.btnAtualizar {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    background: linear-gradient(135deg, #059669, #047857);
+  }
+}
+
+.iconBtn {
+  width: 18px;
+  height: 18px;
+}
+
+.icon {
+  font-size: 1.2em;
+  font-weight: 800;
+}
+/*
+.hideMobile {
+  @media (max-width: 640px) {
+    display: none;
+  }
+}
+  */
+
+// ========================================
+// ESTADO VAZIO
+// ========================================
 .empty {
   display: flex;
   flex-direction: column;
@@ -163,7 +295,7 @@
 }
 
 // ========================================
-// CARDS DE EXERCÍCIOS
+// CARDS DE EXERCÍCIO
 // ========================================
 .exerciciosGrid {
   display: grid;
@@ -254,7 +386,7 @@
 }
 
 // ========================================
-// BOTÕES DE AÇÃO
+// BOTÕES DO CARD
 // ========================================
 .actionButtons {
   display: flex;
@@ -416,9 +548,8 @@
 // MODAL
 // ========================================
 .modalContent {
-  padding: 0.5rem 0;
-  background: linear-gradient(90deg, #e4dddd, #f8f9fa, #d7e0e9);
   padding: 20px;
+  background: linear-gradient(90deg, #e4dddd, #f8f9fa, #d7e0e9);
   border-radius: 12px;
 }
 
@@ -514,17 +645,36 @@
 }
 
 // ========================================
+// ANIMATIONS
+// ========================================
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+// ========================================
 // RESPONSIVIDADE
 // ========================================
+@media (min-width: 769px) {
+  .headerRight {
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .primaryAction {
+    width: auto;
+  }
+}
+
 @media (max-width: 1024px) {
   .header {
     flex-direction: column;
-  }
-
-  .headerActions {
-    width: 100%;
-    flex-direction: row;
-    flex-wrap: wrap;
   }
 
   .modalGrid {
@@ -538,7 +688,24 @@
   }
 
   .header {
+    flex-direction: column;
+    gap: 20px;
+    align-items: stretch;
     padding: 1.5rem;
+  }
+
+  .headerLeft {
+    order: 1;
+  }
+
+  .headerRight {
+    order: 2;
+    width: 100%;
+  }
+
+  .primaryAction {
+    width: 100% !important;
+    max-width: none !important;
   }
 
   .title {
@@ -566,9 +733,15 @@
     grid-template-columns: repeat(2, 1fr);
     padding: 0.75rem;
   }
+}
 
-  .headerActions {
-    flex-direction: column;
+@media (max-width: 640px) {
+  .actionsGroup {
+    justify-content: center;
+  }
+  .actionBtn {
+    width: 30%;
+    align-items: center;
   }
 }
 
@@ -585,5 +758,11 @@
 
   .exercicioDetails {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  .hideMobile {
+    display: none !important;
   }
 }

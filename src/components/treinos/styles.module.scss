@@ -1,3 +1,116 @@
+.toolbarContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.emptyAction {
+  @extend .btnNovo;
+  display: inline-block;
+  margin-top: 16px;
+  padding: 12px 24px;
+}
+
+@media (max-width: 768px) {
+  .toolbarContainer {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .toolbar {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .btnNovo {
+    order: -1;
+    width: 100%;
+    justify-content: center;
+  }
+}
+/* Grupo de Ações (Botões PDF/Whats) */
+.actionsGroup {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+
+  /* Garante que fique alinhado no final da toolbar */
+  margin-left: auto;
+}
+
+.addButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
+  color: white;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  user-select: none;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+
+  &:hover,
+  &:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    outline: none;
+  }
+}
+
+.actionBtn {
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 16px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: white;
+  white-space: nowrap;
+  box-sizing: border-box;
+
+  &:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+.iconBtn {
+  width: 18px;
+  height: 18px;
+  transition: all 0.2s ease;
+}
+
+.btnPdf {
+  background-color: #f59e0b;
+}
+
+.btnWhats {
+  background-color: #25d366;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));

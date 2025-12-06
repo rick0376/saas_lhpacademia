@@ -9,6 +9,7 @@ import styles from "./styles.module.scss";
 import { Button } from "../ui/Button/Button";
 import { Modal } from "../ui/Modal/Modal";
 import { GrupoMuscular } from "@/types";
+import { FaWhatsapp } from "react-icons/fa";
 
 interface Exercicio {
   id: string;
@@ -27,6 +28,8 @@ interface Permissao {
   deletar: boolean;
 }
 
+type PermissoesMap = Record<string, Permissao>;
+
 export const ExercicioTable = () => {
   const { data: session, status } = useSession();
   const [exercicios, setExercicios] = useState<Exercicio[]>([]);
@@ -38,65 +41,71 @@ export const ExercicioTable = () => {
     isOpen: boolean;
     exercicio?: Exercicio;
   }>({ isOpen: false });
-  const [permissoes, setPermissoes] = useState<Permissao>({
-    recurso: "exercicios",
-    criar: false,
-    ler: false,
-    editar: false,
-    deletar: false,
-  });
+  const [permissoes, setPermissoes] = useState<PermissoesMap>({});
   const [permissoesCarregadas, setPermissoesCarregadas] = useState(false);
+
+  const recursosExercicios = ["exercicios", "exercicios_compartilhar"];
 
   const fetchPermissoes = async () => {
     try {
       if (session?.user?.role === "SUPERADMIN") {
-        setPermissoes({
-          recurso: "exercicios",
-          criar: true,
-          ler: true,
-          editar: true,
-          deletar: true,
+        const full: PermissoesMap = {};
+        recursosExercicios.forEach((r) => {
+          full[r] = {
+            recurso: r,
+            criar: true,
+            ler: true,
+            editar: true,
+            deletar: true,
+          };
         });
+        setPermissoes(full);
         setPermissoesCarregadas(true);
         return;
       }
 
       const response = await fetch("/api/permissoes/usuario");
       if (!response.ok) throw new Error("Erro ao buscar permissões");
-      const data = await response.json();
+      const data: Permissao[] = await response.json();
 
-      const permissaoExercicios = data.find(
-        (p: Permissao) => p.recurso === "exercicios"
-      );
-      if (permissaoExercicios) {
-        setPermissoes(permissaoExercicios);
-      } else {
-        setPermissoes({
-          recurso: "exercicios",
-          criar: false,
-          ler: false,
-          editar: false,
-          deletar: false,
-        });
-      }
+      const map: PermissoesMap = {};
+      recursosExercicios.forEach((recurso) => {
+        const p = data.find((perm) => perm.recurso === recurso);
+        map[recurso] =
+          p ??
+          ({
+            recurso,
+            criar: false,
+            ler: false,
+            editar: false,
+            deletar: false,
+          } as Permissao);
+      });
+
+      setPermissoes(map);
       setPermissoesCarregadas(true);
     } catch (error) {
       console.error("❌ Erro ao carregar permissões:", error);
-      setPermissoes({
-        recurso: "exercicios",
-        criar: false,
-        ler: false,
-        editar: false,
-        deletar: false,
-      });
+      setPermissoes({});
       setPermissoesCarregadas(true);
     }
   };
 
+  const permExercicios = permissoes["exercicios"] ?? {
+    recurso: "exercicios",
+    criar: false,
+    ler: false,
+    editar: false,
+    deletar: false,
+  };
+
+  const canCompartilharExercicios =
+    !!permissoes["exercicios_compartilhar"]?.ler;
+
   const fetchExercicios = async (grupo = "", search = "") => {
     try {
       setLoading(true);
-      if (!permissoesCarregadas || !permissoes.ler) return;
+      if (!permissoesCarregadas || !permExercicios.ler) return;
 
       let url = "/api/exercicios?";
       if (grupo) url += `grupoMuscular=${grupo}&`;
@@ -117,13 +126,13 @@ export const ExercicioTable = () => {
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      if (permissoesCarregadas && permissoes.ler) {
+      if (permissoesCarregadas && permExercicios.ler) {
         fetchExercicios(filtroGrupo, searchTerm);
       }
     }, 300);
 
     return () => clearTimeout(handler);
-  }, [filtroGrupo, searchTerm, permissoesCarregadas, permissoes.ler]);
+  }, [filtroGrupo, searchTerm, permissoesCarregadas, permExercicios.ler]);
 
   useEffect(() => {
     if (status === "authenticated" && session) {
@@ -136,7 +145,7 @@ export const ExercicioTable = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!permissoes.deletar) {
+    if (!permExercicios.deletar) {
       alert("⛔ Você não tem permissão para excluir exercícios");
       return;
     }
@@ -193,15 +202,9 @@ export const ExercicioTable = () => {
     return colors[grupo] || "#6b7280";
   };
 
-  // ============================================================
-  // 🚀 PDF COM NOME DO CLIENTE NO RODAPÉ
-  // ============================================================
-
   const gerarPdfLista = async () => {
     if (exercicios.length === 0) return;
 
-    // 1. Define o nome do Cliente (Pega da sessão ou usa padrão)
-    // Se você tiver o nome da Empresa na sessão, use session.user.empresa ou similar
     const nomeCliente = session?.user?.name || "SaaS Academia LHP";
 
     const doc = new jsPDF();
@@ -274,7 +277,6 @@ export const ExercicioTable = () => {
         doc.setFontSize(8);
         doc.setTextColor(100, 100, 100);
 
-        // ✅ Aqui entra o nome do Cliente definido no início
         doc.text(nomeCliente, margin, footerY);
 
         doc.text(`Página ${i} de ${totalPages}`, pageWidth - margin, footerY, {
@@ -337,7 +339,6 @@ export const ExercicioTable = () => {
   const enviarWhatsAppLista = () => {
     if (exercicios.length === 0) return;
 
-    // 1. Define o nome do Cliente (Pega da sessão ou usa padrão)
     const nomeCliente = session?.user?.name || "SaaS Academia LHP";
 
     const porGrupo = exercicios.reduce((acc, ex) => {
@@ -362,7 +363,6 @@ export const ExercicioTable = () => {
         texto += `\n`;
       });
 
-    // 2. Adiciona o rodapé aqui no final
     texto += `------------------------------\n`;
     texto += `📌 *${nomeCliente}*`;
 
@@ -379,7 +379,7 @@ export const ExercicioTable = () => {
     );
   }
 
-  if (!permissoes.ler && session?.user?.role !== "SUPERADMIN") {
+  if (!permExercicios.ler && session?.user?.role !== "SUPERADMIN") {
     return (
       <div className={styles.error}>
         <p>⛔ Você não tem permissão para visualizar exercícios</p>
@@ -409,7 +409,7 @@ export const ExercicioTable = () => {
 
   return (
     <>
-      {permissoes.criar && (
+      {permExercicios.criar && (
         <div className={styles.topActions}>
           <Link href="/dashboard/exercicios/novo" className={styles.addButton}>
             <span className={styles.icon}>+</span>
@@ -452,47 +452,33 @@ export const ExercicioTable = () => {
         </button>
 
         <div style={{ display: "flex", gap: "8px", marginLeft: "auto" }}>
-          <button
-            onClick={gerarPdfLista}
-            className={styles.actionButton}
-            style={{
-              backgroundColor: "#f59e0b",
-              color: "#fff",
-              border: "none",
-              padding: "0.6rem 1rem",
-              borderRadius: "6px",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: "5px",
-            }}
-            disabled={exercicios.length === 0}
-            title="Baixar PDF"
-          >
-            <FileText size={18} />
-            <span className={styles.hideMobile}>PDF</span>
-          </button>
+          {canCompartilharExercicios && (
+            <>
+              {canCompartilharExercicios && (
+                <>
+                  <button
+                    onClick={gerarPdfLista}
+                    className={`${styles.actionBtn} ${styles.btnPdf}`}
+                    disabled={exercicios.length === 0}
+                    title="Baixar PDF"
+                  >
+                    <FileText className={styles.iconBtn} />
+                    <span className={styles.hideMobile}>PDF</span>
+                  </button>
 
-          <button
-            onClick={enviarWhatsAppLista}
-            className={styles.actionButton}
-            style={{
-              backgroundColor: "#25d366",
-              color: "#fff",
-              border: "none",
-              padding: "0.6rem 1rem",
-              borderRadius: "6px",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: "5px",
-            }}
-            disabled={exercicios.length === 0}
-            title="Enviar WhatsApp"
-          >
-            <Share2 size={18} />
-            <span className={styles.hideMobile}>Whats</span>
-          </button>
+                  <button
+                    onClick={enviarWhatsAppLista}
+                    className={`${styles.actionBtn} ${styles.btnWhats}`}
+                    disabled={exercicios.length === 0}
+                    title="Enviar WhatsApp"
+                  >
+                    <FaWhatsapp className={styles.iconBtn} />
+                    <span className={styles.hideMobile}>Whats</span>
+                  </button>
+                </>
+              )}
+            </>
+          )}
 
           <button
             onClick={() => {
@@ -546,7 +532,7 @@ export const ExercicioTable = () => {
               )}
 
               <div className={styles.cardActions}>
-                {permissoes.editar && (
+                {permExercicios.editar && (
                   <Link
                     href={`/dashboard/exercicios/${exercicio.id}/editar`}
                     className={styles.editButton}
@@ -554,7 +540,7 @@ export const ExercicioTable = () => {
                     ✏️ Editar
                   </Link>
                 )}
-                {permissoes.deletar && (
+                {permExercicios.deletar && (
                   <button
                     onClick={() => setDeleteModal({ isOpen: true, exercicio })}
                     className={styles.deleteButton}

@@ -4,10 +4,11 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { jsPDF } from "jspdf";
-import { FileText, Share2 } from "lucide-react";
+import { FileText } from "lucide-react";
 import styles from "./styles.module.scss";
 import { Button } from "../ui/Button/Button";
 import { Modal } from "../ui/Modal/Modal";
+import { FaWhatsapp } from "react-icons/fa";
 
 interface Treino {
   id: string;
@@ -32,6 +33,8 @@ interface Permissao {
   deletar: boolean;
 }
 
+type PermissoesMap = Record<string, Permissao>;
+
 interface TreinoTableProps {
   alunoId?: string;
 }
@@ -45,66 +48,70 @@ export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
     isOpen: boolean;
     treino?: Treino;
   }>({ isOpen: false });
-  const [permissoes, setPermissoes] = useState<Permissao>({
-    recurso: "treinos",
-    criar: false,
-    ler: false,
-    editar: false,
-    deletar: false,
-  });
+  const [permissoes, setPermissoes] = useState<PermissoesMap>({});
   const [permissoesCarregadas, setPermissoesCarregadas] = useState(false);
+
+  const recursosTreinos = ["treinos", "treinos_compartilhar"];
 
   const fetchPermissoes = async () => {
     try {
       if (session?.user?.role === "SUPERADMIN") {
-        setPermissoes({
-          recurso: "treinos",
-          criar: true,
-          ler: true,
-          editar: true,
-          deletar: true,
+        const full: PermissoesMap = {};
+        recursosTreinos.forEach((r) => {
+          full[r] = {
+            recurso: r,
+            criar: true,
+            ler: true,
+            editar: true,
+            deletar: true,
+          };
         });
+        setPermissoes(full);
         setPermissoesCarregadas(true);
         return;
       }
 
       const response = await fetch("/api/permissoes/usuario");
       if (!response.ok) throw new Error("Erro ao buscar permissões");
-      const data = await response.json();
+      const data: Permissao[] = await response.json();
 
-      const permissaoTreinos = data.find(
-        (p: Permissao) => p.recurso === "treinos"
-      );
+      const map: PermissoesMap = {};
+      recursosTreinos.forEach((recurso) => {
+        const p = data.find((perm) => perm.recurso === recurso);
+        map[recurso] =
+          p ??
+          ({
+            recurso,
+            criar: false,
+            ler: false,
+            editar: false,
+            deletar: false,
+          } as Permissao);
+      });
 
-      if (permissaoTreinos) {
-        setPermissoes(permissaoTreinos);
-      } else {
-        setPermissoes({
-          recurso: "treinos",
-          criar: false,
-          ler: false,
-          editar: false,
-          deletar: false,
-        });
-      }
+      setPermissoes(map);
       setPermissoesCarregadas(true);
     } catch (error) {
       console.error("Erro ao carregar permissões:", error);
-      setPermissoes({
-        recurso: "treinos",
-        criar: false,
-        ler: false,
-        editar: false,
-        deletar: false,
-      });
+      setPermissoes({});
       setPermissoesCarregadas(true);
     }
   };
 
+  const permTreinos = permissoes["treinos"] ?? {
+    recurso: "treinos",
+    criar: false,
+    ler: false,
+    editar: false,
+    deletar: false,
+  };
+
+  const canCompartilharFichas = !!permissoes["treinos_compartilhar"]?.ler;
+
   const fetchTreinos = async () => {
     try {
       setLoading(true);
-      if (!permissoesCarregadas || !permissoes.ler) return;
+      if (!permissoesCarregadas || !permTreinos.ler) return;
 
       const url = alunoId ? `/api/treinos?alunoId=${alunoId}` : "/api/treinos";
       const response = await fetch(url);
@@ -122,10 +129,10 @@ export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
   };
 
   useEffect(() => {
-    if (permissoesCarregadas && permissoes.ler) {
+    if (permissoesCarregadas && permTreinos.ler) {
       fetchTreinos();
     }
-  }, [alunoId, permissoesCarregadas, permissoes.ler]);
+  }, [alunoId, permissoesCarregadas, permTreinos.ler]);
 
   useEffect(() => {
     if (status === "authenticated" && session) {
@@ -134,7 +141,7 @@ export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
   }, [status, session]);
 
   const handleDelete = async (id: string) => {
-    if (!permissoes.deletar) {
+    if (!permTreinos.deletar) {
       alert("⛔ Você não tem permissão para excluir treinos");
       return;
     }
@@ -158,9 +165,6 @@ export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
     return date.toLocaleDateString("pt-BR");
   };
 
-  // ============================================================
-  // 🚀 ORDENAÇÃO ALFABÉTICA
-  // ============================================================
   const treinosOrdenados = [...treinos].sort((a, b) =>
     a.nome.localeCompare(b.nome)
   );
@@ -172,8 +176,6 @@ export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
     if (treinosOrdenados.length === 0) return;
 
     const nomeCliente = session?.user?.name || "SaaS Academia";
-
-    // Se existe alunoId e temos treinos, pegamos o nome do aluno do primeiro treino
     const nomeAlunoFiltro =
       alunoId && treinosOrdenados.length > 0
         ? treinosOrdenados[0].aluno.nome
@@ -228,7 +230,6 @@ export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
       doc.setFont("helvetica", "normal");
       doc.setFontSize(10);
 
-      // Se estiver filtrado por aluno, exibe o nome dele
       if (nomeAlunoFiltro) {
         doc.text(`Aluno: ${nomeAlunoFiltro}`, margin, 30);
       }
@@ -283,7 +284,6 @@ export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
         y = 50;
         printHeader();
         printTableHeader();
-        // Força a cor preta ao iniciar nova página
         doc.setTextColor(0, 0, 0);
       }
     };
@@ -371,7 +371,7 @@ export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
     );
   }
 
-  if (!permissoes.ler && session?.user?.role !== "SUPERADMIN") {
+  if (!permTreinos.ler && session?.user?.role !== "SUPERADMIN") {
     return (
       <div className={styles.error}>
         <p>⛔ Você não tem permissão para visualizar treinos</p>
@@ -391,63 +391,57 @@ export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
         <div className={styles.emptyIcon}>📋</div>
         <h3>Nenhum treino cadastrado</h3>
         <p>Comece criando o primeiro treino</p>
+        {permTreinos.criar && (
+          <Link href="/dashboard/treinos/novo" className={styles.emptyAction}>
+            ➕ Criar primeiro treino
+          </Link>
+        )}
       </div>
     );
   }
 
   return (
     <>
-      {/* Botões de Ação no Topo */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          gap: "10px",
-          marginBottom: "20px",
-        }}
-      >
-        <button
-          onClick={gerarPdfLista}
-          className={styles.actionButton}
-          style={{
-            backgroundColor: "#f59e0b",
-            color: "#fff",
-            border: "none",
-            padding: "0.6rem 1rem",
-            borderRadius: "12px",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            gap: "5px",
-          }}
-          title="Baixar PDF de Fichas"
-        >
-          <FileText size={18} />
-          <span className={styles.hideMobile}>Relatório PDF</span>
-        </button>
+      {/* 🆕 Toolbar Completa - NOVO + PDF + WhatsApp */}
+      <div className={styles.toolbarContainer}>
+        {/* ➕ Botão NOVO TREINO (esquerda) */}
+        {permTreinos.criar && (
+          <Link
+            href="/dashboard/treinos/novo"
+            className={`${styles.actionBtn} ${styles.addButton}`}
+          >
+            <span className={styles.icon}>+</span>
+            Novo Treino
+          </Link>
+        )}
 
-        <button
-          onClick={enviarWhatsAppLista}
-          className={styles.actionButton}
-          style={{
-            backgroundColor: "#25d366",
-            color: "#fff",
-            border: "none",
-            padding: "0.6rem 1rem",
-            borderRadius: "12px",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            gap: "5px",
-          }}
-          title="Enviar Relatório WhatsApp"
-        >
-          <Share2 size={18} />
-          <span className={styles.hideMobile}>Relatório Whats</span>
-        </button>
+        {/* 📄 PDF + WhatsApp (direita) */}
+        {canCompartilharFichas && treinosOrdenados.length > 0 && (
+          <div className={styles.toolbar}>
+            <div className={styles.actionsGroup}>
+              <button
+                onClick={gerarPdfLista}
+                className={`${styles.actionBtn} ${styles.btnPdf}`}
+                title="Baixar PDF de Fichas"
+              >
+                <FileText className={styles.iconBtn} />
+                <span className={styles.hideMobile}>PDF</span>
+              </button>
+
+              <button
+                onClick={enviarWhatsAppLista}
+                className={`${styles.actionBtn} ${styles.btnWhats}`}
+                title="Enviar Relatório WhatsApp"
+              >
+                <FaWhatsapp className={styles.iconBtn} />
+                <span className={styles.hideMobile}>Whats</span>
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Grid de Cards (Usando a lista ORDENADA) */}
+      {/* Grid de Cards */}
       <div className={styles.grid}>
         {treinosOrdenados.map((treino) => (
           <div key={treino.id} className={styles.card}>
@@ -505,7 +499,7 @@ export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
               >
                 👁️ Ver Detalhes
               </Link>
-              {permissoes.editar && (
+              {permTreinos.editar && (
                 <Link
                   href={`/dashboard/treinos/${treino.id}/editar`}
                   className={styles.editButton}
@@ -513,9 +507,11 @@ export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
                   ✏️ Editar
                 </Link>
               )}
-              {permissoes.deletar && (
+              {permTreinos.deletar && (
                 <button
-                  onClick={() => setDeleteModal({ isOpen: true, treino })}
+                  onClick={() =>
+                    setDeleteModal({ isOpen: true, treino: treino })
+                  }
                   className={styles.deleteButton}
                 >
                   🗑️

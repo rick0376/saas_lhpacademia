@@ -40,9 +40,40 @@ const RECURSOS = [
     description: "Gerenciar usuários do sistema",
   },
   {
+    value: "usuarios_compartilhar",
+    label: "📤 Usuários • Compartilhar",
+    description: "Exportar lista de usuários em PDF e enviar via WhatsApp",
+  },
+  {
     value: "alunos",
     label: "👤 Alunos",
     description: "Gerenciar cadastro de alunos",
+  },
+  // Recursos adicionais ligados a alunos
+  {
+    value: "alunos_perfil",
+    label: "👤 Alunos • Perfil",
+    description: "Acessar o perfil detalhado do aluno",
+  },
+  {
+    value: "alunos_evolucao",
+    label: "📈 Alunos • Evolução",
+    description: "Visualizar evolução de treinos e progresso",
+  },
+  {
+    value: "alunos_avaliacoes",
+    label: "📝 Alunos • Avaliações",
+    description: "Gerenciar avaliações físicas dos alunos",
+  },
+  {
+    value: "alunos_medidas",
+    label: "📏 Alunos • Medidas",
+    description: "Visualizar e registrar medidas corporais",
+  },
+  {
+    value: "alunos_compartilhar",
+    label: "📤 Alunos • Compartilhar",
+    description: "Exportar relatório em PDF e enviar via WhatsApp",
   },
   {
     value: "avaliacoes",
@@ -50,14 +81,31 @@ const RECURSOS = [
     description: "Gerenciar avaliações de alunos",
   },
   {
+    value: "avaliacoes_compartilhar",
+    label: "📤 Avaliações • Compartilhar",
+    description:
+      "Exportar lista de alunos para avaliação em PDF e enviar via WhatsApp",
+  },
+  {
     value: "exercicios",
     label: "💪 Exercícios",
     description: "Biblioteca de exercícios",
   },
   {
+    value: "exercicios_compartilhar",
+    label: "📤 Exercícios • Compartilhar",
+    description: "Exportar lista de exercícios em PDF e enviar via WhatsApp",
+  },
+  {
     value: "treinos",
     label: "📋 Treinos",
     description: "Criação e edição de treinos",
+  },
+  {
+    value: "treinos_compartilhar",
+    label: "📤 Treinos • Compartilhar",
+    description:
+      "Exportar lista de treinos/fichas em PDF e enviar via WhatsApp",
   },
   {
     value: "medidas",
@@ -100,7 +148,6 @@ export const PermissoesManager = () => {
     fetchUsuarios();
   }, []);
 
-  // ✅ CORREÇÃO: Adicionado dependência para recarregar quando o toggle muda
   useEffect(() => {
     fetchUsuarios();
   }, [mostrarTodos]);
@@ -119,12 +166,11 @@ export const PermissoesManager = () => {
 
       const data = await response.json();
 
-      // ✅ LÓGICA CORRETA DO FILTRO
       const usuariosFiltrados = mostrarTodos
-        ? data.filter((u: Usuario) => u.ativo) // Todos ativos
+        ? data.filter((u: Usuario) => u.ativo)
         : data.filter(
             (u: Usuario) => u.ativo && (u.role === "ADMIN" || u.role === "USER")
-          ); // Só ADMIN/USER
+          );
 
       setUsuarios(usuariosFiltrados);
 
@@ -184,7 +230,6 @@ export const PermissoesManager = () => {
     });
   };
 
-  // ✅ NOVO: Marcar/Desmarcar TODAS as permissões de um tipo
   const handleToggleTodas = (tipo: "criar" | "ler" | "editar" | "deletar") => {
     setPermissoes((prev) => {
       const novoEstado: Record<string, Permissao> = { ...prev };
@@ -210,7 +255,6 @@ export const PermissoesManager = () => {
     });
   };
 
-  // ✅ NOVO: Marcar/Desmarcar TODOS os tipos de UM recurso específico
   const handleToggleTodosTiposRecurso = (recurso: string) => {
     setPermissoes((prev) => {
       const permissaoAtual = prev[recurso] || {
@@ -222,7 +266,6 @@ export const PermissoesManager = () => {
         deletar: false,
       };
 
-      // Se algum estiver marcado, desmarca todos. Se nenhum estiver, marca todos.
       const algumMarcado =
         permissaoAtual.criar ||
         permissaoAtual.ler ||
@@ -242,7 +285,6 @@ export const PermissoesManager = () => {
     });
   };
 
-  // ✅ NOVO: Verifica se todos os tipos de um recurso estão marcados
   const todosTiposMarcadosNoRecurso = (recurso: string) => {
     const permissao = permissoes[recurso];
     if (!permissao) return false;
@@ -301,10 +343,9 @@ export const PermissoesManager = () => {
   };
 
   const closeToast = () => {
-    setToast({ ...toast, show: false });
+    setToast((prev) => ({ ...prev, show: false }));
   };
 
-  // ✅ NOVO: Verifica se todos os itens de um tipo estão marcados
   const todasMarcadas = (tipo: "criar" | "ler" | "editar" | "deletar") => {
     return RECURSOS.every((r) => permissoes[r.value]?.[tipo]);
   };
@@ -313,7 +354,6 @@ export const PermissoesManager = () => {
 
   return (
     <div className={styles.container}>
-      {/* ✅ TOGGLE MOVIDO PARA O TOPO */}
       <div className={styles.filterToggle}>
         <label>
           <input
@@ -362,6 +402,40 @@ export const PermissoesManager = () => {
         </div>
       ) : usuarioSelecionado ? (
         <>
+          {/* linha de marcar todos por tipo (se quiser usar) */}
+          <div className={styles.globalToggles}>
+            <button
+              type="button"
+              onClick={() => handleToggleTodas("ler")}
+              className={todasMarcadas("ler") ? styles.btnOn : styles.btnOff}
+            >
+              Marcar/Desmarcar todos: Visualizar
+            </button>
+            <button
+              type="button"
+              onClick={() => handleToggleTodas("criar")}
+              className={todasMarcadas("criar") ? styles.btnOn : styles.btnOff}
+            >
+              Marcar/Desmarcar todos: Novo
+            </button>
+            <button
+              type="button"
+              onClick={() => handleToggleTodas("editar")}
+              className={todasMarcadas("editar") ? styles.btnOn : styles.btnOff}
+            >
+              Marcar/Desmarcar todos: Editar
+            </button>
+            <button
+              type="button"
+              onClick={() => handleToggleTodas("deletar")}
+              className={
+                todasMarcadas("deletar") ? styles.btnOn : styles.btnOff
+              }
+            >
+              Marcar/Desmarcar todos: Deletar
+            </button>
+          </div>
+
           <div className={styles.permissoesGrid}>
             {RECURSOS.map(({ value: recurso, label, description }) => {
               const permissao = permissoes[recurso] || {
@@ -453,7 +527,6 @@ export const PermissoesManager = () => {
         </div>
       )}
 
-      {/* Toast para mensagens */}
       {toast.show && (
         <Toast
           message={toast.message}

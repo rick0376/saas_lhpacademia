@@ -18,8 +18,8 @@ export default function LoginPage() {
   const { data: session } = useSession();
 
   const [formData, setFormData] = useState({
-    email: "",
-    senha: "",
+    email: "admin@lhp.com",
+    senha: "123456",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");

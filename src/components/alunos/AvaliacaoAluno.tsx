@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { jsPDF } from "jspdf"; // Import do PDF
+import { jsPDF } from "jspdf";
 import styles from "./avalicaoAluno.module.scss";
-import { FaEnvelope, FaPhone, FaBullseye, FaWhatsapp } from "react-icons/fa"; // FaWhatsapp aqui
-import { ClipboardCheck, FileText, Share2 } from "lucide-react"; // FileText e Share2 aqui
+import { FaEnvelope, FaPhone, FaBullseye, FaWhatsapp } from "react-icons/fa";
+import { ClipboardCheck, FileText } from "lucide-react";
 
 interface Aluno {
   id: string;
@@ -31,6 +31,8 @@ interface Permissao {
   deletar: boolean;
 }
 
+type PermissoesMap = Record<string, Permissao>;
+
 export const AvaliacaoAluno = () => {
   const { data: session, status } = useSession();
   const [alunos, setAlunos] = useState<Aluno[]>([]);
@@ -38,57 +40,52 @@ export const AvaliacaoAluno = () => {
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedTerm, setDebouncedTerm] = useState("");
-  const [permissoes, setPermissoes] = useState<Permissao>({
-    recurso: "avaliacoes",
-    criar: false,
-    ler: false,
-    editar: false,
-    deletar: false,
-  });
+  const [permissoes, setPermissoes] = useState<PermissoesMap>({});
   const [permissoesCarregadas, setPermissoesCarregadas] = useState(false);
+
+  const recursosAvaliacao = ["avaliacoes", "avaliacoes_compartilhar"];
 
   const fetchPermissoes = async () => {
     try {
       if (session?.user?.role === "SUPERADMIN") {
-        setPermissoes({
-          recurso: "avaliacoes",
-          criar: true,
-          ler: true,
-          editar: true,
-          deletar: true,
+        const full: PermissoesMap = {};
+        recursosAvaliacao.forEach((r) => {
+          full[r] = {
+            recurso: r,
+            criar: true,
+            ler: true,
+            editar: true,
+            deletar: true,
+          };
         });
+        setPermissoes(full);
         setPermissoesCarregadas(true);
         return;
       }
 
       const response = await fetch("/api/permissoes/usuario");
       if (!response.ok) throw new Error("Erro ao buscar permissões");
-      const data = await response.json();
+      const data: Permissao[] = await response.json();
 
-      const permissaoAvaliacoes = data.find(
-        (p: Permissao) => p.recurso === "avaliacoes"
-      );
-      if (permissaoAvaliacoes) {
-        setPermissoes(permissaoAvaliacoes);
-      } else {
-        setPermissoes({
-          recurso: "avaliacoes",
-          criar: false,
-          ler: false,
-          editar: false,
-          deletar: false,
-        });
-      }
+      const map: PermissoesMap = {};
+      recursosAvaliacao.forEach((recurso) => {
+        const p = data.find((perm) => perm.recurso === recurso);
+        map[recurso] =
+          p ??
+          ({
+            recurso,
+            criar: false,
+            ler: false,
+            editar: false,
+            deletar: false,
+          } as Permissao);
+      });
+
+      setPermissoes(map);
       setPermissoesCarregadas(true);
     } catch (error) {
       console.error("Erro ao carregar permissões:", error);
-      setPermissoes({
-        recurso: "avaliacoes",
-        criar: false,
-        ler: false,
-        editar: false,
-        deletar: false,
-      });
+      setPermissoes({});
       setPermissoesCarregadas(true);
     }
   };
@@ -101,10 +98,11 @@ export const AvaliacaoAluno = () => {
   }, [searchTerm]);
 
   useEffect(() => {
-    if (permissoesCarregadas && permissoes.ler) {
+    const permAval = permissoes["avaliacoes"];
+    if (permissoesCarregadas && permAval?.ler) {
       fetchAlunos(debouncedTerm);
     }
-  }, [debouncedTerm, permissoesCarregadas, permissoes.ler]);
+  }, [debouncedTerm, permissoesCarregadas, permissoes]);
 
   useEffect(() => {
     if (status === "authenticated" && session) {
@@ -131,9 +129,6 @@ export const AvaliacaoAluno = () => {
     }
   }
 
-  // ============================================================
-  // 🚀 ORDENAÇÃO ALFABÉTICA
-  // ============================================================
   const alunosOrdenados = [...alunos].sort((a, b) =>
     a.nome.localeCompare(b.nome, "pt-BR", { sensitivity: "base" })
   );
@@ -143,11 +138,18 @@ export const AvaliacaoAluno = () => {
     setDebouncedTerm(searchTerm);
   };
 
-  // ============================================================
-  // 🚀 GERAR PDF (LISTA DE ALUNOS PARA AVALIAÇÃO)
-  // ============================================================
+  const permAvaliacoes = permissoes["avaliacoes"] ?? {
+    recurso: "avaliacoes",
+    criar: false,
+    ler: false,
+    editar: false,
+    deletar: false,
+  };
+  const canCompartilharAvaliacoes =
+    !!permissoes["avaliacoes_compartilhar"]?.ler;
+
   const gerarPdfLista = async () => {
-    if (alunosOrdenados.length === 0) return; // Alterado para usar alunosOrdenados
+    if (alunosOrdenados.length === 0) return;
 
     const nomeCliente = session?.user?.name || "SaaS Academia";
     const doc = new jsPDF();
@@ -156,7 +158,6 @@ export const AvaliacaoAluno = () => {
     const margin = 10;
     let y = 50;
 
-    // Logo
     const getLogoBase64 = async () => {
       try {
         const origin =
@@ -212,7 +213,7 @@ export const AvaliacaoAluno = () => {
       doc.text("EMAIL", 60, y);
       doc.text("TELEFONE", 110, y);
       doc.text("STATUS", 150, y);
-      doc.text("MEDIDAS", 175, y); // Coluna extra relevante para avaliação
+      doc.text("MEDIDAS", 175, y);
       doc.setDrawColor(200, 200, 200);
       doc.line(margin, y + 2, pageWidth - margin, y + 2);
       y += 8;
@@ -277,11 +278,8 @@ export const AvaliacaoAluno = () => {
     doc.save("lista-alunos-avaliacao.pdf");
   };
 
-  // ============================================================
-  // 🚀 WHATSAPP (LISTA)
-  // ============================================================
   const enviarWhatsAppLista = () => {
-    if (alunosOrdenados.length === 0) return; // Alterado para usar alunosOrdenados
+    if (alunosOrdenados.length === 0) return;
     const nomeCliente = session?.user?.name || "SaaS Academia";
     let texto = `📋 *ALUNOS PARA AVALIAÇÃO*\n\n`;
 
@@ -295,11 +293,9 @@ export const AvaliacaoAluno = () => {
     window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, "_blank");
   };
 
-  // ============================================================
-
   if (
     permissoesCarregadas &&
-    !permissoes.ler &&
+    !permAvaliacoes.ler &&
     session?.user?.role !== "SUPERADMIN"
   ) {
     return (
@@ -317,7 +313,6 @@ export const AvaliacaoAluno = () => {
 
   return (
     <div className={styles.container}>
-      {/* BARRA DE FERRAMENTAS (BUSCA + BOTÕES) */}
       <div className={styles.toolbar}>
         <form onSubmit={handleSearch} className={styles.searchGroup}>
           <input
@@ -335,25 +330,29 @@ export const AvaliacaoAluno = () => {
         </form>
 
         <div className={styles.actionsGroup}>
-          <button
-            onClick={gerarPdfLista}
-            className={`${styles.actionBtn} ${styles.btnPdf}`}
-            disabled={alunosOrdenados.length === 0}
-            title="Baixar PDF"
-          >
-            <FileText className={styles.iconBtn} />
-            <span className={styles.hideMobile}>PDF</span>
-          </button>
+          {canCompartilharAvaliacoes && (
+            <>
+              <button
+                onClick={gerarPdfLista}
+                className={`${styles.actionBtn} ${styles.btnPdf}`}
+                disabled={alunosOrdenados.length === 0}
+                title="Baixar PDF"
+              >
+                <FileText className={styles.iconBtn} />
+                <span className={styles.hideMobile}>PDF</span>
+              </button>
 
-          <button
-            onClick={enviarWhatsAppLista}
-            className={`${styles.actionBtn} ${styles.btnWhats}`}
-            disabled={alunosOrdenados.length === 0}
-            title="Enviar WhatsApp"
-          >
-            <FaWhatsapp className={styles.iconBtn} />
-            <span className={styles.hideMobile}>Whats</span>
-          </button>
+              <button
+                onClick={enviarWhatsAppLista}
+                className={`${styles.actionBtn} ${styles.btnWhats}`}
+                disabled={alunosOrdenados.length === 0}
+                title="Enviar WhatsApp"
+              >
+                <FaWhatsapp className={styles.iconBtn} />
+                <span className={styles.hideMobile}>Whats</span>
+              </button>
+            </>
+          )}
         </div>
       </div>
 

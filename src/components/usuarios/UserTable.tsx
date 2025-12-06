@@ -39,6 +39,8 @@ interface Permissao {
   deletar: boolean;
 }
 
+type PermissoesMap = Record<string, Permissao>;
+
 export const UserTable = () => {
   const { data: session, status } = useSession();
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
@@ -51,58 +53,52 @@ export const UserTable = () => {
     usuario?: Usuario;
   }>({ isOpen: false });
   const [deleting, setDeleting] = useState(false);
-  const [permissoes, setPermissoes] = useState<Permissao>({
-    recurso: "usuarios",
-    criar: false,
-    ler: false,
-    editar: false,
-    deletar: false,
-  });
+  const [permissoes, setPermissoes] = useState<PermissoesMap>({});
   const [permissoesCarregadas, setPermissoesCarregadas] = useState(false);
+
+  const recursosUsuarios = ["usuarios", "usuarios_compartilhar"];
 
   const fetchPermissoes = async () => {
     try {
       if (session?.user?.role === "SUPERADMIN") {
-        setPermissoes({
-          recurso: "usuarios",
-          criar: true,
-          ler: true,
-          editar: true,
-          deletar: true,
+        const full: PermissoesMap = {};
+        recursosUsuarios.forEach((r) => {
+          full[r] = {
+            recurso: r,
+            criar: true,
+            ler: true,
+            editar: true,
+            deletar: true,
+          };
         });
+        setPermissoes(full);
         setPermissoesCarregadas(true);
         return;
       }
 
       const response = await fetch("/api/permissoes/usuario");
       if (!response.ok) throw new Error("Erro ao buscar permissões");
-      const data = await response.json();
+      const data: Permissao[] = await response.json();
 
-      const permissaoUsuarios = data.find(
-        (p: Permissao) => p.recurso === "usuarios"
-      );
+      const map: PermissoesMap = {};
+      recursosUsuarios.forEach((recurso) => {
+        const p = data.find((perm) => perm.recurso === recurso);
+        map[recurso] =
+          p ??
+          ({
+            recurso,
+            criar: false,
+            ler: false,
+            editar: false,
+            deletar: false,
+          } as Permissao);
+      });
 
-      if (permissaoUsuarios) {
-        setPermissoes(permissaoUsuarios);
-      } else {
-        setPermissoes({
-          recurso: "usuarios",
-          criar: false,
-          ler: false,
-          editar: false,
-          deletar: false,
-        });
-      }
+      setPermissoes(map);
       setPermissoesCarregadas(true);
     } catch (err) {
       console.error("Erro ao carregar permissões de usuários:", err);
-      setPermissoes({
-        recurso: "usuarios",
-        criar: false,
-        ler: false,
-        editar: false,
-        deletar: false,
-      });
+      setPermissoes({});
       setPermissoesCarregadas(true);
     }
   };
@@ -115,10 +111,11 @@ export const UserTable = () => {
   }, [searchTerm]);
 
   useEffect(() => {
-    if (permissoesCarregadas && permissoes.ler) {
+    const permUsuarios = permissoes["usuarios"];
+    if (permissoesCarregadas && permUsuarios?.ler) {
       fetchUsuarios(debouncedTerm);
     }
-  }, [debouncedTerm, permissoesCarregadas, permissoes.ler]);
+  }, [debouncedTerm, permissoesCarregadas, permissoes]);
 
   useEffect(() => {
     if (status === "authenticated" && session) {
@@ -154,8 +151,18 @@ export const UserTable = () => {
     setDebouncedTerm(searchTerm);
   };
 
+  const permUsuarios = permissoes["usuarios"] ?? {
+    recurso: "usuarios",
+    criar: false,
+    ler: false,
+    editar: false,
+    deletar: false,
+  };
+
+  const canCompartilharUsuarios = !!permissoes["usuarios_compartilhar"]?.ler;
+
   const handleDelete = async (id: string) => {
-    if (!permissoes.deletar) {
+    if (!permUsuarios.deletar) {
       alert("⛔ Você não tem permissão para excluir usuários");
       return;
     }
@@ -203,7 +210,6 @@ export const UserTable = () => {
     });
   };
 
-  // ✅ Gerar PDF de TODOS os Usuários
   const gerarPdfUsuarios = async () => {
     if (usuariosOrdenados.length === 0) return;
 
@@ -345,7 +351,6 @@ export const UserTable = () => {
     doc.save("relatorio-usuarios.pdf");
   };
 
-  // ✅ Enviar WhatsApp de TODOS os Usuários
   const enviarWhatsAppUsuarios = () => {
     if (usuariosOrdenados.length === 0) return;
 
@@ -371,7 +376,6 @@ export const UserTable = () => {
     window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, "_blank");
   };
 
-  // ✅ Gerar PDF de UM Usuário Específico
   const gerarPdfUsuario = async (usuario: Usuario) => {
     const nomeUsuario = session?.user?.name || "Sistema";
     const doc = new jsPDF();
@@ -403,7 +407,6 @@ export const UserTable = () => {
 
     const logoDataUri = await getLogoBase64();
 
-    // Cabeçalho
     doc.setFillColor(25, 35, 55);
     doc.rect(0, 0, pageWidth, 40, "F");
     doc.setFillColor(218, 165, 32);
@@ -420,7 +423,6 @@ export const UserTable = () => {
     doc.setTextColor(255, 255, 255);
     doc.text("FICHA DO USUÁRIO", pageWidth / 2, 18, { align: "center" });
 
-    // Dados do usuário
     y = 60;
     doc.setFont("helvetica", "bold");
     doc.setFontSize(14);
@@ -470,7 +472,6 @@ export const UserTable = () => {
       doc.text(usuario.cliente.nome, margin + 25, y);
     }
 
-    // Rodapé
     const footerY = pageHeight - 10;
     doc.setDrawColor(200, 200, 200);
     doc.setLineWidth(0.5);
@@ -488,7 +489,6 @@ export const UserTable = () => {
     doc.save(`usuario-${usuario.nome.replace(/\s+/g, "-").toLowerCase()}.pdf`);
   };
 
-  // ✅ Enviar WhatsApp de UM Usuário Específico
   const enviarWhatsAppUsuario = (usuario: Usuario) => {
     const nomeUsuario = session?.user?.name || "Sistema";
     const status = usuario.ativo ? "✅ Ativo" : "🛑 Inativo";
@@ -509,10 +509,9 @@ export const UserTable = () => {
     window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, "_blank");
   };
 
-  // Sem permissão de leitura
   if (
     permissoesCarregadas &&
-    !permissoes.ler &&
+    !permUsuarios.ler &&
     session?.user?.role !== "SUPERADMIN"
   ) {
     return (
@@ -530,7 +529,6 @@ export const UserTable = () => {
 
   return (
     <div className={styles.container}>
-      {/* ✅ Toolbar */}
       <div className={styles.toolbar}>
         <form onSubmit={handleSearch} className={styles.searchGroup}>
           <input
@@ -547,32 +545,36 @@ export const UserTable = () => {
         </form>
 
         <div className={styles.actionsGroup}>
-          {permissoes.criar && (
+          {permUsuarios.criar && (
             <Link href="/dashboard/usuarios/novo" className={styles.addButton}>
               <Plus size={18} />
               <span className={styles.hideMobile}>Novo</span>
             </Link>
           )}
 
-          <button
-            onClick={gerarPdfUsuarios}
-            className={`${styles.actionBtn} ${styles.btnPdf}`}
-            disabled={usuariosOrdenados.length === 0}
-            title="Baixar PDF"
-          >
-            <FileText className={styles.iconBtn} />
-            <span className={styles.hideMobile}>PDF</span>
-          </button>
+          {canCompartilharUsuarios && (
+            <>
+              <button
+                onClick={gerarPdfUsuarios}
+                className={`${styles.actionBtn} ${styles.btnPdf}`}
+                disabled={usuariosOrdenados.length === 0}
+                title="Baixar PDF"
+              >
+                <FileText className={styles.iconBtn} />
+                <span className={styles.hideMobile}>PDF</span>
+              </button>
 
-          <button
-            onClick={enviarWhatsAppUsuarios}
-            className={`${styles.actionBtn} ${styles.btnWhats}`}
-            disabled={usuariosOrdenados.length === 0}
-            title="Enviar WhatsApp"
-          >
-            <FaWhatsapp className={styles.iconBtn} />
-            <span className={styles.hideMobile}>Whats</span>
-          </button>
+              <button
+                onClick={enviarWhatsAppUsuarios}
+                className={`${styles.actionBtn} ${styles.btnWhats}`}
+                disabled={usuariosOrdenados.length === 0}
+                title="Enviar WhatsApp"
+              >
+                <FaWhatsapp className={styles.iconBtn} />
+                <span className={styles.hideMobile}>Whats</span>
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -660,26 +662,27 @@ export const UserTable = () => {
               </div>
 
               <div className={styles.actions}>
-                {/* ✅ PDF do usuário */}
-                <button
-                  onClick={() => gerarPdfUsuario(usuario)}
-                  className={styles.actionBtnCard}
-                  title="PDF do Usuário"
-                >
-                  <FileText size={18} />
-                </button>
+                {canCompartilharUsuarios && (
+                  <>
+                    <button
+                      onClick={() => gerarPdfUsuario(usuario)}
+                      className={styles.actionBtnCard}
+                      title="PDF do Usuário"
+                    >
+                      <FileText size={18} />
+                    </button>
 
-                {/* ✅ WhatsApp do usuário */}
-                <button
-                  onClick={() => enviarWhatsAppUsuario(usuario)}
-                  className={styles.actionBtnCardWhats}
-                  title="WhatsApp do Usuário"
-                >
-                  <FaWhatsapp size={18} />
-                </button>
+                    <button
+                      onClick={() => enviarWhatsAppUsuario(usuario)}
+                      className={styles.actionBtnCardWhats}
+                      title="WhatsApp do Usuário"
+                    >
+                      <FaWhatsapp size={18} />
+                    </button>
+                  </>
+                )}
 
-                {/* Editar */}
-                {permissoes.editar && (
+                {permUsuarios.editar && (
                   <Link
                     href={`/dashboard/usuarios/${usuario.id}/editar`}
                     title="Editar"
@@ -689,8 +692,7 @@ export const UserTable = () => {
                   </Link>
                 )}
 
-                {/* Excluir */}
-                {permissoes.deletar && (
+                {permUsuarios.deletar && (
                   <button
                     onClick={() => setDeleteModal({ isOpen: true, usuario })}
                     title="Excluir"

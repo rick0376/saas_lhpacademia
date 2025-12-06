@@ -14,6 +14,7 @@ import { ExecucaoSection } from "./ExecucaoSection";
 import { Toast } from "../ui/Toast/Toast";
 import { ConfirmModal } from "../ui/ConfirmModal/ConfirmModal";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
+import { FaWhatsapp } from "react-icons/fa";
 
 interface Exercicio {
   id: string;
@@ -36,6 +37,15 @@ interface TreinoDetalhesProps {
   treino: any;
   permissoesEditar: boolean;
 }
+
+interface Permissao {
+  recurso: string;
+  criar: boolean;
+  ler: boolean;
+  editar: boolean;
+  deletar: boolean;
+}
+type PermissoesMap = Record<string, Permissao>;
 
 const DEFAULT_NOVO_EXERCICIO = {
   exercicioId: "",
@@ -63,6 +73,72 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
   const [modalEditExercicio, setModalEditExercicio] = useState(false);
   const [loading, setLoading] = useState(false);
   const [filtroGrupo, setFiltroGrupo] = useState("");
+
+  const [permissoes, setPermissoes] = useState<PermissoesMap>({});
+  const [permissoesCarregadas, setPermissoesCarregadas] = useState(false);
+  const recursosTreinos = ["treinos", "treinos_compartilhar"];
+
+  // carregar permissões do usuário logado
+  useEffect(() => {
+    const fetchPermissoes = async () => {
+      try {
+        // SUPERADMIN: tudo liberado
+        if (session?.user?.role === "SUPERADMIN") {
+          const full: PermissoesMap = {};
+          recursosTreinos.forEach((r) => {
+            full[r] = {
+              recurso: r,
+              criar: true,
+              ler: true,
+              editar: true,
+              deletar: true,
+            };
+          });
+          setPermissoes(full);
+          setPermissoesCarregadas(true);
+          return;
+        }
+
+        const resp = await fetch("/api/permissoes/usuario");
+        if (!resp.ok) throw new Error("Erro ao buscar permissões");
+        const data: Permissao[] = await resp.json();
+
+        const map: PermissoesMap = {};
+        recursosTreinos.forEach((recurso) => {
+          const p = data.find((perm) => perm.recurso === recurso);
+          map[recurso] = p ?? {
+            recurso,
+            criar: false,
+            ler: false,
+            editar: false,
+            deletar: false,
+          };
+        });
+
+        setPermissoes(map);
+        setPermissoesCarregadas(true);
+      } catch {
+        setPermissoes({});
+        setPermissoesCarregadas(true);
+      }
+    };
+
+    if (session) fetchPermissoes();
+  }, [session]);
+
+  // helpers
+  const permTreinos = permissoes["treinos"] ?? {
+    recurso: "treinos",
+    criar: false,
+    ler: false,
+    editar: false,
+    deletar: false,
+  };
+
+  const canCompartilharFichas = !!permissoes["treinos_compartilhar"]?.ler;
+  const canEditarTreino = !!permissoesEditar && !!permTreinos; // mantém o prop como verdade final
+  const canAtualizar =
+    !!permTreinos.ler || session?.user?.role === "SUPERADMIN";
 
   const [novoExercicio, setNovoExercicio] = useState(DEFAULT_NOVO_EXERCICIO);
 
@@ -523,92 +599,81 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <div className={styles.headerInfo}>
+        {/* ESQUERDA: Voltar + Título + Meta */}
+        <div className={styles.headerLeft}>
           <Link href="/dashboard/treinos" className={styles.backButton}>
             ← Voltar
           </Link>
-          <h1 className={styles.title}>{treino.nome}</h1>
-          <div className={styles.meta}>
-            <span className={styles.metaItem}>👤 {treino.aluno.nome}</span>
-            {treino.objetivo && (
-              <span className={styles.metaItem}>🎯 {treino.objetivo}</span>
-            )}
-            <span
-              className={`${styles.statusBadge} ${
-                treino.ativo ? styles.ativo : styles.inativo
-              }`}
-            >
-              {treino.ativo ? "Ativo" : "Inativo"}
-            </span>
-            {isRefreshing && (
-              <span className={styles.refreshingBadge}>🔄 Atualizando...</span>
-            )}
+          <div>
+            <h1 className={styles.title}>{treino.nome}</h1>
+            <div className={styles.meta}>
+              <span className={styles.metaItem}>👤 {treino.aluno.nome}</span>
+              {treino.objetivo && (
+                <span className={styles.metaItem}>🎯 {treino.objetivo}</span>
+              )}
+              <span
+                className={`${styles.statusBadge} ${
+                  treino.ativo ? styles.ativo : styles.inativo
+                }`}
+              >
+                {treino.ativo ? "Ativo" : "Inativo"}
+              </span>
+            </div>
           </div>
         </div>
-        <div className={styles.headerActions}>
-          {/* NOVOS BOTÕES AQUI */}
-          <div style={{ display: "flex", gap: "12px", marginRight: "10px" }}>
-            <button
-              onClick={gerarPdfFicha}
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                color: "#f59e0b",
-                display: "flex",
-                alignItems: "center",
-                gap: "5px",
-              }}
-              title="Baixar PDF"
-            >
-              <FileText size={20} />{" "}
-              <span style={{ fontSize: "0.9rem", fontWeight: "bold" }}>
-                PDF
-              </span>
-            </button>
-            <button
-              onClick={enviarWhatsAppFicha}
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                color: "#25d366",
-                display: "flex",
-                alignItems: "center",
-                gap: "5px",
-              }}
-              title="Enviar WhatsApp"
-            >
-              <Share2 size={20} />{" "}
-              <span style={{ fontSize: "0.9rem", fontWeight: "bold" }}>
-                Whats
-              </span>
-            </button>
-          </div>
 
-          {permissoesEditar && (
-            <Button
-              variant="primary"
-              onClick={() => setModalAddExercicio(true)}
-              disabled={loading}
-            >
-              + Adicionar Exercício
-            </Button>
+        <div className={styles.headerRight}>
+          {/* BOTÃO PRINCIPAL - Full width no mobile */}
+          {canEditarTreino && (
+            <div className={styles.primaryAction}>
+              <Button
+                variant="primary"
+                onClick={() => setModalAddExercicio(true)}
+                disabled={loading}
+                size="medium"
+                className={`${styles.addBtn} ${styles.addButton}`}
+              >
+                <span className={styles.icon}>+</span>
+                Adicionar Exercício
+              </Button>
+            </div>
           )}
-          <Link href={`/dashboard/treinos/${treino.id}/editar`}>
-            <Button variant="outline">✏️ Editar Treino</Button>
-          </Link>
-          <Button
-            variant="outline"
-            onClick={refresh}
-            disabled={isRefreshing || loading}
-            size="medium"
-          >
-            {isRefreshing ? "🔄" : "↻"} Atualizar
-          </Button>
+
+          {/* AÇÕES SECUNDÁRIAS - Sempre à direita */}
         </div>
       </div>
+      <div className={styles.actionsGroup}>
+        {canCompartilharFichas && (
+          <>
+            <button
+              className={`${styles.actionBtn} ${styles.btnPdf}`}
+              onClick={gerarPdfFicha}
+            >
+              <FileText className={styles.iconBtn} />
+              <span className={styles.hideMobile}>PDF</span>
+            </button>
+            <button
+              className={`${styles.actionBtn} ${styles.btnWhats}`}
+              onClick={enviarWhatsAppFicha}
+            >
+              <FaWhatsapp className={styles.iconBtn} />
+              <span className={styles.hideMobile}>Whats</span>
+            </button>
+          </>
+        )}
 
+        {canEditarTreino && (
+          <button
+            className={`${styles.actionBtn} ${styles.btnEditar}`}
+            onClick={() =>
+              router.push(`/dashboard/treinos/${treino.id}/editar`)
+            }
+          >
+            <span className={styles.iconBtn}>✏️</span>
+            <span className={styles.hideMobile}>Editar</span>
+          </button>
+        )}
+      </div>
       <div className={styles.exerciciosList}>
         <h2 className={styles.sectionTitle}>
           Exercícios ({treino.exercicios.length})

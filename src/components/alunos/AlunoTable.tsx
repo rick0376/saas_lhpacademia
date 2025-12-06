@@ -17,8 +17,7 @@ import {
   Trash2,
   Plus,
   FileText,
-  Share2,
-  TrendingUp, // ✅ NOVO ÍCONE IMPORTADO
+  TrendingUp,
 } from "lucide-react";
 
 interface Aluno {
@@ -44,6 +43,8 @@ interface Permissao {
   deletar: boolean;
 }
 
+type PermissoesMap = Record<string, Permissao>;
+
 interface AlunoTableProps {
   canCreate: boolean;
 }
@@ -61,57 +62,59 @@ export const AlunoTable = ({ canCreate }: AlunoTableProps) => {
     aluno?: Aluno;
   }>({ isOpen: false });
   const [deleting, setDeleting] = useState(false);
-  const [permissoes, setPermissoes] = useState<Permissao>({
-    recurso: "alunos",
-    criar: false,
-    ler: false,
-    editar: false,
-    deletar: false,
-  });
+  const [permissoes, setPermissoes] = useState<PermissoesMap>({});
   const [permissoesCarregadas, setPermissoesCarregadas] = useState(false);
+
+  const recursosAlunos = [
+    "alunos",
+    "alunos_perfil",
+    "alunos_evolucao",
+    "alunos_avaliacoes",
+    "alunos_medidas",
+    "alunos_compartilhar",
+  ];
 
   const fetchPermissoes = async () => {
     try {
       if (session?.user?.role === "SUPERADMIN") {
-        setPermissoes({
-          recurso: "alunos",
-          criar: true,
-          ler: true,
-          editar: true,
-          deletar: true,
+        const full: PermissoesMap = {};
+        recursosAlunos.forEach((r) => {
+          full[r] = {
+            recurso: r,
+            criar: true,
+            ler: true,
+            editar: true,
+            deletar: true,
+          };
         });
+        setPermissoes(full);
         setPermissoesCarregadas(true);
         return;
       }
 
       const response = await fetch("/api/permissoes/usuario");
       if (!response.ok) throw new Error("Erro ao buscar permissões");
-      const data = await response.json();
+      const data: Permissao[] = await response.json();
 
-      const permissaoAlunos = data.find(
-        (p: Permissao) => p.recurso === "alunos"
-      );
-      if (permissaoAlunos) {
-        setPermissoes(permissaoAlunos);
-      } else {
-        setPermissoes({
-          recurso: "alunos",
-          criar: false,
-          ler: false,
-          editar: false,
-          deletar: false,
-        });
-      }
+      const map: PermissoesMap = {};
+      recursosAlunos.forEach((recurso) => {
+        const p = data.find((perm) => perm.recurso === recurso);
+        map[recurso] =
+          p ??
+          ({
+            recurso,
+            criar: false,
+            ler: false,
+            editar: false,
+            deletar: false,
+          } as Permissao);
+      });
+
+      setPermissoes(map);
       setPermissoesCarregadas(true);
     } catch (error) {
       console.error("❌ Erro ao carregar permissões:", error);
-      setPermissoes({
-        recurso: "alunos",
-        criar: false,
-        ler: false,
-        editar: false,
-        deletar: false,
-      });
+      setPermissoes({});
       setPermissoesCarregadas(true);
     }
   };
@@ -125,10 +128,11 @@ export const AlunoTable = ({ canCreate }: AlunoTableProps) => {
   }, [searchTerm]);
 
   useEffect(() => {
-    if (permissoesCarregadas && permissoes.ler) {
+    const permAlunos = permissoes["alunos"];
+    if (permissoesCarregadas && permAlunos?.ler) {
       fetchAlunos(debouncedTerm);
     }
-  }, [debouncedTerm, permissoesCarregadas, permissoes.ler]);
+  }, [debouncedTerm, permissoesCarregadas, permissoes]);
 
   useEffect(() => {
     if (status === "authenticated" && session) {
@@ -164,8 +168,22 @@ export const AlunoTable = ({ canCreate }: AlunoTableProps) => {
     setDebouncedTerm(searchTerm);
   };
 
+  const permAlunos = permissoes["alunos"] ?? {
+    recurso: "alunos",
+    criar: false,
+    ler: false,
+    editar: false,
+    deletar: false,
+  };
+
+  const canPerfil = !!permissoes["alunos_perfil"]?.ler;
+  const canEvolucao = !!permissoes["alunos_evolucao"]?.ler;
+  const canAvaliacoes = !!permissoes["alunos_avaliacoes"]?.ler;
+  const canMedidas = !!permissoes["alunos_medidas"]?.ler;
+  const canCompartilhar = !!permissoes["alunos_compartilhar"]?.ler;
+
   const handleDelete = async (id: string) => {
-    if (!permissoes.deletar) {
+    if (!permAlunos.deletar) {
       alert("⛔ Você não tem permissão para deletar alunos");
       return;
     }
@@ -359,7 +377,7 @@ export const AlunoTable = ({ canCreate }: AlunoTableProps) => {
 
   if (
     permissoesCarregadas &&
-    !permissoes.ler &&
+    !permAlunos.ler &&
     session?.user?.role !== "SUPERADMIN"
   ) {
     return (
@@ -377,9 +395,7 @@ export const AlunoTable = ({ canCreate }: AlunoTableProps) => {
 
   return (
     <div className={styles.container}>
-      {/* --- NOVA BARRA DE AÇÕES (Alinhada via CSS) --- */}
       <div className={styles.toolbar}>
-        {/* Lado Esquerdo: Busca */}
         <form onSubmit={handleSearch} className={styles.searchGroup}>
           <input
             type="text"
@@ -394,9 +410,8 @@ export const AlunoTable = ({ canCreate }: AlunoTableProps) => {
           </button>
         </form>
 
-        {/* Lado Direito: Ações */}
         <div className={styles.actionsGroup}>
-          {canCreate && (
+          {canCreate && permAlunos.criar && (
             <Link
               href="/dashboard/alunos/novo"
               className={`${styles.actionBtn} ${styles.btnNovo}`}
@@ -407,25 +422,29 @@ export const AlunoTable = ({ canCreate }: AlunoTableProps) => {
             </Link>
           )}
 
-          <button
-            onClick={gerarPdfAlunos}
-            className={`${styles.actionBtn} ${styles.btnPdf}`}
-            disabled={alunosOrdenados.length === 0}
-            title="Baixar PDF"
-          >
-            <FileText className={styles.iconBtn} />
-            <span className={styles.hideMobile}>PDF</span>
-          </button>
+          {canCompartilhar && (
+            <>
+              <button
+                onClick={gerarPdfAlunos}
+                className={`${styles.actionBtn} ${styles.btnPdf}`}
+                disabled={alunosOrdenados.length === 0}
+                title="Baixar PDF"
+              >
+                <FileText className={styles.iconBtn} />
+                <span className={styles.hideMobile}>PDF</span>
+              </button>
 
-          <button
-            onClick={enviarWhatsAppAlunos}
-            className={`${styles.actionBtn} ${styles.btnWhats}`}
-            disabled={alunosOrdenados.length === 0}
-            title="Enviar WhatsApp"
-          >
-            <FaWhatsapp className={styles.iconBtn} />
-            <span className={styles.hideMobile}>Whats</span>
-          </button>
+              <button
+                onClick={enviarWhatsAppAlunos}
+                className={`${styles.actionBtn} ${styles.btnWhats}`}
+                disabled={alunosOrdenados.length === 0}
+                title="Enviar WhatsApp"
+              >
+                <FaWhatsapp className={styles.iconBtn} />
+                <span className={styles.hideMobile}>Whats</span>
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -504,23 +523,27 @@ export const AlunoTable = ({ canCreate }: AlunoTableProps) => {
               </div>
 
               <div className={styles.actions}>
-                <Link
-                  href={`/dashboard/alunos/${aluno.id}`}
-                  title="Ver Perfil"
-                  className={styles.iconPerfil}
-                >
-                  <User size={24} />
-                </Link>
+                {canPerfil && (
+                  <Link
+                    href={`/dashboard/alunos/${aluno.id}`}
+                    title="Ver Perfil"
+                    className={styles.iconPerfil}
+                  >
+                    <User size={24} />
+                  </Link>
+                )}
 
-                <Link
-                  href={`/dashboard/alunos/${aluno.id}/evolucao`}
-                  title="Ver Evolução"
-                  className={styles.iconEvolucao}
-                >
-                  <TrendingUp size={24} />
-                </Link>
+                {canEvolucao && (
+                  <Link
+                    href={`/dashboard/alunos/${aluno.id}/evolucao`}
+                    title="Ver Evolução"
+                    className={styles.iconEvolucao}
+                  >
+                    <TrendingUp size={24} />
+                  </Link>
+                )}
 
-                {permissoes.editar && (
+                {permAlunos.editar && (
                   <Link
                     href={`/dashboard/alunos/${aluno.id}/editar`}
                     title="Editar"
@@ -529,23 +552,30 @@ export const AlunoTable = ({ canCreate }: AlunoTableProps) => {
                     <Edit size={24} />
                   </Link>
                 )}
-                <Link
-                  href={`/dashboard/alunos/${aluno.id}/avaliacoes`}
-                  title="Ver Avaliações"
-                  className={styles.iconAvaliar}
-                >
-                  <ClipboardCheck size={24} />
-                </Link>
-                <Link
-                  href={`/dashboard/medidas?alunoId=${
-                    aluno.id
-                  }&alunoNome=${encodeURIComponent(aluno.nome)}`}
-                  title="Ver Medidas"
-                  className={styles.iconMedidas}
-                >
-                  <Ruler size={24} />
-                </Link>
-                {permissoes.deletar && (
+
+                {canAvaliacoes && (
+                  <Link
+                    href={`/dashboard/alunos/${aluno.id}/avaliacoes`}
+                    title="Ver Avaliações"
+                    className={styles.iconAvaliar}
+                  >
+                    <ClipboardCheck size={24} />
+                  </Link>
+                )}
+
+                {canMedidas && (
+                  <Link
+                    href={`/dashboard/medidas?alunoId=${
+                      aluno.id
+                    }&alunoNome=${encodeURIComponent(aluno.nome)}`}
+                    title="Ver Medidas"
+                    className={styles.iconMedidas}
+                  >
+                    <Ruler size={24} />
+                  </Link>
+                )}
+
+                {permAlunos.deletar && (
                   <button
                     onClick={() => setDeleteModal({ isOpen: true, aluno })}
                     title="Excluir"

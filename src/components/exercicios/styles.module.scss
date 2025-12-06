@@ -91,6 +91,52 @@
   }
 }
 
+.actionBtn {
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: white;
+  white-space: nowrap;
+  box-sizing: border-box;
+
+  &:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+.iconBtn {
+  width: 18px;
+  height: 18px;
+  transition: all 0.2s ease;
+}
+
+.btnPdf {
+  background-color: #f59e0b;
+}
+
+.btnWhats {
+  background-color: #25d366;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
