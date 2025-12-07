@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
     }
 
-    // Verificar permissão de criar treinos (se não for SUPERADMIN)
+    // Verificar permissão
     if (session.user.role !== "SUPERADMIN") {
       const permissao = await prisma.permissao.findUnique({
         where: {
@@ -100,9 +100,9 @@ export async function POST(request: NextRequest) {
     const { nome, alunoId, objetivo, observacoes, ativo, dataInicio, dataFim } =
       body;
 
-    if (!nome || !alunoId) {
+    if (!nome || nome.trim().length < 3) {
       return NextResponse.json(
-        { error: "Nome e aluno são obrigatórios" },
+        { error: "Nome é obrigatório (mín. 3 caracteres)" },
         { status: 400 }
       );
     }
@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
     const novoTreino = await prisma.treino.create({
       data: {
         nome,
-        alunoId,
+        alunoId: alunoId || null, // ✅ OPCIONAL
         objetivo: objetivo || null,
         observacoes: observacoes || null,
         ativo: ativo ?? true,
@@ -118,11 +118,13 @@ export async function POST(request: NextRequest) {
         dataFim: dataFim ? new Date(dataFim) : null,
       },
       include: {
-        aluno: {
-          select: {
-            nome: true,
-          },
-        },
+        aluno: alunoId
+          ? {
+              select: {
+                nome: true,
+              },
+            }
+          : undefined,
       },
     });
 

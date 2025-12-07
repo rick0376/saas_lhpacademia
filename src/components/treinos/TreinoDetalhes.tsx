@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { jsPDF } from "jspdf"; // Novo
-import { FileText, Share2 } from "lucide-react"; // Novos ícones
+import { jsPDF } from "jspdf";
+import { FileText, Users } from "lucide-react";
 import styles from "./detalhesStyles.module.scss";
 import { Button } from "../ui/Button/Button";
 import { Modal } from "../ui/Modal/Modal";
@@ -15,6 +15,7 @@ import { Toast } from "../ui/Toast/Toast";
 import { ConfirmModal } from "../ui/ConfirmModal/ConfirmModal";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 import { FaWhatsapp } from "react-icons/fa";
+import { AtribuirTreinoModal } from "./AtribuirTreinoModal";
 
 interface Exercicio {
   id: string;
@@ -71,6 +72,7 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
   const [exercicios, setExercicios] = useState<any[]>([]);
   const [modalAddExercicio, setModalAddExercicio] = useState(false);
   const [modalEditExercicio, setModalEditExercicio] = useState(false);
+  const [modalAtribuir, setModalAtribuir] = useState(false);
   const [loading, setLoading] = useState(false);
   const [filtroGrupo, setFiltroGrupo] = useState("");
 
@@ -78,11 +80,9 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
   const [permissoesCarregadas, setPermissoesCarregadas] = useState(false);
   const recursosTreinos = ["treinos", "treinos_compartilhar"];
 
-  // carregar permissões do usuário logado
   useEffect(() => {
     const fetchPermissoes = async () => {
       try {
-        // SUPERADMIN: tudo liberado
         if (session?.user?.role === "SUPERADMIN") {
           const full: PermissoesMap = {};
           recursosTreinos.forEach((r) => {
@@ -126,7 +126,6 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
     if (session) fetchPermissoes();
   }, [session]);
 
-  // helpers
   const permTreinos = permissoes["treinos"] ?? {
     recurso: "treinos",
     criar: false,
@@ -136,7 +135,7 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
   };
 
   const canCompartilharFichas = !!permissoes["treinos_compartilhar"]?.ler;
-  const canEditarTreino = !!permissoesEditar && !!permTreinos; // mantém o prop como verdade final
+  const canEditarTreino = !!permissoesEditar && !!permTreinos;
   const canAtualizar =
     !!permTreinos.ler || session?.user?.role === "SUPERADMIN";
 
@@ -173,6 +172,18 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
     type: "success",
   });
 
+  const [confirmRemoveAluno, setConfirmRemoveAluno] = useState<{
+    isOpen: boolean;
+    atribuicaoId: string;
+    alunoNome: string;
+    loading: boolean;
+  }>({
+    isOpen: false,
+    atribuicaoId: "",
+    alunoNome: "",
+    loading: false,
+  });
+
   useEffect(() => {
     fetchExercicios();
   }, []);
@@ -187,9 +198,6 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
     }
   };
 
-  // ============================================================
-  // 🚀 GERAR PDF DA FICHA
-  // ============================================================
   const gerarPdfFicha = async () => {
     if (!treino) return;
 
@@ -242,8 +250,11 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
 
       doc.setFont("helvetica", "normal");
       doc.setFontSize(12);
-      doc.setTextColor(218, 165, 32); // <--- AQUI ELE DEFINE DOURADO
-      doc.text(`Aluno: ${treino.aluno.nome}`, margin, 30);
+      doc.setTextColor(218, 165, 32);
+
+      if (treino.aluno) {
+        doc.text(`Aluno: ${treino.aluno.nome}`, margin, 30);
+      }
       doc.text(`Treino: ${treino.nome}`, pageWidth - margin, 30, {
         align: "right",
       });
@@ -268,26 +279,22 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
       }
     };
 
-    // --- CORREÇÃO AQUI ---
     const checkPageBreak = (heightNeeded: number) => {
       if (y + heightNeeded > pageHeight - 20) {
         doc.addPage();
         y = 50;
         printHeader();
-
-        // RESETAR A COR PARA PRETO APÓS O CABEÇALHO DA NOVA PÁGINA
         doc.setTextColor(0, 0, 0);
         doc.setFont("helvetica", "normal");
-        doc.setFontSize(10); // Garante o tamanho da fonte correto
+        doc.setFontSize(10);
       }
     };
 
     printHeader();
 
-    // Info do Treino
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
-    doc.setTextColor(0, 0, 0); // Preto na primeira página
+    doc.setTextColor(0, 0, 0);
     doc.text(`Objetivo: ${treino.objetivo || "-"}`, margin, y);
     doc.text(
       `Status: ${treino.ativo ? "Ativo" : "Inativo"}`,
@@ -297,12 +304,11 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
     );
     y += 10;
 
-    // Tabela de Exercícios (Cabeçalho)
     doc.setFillColor(240, 240, 240);
     doc.rect(margin, y, pageWidth - margin * 2, 8, "F");
     doc.setFont("helvetica", "bold");
     doc.setFontSize(9);
-    doc.setTextColor(0, 0, 0); // Garante preto para os títulos
+    doc.setTextColor(0, 0, 0);
     doc.text("EXERCÍCIO", margin + 2, y + 5);
     doc.text("SÉRIES", 90, y + 5);
     doc.text("REPS", 110, y + 5);
@@ -336,14 +342,13 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
     doc.save(`ficha-${treino.nome.replace(/\s+/g, "-").toLowerCase()}.pdf`);
   };
 
-  // ============================================================
-  // 🚀 WHATSAPP DA FICHA
-  // ============================================================
   const enviarWhatsAppFicha = () => {
     const nomeCliente = session?.user?.name || "SaaS Academia";
 
     let texto = `💪 *FICHA DE TREINO*\n`;
-    texto += `👤 Aluno: ${treino.aluno.nome}\n`;
+    if (treino.aluno) {
+      texto += `👤 Aluno: ${treino.aluno.nome}\n`;
+    }
     texto += `📄 Treino: ${treino.nome}\n`;
     if (treino.objetivo) texto += `🎯 Objetivo: ${treino.objetivo}\n`;
     texto += `\n`;
@@ -363,8 +368,6 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
     const url = `https://wa.me/?text=${encodeURIComponent(texto)}`;
     window.open(url, "_blank");
   };
-
-  // ============================================================
 
   const handleReordenar = async (
     exercicioId: string,
@@ -574,6 +577,63 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
     }
   };
 
+  const handleRemoveAlunoTreino = async () => {
+    if (!permissoesEditar) {
+      setToast({
+        show: true,
+        message: "⛔ Você não tem permissão para remover alunos",
+        type: "error",
+      });
+      return;
+    }
+
+    setConfirmRemoveAluno((prev) => ({ ...prev, loading: true }));
+
+    try {
+      // ✅ MUDANÇA AQUI - Buscar alunoId da atribuição
+      const atribuicao = treino.alunosAtribuidos.find(
+        (a: any) => a.id === confirmRemoveAluno.atribuicaoId
+      );
+
+      if (!atribuicao) {
+        throw new Error("Atribuição não encontrada");
+      }
+
+      // ✅ Usa query param em vez de rota dinâmica
+      const response = await fetch(
+        `/api/treinos/${treino.id}/atribuir?alunoId=${atribuicao.alunoId}`,
+        { method: "DELETE" }
+      );
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Erro ao remover aluno do treino");
+      }
+
+      setConfirmRemoveAluno({
+        isOpen: false,
+        atribuicaoId: "",
+        alunoNome: "",
+        loading: false,
+      });
+
+      setToast({
+        show: true,
+        message: "✅ Aluno removido do treino com sucesso!",
+        type: "success",
+      });
+
+      await refresh();
+    } catch (error: any) {
+      setConfirmRemoveAluno((prev) => ({ ...prev, loading: false }));
+      setToast({
+        show: true,
+        message: error.message || "❌ Erro ao remover aluno",
+        type: "error",
+      });
+    }
+  };
+
   const getGrupoMuscularLabel = (grupo: string) => {
     const labels: Record<string, string> = {
       PEITO: "Peito",
@@ -596,18 +656,32 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
     ? exercicios.filter((e) => e.grupoMuscular === filtroGrupo)
     : exercicios;
 
+  const isTreinoTemplate = !treino.aluno;
+  const totalAlunosAtribuidos = treino._count?.alunosAtribuidos || 0;
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        {/* ESQUERDA: Voltar + Título + Meta */}
         <div className={styles.headerLeft}>
           <Link href="/dashboard/treinos" className={styles.backButton}>
             ← Voltar
           </Link>
           <div>
-            <h1 className={styles.title}>{treino.nome}</h1>
+            <h1 className={styles.title}>
+              {treino.nome}
+              {isTreinoTemplate && (
+                <span className={styles.templateBadge}>📋 Template</span>
+              )}
+            </h1>
             <div className={styles.meta}>
-              <span className={styles.metaItem}>👤 {treino.aluno.nome}</span>
+              {treino.aluno ? (
+                <span className={styles.metaItem}>👤 {treino.aluno.nome}</span>
+              ) : (
+                <span className={styles.metaItem}>
+                  👥 {totalAlunosAtribuidos} aluno
+                  {totalAlunosAtribuidos !== 1 ? "s" : ""}
+                </span>
+              )}
               {treino.objetivo && (
                 <span className={styles.metaItem}>🎯 {treino.objetivo}</span>
               )}
@@ -623,7 +697,6 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
         </div>
 
         <div className={styles.headerRight}>
-          {/* BOTÃO PRINCIPAL - Full width no mobile */}
           {canEditarTreino && (
             <div className={styles.primaryAction}>
               <Button
@@ -638,11 +711,24 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
               </Button>
             </div>
           )}
-
-          {/* AÇÕES SECUNDÁRIAS - Sempre à direita */}
         </div>
       </div>
+
       <div className={styles.actionsGroup}>
+        {canEditarTreino && (
+          <button
+            className={`${styles.actionBtn} ${styles.btnAtribuir}`}
+            onClick={() => setModalAtribuir(true)}
+            title="Gerenciar alunos"
+          >
+            <Users className={styles.iconBtn} size={18} />
+            <span className={styles.hideMobile}>Alunos</span>
+            {totalAlunosAtribuidos > 0 && (
+              <span className={styles.badgeCount}>{totalAlunosAtribuidos}</span>
+            )}
+          </button>
+        )}
+
         {canCompartilharFichas && (
           <>
             <button
@@ -674,6 +760,66 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
           </button>
         )}
       </div>
+
+      {treino.alunosAtribuidos && treino.alunosAtribuidos.length > 0 && (
+        <div className={styles.alunosSection}>
+          <h3 className={styles.alunosSectionTitle}>
+            👥 Alunos com este treino ({treino.alunosAtribuidos.length})
+          </h3>
+          <div className={styles.alunosGrid}>
+            {treino.alunosAtribuidos.map((atrib: any) => (
+              <div key={atrib.id} className={styles.alunoCard}>
+                <div className={styles.alunoInfo}>
+                  {atrib.aluno.foto && (
+                    <img
+                      src={atrib.aluno.foto}
+                      alt={atrib.aluno.nome}
+                      className={styles.alunoFoto}
+                    />
+                  )}
+                  <div>
+                    <span className={styles.alunoNome}>{atrib.aluno.nome}</span>
+                    {atrib.aluno.email && (
+                      <span className={styles.alunoEmail}>
+                        {atrib.aluno.email}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className={styles.alunoActions}>
+                  <span
+                    className={`${styles.alunoStatus} ${
+                      atrib.ativo ? styles.ativo : styles.inativo
+                    }`}
+                  >
+                    {atrib.ativo ? "✓" : "✕"}
+                  </span>
+
+                  {canEditarTreino && (
+                    <button
+                      className={styles.alunoRemoveBtn}
+                      onClick={() =>
+                        setConfirmRemoveAluno({
+                          isOpen: true,
+                          atribuicaoId: atrib.id,
+                          alunoNome: atrib.aluno.nome,
+                          loading: false,
+                        })
+                      }
+                      title="Remover aluno do treino"
+                      disabled={confirmRemoveAluno.loading}
+                    >
+                      🗑️
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className={styles.exerciciosList}>
         <h2 className={styles.sectionTitle}>
           Exercícios ({treino.exercicios.length})
@@ -701,7 +847,6 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
                   </div>
 
                   <div className={styles.actionButtons}>
-                    {/* REORDENAR - Só aparece se tiver permissão de editar */}
                     {permissoesEditar && (
                       <div className={styles.reorderButtons}>
                         <button
@@ -803,6 +948,23 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
         treinoExercicios={treino.exercicios}
       />
 
+      {canEditarTreino && (
+        <AtribuirTreinoModal
+          isOpen={modalAtribuir}
+          onClose={() => setModalAtribuir(false)}
+          treinoId={treino.id}
+          treinoNome={treino.nome}
+          onSuccess={() => {
+            refresh();
+            setToast({
+              show: true,
+              message: "✅ Atribuição atualizada!",
+              type: "success",
+            });
+          }}
+        />
+      )}
+
       <ConfirmModal
         isOpen={confirmModal.isOpen}
         onClose={() =>
@@ -821,6 +983,25 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
         type="danger"
         loading={confirmModal.loading}
       />
+      {/* ✅ MODAL DE CONFIRMAÇÃO - REMOVER ALUNO */}
+      <ConfirmModal
+        isOpen={confirmRemoveAluno.isOpen}
+        onClose={() =>
+          setConfirmRemoveAluno({
+            isOpen: false,
+            atribuicaoId: "",
+            alunoNome: "",
+            loading: false,
+          })
+        }
+        onConfirm={handleRemoveAlunoTreino}
+        title="Remover Aluno do Treino"
+        message={`Tem certeza que deseja remover "${confirmRemoveAluno.alunoNome}" deste treino? Esta ação não pode ser desfeita.`}
+        confirmText="Sim, remover"
+        cancelText="Cancelar"
+        type="danger"
+        loading={confirmRemoveAluno.loading}
+      />
 
       {toast.show && (
         <Toast
@@ -830,7 +1011,6 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
         />
       )}
 
-      {/* Modal Adicionar Exercício */}
       {permissoesEditar && (
         <Modal
           isOpen={modalAddExercicio}
@@ -983,7 +1163,6 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
         </Modal>
       )}
 
-      {/* Modal Editar Exercício */}
       {permissoesEditar && (
         <Modal
           isOpen={modalEditExercicio}

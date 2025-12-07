@@ -86,9 +86,7 @@ export const TreinoForm: React.FC<TreinoFormProps> = ({
       newErrors.nome = "O nome deve ter no mínimo 3 caracteres";
     }
 
-    if (!formData.alunoId) {
-      newErrors.alunoId = "Selecione um aluno";
-    }
+    // ✅ REMOVIDO: validação obrigatória de alunoId
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -145,16 +143,15 @@ export const TreinoForm: React.FC<TreinoFormProps> = ({
         />
 
         <div className={styles.selectWrapper}>
-          <label className={styles.label}>Aluno *</label>
+          <label className={styles.label}>Aluno (Opcional)</label>
           <select
             name="alunoId"
             value={formData.alunoId}
             onChange={handleChange}
             className={`${styles.select} ${errors.alunoId ? styles.error : ""}`}
-            required
             disabled={isEdit}
           >
-            <option value="">Selecione um aluno...</option>
+            <option value="">Nenhum (Treino template)</option>
             {alunos.map((aluno) => (
               <option key={aluno.id} value={aluno.id}>
                 {aluno.nome}
@@ -167,6 +164,9 @@ export const TreinoForm: React.FC<TreinoFormProps> = ({
           <Link href="/dashboard/alunos/novo" className={styles.linkNovoAluno}>
             + Cadastrar novo aluno
           </Link>
+          <p className={styles.helpText}>
+            💡 Deixe vazio para criar um treino reutilizável
+          </p>
         </div>
 
         <div className={styles.selectWrapper}>

@@ -35,6 +35,29 @@ export default async function TreinoDetalhesPage({ params }: Props) {
       cronogramas: {
         orderBy: { diaSemana: "asc" },
       },
+      // ✅ NOVO - Buscar alunos atribuídos
+      alunosAtribuidos: {
+        include: {
+          aluno: {
+            select: {
+              id: true,
+              nome: true,
+              email: true,
+              foto: true,
+            },
+          },
+        },
+        where: { ativo: true },
+        orderBy: { dataInicio: "desc" },
+      },
+      // ✅ NOVO - Contar atribuições
+      _count: {
+        select: {
+          exercicios: true,
+          cronogramas: true,
+          alunosAtribuidos: true,
+        },
+      },
     },
   });
 

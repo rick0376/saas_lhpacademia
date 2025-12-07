@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma"; // ✅ Use a instância global
 
 export async function GET(request: NextRequest) {
   try {
@@ -21,30 +19,63 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Removidos logs sensíveis
-    // console.log("🔍 API /api/alunos/treinos: Aluno ID:", alunoId);
+    // ✅ ATUALIZADO: Buscar treinos atribuídos via TreinoAluno OU treinos diretos (legado)
+    const [treinosAtribuidos, treinosDiretos] = await Promise.all([
+      // Treinos atribuídos via TreinoAluno (novo sistema)
+      prisma.treinoAluno.findMany({
+        where: {
+          alunoId: alunoId,
+          ativo: true,
+        },
+        include: {
+          treino: {
+            select: {
+              id: true,
+              nome: true,
+              descricao: true,
+              ativo: true,
+              dataInicio: true,
+            },
+          },
+        },
+        orderBy: { dataInicio: "desc" },
+      }),
 
-    const treinos = await prisma.treino.findMany({
-      where: {
-        alunoId: alunoId,
-        ativo: true,
-      },
-      orderBy: { dataInicio: "desc" },
-      select: {
-        id: true,
-        nome: true,
-        descricao: true,
-        ativo: true,
-        dataInicio: true,
-      },
+      // Treinos com alunoId direto (sistema legado - compatibilidade)
+      prisma.treino.findMany({
+        where: {
+          alunoId: alunoId,
+          ativo: true,
+        },
+        orderBy: { dataInicio: "desc" },
+        select: {
+          id: true,
+          nome: true,
+          descricao: true,
+          ativo: true,
+          dataInicio: true,
+        },
+      }),
+    ]);
+
+    // Combinar ambos e remover duplicatas
+    const treinosMap = new Map();
+
+    // Adicionar treinos atribuídos
+    treinosAtribuidos.forEach((atrib) => {
+      if (atrib.treino.ativo) {
+        treinosMap.set(atrib.treino.id, atrib.treino);
+      }
     });
 
-    // console.log(
-    //   "✅ Treinos carregados:",
-    //   treinos.length,
-    //   "para aluno",
-    //   alunoId
-    // );
+    // Adicionar treinos diretos (legado)
+    treinosDiretos.forEach((treino) => {
+      if (!treinosMap.has(treino.id)) {
+        treinosMap.set(treino.id, treino);
+      }
+    });
+
+    const treinos = Array.from(treinosMap.values());
 
     return NextResponse.json(treinos);
   } catch (error) {
@@ -53,7 +84,5 @@ export async function GET(request: NextRequest) {
       { error: "Internal Server Error" },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }

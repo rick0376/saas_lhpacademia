@@ -31,7 +31,7 @@ model Usuario {
   clienteId      String
   telefone       String?
   dataNascimento DateTime?
-  objetivo       String?   // ✅ ADICIONE ESTA LINHA
+  objetivo       String?   
   cliente        Cliente   @relation(fields: [clienteId], references: [id], onDelete: Cascade)
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
@@ -78,8 +78,9 @@ model Aluno {
   // Relacionamentos
   medidas    Medida[]
   treinos    Treino[]
+   treinosAtribuidos TreinoAluno[]
   avaliacoes Avaliacao[]
-  execucoes  ExecucaoTreino[] // ✅ NOVO
+  execucoes  ExecucaoTreino[] 
 
   @@map("alunos")
 }
@@ -180,8 +181,8 @@ model Treino {
   id          String    @id @default(cuid())
   nome        String
   descricao   String?
-  alunoId     String
-  aluno       Aluno     @relation(fields: [alunoId], references: [id], onDelete: Cascade)
+  alunoId     String?
+  aluno       Aluno?     @relation(fields: [alunoId], references: [id], onDelete: SetNull)
   objetivo    String?
   observacoes String?
   ativo       Boolean   @default(true)
@@ -194,8 +195,28 @@ model Treino {
   exercicios  TreinoExercicio[]
   cronogramas Cronograma[]
   execucoes   ExecucaoTreino[]
+  alunosAtribuidos TreinoAluno[]
 
   @@map("treinos")
+}
+
+// ✅ NOVO - Tabela de atribuição de treinos aos alunos
+model TreinoAluno {
+  id          String   @id @default(cuid())
+  treinoId    String
+  treino      Treino   @relation(fields: [treinoId], references: [id], onDelete: Cascade)
+  alunoId     String
+  aluno       Aluno    @relation(fields: [alunoId], references: [id], onDelete: Cascade)
+  dataInicio  DateTime @default(now())
+  dataFim     DateTime?
+  ativo       Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([treinoId, alunoId])
+  @@index([alunoId])
+  @@index([treinoId])
+  @@map("treino_alunos")
 }
 
 // Relação Treino-Exercicio (com detalhes)
