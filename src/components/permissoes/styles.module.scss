@@ -357,3 +357,52 @@
     }
   }
 }
+// ============================================
+// CONTROLES GLOBAIS (FALTAVA ESTA SEÇÃO)
+// ============================================
+.globalToggles {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.btnOn {
+  padding: 10px 16px;
+  background: linear-gradient(135deg, var(--primary-color), #6366f1);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  }
+}
+
+.btnOff {
+  padding: 10px 16px;
+  background: #f1f5f9;
+  color: #151618;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #e2e8f0;
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+  }
+}
