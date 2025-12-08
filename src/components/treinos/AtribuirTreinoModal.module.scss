@@ -11,7 +11,7 @@
   flex-direction: column;
   gap: 1rem;
   padding: 1.5rem;
-  background: #f8f9fa;
+  background: linear-gradient(90deg, #c7bebe, #e5eaf0, #c9d3dd);
   border-radius: 8px;
 }
 
@@ -37,7 +37,7 @@
 .select {
   padding: 0.75rem;
   border: 1px solid #ddd;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 1rem;
   background: white;
   cursor: pointer;
@@ -235,22 +235,24 @@
 // ========================================
 .btnAtribuir {
   padding: 0.75rem 1.5rem;
-  background: #007bff; /* Cor de fundo (azul) */
+  //background: #007bff;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s, transform 0.1s;
+  transition: all 0.3s ease;
 
   &:hover {
-    background: #0056b3; /* Cor de fundo ao passar o mouse (azul mais escuro) */
+    transform: translateY(-3px);
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
   }
 
   &:active {
-    background: #004085; /* Cor de fundo quando o botão for pressionado */
-    transform: scale(0.98); /* Efeito de "aperto" no botão */
+    background: #004085;
+    transform: scale(0.98);
   }
 
   &:disabled {
