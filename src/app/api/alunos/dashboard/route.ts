@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
       }),
 
       // 2. Treinos count (apenas ativos)
-      prisma.treino.count({
+      prisma.treinoAluno.count({
         where: {
           alunoId: alunoId,
           ativo: true,

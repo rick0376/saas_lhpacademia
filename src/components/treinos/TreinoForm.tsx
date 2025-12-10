@@ -16,7 +16,7 @@ interface TreinoFormProps {
   initialData?: {
     id?: string;
     nome: string;
-    alunoId: string;
+    alunoId?: string;
     objetivo?: string;
     observacoes?: string;
     ativo: boolean;
@@ -52,7 +52,6 @@ export const TreinoForm: React.FC<TreinoFormProps> = ({
 
   const fetchAlunos = async () => {
     try {
-      // Ajuste da API para trazer todos os alunos com acesso (filtrar ativos)
       const response = await fetch("/api/alunos");
       const data = await response.json();
       setAlunos(data.filter((a: any) => a.ativo));
@@ -86,8 +85,6 @@ export const TreinoForm: React.FC<TreinoFormProps> = ({
       newErrors.nome = "O nome deve ter no mínimo 3 caracteres";
     }
 
-    // ✅ REMOVIDO: validação obrigatória de alunoId
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -105,12 +102,14 @@ export const TreinoForm: React.FC<TreinoFormProps> = ({
       const url = isEdit ? `/api/treinos/${initialData?.id}` : "/api/treinos";
       const method = isEdit ? "PUT" : "POST";
 
+      // Separar alunoId para não enviar ao criar o treino
+      const { alunoId, ...treinoData } = formData;
+
+      // 1️⃣ Criar o treino sem alunoId
       const response = await fetch(url, {
         method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(treinoData),
       });
 
       if (!response.ok) {
@@ -119,6 +118,15 @@ export const TreinoForm: React.FC<TreinoFormProps> = ({
       }
 
       const treino = await response.json();
+
+      // 2️⃣ Se alunoId estiver preenchido, associar o aluno ao treino
+      if (alunoId) {
+        await fetch(`/api/treinos/${treino.id}/atribuir`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ alunoId }),
+        });
+      }
 
       router.push(`/dashboard/treinos/${treino.id}`);
       router.refresh();

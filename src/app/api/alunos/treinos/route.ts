@@ -19,63 +19,40 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // ✅ ATUALIZADO: Buscar treinos atribuídos via TreinoAluno OU treinos diretos (legado)
-    const [treinosAtribuidos, treinosDiretos] = await Promise.all([
-      // Treinos atribuídos via TreinoAluno (novo sistema)
-      prisma.treinoAluno.findMany({
-        where: {
-          alunoId: alunoId,
-          ativo: true,
-        },
-        include: {
-          treino: {
-            select: {
-              id: true,
-              nome: true,
-              descricao: true,
-              ativo: true,
-              dataInicio: true,
-            },
+    // ============================
+    // ✅ Buscar SOMENTE treinos via TreinoAluno
+    // ============================
+    const treinosAtribuidos = await prisma.treinoAluno.findMany({
+      where: {
+        alunoId,
+        ativo: true,
+      },
+      include: {
+        treino: {
+          select: {
+            id: true,
+            nome: true,
+            descricao: true,
+            ativo: true,
+            dataInicio: true,
           },
         },
-        orderBy: { dataInicio: "desc" },
-      }),
-
-      // Treinos com alunoId direto (sistema legado - compatibilidade)
-      prisma.treino.findMany({
-        where: {
-          alunoId: alunoId,
-          ativo: true,
-        },
-        orderBy: { dataInicio: "desc" },
-        select: {
-          id: true,
-          nome: true,
-          descricao: true,
-          ativo: true,
-          dataInicio: true,
-        },
-      }),
-    ]);
-
-    // Combinar ambos e remover duplicatas
-    const treinosMap = new Map();
-
-    // Adicionar treinos atribuídos
-    treinosAtribuidos.forEach((atrib) => {
-      if (atrib.treino.ativo) {
-        treinosMap.set(atrib.treino.id, atrib.treino);
-      }
+      },
+      orderBy: { createdAt: "desc" },
     });
 
-    // Adicionar treinos diretos (legado)
-    treinosDiretos.forEach((treino) => {
-      if (!treinosMap.has(treino.id)) {
-        treinosMap.set(treino.id, treino);
-      }
-    });
-
-    const treinos = Array.from(treinosMap.values());
+    // ============================
+    // ✅ Formatar resposta final
+    // ============================
+    const treinos = treinosAtribuidos.map((atr) => ({
+      id: atr.treino.id,
+      nome: atr.treino.nome,
+      descricao: atr.treino.descricao,
+      ativo: atr.treino.ativo,
+      dataInicioTreino: atr.treino.dataInicio,
+      dataInicioAtribuicao: atr.dataInicio,
+      dataFimAtribuicao: atr.dataFim,
+    }));
 
     return NextResponse.json(treinos);
   } catch (error) {

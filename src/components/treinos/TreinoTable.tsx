@@ -459,7 +459,9 @@ export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
             <div className={styles.cardBody}>
               <div className={styles.infoRow}>
                 <span className={styles.label}>Aluno:</span>
-                <span className={styles.value}>{treino.aluno.nome}</span>
+                <span className={styles.value}>
+                  {treino.aluno?.nome || "Aluno não vinculado"}
+                </span>
               </div>
 
               {treino.objetivo && (

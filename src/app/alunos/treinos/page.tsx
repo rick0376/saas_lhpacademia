@@ -20,13 +20,26 @@ interface Treino {
   nome: string;
   descricao: string;
   ativo: boolean;
-  dataInicio: string;
+  dataInicioTreino: string;
+  dataInicioAtribuicao: string;
+  dataFimAtribuicao: string | null;
+}
+
+interface Exercício {
+  id: string;
+  nome: string;
+  series: number;
+  reps: string;
+  descanso: string;
+  descricao?: string;
+  fotoExecucao?: string;
 }
 
 export default function TreinosPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [treinos, setTreinos] = useState<Treino[]>([]);
+  const [exercicios, setExercicios] = useState<Exercício[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -55,26 +68,32 @@ export default function TreinosPage() {
       if (!response.ok) throw new Error(`Erro: ${response.status}`);
 
       const data: Treino[] = await response.json();
-
-      // ✅ NOVO - Ordena em ordem alfabética pelo nome
       const treinosOrdenados = data.sort((a, b) => {
         return a.nome.localeCompare(b.nome, "pt-BR");
       });
-
-      /*
-      // ✅ NOVO - Ordena em ordem crescente pela data de início
-      const treinosOrdenados = data.sort((a, b) => {
-        return (
-          new Date(a.dataInicio).getTime() - new Date(b.dataInicio).getTime()
-        );
-      });
-      */
 
       setTreinos(treinosOrdenados);
     } catch (err: any) {
       setError(err.message || "Erro ao carregar treinos");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchExercicios = async (treinoId: string, alunoId: string) => {
+    try {
+      const response = await fetch(
+        `/api/alunos/treinos/${treinoId}/exercicios?alunoId=${alunoId}`
+      );
+
+      if (!response.ok) {
+        throw new Error("Erro ao buscar exercícios");
+      }
+
+      const data = await response.json();
+      setExercicios(data.exercicios); // Agora você tem os exercícios
+    } catch (err) {
+      console.error("Erro ao carregar os exercícios:", err);
     }
   };
 
@@ -172,11 +191,14 @@ export default function TreinosPage() {
                     <Calendar size={16} />
                     <span>
                       Início:{" "}
-                      {new Date(treino.dataInicio).toLocaleDateString("pt-BR", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                      })}
+                      {new Date(treino.dataInicioTreino).toLocaleDateString(
+                        "pt-BR",
+                        {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        }
+                      )}
                     </span>
                   </div>
 

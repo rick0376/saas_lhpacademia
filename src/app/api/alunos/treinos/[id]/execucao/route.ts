@@ -24,29 +24,28 @@ export async function POST(
     const alunoId = (session.user as any).aluno.id;
     const { id: treinoId } = await params;
 
-    const treino = await prisma.treino.findFirst({
-      where: {
-        id: treinoId,
-        alunoId: alunoId,
-      },
+    // Verifica se o treino é realmente atribuído ao aluno
+    const atribuicao = await prisma.treinoAluno.findFirst({
+      where: { treinoId, alunoId, ativo: true },
+    });
+
+    if (!atribuicao) {
+      return NextResponse.json(
+        { error: "Treino não atribuído a este aluno" },
+        { status: 403 }
+      );
+    }
+
+    // Buscar o treino sem filtrar por alunoId
+    const treino = await prisma.treino.findUnique({
+      where: { id: treinoId },
       include: {
         exercicios: {
-          include: {
-            exercicio: true,
-          },
-          orderBy: {
-            ordem: "asc",
-          },
+          include: { exercicio: true },
+          orderBy: { ordem: "asc" },
         },
       },
     });
-
-    if (!treino) {
-      return NextResponse.json(
-        { error: "Treino não encontrado" },
-        { status: 404 }
-      );
-    }
 
     const body = await req.json();
     const { intensidade, observacoes, data, exerciciosRealizados } = body;
@@ -62,12 +61,12 @@ export async function POST(
     const dataExecucao = data ? new Date(data) : new Date();
     const totalExercicios = treino.exercicios.length;
 
-    // ✅ CORREÇÃO 1: Tipagem explícita da entrada
+    // ✅ Tipagem explícita da entrada
     const exerciciosRealizadosArray = (exerciciosRealizados ||
       []) as ExercicioRealizadoInput[];
     const completo = exerciciosRealizadosArray.length === totalExercicios;
 
-    // ✅ CORREÇÃO 2: Tipagem explícita do Map
+    // ✅ Tipagem explícita do Map
     const cargasMap = new Map<string, string | null>(
       exerciciosRealizadosArray.map((ex) => [ex.id, ex.carga])
     );
@@ -77,7 +76,7 @@ export async function POST(
       .map((te) => {
         const cargaCustomizada = cargasMap.get(te.id);
 
-        // ✅ CORREÇÃO 3: Lógica segura para definir a carga final
+        // ✅ Lógica segura para definir a carga final
         // Se cargaCustomizada não for undefined, usa ela. Senão, usa a do treino. Por fim, null.
         const cargaFinal =
           cargaCustomizada !== undefined ? cargaCustomizada : te.carga;
@@ -114,7 +113,7 @@ export async function POST(
       },
     });
 
-    // ✅ CORREÇÃO 4: Cast para 'any' para acessar _count sem erro de tipo
+    // ✅ Cast para 'any' para acessar _count sem erro de tipo
     // O TypeScript às vezes não infere corretamente o retorno do create com include
     const execucaoComCount = execucao as any;
 
@@ -293,9 +292,20 @@ export async function PUT(
       );
     }
 
-    // Se enviou exerciciosRealizadosIds, busca treino e atualiza tudo
-    const treino = await prisma.treino.findFirst({
-      where: { id: treinoId, alunoId },
+    // Verifica se o treino é realmente atribuído ao aluno
+    const atribuicao = await prisma.treinoAluno.findFirst({
+      where: { treinoId, alunoId, ativo: true },
+    });
+
+    if (!atribuicao) {
+      return NextResponse.json(
+        { error: "Treino não atribuído a este aluno" },
+        { status: 403 }
+      );
+    }
+
+    const treino = await prisma.treino.findUnique({
+      where: { id: treinoId },
       include: {
         exercicios: {
           include: { exercicio: true },
@@ -303,13 +313,6 @@ export async function PUT(
         },
       },
     });
-
-    if (!treino) {
-      return NextResponse.json(
-        { error: "Treino não encontrado" },
-        { status: 404 }
-      );
-    }
 
     const totalExercicios = treino.exercicios.length;
     const completo = exerciciosRealizadosIds.length === totalExercicios;
