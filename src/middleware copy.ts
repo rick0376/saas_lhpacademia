@@ -10,27 +10,20 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  // ------------------------------------
-  // 1️⃣ ROTAS PÚBLICAS (sempre liberadas)
-  // ------------------------------------
+  // Rotas públicas que não exigem autenticação
   const publicRoutes = ["/", "/login", "/login-superadmin", "/alunos/login"];
-  const isPublicRoute = publicRoutes.includes(pathname);
+  const isPublicRoute = publicRoutes.some((route) => pathname === route);
 
-  // Se a rota é pública → libera mesmo se existir token
   if (isPublicRoute) {
     return NextResponse.next();
   }
 
-  // ------------------------------------
-  // 2️⃣ ALUNOS — Área /alunos/**
-  // ------------------------------------
+  // Rotas de /alunos/**: permitido para ALUNO, ADMIN e SUPERADMIN
   if (pathname.startsWith("/alunos")) {
-    // Se não está logado → leva para login de aluno
     if (!token) {
       return NextResponse.redirect(new URL("/alunos/login", request.url));
     }
 
-    // Permitir apenas: ALUNO, ADMIN, SUPERADMIN
     if (!["ALUNO", "ADMIN", "SUPERADMIN"].includes(token.role)) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
@@ -38,42 +31,37 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // ------------------------------------
-  // 3️⃣ ÁREA ADMIN /dashboard/**
-  // ------------------------------------
+  // Rotas de /dashboard/**:
   if (pathname.startsWith("/dashboard")) {
-    // Se não tem token → volta para home
     if (!token) {
       return NextResponse.redirect(new URL("/", request.url));
     }
 
-    // ❗ CORREÇÃO DO SEU BUG:
-    // Aluno não pode entrar no dashboard admin,
-    // MAS NÃO deve ser redirecionado quando estiver deslogando.
     if (token.role === "ALUNO") {
       return NextResponse.redirect(new URL("/alunos/dashboard", request.url));
     }
 
-    // ------------------------------------
-    // 4️⃣ Rotas exclusivas do SUPERADMIN
-    // ------------------------------------
-    const superAdminOnlyRoutes = ["/dashboard/permissoes"];
+    // Rotas restritas a SUPERADMIN
+    const superAdminOnlyRoutes = [
+      /*"/dashboard/clientes",*/
+      "/dashboard/permissoes",
+    ];
 
-    if (
-      superAdminOnlyRoutes.some((route) => pathname.startsWith(route)) &&
-      token.role !== "SUPERADMIN"
-    ) {
+    const isSuperAdminOnlyRoute = superAdminOnlyRoutes.some((route) =>
+      pathname.startsWith(route)
+    );
+
+    if (isSuperAdminOnlyRoute && token.role !== "SUPERADMIN") {
       return NextResponse.redirect(
         new URL("/dashboard?erro=sem-permissao", request.url)
       );
     }
 
+    // ADMIN e SUPERADMIN têm acesso às demais rotas dashboard
     return NextResponse.next();
   }
 
-  // ------------------------------------
-  // 5️⃣ Qualquer outra rota não protegida
-  // ------------------------------------
+  // Outras rotas públicas ou não protegidas
   return NextResponse.next();
 }
 

@@ -33,7 +33,7 @@ export const AlunoLayout: React.FC<Props> = ({ children }) => {
   const openLogout = () => setLogoutOpen(true);
   const closeLogout = () => setLogoutOpen(false);
   const confirmLogout = () => {
-    signOut({ callbackUrl: "/alunos/login" });
+    signOut({ callbackUrl: "/" });
     localStorage.removeItem("alunoId");
   };
 
