@@ -406,10 +406,6 @@
 }
 
 @media (max-width: 640px) {
-  .hideMobile {
-    display: none;
-  }
-
   .cardsContainer {
     grid-template-columns: 1fr;
   }

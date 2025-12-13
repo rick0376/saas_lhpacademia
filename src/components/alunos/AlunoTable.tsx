@@ -18,6 +18,7 @@ import {
   Plus,
   FileText,
   TrendingUp,
+  Search,
 } from "lucide-react";
 
 interface Aluno {
@@ -406,7 +407,8 @@ export const AlunoTable = ({ canCreate }: AlunoTableProps) => {
             autoFocus
           />
           <button type="submit" className={styles.searchButton}>
-            🔍 Buscar
+            <Search className={styles.iconBtn} />
+            <span>Buscar</span>
           </button>
         </form>
 

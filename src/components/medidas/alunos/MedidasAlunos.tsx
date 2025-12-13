@@ -5,9 +5,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { jsPDF } from "jspdf";
-import { MedidasList } from "@/components/medidas/MedidasList";
+import { MedidasList } from "@/components/medidas/detalhes/MedidasList";
 import styles from "./styles.module.scss";
-//import { FileText, Ruler, Search } from "lucide-react";
 import { FileText, Ruler, Search, Weight, TrendingUp } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 

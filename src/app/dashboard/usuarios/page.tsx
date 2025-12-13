@@ -47,14 +47,7 @@ export default async function UsuariosPage() {
               Cadastre e gerencie todos os usuários do sistema
             </p>
           </div>
-          {canCreate && (
-            <Link href="/dashboard/usuarios/novo" className={styles.addButton}>
-              <Plus size={20} />
-              Novo Usuário
-            </Link>
-          )}
         </header>
-
         <UserTable />
       </div>
     </main>

@@ -188,7 +188,7 @@
   font-size: 14px;
 }
 
-/* --- CARDS --- */
+// ==================== CARDS ====================
 .cardsContainer {
   display: flex;
   flex-wrap: wrap;
@@ -478,9 +478,6 @@
 }
 
 @media (max-width: 640px) {
-  .hideMobile {
-    display: none;
-  }
   .iconBtn {
     width: 24px;
     height: 24px;
@@ -494,5 +491,11 @@
   }
   .cardsContainer {
     grid-template-columns: 1fr;
-  } /* Garante 1 coluna no mobile */
+  }
+}
+
+@media (max-width: 440px) {
+  .hideMobile {
+    display: none;
+  }
 }

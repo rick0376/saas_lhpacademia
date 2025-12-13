@@ -540,14 +540,19 @@ export const UserTable = () => {
             autoFocus
           />
           <button type="submit" className={styles.searchButton}>
-            <Search size={18} /> Buscar
+            <Search className={styles.iconBtn} />
+            <span>Buscar</span>
           </button>
         </form>
 
         <div className={styles.actionsGroup}>
           {permUsuarios.criar && (
-            <Link href="/dashboard/usuarios/novo" className={styles.addButton}>
-              <Plus size={18} />
+            <Link
+              href="/dashboard/usuarios/novo"
+              className={`${styles.actionBtn} ${styles.btnNovo}`}
+              title="Novo Aluno"
+            >
+              <Plus className={styles.iconBtn} />
               <span className={styles.hideMobile}>Novo</span>
             </Link>
           )}

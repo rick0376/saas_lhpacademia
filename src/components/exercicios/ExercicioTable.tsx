@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { jsPDF } from "jspdf";
-import { FileText, Share2 } from "lucide-react";
+import { FileText, Search, Share2 } from "lucide-react";
 import styles from "./styles.module.scss";
 import { Button } from "../ui/Button/Button";
 import { Modal } from "../ui/Modal/Modal";
@@ -447,11 +447,12 @@ export const ExercicioTable = () => {
           <option value="FUNCIONAL">Funcional</option>
         </select>
 
-        <button onClick={handleFilter} className={styles.filterButton}>
-          🔍 Filtrar
+        <button onClick={handleFilter} className={styles.searchButton}>
+          <Search className={styles.iconBtn} />
+          <span>Buscar</span>
         </button>
 
-        <div style={{ display: "flex", gap: "8px", marginLeft: "auto" }}>
+        <div className={styles.actionsGroup}>
           {canCompartilharExercicios && (
             <>
               {canCompartilharExercicios && (
@@ -479,17 +480,6 @@ export const ExercicioTable = () => {
               )}
             </>
           )}
-
-          <button
-            onClick={() => {
-              setFiltroGrupo("");
-              setSearchTerm("");
-              fetchExercicios();
-            }}
-            className={styles.clearButton}
-          >
-            ✕ Limpar
-          </button>
         </div>
       </div>
 

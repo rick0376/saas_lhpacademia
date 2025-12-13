@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 import { jsPDF } from "jspdf";
 import styles from "./avalicaoAluno.module.scss";
 import { FaEnvelope, FaPhone, FaBullseye, FaWhatsapp } from "react-icons/fa";
-import { ClipboardCheck, FileText } from "lucide-react";
+import { ClipboardCheck, FileText, Search } from "lucide-react";
 
 interface Aluno {
   id: string;
@@ -325,7 +325,8 @@ export const AvaliacaoAluno = () => {
             autoFocus
           />
           <button type="submit" className={styles.searchButton}>
-            🔍 Buscar
+            <Search className={styles.iconBtn} />
+            <span>Buscar</span>
           </button>
         </form>
 

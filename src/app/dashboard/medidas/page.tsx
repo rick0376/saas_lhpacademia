@@ -2,7 +2,7 @@ import React, { Suspense } from "react";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import MedidasClient from "@/components/listas/medidas/index";
+import MedidasClient from "@/components/medidas/alunos/MedidasAlunos";
 import styles from "./styles.module.scss";
 
 export default async function MedidasPage() {
