@@ -82,14 +82,17 @@ export async function PUT(
       objetivo,
     } = body;
 
+    // ===========================
+    // 1️⃣ Monta dados do usuário
+    // ===========================
     const dataToUpdate: any = {
       nome,
       email,
       role,
       ativo,
-      telefone, // ✅ ADICIONE
-      dataNascimento: dataNascimento ? new Date(dataNascimento) : null, // ✅ ADICIONE
-      objetivo, // ✅ ADICIONE
+      telefone,
+      dataNascimento: dataNascimento ? new Date(dataNascimento) : null,
+      objetivo,
     };
 
     if (senha && senha.trim() !== "") {
@@ -110,34 +113,46 @@ export async function PUT(
       },
     });
 
-    // Atualiza ou cria dados do aluno relacionados
+    // ===========================
+    // 2️⃣ Verificar papel do usuário
+    // ===========================
+    const usuarioEditado = await prisma.usuario.findUnique({
+      where: { id },
+      select: { role: true },
+    });
+
+    // ===========================
+    // 3️⃣ Se for SUPERADMIN → NÃO mexe no aluno
+    // ===========================
+    if (usuarioEditado?.role === "SUPERADMIN") {
+      return NextResponse.json(usuarioAtualizado);
+    }
+
+    // ===========================
+    // 4️⃣ Verificar se existe aluno vinculado
+    // ===========================
     const usuarioAluno = await prisma.aluno.findUnique({
       where: { usuarioId: id },
     });
 
-    if (usuarioAluno) {
-      await prisma.aluno.update({
-        where: { id: usuarioAluno.id },
-        data: {
-          telefone,
-          dataNascimento: dataNascimento ? new Date(dataNascimento) : null,
-          objetivo,
-        },
-      });
-    } else {
-      await prisma.aluno.create({
-        data: {
-          usuarioId: id,
-          clienteId: session.user.clienteId,
-          nome,
-          email,
-          telefone,
-          dataNascimento: dataNascimento ? new Date(dataNascimento) : null,
-          objetivo,
-          ativo,
-        },
-      });
+    // ===========================
+    // 5️⃣ Se NÃO for aluno → não atualiza aluno
+    // ===========================
+    if (!usuarioAluno) {
+      return NextResponse.json(usuarioAtualizado);
     }
+
+    // ===========================
+    // 6️⃣ Atualiza o aluno vinculado
+    // ===========================
+    await prisma.aluno.update({
+      where: { id: usuarioAluno.id },
+      data: {
+        telefone,
+        dataNascimento: dataNascimento ? new Date(dataNascimento) : null,
+        objetivo,
+      },
+    });
 
     return NextResponse.json(usuarioAtualizado);
   } catch (error) {
