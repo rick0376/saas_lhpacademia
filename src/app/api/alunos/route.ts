@@ -79,6 +79,7 @@ export async function GET(req: Request) {
 }
 
 // ✅ POST - Criar aluno
+// POST - Criar aluno
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -106,7 +107,13 @@ export async function POST(req: Request) {
       }
     }
 
-    const clienteId = (session.user as any).clienteId;
+    // ✅ TEM QUE VIR ANTES DE USAR formData
+    const formData = await req.formData();
+
+    // ⭐ CORREÇÃO DEFINITIVA — prioridade ao formulário
+    const clienteId =
+      (formData.get("clienteId") as string) ||
+      ((session.user as any).clienteId as string);
 
     if (!clienteId) {
       return NextResponse.json(
@@ -115,8 +122,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // Resto do código permanece igual...
-    const formData = await req.formData();
+    // agora SIM leia os outros campos...
     const nome = formData.get("nome") as string;
     const email = formData.get("email") as string;
     const telefone = formData.get("telefone") as string;

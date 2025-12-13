@@ -8,7 +8,16 @@ import { jsPDF } from "jspdf";
 import styles from "./styles.module.scss";
 import { Button } from "../ui/Button/Button";
 import { Modal } from "../ui/Modal/Modal";
-import { Edit, Trash2, Plus, FileText, Users, Calendar } from "lucide-react";
+import {
+  Edit,
+  Trash2,
+  Plus,
+  FileText,
+  Users,
+  Calendar,
+  Users2,
+  GraduationCap,
+} from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 
 interface Cliente {
@@ -19,6 +28,7 @@ interface Cliente {
   createdAt: string;
   _count: {
     usuarios: number;
+    alunos: number;
   };
 }
 
@@ -234,8 +244,9 @@ export const ClienteTable = () => {
       doc.setFont("helvetica", "bold");
 
       doc.text("CLIENTE", margin, y);
-      doc.text("STATUS", 90, y);
-      doc.text("USUÁRIOS", 130, y);
+      doc.text("STATUS", 78, y);
+      doc.text("USUÁRIOS", 110, y);
+      doc.text("ALUNOS", 140, y);
       doc.text("CADASTRO", 165, y);
 
       doc.setDrawColor(200, 200, 200);
@@ -290,11 +301,14 @@ export const ClienteTable = () => {
       // Status
       if (cliente.ativo) doc.setTextColor(0, 128, 0);
       else doc.setTextColor(255, 0, 0);
-      doc.text(cliente.ativo ? "Ativo" : "Inativo", 90, y);
+      doc.text(cliente.ativo ? "Ativo" : "Inativo", 80, y);
       doc.setTextColor(0, 0, 0);
 
       // Usuários
-      doc.text(`${cliente._count.usuarios}`, 140, y);
+      doc.text(`${cliente._count.usuarios}`, 115, y);
+
+      // Alunos
+      doc.text(`${cliente._count.alunos}`, 145, y);
 
       // Data
       doc.text(formatDate(cliente.createdAt), 165, y);
@@ -322,6 +336,7 @@ export const ClienteTable = () => {
       texto += `*${cliente.nome}*\n`;
       texto += `Status: ${status}\n`;
       texto += `👥 Usuários: ${cliente._count.usuarios}\n`;
+      texto += `👥 Alunos: ${cliente._count.alunos}\n`;
       texto += `📅 Cadastro: ${formatDate(cliente.createdAt)}\n`;
       texto += `------------------------------\n`;
     });
@@ -432,15 +447,23 @@ export const ClienteTable = () => {
             <div className={styles.cardContent}>
               <div className={styles.infoItem}>
                 <Users
-                  size={16}
+                  size={18}
                   className={`${styles.iconInfo} ${styles.iconUsuarios}`}
                 />
                 <span className={styles.label}>Usuários:</span>
                 <span className={styles.value}>{cliente._count.usuarios}</span>
               </div>
               <div className={styles.infoItem}>
+                <GraduationCap
+                  size={18}
+                  className={`${styles.iconInfo} ${styles.iconUsuarios}`}
+                />
+                <span className={styles.label}>Alunos:</span>
+                <span className={styles.value}>{cliente._count.alunos}</span>
+              </div>
+              <div className={styles.infoItem}>
                 <Calendar
-                  size={16}
+                  size={18}
                   className={`${styles.iconInfo} ${styles.iconCadastro}`}
                 />
                 <span className={styles.label}>Cadastro:</span>

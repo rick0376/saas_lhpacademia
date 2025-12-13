@@ -11,6 +11,7 @@ export default async function NovoAluno(props: any) {
 
   const sp = await props.searchParams;
   const cid = sp?.clienteId || session.user.clienteId || null;
+  console.log("CID =", cid);
 
   let cnome = null;
   if (cid) {

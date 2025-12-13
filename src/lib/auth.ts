@@ -83,7 +83,7 @@ export const authOptions: NextAuthOptions = {
         (token as any).cliente = user.cliente;
         (token as any).aluno = user.aluno;
 
-        // ✅ Buscar permissões do usuário (exceto SUPERADMIN e ALUNO)
+        // buscar permissões (somente ADMIN / PERSONAL / USER)
         if (user.role !== "SUPERADMIN" && user.role !== "ALUNO") {
           try {
             const permissoes = await prisma.permissao.findMany({
@@ -106,7 +106,7 @@ export const authOptions: NextAuthOptions = {
         }
       }
 
-      // ✅ Recarregar permissões quando session.update() for chamado
+      // atualizar permissões quando session.update() é chamado
       if (
         trigger === "update" &&
         token.id &&
@@ -132,6 +132,7 @@ export const authOptions: NextAuthOptions = {
 
       return token;
     },
+
     async session({ session, token }) {
       if (session.user && token && token.id) {
         session.user.id = token.id;
@@ -143,6 +144,8 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
+
+    // ❌ Removemos o redirect porque NÃO funciona com token e causa erro
   },
   secret: process.env.NEXTAUTH_SECRET,
 };

@@ -28,11 +28,11 @@ model Usuario {
   senha          String
   role           Role      @default(USER)
   ativo          Boolean   @default(false)
-  clienteId      String
+  clienteId      String?   // agora é opcional
+  cliente        Cliente?  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
   telefone       String?
   dataNascimento DateTime?
-  objetivo       String?   
-  cliente        Cliente   @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  objetivo       String?
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   permissoes     Permissao[]

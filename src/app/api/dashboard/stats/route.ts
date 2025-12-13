@@ -118,6 +118,8 @@ export async function GET(request: NextRequest) {
         treinos: totalTreinos,
         treinosAtivos,
         exercicios: totalExercicios,
+        clientes:
+          session.user.role === "SUPERADMIN" ? await prisma.cliente.count() : 0,
       },
       atividade: {
         execucoesUltimos7Dias,

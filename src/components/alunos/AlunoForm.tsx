@@ -68,11 +68,19 @@ export const AlunoForm: React.FC<AlunoFormProps> = ({
     ativo: initialData?.ativo ?? true,
     darAcessoApp: false,
     senhaInicial: "",
-    clienteIdSelecionado: isEdit
-      ? initialData?.clienteId || searchParams.get("clienteId") || ""
-      : clienteId || "",
+    clienteIdSelecionado: clienteId || "",
+
     usuarioSelecionadoId: "",
   });
+
+  useEffect(() => {
+    if (clienteId) {
+      setFormData((prev) => ({
+        ...prev,
+        clienteIdSelecionado: clienteId,
+      }));
+    }
+  }, [clienteId]);
 
   useEffect(() => {
     if (!clienteId && !isEdit) {
@@ -272,6 +280,12 @@ export const AlunoForm: React.FC<AlunoFormProps> = ({
                 </span>
               )}
             </div>
+          )}
+
+          {clienteId && (
+            <h2 style={{ marginBottom: "15px", color: "white" }}>
+              Criando aluno para cliente: {clienteId}
+            </h2>
           )}
 
           <div className={styles.selectWrapper}>

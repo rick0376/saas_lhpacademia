@@ -76,11 +76,14 @@
 
 .statContent {
   display: flex;
+  text-align: center;
   flex-direction: column;
   gap: 4px;
 }
 
 .statValue {
+  //display: block;
+  //text-align: center;
   font-size: 36px;
   font-weight: 800;
   color: var(--dark-color);

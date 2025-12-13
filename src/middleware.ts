@@ -10,53 +10,61 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  // ------------------------------------
-  // 1️⃣ ROTAS PÚBLICAS (sempre liberadas)
-  // ------------------------------------
+  // ======================================
+  // 1️⃣ ROTAS PÚBLICAS (SEM AUTENTICAÇÃO)
+  // ======================================
   const publicRoutes = ["/", "/login", "/login-superadmin", "/alunos/login"];
   const isPublicRoute = publicRoutes.includes(pathname);
 
-  // Se a rota é pública → libera mesmo se existir token
-  if (isPublicRoute) {
+  if (isPublicRoute) return NextResponse.next();
+
+  // ======================================
+  // 2️⃣ SUPERADMIN → deve acessar o dashboard normal
+  // ======================================
+  if (token?.role === "SUPERADMIN") {
+    // SUPERADMIN nunca acessa a área do aluno
+    if (pathname.startsWith("/alunos")) {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+
+    // SUPERADMIN pode acessar qualquer /dashboard
+    // e qualquer rota do sistema
     return NextResponse.next();
   }
 
-  // ------------------------------------
-  // 2️⃣ ALUNOS — Área /alunos/**
-  // ------------------------------------
+  // ======================================
+  // 3️⃣ ÁREA DO ALUNO → /alunos/**
+  // ======================================
   if (pathname.startsWith("/alunos")) {
-    // Se não está logado → leva para login de aluno
+    // Não autenticado → login do aluno
     if (!token) {
       return NextResponse.redirect(new URL("/alunos/login", request.url));
     }
 
-    // Permitir apenas: ALUNO, ADMIN, SUPERADMIN
-    if (!["ALUNO", "ADMIN", "SUPERADMIN"].includes(token.role)) {
+    // Apenas ALUNO pode acessar o PCW
+    if (token.role !== "ALUNO") {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
 
     return NextResponse.next();
   }
 
-  // ------------------------------------
-  // 3️⃣ ÁREA ADMIN /dashboard/**
-  // ------------------------------------
+  // ======================================
+  // 4️⃣ ÁREA ADMIN /dashboard/**
+  // ======================================
   if (pathname.startsWith("/dashboard")) {
-    // Se não tem token → volta para home
+    // Não logado → voltar para home
     if (!token) {
       return NextResponse.redirect(new URL("/", request.url));
     }
 
-    // ❗ CORREÇÃO DO SEU BUG:
-    // Aluno não pode entrar no dashboard admin,
-    // MAS NÃO deve ser redirecionado quando estiver deslogando.
+    // Aluno tentando acessar dashboard → volta para PCW
     if (token.role === "ALUNO") {
       return NextResponse.redirect(new URL("/alunos/dashboard", request.url));
     }
 
-    // ------------------------------------
-    // 4️⃣ Rotas exclusivas do SUPERADMIN
-    // ------------------------------------
+    // ADMIN / PERSONAL / USER → normalmente permitido
+    // Mas algumas rotas são EXCLUSIVAS do SUPERADMIN
     const superAdminOnlyRoutes = ["/dashboard/permissoes"];
 
     if (
@@ -71,9 +79,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // ------------------------------------
-  // 5️⃣ Qualquer outra rota não protegida
-  // ------------------------------------
+  // ======================================
+  // 5️⃣ QUALQUER OUTRA ROTA → liberar
+  // ======================================
   return NextResponse.next();
 }
 

@@ -13,6 +13,7 @@ interface Stats {
     treinos: number;
     treinosAtivos: number;
     exercicios: number;
+    clientes: number;
   };
   atividade: {
     execucoesUltimos7Dias: number;
@@ -69,6 +70,22 @@ export const DashboardStats = () => {
     <div className={styles.container}>
       {/* Cards de Estatísticas */}
       <div className={styles.statsGrid}>
+        <div className={styles.statCard}>
+          <div
+            className={styles.statIcon}
+            style={{
+              background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+            }}
+          >
+            🏢
+          </div>
+          <div className={styles.statContent}>
+            <span className={styles.statValue}>{stats.totais.clientes}</span>
+            <span className={styles.statLabel}>Academias</span>
+            <span className={styles.statSubtext}>registradas no sistema</span>
+          </div>
+        </div>
+
         <div className={styles.statCard}>
           <div
             className={styles.statIcon}
@@ -195,10 +212,10 @@ export const DashboardStats = () => {
                 <div key={execucao.id} className={styles.recentItem}>
                   <div className={styles.recentInfo}>
                     <span className={styles.recentName}>
-                      {execucao.treino.aluno.nome}
+                      {execucao.treino?.aluno?.nome ?? "Sem aluno"}
                     </span>
                     <span className={styles.recentSubtext}>
-                      {execucao.treino.nome}
+                      {execucao.treino?.nome ?? "Sem treino"}
                     </span>
                   </div>
                   <div className={styles.recentDate}>
