@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { MedidasList } from "@/components/medidas/MedidasList";
+import { MedidasList } from "@/components/medidas/detalhes/MedidasList";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import styles from "./styles.module.scss";
