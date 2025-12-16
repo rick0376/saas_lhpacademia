@@ -12,6 +12,7 @@ model Cliente {
   nome       String
   logo       String?
   ativo      Boolean     @default(true)
+  dataVencimento DateTime?  
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
   usuarios   Usuario[]

@@ -15,9 +15,18 @@ export async function GET(request: NextRequest) {
     }
 
     const clientes = await prisma.cliente.findMany({
-      include: {
+      select: {
+        id: true,
+        nome: true,
+        logo: true,
+        ativo: true,
+        createdAt: true,
+        dataVencimento: true,
         _count: {
-          select: { usuarios: true, alunos: true },
+          select: {
+            usuarios: true,
+            alunos: true,
+          },
         },
       },
       orderBy: { createdAt: "desc" },
@@ -55,6 +64,7 @@ export async function POST(request: NextRequest) {
     const senha = formData.get("senha") as string; // ✅ SENHA
     const ativo = formData.get("ativo") === "true";
     const logoFile = formData.get("logo") as File | null;
+    const dataVencimento = formData.get("dataVencimento") as string | null; // ✅ NOVO CAMPO
 
     if (!nome || !login || !senha) {
       return NextResponse.json(
@@ -101,6 +111,7 @@ export async function POST(request: NextRequest) {
         nome,
         logo: logoUrl,
         ativo,
+        dataVencimento: dataVencimento ? new Date(dataVencimento) : null, // ✅ Adicionando dataVencimento
       },
     });
 

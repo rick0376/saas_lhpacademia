@@ -26,6 +26,7 @@ interface Cliente {
   logo?: string;
   ativo: boolean;
   createdAt: string;
+  dataVencimento?: string | null;
   _count: {
     usuarios: number;
     alunos: number;
@@ -168,11 +169,12 @@ export const ClienteTable = () => {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString("pt-BR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
+
+    const day = String(date.getUTCDate()).padStart(2, "0");
+    const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+    const year = date.getUTCFullYear();
+
+    return `${day}/${month}/${year}`;
   };
 
   // ✅ Gerar PDF dos Clientes
@@ -469,6 +471,18 @@ export const ClienteTable = () => {
                 <span className={styles.label}>Cadastro:</span>
                 <span className={styles.value}>
                   {formatDate(cliente.createdAt)}
+                </span>
+              </div>
+              <div className={styles.infoItem}>
+                <Calendar
+                  size={18}
+                  className={`${styles.iconInfo} ${styles.iconCadastro}`}
+                />
+                <span className={styles.label}>Vencimento:</span>
+                <span className={styles.value}>
+                  {cliente.dataVencimento
+                    ? formatDate(cliente.dataVencimento)
+                    : "Não definido"}
                 </span>
               </div>
             </div>

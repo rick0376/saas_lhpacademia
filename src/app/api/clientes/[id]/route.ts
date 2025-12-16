@@ -21,9 +21,18 @@ export async function GET(
 
     const cliente = await prisma.cliente.findUnique({
       where: { id },
-      include: {
+      select: {
+        id: true,
+        nome: true,
+        logo: true,
+        ativo: true,
+        createdAt: true,
+        dataVencimento: true, // ← AGORA SIM! 🔥
         _count: {
-          select: { usuarios: true },
+          select: {
+            usuarios: true,
+            alunos: true,
+          },
         },
       },
     });
@@ -66,12 +75,14 @@ export async function PUT(
     const ativo = formData.get("ativo") === "true";
     const logoFile = formData.get("logo") as File | null;
     const logoExistente = formData.get("logoExistente") as string | null;
+    const dataVencimento = formData.get("dataVencimento") as string | null; // <-- capturando a data
 
     console.log("📝 Atualizando cliente:", {
       id,
       nome,
       temNovoArquivo: !!logoFile,
       manterLogoExistente: !!logoExistente,
+      dataVencimento, // logando o valor para verificar
     });
 
     // Buscar cliente atual
@@ -127,13 +138,24 @@ export async function PUT(
       }
     }
 
-    // Atualizar no banco
+    // Verificando e ajustando a dataVencimento para evitar diferença de fuso horário
+    let dataVencimentoFormatada = null;
+
+    if (dataVencimento) {
+      const [ano, mes, dia] = dataVencimento.split("-").map(Number);
+
+      // Criar data em UTC sem sofrer ajuste de timezone
+      dataVencimentoFormatada = new Date(Date.UTC(ano, mes - 1, dia));
+    }
+
+    // Atualizar no banco com a nova data de vencimento
     const clienteAtualizado = await prisma.cliente.update({
       where: { id },
       data: {
         nome,
         logo: novoLogoUrl,
         ativo,
+        dataVencimento: dataVencimentoFormatada, // <-- passando a data corrigida
       },
     });
 

@@ -413,6 +413,20 @@
   margin-bottom: 32px;
 }
 
+.inlineGroup {
+  display: flex; /* input + botão lado a lado */ /* [web:146][web:152] */
+  align-items: flex-end;
+  gap: 0.75rem; // espaço entre input e botão [web:155]
+
+  // ajusta o Input ocupando mais espaço
+  & > :first-child {
+    flex: 1;
+  }
+
+  button {
+    white-space: nowrap;
+  }
+}
 .checkboxWrapper {
   padding: 16px;
   background-color: var(--light-color);

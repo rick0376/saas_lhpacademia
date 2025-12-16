@@ -32,6 +32,7 @@ export default async function EditarClientePage({ params }: Props) {
       nome: true,
       logo: true,
       ativo: true,
+      dataVencimento: true,
     },
   });
 
@@ -56,6 +57,7 @@ export default async function EditarClientePage({ params }: Props) {
               nome: cliente.nome,
               logo: cliente.logo || undefined,
               ativo: cliente.ativo,
+              dataVencimento: cliente.dataVencimento || null,
             }}
             isEdit={true}
           />

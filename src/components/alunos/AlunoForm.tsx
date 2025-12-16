@@ -48,6 +48,7 @@ export const AlunoForm: React.FC<AlunoFormProps> = ({
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [clientes, setClientes] = useState<any[]>([]);
+  const [clienteNome, setClienteNome] = useState<string>("");
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [toastData, setToastData] = useState<{
     message: string;
@@ -87,6 +88,24 @@ export const AlunoForm: React.FC<AlunoFormProps> = ({
       fetchClientes();
     }
   }, [clienteId, isEdit]);
+
+  useEffect(() => {
+    async function fetchClienteNome() {
+      if (!clienteId) return;
+
+      try {
+        const response = await fetch(`/api/clientes/${clienteId}`);
+        if (!response.ok) return;
+
+        const data = await response.json();
+        setClienteNome(data.nome);
+      } catch (err) {
+        console.error("Erro ao buscar nome do cliente:", err);
+      }
+    }
+
+    fetchClienteNome();
+  }, [clienteId]);
 
   useEffect(() => {
     if (formData.clienteIdSelecionado) {
@@ -283,8 +302,9 @@ export const AlunoForm: React.FC<AlunoFormProps> = ({
           )}
 
           {clienteId && (
-            <h2 style={{ marginBottom: "15px", color: "white" }}>
-              Criando aluno para cliente: {clienteId}
+            <h2 className={styles.clienteTitulo}>
+              Criando aluno para cliente:
+              <span className={styles.clienteNome}>{clienteNome}</span>
             </h2>
           )}
 

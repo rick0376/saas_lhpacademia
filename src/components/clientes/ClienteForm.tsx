@@ -13,6 +13,7 @@ interface ClienteFormProps {
     nome: string;
     logo?: string;
     ativo: boolean;
+    dataVencimento?: Date | null;
   };
   isEdit?: boolean;
 }
@@ -35,7 +36,26 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({
     login: "", // ✅ LOGIN
     senha: "", // ✅ SENHA
     ativo: initialData?.ativo ?? true,
+    dataVencimento: initialData?.dataVencimento
+      ? new Date(initialData.dataVencimento).toISOString().slice(0, 10)
+      : "",
+    diasAdicionar: "",
   });
+
+  /*const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type } = e.target;
+    const checked = (e.target as HTMLInputElement).checked;
+
+    setFormData({
+      ...formData,
+      [name]: type === "checkbox" ? checked : value,
+    });
+
+    if (errors[name]) {
+      setErrors({ ...errors, [name]: "" });
+    }
+  };
+*/
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
@@ -94,6 +114,7 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({
       const formDataToSend = new FormData();
       formDataToSend.append("nome", formData.nome);
       formDataToSend.append("ativo", String(formData.ativo));
+      formDataToSend.append("dataVencimento", formData.dataVencimento);
 
       // ✅ ADICIONAR LOGIN E SENHA (só ao criar)
       if (!isEdit) {
@@ -136,6 +157,22 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({
     }
   };
 
+  const aplicarDias = () => {
+    const qtd = Number(formData.diasAdicionar || 0);
+    if (!formData.dataVencimento || !qtd) return;
+
+    const base = new Date(formData.dataVencimento);
+    base.setDate(base.getDate() + qtd);
+
+    const novaData = base.toISOString().slice(0, 10);
+
+    setFormData((prev) => ({
+      ...prev,
+      dataVencimento: novaData,
+      diasAdicionar: "",
+    }));
+  };
+
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
       <div className={styles.formGrid}>
@@ -149,6 +186,28 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({
           error={errors.nome}
           required
         />
+
+        <Input
+          label="Data de Vencimento"
+          type="date"
+          name="dataVencimento"
+          value={formData.dataVencimento}
+          onChange={handleChange}
+        />
+
+        <div className={styles.inlineGroup}>
+          <Input
+            label="Adicionar dias"
+            type="number"
+            name="diasAdicionar"
+            placeholder="Ex: 20"
+            value={formData.diasAdicionar}
+            onChange={handleChange}
+          />
+          <Button type="button" onClick={aplicarDias}>
+            Aplicar
+          </Button>
+        </div>
 
         {/* ✅ LOGIN E SENHA (só aparece ao criar) */}
         {!isEdit && (
