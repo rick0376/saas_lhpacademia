@@ -51,6 +51,11 @@ export const ClienteTable = () => {
     isOpen: boolean;
     cliente?: Cliente;
   }>({ isOpen: false });
+  const [vencimentoModal, setVencimentoModal] = useState<{
+    isOpen: boolean;
+    cliente?: Cliente;
+  }>({ isOpen: false });
+
   const [permissoes, setPermissoes] = useState<Permissao>({
     recurso: "clientes",
     criar: false,
@@ -163,6 +168,43 @@ export const ClienteTable = () => {
       alert(
         "Erro ao excluir cliente. Verifique se não há usuários vinculados."
       );
+      console.error(err);
+    }
+  };
+
+  const handleUpdateVencimento = async (
+    cliente: Cliente,
+    dataVencimento: string
+  ) => {
+    try {
+      const formData = new FormData();
+
+      formData.append("nome", cliente.nome);
+      formData.append("ativo", String(cliente.ativo));
+      formData.append("dataVencimento", dataVencimento);
+
+      // mantém logo atual (importantíssimo, senão zera) [web:114][web:119]
+      if (cliente.logo) {
+        formData.append("logoExistente", cliente.logo);
+      }
+
+      const response = await fetch(`/api/clientes/${cliente.id}`, {
+        method: "PUT",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro ao atualizar vencimento");
+      }
+
+      // atualiza lista em memória
+      setClientes((prev) =>
+        prev.map((c) => (c.id === cliente.id ? { ...c, dataVencimento } : c))
+      );
+
+      setVencimentoModal({ isOpen: false });
+    } catch (err) {
+      alert("Erro ao atualizar vencimento");
       console.error(err);
     }
   };
@@ -499,6 +541,16 @@ export const ClienteTable = () => {
               </button>
 
               {permissoes.editar && (
+                <button
+                  onClick={() => setVencimentoModal({ isOpen: true, cliente })}
+                  className={styles.vencimentoButton}
+                  title="Alterar vencimento"
+                >
+                  <Calendar size={18} />
+                </button>
+              )}
+
+              {permissoes.editar && (
                 <Link
                   href={`/dashboard/clientes/${cliente.id}/editar`}
                   className={styles.editButton}
@@ -521,6 +573,58 @@ export const ClienteTable = () => {
           </div>
         ))}
       </div>
+
+      <Modal
+        isOpen={vencimentoModal.isOpen}
+        onClose={() => setVencimentoModal({ isOpen: false })}
+        title="Alterar vencimento"
+        size="small"
+      >
+        <div className={styles.modalContent}>
+          <p>
+            Cliente: <strong>{vencimentoModal.cliente?.nome}</strong>
+          </p>
+
+          <input
+            type="date"
+            className={styles.dateInput}
+            value={
+              vencimentoModal.cliente?.dataVencimento
+                ? new Date(vencimentoModal.cliente.dataVencimento)
+                    .toISOString()
+                    .slice(0, 10)
+                : ""
+            }
+            onChange={(e) =>
+              setVencimentoModal((prev) =>
+                prev.cliente
+                  ? {
+                      ...prev,
+                      cliente: {
+                        ...prev.cliente,
+                        dataVencimento: e.target.value || null,
+                      },
+                    }
+                  : prev
+              )
+            }
+          />
+
+          <div className={styles.modalActions}>
+            <Button
+              variant="primary"
+              onClick={() => {
+                const cli = vencimentoModal.cliente;
+                if (!cli?.dataVencimento) return;
+
+                handleUpdateVencimento(cli, cli.dataVencimento);
+              }}
+            >
+              Salvar
+            </Button>
+          </div>
+        </div>
+      </Modal>
 
       {/* Modal de Exclusão */}
       <Modal
