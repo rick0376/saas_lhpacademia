@@ -289,9 +289,10 @@ export const ClienteTable = () => {
 
       doc.text("CLIENTE", margin, y);
       doc.text("STATUS", 78, y);
-      doc.text("USUÁRIOS", 110, y);
-      doc.text("ALUNOS", 140, y);
-      doc.text("CADASTRO", 165, y);
+      doc.text("USUÁRIOS", 100, y);
+      doc.text("ALUNOS", 120, y);
+      doc.text("CADASTRO", 145, y);
+      doc.text("VENCIMENTO", 175, y);
 
       doc.setDrawColor(200, 200, 200);
       doc.line(margin, y + 2, pageWidth - margin, y + 2);
@@ -349,13 +350,16 @@ export const ClienteTable = () => {
       doc.setTextColor(0, 0, 0);
 
       // Usuários
-      doc.text(`${cliente._count.usuarios}`, 115, y);
+      doc.text(`${cliente._count.usuarios}`, 105, y);
 
       // Alunos
-      doc.text(`${cliente._count.alunos}`, 145, y);
+      doc.text(`${cliente._count.alunos}`, 125, y);
 
       // Data
-      doc.text(formatDate(cliente.createdAt), 165, y);
+      doc.text(formatDate(cliente.createdAt), 146, y);
+
+      // Vencimento
+      doc.text(formatDate(cliente.dataVencimento), 177, y);
 
       doc.setDrawColor(245, 245, 245);
       doc.line(margin, y + 5, pageWidth - margin, y + 5);
@@ -368,7 +372,7 @@ export const ClienteTable = () => {
   };
 
   // ✅ Enviar WhatsApp
-  const enviarWhatsAppClientes = () => {
+  /*const enviarWhatsAppClientes = () => {
     if (clientes.length === 0) return;
 
     const nomeUsuario = session?.user?.name || "Sistema";
@@ -382,12 +386,44 @@ export const ClienteTable = () => {
       texto += `👥 Usuários: ${cliente._count.usuarios}\n`;
       texto += `👥 Alunos: ${cliente._count.alunos}\n`;
       texto += `📅 Cadastro: ${formatDate(cliente.createdAt)}\n`;
+      texto += `⏳Vencimento: ${formatDate(cliente.dataVencimento)}\n`;
       texto += `------------------------------\n`;
     });
 
     texto += `\n📌 *${nomeUsuario}*`;
 
     window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, "_blank");
+  };
+*/
+
+  const enviarWhatsAppClientes = () => {
+    if (clientes.length === 0) return;
+
+    const nomeUsuario = session?.user?.name || "Sistema";
+
+    let texto = `🏢 *RELATÓRIO DE CLIENTES*\n\n`;
+
+    clientes.forEach((cliente) => {
+      const status = cliente.ativo ? "✅ Ativo" : "🛑 Inativo";
+      texto += `*${cliente.nome}*\n`;
+      texto += `Status: ${status}\n`;
+      texto += `👥 Usuários: ${cliente._count.usuarios}\n`;
+      texto += `🎓 Alunos: ${cliente._count.alunos}\n`;
+      texto += `📅 Cadastro: ${formatDate(cliente.createdAt)}\n`;
+      texto += `⏳ Vencimento: ${
+        cliente.dataVencimento
+          ? formatDate(cliente.dataVencimento)
+          : "Não definido"
+      }\n`;
+      texto += `------------------------------\n`;
+    });
+
+    texto += `\n📌 *${nomeUsuario}*`;
+
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(
+      texto
+    )}`;
+    window.open(url, "_blank");
   };
 
   if (loading) {
