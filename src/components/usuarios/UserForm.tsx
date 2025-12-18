@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import styles from "./userform.module.scss";
@@ -62,7 +62,39 @@ export const UserForm: React.FC<UserFormProps> = ({
     confirmarSenha: "",
     role: initialData?.role || "USER",
     ativo: initialData?.ativo ?? false,
+    clienteId: "",
   });
+
+  const [clientes, setClientes] = useState<Array<{ id: string; nome: string }>>(
+    []
+  );
+  const [loadingClientes, setLoadingClientes] = useState(false);
+
+  useEffect(() => {
+    const fetchClientes = async () => {
+      if (session?.user?.role !== "SUPERADMIN") return;
+
+      try {
+        setLoadingClientes(true);
+        const resp = await fetch("/api/clientes");
+        if (!resp.ok) throw new Error("Erro ao carregar clientes");
+
+        const data = await resp.json();
+        setClientes(
+          data.map((c: any) => ({
+            id: c.id,
+            nome: c.nome,
+          }))
+        );
+      } catch (err) {
+        console.error("Erro ao buscar clientes", err);
+      } finally {
+        setLoadingClientes(false);
+      }
+    };
+
+    fetchClientes();
+  }, [session]);
 
   // Função para formatação do telefone
   const formatTelefone = (value: string) => {
@@ -190,6 +222,11 @@ export const UserForm: React.FC<UserFormProps> = ({
         role: formData.role,
         ativo: formData.ativo,
       };
+
+      // ⬇️ SE SUPERADMIN, ENVIA O CLIENTE ESCOLHIDO
+      if (session?.user?.role === "SUPERADMIN" && formData.clienteId) {
+        body.clienteId = formData.clienteId;
+      }
 
       if (formData.senha) {
         body.senha = formData.senha;
@@ -357,6 +394,31 @@ export const UserForm: React.FC<UserFormProps> = ({
               ))}
             </select>
           </div>
+
+          {session?.user?.role === "SUPERADMIN" && (
+            <div className={styles.selectWrapper}>
+              <label className={styles.label}>Cliente</label>
+              <select
+                name="clienteId"
+                value={formData.clienteId}
+                onChange={handleChange}
+                className={styles.select}
+              >
+                <option value="">Selecione um cliente</option>
+                {clientes.map((cliente) => (
+                  <option key={cliente.id} value={cliente.id}>
+                    {cliente.nome}
+                  </option>
+                ))}
+              </select>
+              {loadingClientes && (
+                <span className={styles.helperText}>
+                  Carregando clientes...
+                </span>
+              )}
+            </div>
+          )}
+
           <div className={styles.checkboxWrapper}>
             <label className={styles.checkboxLabel}>
               <input

@@ -18,6 +18,7 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Senha", type: "password" },
         clienteId: { label: "Cliente ID", type: "text", required: false },
       },
+
       async authorize(credentials) {
         const senha = credentials?.password || (credentials as any)?.senha;
 
@@ -41,20 +42,28 @@ export const authOptions: NextAuthOptions = {
             throw new Error("Usuário não encontrado ou inativo");
           }
 
-          const clienteId = credentials.clienteId as string | undefined;
-          if (
-            clienteId &&
-            usuario.role !== "ADMIN" &&
-            usuario.role !== "SUPERADMIN" &&
-            usuario.clienteId !== clienteId
-          ) {
-            throw new Error("Cliente ID inválido");
-          }
-
+          // 🔐 valida a senha
           const senhaValida = await compare(senha, usuario.senha);
-
           if (!senhaValida) {
             throw new Error("Senha incorreta");
+          }
+
+          const clienteId = credentials.clienteId as string | undefined;
+
+          // 🌐 LOGIN SUPERADMIN (painel global) → não tem clienteId
+          if (!clienteId) {
+            if (usuario.role !== "SUPERADMIN") {
+              throw new Error("Apenas SuperAdmin pode acessar este painel");
+            }
+            // SUPERADMIN logando no /login-superadmin → OK
+          } else {
+            // 🏢 LOGIN POR CARD (clienteId vindo da URL)
+            if (
+              usuario.role !== "SUPERADMIN" && // superadmin entra em qualquer card
+              usuario.clienteId !== clienteId // demais só no próprio cliente
+            ) {
+              throw new Error("Usuário não pertence a esta academia");
+            }
           }
 
           const user = {

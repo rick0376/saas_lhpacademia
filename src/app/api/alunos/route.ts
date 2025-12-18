@@ -133,6 +133,7 @@ export async function POST(req: Request) {
     const darAcessoApp = formData.get("darAcessoApp") === "true";
     const senhaInicial = formData.get("senhaInicial") as string;
     const fotoFile = formData.get("foto") as File | null;
+    const usuarioIdSelecionado = formData.get("usuarioId") as string | null;
 
     if (!nome) {
       return NextResponse.json(
@@ -157,49 +158,39 @@ export async function POST(req: Request) {
       }
     }
 
-    let usuarioId = null;
+    let usuarioId: string | null = null;
 
-    if (darAcessoApp) {
-      if (!email) {
-        return NextResponse.json(
-          { error: "Email é obrigatório para dar acesso ao app" },
-          { status: 400 }
-        );
-      }
-
-      if (!senhaInicial) {
-        return NextResponse.json(
-          { error: "Senha inicial é obrigatória para dar acesso ao app" },
-          { status: 400 }
-        );
-      }
-
-      const usuarioExistente = await prisma.usuario.findUnique({
-        where: { email },
-      });
-
-      if (usuarioExistente) {
-        return NextResponse.json(
-          { error: "Já existe um usuário com este email" },
-          { status: 400 }
-        );
-      }
-
-      const senhaHash = await bcrypt.hash(senhaInicial, 10);
-      const usuario = await prisma.usuario.create({
-        data: {
-          nome,
-          email,
-          senha: senhaHash,
-          role: "ALUNO",
-          ativo: true,
+    // Se veio usuarioId no form, usa ele:
+    if (usuarioIdSelecionado) {
+      // garante que o usuário existe e é do mesmo cliente
+      const usuario = await prisma.usuario.findFirst({
+        where: {
+          id: usuarioIdSelecionado,
           clienteId,
         },
       });
 
+      if (!usuario) {
+        return NextResponse.json(
+          { error: "Usuário selecionado não encontrado para este cliente" },
+          { status: 400 }
+        );
+      }
+
       usuarioId = usuario.id;
     }
 
+    // Opcional: se marcar "Dar acesso ao app" sem usuário ligado, bloquear
+    /*  if (darAcessoApp && !usuarioId) {
+      return NextResponse.json(
+        {
+          error:
+            "Para dar acesso ao app, selecione um usuário existente primeiro",
+        },
+        { status: 400 }
+      );
+    }
+*/
     let fotoUrl = null;
     if (fotoFile && fotoFile.size > 0) {
       fotoUrl = await uploadToCloudinary(fotoFile, "alunos");
