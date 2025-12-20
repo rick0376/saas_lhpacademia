@@ -1054,11 +1054,13 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
                   required
                 >
                   <option value="">Selecione...</option>
-                  {exerciciosFiltrados.map((ex) => (
-                    <option key={ex.id} value={ex.id}>
-                      {ex.nome} - {getGrupoMuscularLabel(ex.grupoMuscular)}
-                    </option>
-                  ))}
+                  {exerciciosFiltrados
+                    .sort((a, b) => a.nome.localeCompare(b.nome))
+                    .map((ex) => (
+                      <option key={ex.id} value={ex.id}>
+                        {ex.nome} - {getGrupoMuscularLabel(ex.grupoMuscular)}
+                      </option>
+                    ))}
                 </select>
               </div>
 

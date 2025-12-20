@@ -52,6 +52,7 @@ export async function GET(request: NextRequest) {
           select: {
             exercicios: true,
             cronogramas: true,
+            alunosAtribuidos: true, // ✅ ADICIONAR ESTA LINHA
           },
         },
       },

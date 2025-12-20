@@ -16,12 +16,14 @@ interface Treino {
   objetivo?: string;
   ativo: boolean;
   dataInicio: string;
-  aluno: {
+  aluno?: {
+    // ✅ Tornar opcional com ?
     nome: string;
   };
   _count: {
     exercicios: number;
     cronogramas: number;
+    alunosAtribuidos: number; // ✅ ADICIONAR ESTA LINHA
   };
 }
 
@@ -298,7 +300,14 @@ export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
       checkPageBreak(10);
 
       const nome = doc.splitTextToSize(t.nome, 48);
-      const aluno = doc.splitTextToSize(t.aluno.nome, 40);
+
+      const alunoNome = t.aluno
+        ? t.aluno.nome
+        : `${String(t._count.alunosAtribuidos || 0).padStart(2, "0")} aluno${
+            t._count.alunosAtribuidos === 1 ? "" : "s"
+          } vinculados`;
+
+      const aluno = doc.splitTextToSize(alunoNome, 40);
       const objetivo = doc.splitTextToSize(t.objetivo || "-", 40);
       const qtdExercicios = String(t._count.exercicios);
       const status = t.ativo ? "Ativo" : "Inativo";
@@ -347,16 +356,24 @@ export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
 
     treinosOrdenados.forEach((t) => {
       const status = t.ativo ? "✅ Ativo" : "🛑 Inativo";
+
+      const alunoNome = t.aluno
+        ? t.aluno.nome
+        : `${String(t._count.alunosAtribuidos || 0).padStart(2, "0")} aluno${
+            t._count.alunosAtribuidos === 1 ? "" : "s"
+          } vinculados`;
+
       texto += `*${t.nome}*\n`;
-      texto += `👤 Aluno: ${t.aluno.nome}\n`;
+      texto += `👤 Aluno(s): ${alunoNome}\n`;
       texto += `📅 Data: ${formatDate(t.dataInicio)} | ${status}\n`;
       texto += `📊 Ex: ${t._count.exercicios} | Dias: ${t._count.cronogramas}\n`;
       texto += `------------------------------\n`;
     });
 
     texto += `📌 *${nomeCliente}*`;
-
-    const url = `https://wa.me/?text=${encodeURIComponent(texto)}`;
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(
+      texto
+    )}`;
     window.open(url, "_blank");
   };
 
@@ -458,9 +475,16 @@ export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
 
             <div className={styles.cardBody}>
               <div className={styles.infoRow}>
-                <span className={styles.label}>Aluno:</span>
+                <span className={styles.label}>
+                  {treino.aluno ? "Aluno:" : "Alunos:"}
+                </span>
                 <span className={styles.value}>
-                  {treino.aluno?.nome || "Aluno não vinculado"}
+                  {treino.aluno
+                    ? treino.aluno.nome
+                    : String(treino._count.alunosAtribuidos || 0).padStart(
+                        2,
+                        "0"
+                      )}
                 </span>
               </div>
 
