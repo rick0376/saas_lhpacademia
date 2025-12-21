@@ -111,3 +111,12 @@
 .fullWidth {
   width: 100%;
 }
+
+.warning {
+  background-color: #d97706;
+  color: white;
+
+  &:hover:not(:disabled) {
+    background-color: #f59e0b;
+  }
+}

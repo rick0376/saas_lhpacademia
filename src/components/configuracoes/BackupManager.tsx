@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/Button/Button";
 import { Toast } from "@/components/ui/Toast/Toast";
-import styles from "./BackupManager.module.scss";
+import styles from "./styles.module.scss";
 
 interface Backup {
   nome: string;
@@ -17,6 +17,8 @@ export const BackupManager = () => {
   const [agendamentoAtivo, setAgendamentoAtivo] = useState(false);
   const [intervalo, setIntervalo] = useState("diario");
   const [showRestaurarModal, setShowRestaurarModal] = useState(false);
+  const [showExcluirModal, setShowExcluirModal] = useState(false);
+  const [backupParaExcluir, setBackupParaExcluir] = useState<string>("");
   const [backupSelecionado, setBackupSelecionado] = useState<string>("");
   const [backupExterno, setBackupExterno] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -192,6 +194,47 @@ export const BackupManager = () => {
     }
   };
 
+  // ✅ Abrir Modal Excluir Backups
+  const abrirModalExcluir = (nomeArquivo: string) => {
+    setBackupParaExcluir(nomeArquivo);
+    setShowExcluirModal(true);
+  };
+
+  // ✅ Excluir Backups
+  const handleExcluirBackup = async () => {
+    setLoading(true);
+    setShowExcluirModal(false);
+
+    try {
+      const response = await fetch("/api/backup/excluir", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename: backupParaExcluir }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) throw new Error(data.error);
+
+      setToast({
+        show: true,
+        message: "Backup excluído com sucesso!",
+        type: "success",
+      });
+
+      carregarBackups(); // Recarregar lista
+    } catch (error: any) {
+      setToast({
+        show: true,
+        message: error.message || "Erro ao excluir backup",
+        type: "error",
+      });
+    } finally {
+      setLoading(false);
+      setBackupParaExcluir("");
+    }
+  };
+
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>💾 Backup do Banco de Dados</h2>
@@ -294,10 +337,16 @@ export const BackupManager = () => {
                     ⬇️ Download
                   </Button>
                   <Button
-                    variant="danger"
+                    variant="warning"
                     onClick={() => abrirModalRestaurar(backup.nome)}
                   >
                     🔄 Restaurar
+                  </Button>
+                  <Button
+                    variant="danger"
+                    onClick={() => abrirModalExcluir(backup.nome)}
+                  >
+                    🗑️ Excluir
                   </Button>
                 </div>
               </div>
@@ -343,6 +392,49 @@ export const BackupManager = () => {
               </Button>
               <Button variant="danger" onClick={handleRestaurar}>
                 Confirmar Restauração
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Confirmação de Exclusão */}
+      {showExcluirModal && (
+        <div
+          className={styles.modalOverlay}
+          onClick={() => {
+            setShowExcluirModal(false);
+            setBackupParaExcluir("");
+          }}
+        >
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalIcon}>🗑️</div>
+            <h3 className={styles.modalTitle}>Confirmar Exclusão</h3>
+            <p className={styles.modalText}>
+              Tem certeza que deseja excluir este backup?
+            </p>
+            <p className={styles.modalText}>
+              Backup: <strong>{backupParaExcluir}</strong>
+            </p>
+            <p className={styles.modalWarning}>
+              ⚠️ Esta operação NÃO pode ser desfeita!
+            </p>
+            <div className={styles.modalActions}>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setShowExcluirModal(false);
+                  setBackupParaExcluir("");
+                }}
+              >
+                Cancelar
+              </Button>
+              <Button
+                variant="danger"
+                onClick={handleExcluirBackup}
+                disabled={loading}
+              >
+                {loading ? "Excluindo..." : "Confirmar Exclusão"}
               </Button>
             </div>
           </div>
