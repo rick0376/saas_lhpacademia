@@ -70,6 +70,7 @@ export async function GET(req: Request) {
     const alunos = await prisma.aluno.findMany({
       where: whereClause,
       include: {
+        cliente: { select: { nome: true } },
         _count: {
           select: {
             treinos: true,

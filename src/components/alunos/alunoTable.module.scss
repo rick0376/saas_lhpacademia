@@ -38,18 +38,12 @@
   gap: 8px;
   flex: 1;
   min-width: 200px;
-
-  label {
-    font-weight: 600;
-    font-size: 14px;
-    white-space: nowrap;
-  }
+  margin-left: 0;
 }
 
 .filterSelect {
   flex: 1;
-  //padding: 8px 12px;
-  padding: 0 12px;
+  padding: 8px 12px;
   border: 2px solid #a78bfa;
   border-radius: 12px;
   font-size: 14px;

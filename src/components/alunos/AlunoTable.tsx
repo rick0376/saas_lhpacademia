@@ -34,6 +34,7 @@ interface Aluno {
     medidas: number;
   };
   clienteId: string;
+  cliente?: { nome: string };
 }
 
 interface Permissao {
@@ -294,10 +295,11 @@ export const AlunoTable = ({ canCreate }: AlunoTableProps) => {
       doc.setFont("helvetica", "bold");
 
       doc.text("NOME", margin, y);
-      doc.text("EMAIL", 60, y);
-      doc.text("TELEFONE", 110, y);
-      doc.text("OBJETIVO", 140, y);
-      doc.text("STATUS", 175, y);
+      doc.text("ACADEMIA", 50, y);
+      doc.text("EMAIL", 85, y);
+      doc.text("TELEFONE", 125, y);
+      doc.text("OBJETIVO", 157, y);
+      doc.text("STATUS", 185, y);
 
       doc.setDrawColor(200, 200, 200);
       doc.line(margin, y + 2, pageWidth - margin, y + 2);
@@ -342,14 +344,16 @@ export const AlunoTable = ({ canCreate }: AlunoTableProps) => {
     alunosOrdenados.forEach((a) => {
       checkPageBreak(10);
 
-      const nome = doc.splitTextToSize(a.nome, 45);
-      const email = doc.splitTextToSize(a.email || "-", 45);
+      const nome = doc.splitTextToSize(a.nome, 35);
+      const academia = doc.splitTextToSize(a.cliente?.nome || "-", 30);
+      const email = doc.splitTextToSize(a.email || "-", 35);
       const telefone = a.telefone || "-";
-      const objetivo = doc.splitTextToSize(a.objetivo || "-", 30);
+      const objetivo = doc.splitTextToSize(a.objetivo || "-", 25);
       const status = a.ativo ? "Ativo" : "Inativo";
 
       const height = Math.max(
         nome.length * 4,
+        academia.length * 4,
         email.length * 4,
         objetivo.length * 4,
         6
@@ -358,13 +362,14 @@ export const AlunoTable = ({ canCreate }: AlunoTableProps) => {
       doc.setFontSize(8);
 
       doc.text(nome, margin, y);
-      doc.text(email, 60, y);
-      doc.text(telefone, 110, y);
-      doc.text(objetivo, 140, y);
+      doc.text(academia, 50, y);
+      doc.text(email, 85, y);
+      doc.text(telefone, 124, y);
+      doc.text(objetivo, 152, y);
 
       if (a.ativo) doc.setTextColor(0, 128, 0);
       else doc.setTextColor(255, 0, 0);
-      doc.text(status, 175, y);
+      doc.text(status, 187, y);
 
       doc.setTextColor(0, 0, 0);
 
@@ -388,6 +393,7 @@ export const AlunoTable = ({ canCreate }: AlunoTableProps) => {
     alunosOrdenados.forEach((a) => {
       const status = a.ativo ? "✅ Ativo" : "🛑 Inativo";
       texto += `*${a.nome}*\n`;
+      texto += `🏢 *${a.cliente?.nome || "Não informada"}*\n`;
       if (a.email) texto += `📧 ${a.email}\n`;
       if (a.telefone) texto += `📱 ${a.telefone}\n`;
       if (a.objetivo) texto += `🎯 ${a.objetivo}\n`;
@@ -398,7 +404,9 @@ export const AlunoTable = ({ canCreate }: AlunoTableProps) => {
 
     texto += `📌 *${nomeCliente}*`;
 
-    const url = `https://wa.me/?text=${encodeURIComponent(texto)}`;
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(
+      texto
+    )}`;
     window.open(url, "_blank");
   };
 
@@ -425,7 +433,6 @@ export const AlunoTable = ({ canCreate }: AlunoTableProps) => {
       <div className={styles.toolbar}>
         {session?.user?.role === "SUPERADMIN" && (
           <div className={styles.filterGroup}>
-            <label htmlFor="clienteFilter">Cliente:</label>
             <select
               id="clienteFilter"
               value={clienteId}

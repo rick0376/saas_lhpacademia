@@ -371,31 +371,6 @@ export const ClienteTable = () => {
     doc.save("relatorio-clientes.pdf");
   };
 
-  // ✅ Enviar WhatsApp
-  /*const enviarWhatsAppClientes = () => {
-    if (clientes.length === 0) return;
-
-    const nomeUsuario = session?.user?.name || "Sistema";
-
-    let texto = `🏢 *RELATÓRIO DE CLIENTES*\n\n`;
-
-    clientes.forEach((cliente) => {
-      const status = cliente.ativo ? "✅ Ativo" : "🛑 Inativo";
-      texto += `*${cliente.nome}*\n`;
-      texto += `Status: ${status}\n`;
-      texto += `👥 Usuários: ${cliente._count.usuarios}\n`;
-      texto += `👥 Alunos: ${cliente._count.alunos}\n`;
-      texto += `📅 Cadastro: ${formatDate(cliente.createdAt)}\n`;
-      texto += `⏳Vencimento: ${formatDate(cliente.dataVencimento)}\n`;
-      texto += `------------------------------\n`;
-    });
-
-    texto += `\n📌 *${nomeUsuario}*`;
-
-    window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, "_blank");
-  };
-*/
-
   const enviarWhatsAppClientes = () => {
     if (clientes.length === 0) return;
 
