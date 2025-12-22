@@ -576,6 +576,16 @@ export const ClienteTable = () => {
                 <Users size={18} />
               </button>
 
+              <button
+                onClick={() =>
+                  router.push(`/dashboard/alunos?clienteId=${cliente.id}`)
+                }
+                className={styles.viewAlunosButton}
+                title="Ver Alunos deste Cliente"
+              >
+                <Users2 size={18} />
+              </button>
+
               {permissoes.editar && (
                 <button
                   onClick={() => setVencimentoModal({ isOpen: true, cliente })}

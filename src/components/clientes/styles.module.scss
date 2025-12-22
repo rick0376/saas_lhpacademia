@@ -330,6 +330,7 @@
 }
 
 .manageButton,
+.viewAlunosButton,
 .editButton,
 .deleteButton,
 .vencimentoButton {
@@ -351,6 +352,16 @@
 
   &:hover {
     background-color: #3b82f6;
+    color: white;
+  }
+}
+
+.viewAlunosButton {
+  background-color: #b7a4e7; // Roxo
+  color: #4a12ac;
+
+  &:hover {
+    background-color: #4a12ac; // Roxo mais escuro
     color: white;
   }
 }

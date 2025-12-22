@@ -33,28 +33,42 @@ export async function GET(req: Request) {
       }
     }
 
-    const clienteId = (session.user as any).clienteId;
-
-    if (!clienteId) {
-      return NextResponse.json(
-        { error: "Cliente não identificado" },
-        { status: 400 }
-      );
-    }
-
     const { searchParams } = new URL(req.url);
     const search = searchParams.get("search") || "";
+    const clienteIdParam = searchParams.get("clienteId"); // ✅ Filtro opcional
+
+    // ✅ Montar WHERE baseado no role
+    let whereClause: any = {};
+
+    if (session.user.role === "SUPERADMIN") {
+      // SUPERADMIN: se passou clienteId filtra, senão retorna TODOS
+      if (clienteIdParam) {
+        whereClause.clienteId = clienteIdParam;
+      }
+    } else {
+      // Usuários normais: sempre filtram pelo próprio cliente
+      const clienteId = (session.user as any).clienteId;
+
+      if (!clienteId) {
+        return NextResponse.json(
+          { error: "Cliente não identificado" },
+          { status: 400 }
+        );
+      }
+
+      whereClause.clienteId = clienteId;
+    }
+
+    // Adicionar busca por nome/email
+    if (search) {
+      whereClause.OR = [
+        { nome: { contains: search, mode: "insensitive" } },
+        { email: { contains: search, mode: "insensitive" } },
+      ];
+    }
 
     const alunos = await prisma.aluno.findMany({
-      where: {
-        clienteId,
-        ...(search && {
-          OR: [
-            { nome: { contains: search, mode: "insensitive" } },
-            { email: { contains: search, mode: "insensitive" } },
-          ],
-        }),
-      },
+      where: whereClause,
       include: {
         _count: {
           select: {
@@ -64,7 +78,7 @@ export async function GET(req: Request) {
         },
       },
       orderBy: {
-        createdAt: "desc",
+        nome: "asc",
       },
     });
 
@@ -79,7 +93,6 @@ export async function GET(req: Request) {
 }
 
 // ✅ POST - Criar aluno
-// POST - Criar aluno
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);

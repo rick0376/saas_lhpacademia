@@ -57,6 +57,10 @@ export const AlunoTable = ({ canCreate }: AlunoTableProps) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [clienteId, setClienteId] = useState<string>("");
+  const [clientes, setClientes] = useState<Array<{ id: string; nome: string }>>(
+    []
+  );
   const [debouncedTerm, setDebouncedTerm] = useState("");
   const [deleteModal, setDeleteModal] = useState<{
     isOpen: boolean;
@@ -120,6 +124,17 @@ export const AlunoTable = ({ canCreate }: AlunoTableProps) => {
     }
   };
 
+  const fetchClientes = async () => {
+    try {
+      const response = await fetch("/api/clientes");
+      if (!response.ok) return;
+      const data = await response.json();
+      setClientes(data);
+    } catch (error) {
+      console.error("Erro ao carregar clientes:", error);
+    }
+  };
+
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedTerm(searchTerm);
@@ -130,23 +145,34 @@ export const AlunoTable = ({ canCreate }: AlunoTableProps) => {
 
   useEffect(() => {
     const permAlunos = permissoes["alunos"];
-    if (permissoesCarregadas && permAlunos?.ler) {
+    const canLer = permAlunos?.ler || session?.user?.role === "SUPERADMIN";
+
+    if (permissoesCarregadas && canLer) {
       fetchAlunos(debouncedTerm);
     }
-  }, [debouncedTerm, permissoesCarregadas, permissoes]);
+  }, [debouncedTerm, permissoesCarregadas, permissoes, session, clienteId]);
 
   useEffect(() => {
     if (status === "authenticated" && session) {
       fetchPermissoes();
+      if (session.user.role === "SUPERADMIN") {
+        fetchClientes();
+      }
     }
   }, [status, session]);
 
   async function fetchAlunos(search = "") {
     try {
       setLoading(true);
-      const url = search
-        ? `/api/alunos?search=${encodeURIComponent(search)}`
-        : "/api/alunos";
+
+      let url = "/api/alunos";
+      const params = new URLSearchParams();
+
+      if (search) params.append("search", search);
+      if (clienteId) params.append("clienteId", clienteId);
+
+      if (params.toString()) url += `?${params.toString()}`;
+
       const response = await fetch(url);
       if (!response.ok) throw new Error("Erro ao buscar alunos");
       const data = await response.json();
@@ -397,6 +423,25 @@ export const AlunoTable = ({ canCreate }: AlunoTableProps) => {
   return (
     <div className={styles.container}>
       <div className={styles.toolbar}>
+        {session?.user?.role === "SUPERADMIN" && (
+          <div className={styles.filterGroup}>
+            <label htmlFor="clienteFilter">Cliente:</label>
+            <select
+              id="clienteFilter"
+              value={clienteId}
+              onChange={(e) => setClienteId(e.target.value)}
+              className={styles.filterSelect}
+            >
+              <option value="">Todos os clientes</option>
+              {clientes.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.nome}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
         <form onSubmit={handleSearch} className={styles.searchGroup}>
           <input
             type="text"

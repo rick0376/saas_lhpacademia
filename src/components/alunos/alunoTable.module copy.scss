@@ -15,8 +15,7 @@
   flex-wrap: wrap;
   gap: 16px;
   align-items: center;
-  justify-content: flex-start;
-  //justify-content: space-between;
+  justify-content: space-between;
   margin-bottom: 24px;
   background: white;
   padding: 16px;
@@ -36,20 +35,15 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  flex: 1;
-  min-width: 200px;
 
   label {
     font-weight: 600;
     font-size: 14px;
-    white-space: nowrap;
   }
 }
 
 .filterSelect {
-  flex: 1;
-  //padding: 8px 12px;
-  padding: 0 12px;
+  padding: 8px 12px;
   border: 2px solid #a78bfa;
   border-radius: 12px;
   font-size: 14px;
@@ -489,20 +483,17 @@
 
 /* --- RESPONSIVIDADE --- */
 @media (max-width: 1100px) {
-  .card {
-    flex: 1 1 calc(50% - 1.8rem); /* 2 colunas */
-    max-width: calc(50% - 1.8rem);
-  }
-
   .toolbar {
     flex-direction: column;
     align-items: stretch;
   }
+
   .searchGroup {
     width: 100%;
     min-width: 0;
     flex-direction: column;
   }
+
   .actionsGroup {
     width: 100%;
     justify-content: space-between;
@@ -513,6 +504,7 @@
   }
 }
 
+/* --- RESPONSIVIDADE --- */
 @media (max-width: 768px) {
   .toolbar {
     flex-direction: column;
