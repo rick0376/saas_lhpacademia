@@ -223,19 +223,17 @@
 }
 
 .card {
-  flex: 1 1 360px;
+  flex: 1 1 300px;
   width: 100%;
-  min-width: 200px;
+  min-width: 360px;
   background: rgb(241, 246, 250);
   padding: 1.4rem 1.6rem;
   border-radius: 14px;
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
-  color: #2f2f6d;
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
-  user-select: none;
-  transition: box-shadow 0.3s ease;
+  transition: all 0.3s ease;
 
   &:hover {
     box-shadow: 0 12px 30px rgba(122, 79, 237, 0.4);
@@ -248,9 +246,10 @@
   align-items: center;
   gap: 12px;
   padding: 16px;
-  border-radius: 12px;
   background: linear-gradient(90deg, #c7bebe, #e5eaf0, #c9d3dd);
   border-bottom: 1px solid #e5e7eb;
+  margin: -1.4rem -1.6rem 0.8rem -1.6rem;
+  border-radius: 14px 14px 0 0;
 }
 
 .avatar {
