@@ -30,6 +30,96 @@
   margin: 2rem 0;
 }
 
+.checkboxGroup {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 8px;
+  margin-top: 8px;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+
+  input[type="checkbox"] {
+    cursor: pointer;
+  }
+
+  &:hover {
+    color: #6366f1;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+
+  label {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-primary);
+  }
+}
+
+.select {
+  padding: 10px 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 14px;
+  color: #1f2937;
+  background-color: white;
+  cursor: pointer;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  }
+
+  &:hover {
+    border-color: #d1d5db;
+  }
+}
+
+.checkboxGroup {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 8px;
+  margin-top: 8px;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #374151;
+
+  input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: #6366f1;
+  }
+
+  &:hover {
+    color: #6366f1;
+  }
+}
+
 .form {
   display: flex;
   flex-direction: column;
@@ -52,33 +142,6 @@
 
       span {
         user-select: none;
-      }
-    }
-  }
-
-  .field {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-
-    label {
-      font-size: 0.9rem;
-      font-weight: 500;
-      color: var(--text-primary);
-    }
-
-    .select {
-      padding: 0.75rem;
-      border: 1px solid var(--border-color, #e5e7eb);
-      border-radius: 8px;
-      font-size: 0.95rem;
-      background: var(--background-input, #fff);
-      color: var(--text-primary);
-      cursor: pointer;
-
-      &:focus {
-        outline: none;
-        border-color: var(--primary-color, #3b82f6);
       }
     }
   }

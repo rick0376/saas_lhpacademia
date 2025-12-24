@@ -16,6 +16,26 @@ export default async function EditarTreinoPage({ params }: Props) {
     redirect("/");
   }
 
+  if (session.user.role === "ALUNO") {
+    redirect("/dashboard");
+  }
+
+  // ✅ ADICIONAR VERIFICAÇÃO DE PERMISSÃO (EDITAR)
+  if (session.user.role !== "SUPERADMIN") {
+    const permissao = await prisma.permissao.findUnique({
+      where: {
+        usuarioId_recurso: {
+          usuarioId: session.user.id,
+          recurso: "treinos",
+        },
+      },
+    });
+
+    if (!permissao || !permissao.editar) {
+      redirect("/dashboard?erro=sem-permissao");
+    }
+  }
+
   // ✅ Await params
   const { id } = await params;
 

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import fs from "fs";
 import path from "path";
 
@@ -8,8 +9,20 @@ export async function GET(request: Request) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session || session.user.role !== "SUPERADMIN") {
-      return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
+    // Permitir SUPERADMIN ou usuários com permissão
+    if (session.user.role !== "SUPERADMIN") {
+      const permissao = await prisma.permissao.findUnique({
+        where: {
+          usuarioId_recurso: {
+            usuarioId: session.user.id,
+            recurso: "backup",
+          },
+        },
+      });
+
+      if (!permissao?.criar) {
+        return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
+      }
     }
 
     const { searchParams } = new URL(request.url);

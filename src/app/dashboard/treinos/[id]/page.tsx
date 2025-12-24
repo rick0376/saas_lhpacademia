@@ -20,6 +20,21 @@ export default async function TreinoDetalhesPage({ params }: Props) {
     redirect("/dashboard");
   }
 
+  if (session.user.role !== "SUPERADMIN") {
+    const permissao = await prisma.permissao.findUnique({
+      where: {
+        usuarioId_recurso: {
+          usuarioId: session.user.id,
+          recurso: "treinos",
+        },
+      },
+    });
+
+    if (!permissao || !permissao.ler) {
+      redirect("/dashboard?erro=sem-permissao");
+    }
+  }
+
   const { id } = await params;
 
   const treino = await prisma.treino.findUnique({

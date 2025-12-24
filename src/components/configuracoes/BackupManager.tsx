@@ -23,6 +23,26 @@ export const BackupManager = () => {
   const [backupExterno, setBackupExterno] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [tipoBackup, setTipoBackup] = useState<"completo" | "seletivo">(
+    "completo"
+  );
+  const [tabelasSelecionadas, setTabelasSelecionadas] = useState<string[]>([]);
+  const [clienteSelecionado, setClienteSelecionado] = useState<string>("");
+  const [clientes, setClientes] = useState<Array<{ id: string; nome: string }>>(
+    []
+  );
+
+  const tabelasDisponiveis = [
+    "usuarios",
+    "clientes",
+    "alunos",
+    "treinos",
+    "exercicios",
+    "avaliacoes",
+    "medidas",
+    "permissoes",
+  ];
+
   const [toast, setToast] = useState<{
     show: boolean;
     message: string;
@@ -33,6 +53,22 @@ export const BackupManager = () => {
     carregarBackups();
     carregarConfigAgendamento();
   }, []);
+
+  useEffect(() => {
+    carregarBackups();
+    carregarConfigAgendamento();
+    carregarClientes();
+  }, []);
+
+  const carregarClientes = async () => {
+    try {
+      const response = await fetch("/api/clientes");
+      const data = await response.json();
+      setClientes(data || []);
+    } catch (error) {
+      console.error("Erro ao carregar clientes:", error);
+    }
+  };
 
   const carregarBackups = async () => {
     try {
@@ -58,7 +94,23 @@ export const BackupManager = () => {
   const handleBackupManual = async () => {
     setLoading(true);
     try {
-      const response = await fetch("/api/backup/manual", { method: "POST" });
+      const body: any = { tipo: tipoBackup };
+
+      if (tipoBackup === "seletivo") {
+        if (tabelasSelecionadas.length > 0) {
+          body.tabelas = tabelasSelecionadas;
+        }
+        if (clienteSelecionado) {
+          body.clienteId = clienteSelecionado;
+        }
+      }
+
+      const response = await fetch("/api/backup/manual", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
       const data = await response.json();
 
       if (!response.ok) throw new Error(data.error);
@@ -243,8 +295,74 @@ export const BackupManager = () => {
       <div className={styles.section}>
         <h3>Backup Manual</h3>
         <p className={styles.description}>
-          Crie um backup completo do banco de dados agora.
+          Crie um backup completo ou seletivo do banco de dados.
         </p>
+
+        {/* Seletor de Tipo */}
+        <div className={styles.field}>
+          <label>Tipo de Backup</label>
+          <select
+            value={tipoBackup}
+            onChange={(e) =>
+              setTipoBackup(e.target.value as "completo" | "seletivo")
+            }
+            className={styles.select}
+          >
+            <option value="completo">Completo (todas as tabelas)</option>
+            <option value="seletivo">
+              Seletivo (escolher tabelas/cliente)
+            </option>
+          </select>
+        </div>
+
+        {/* Opções de Backup Seletivo */}
+        {tipoBackup === "seletivo" && (
+          <>
+            <div className={styles.field}>
+              <label>Filtrar por Cliente (opcional)</label>
+              <select
+                value={clienteSelecionado}
+                onChange={(e) => setClienteSelecionado(e.target.value)}
+                className={styles.select}
+              >
+                <option value="">Todos os clientes</option>
+                {clientes.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.nome}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className={styles.field}>
+              <label>Tabelas (opcional)</label>
+              <div className={styles.checkboxGroup}>
+                {tabelasDisponiveis.map((tabela) => (
+                  <label key={tabela} className={styles.checkboxLabel}>
+                    <input
+                      type="checkbox"
+                      checked={tabelasSelecionadas.includes(tabela)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setTabelasSelecionadas([
+                            ...tabelasSelecionadas,
+                            tabela,
+                          ]);
+                        } else {
+                          setTabelasSelecionadas(
+                            tabelasSelecionadas.filter((t) => t !== tabela)
+                          );
+                        }
+                      }}
+                    />
+                    <span>{tabela}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
         <Button onClick={handleBackupManual} disabled={loading} fullWidth>
           {loading ? "Criando backup..." : "📦 Criar Backup Agora"}
         </Button>

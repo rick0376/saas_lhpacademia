@@ -49,7 +49,6 @@ const RECURSOS = [
     label: "👤 Alunos",
     description: "Gerenciar cadastro de alunos",
   },
-  // Recursos adicionais ligados a alunos
   {
     value: "alunos_perfil",
     label: "👤 Alunos • Perfil",
@@ -108,6 +107,11 @@ const RECURSOS = [
       "Exportar lista de treinos/fichas em PDF e enviar via WhatsApp",
   },
   {
+    value: "treinos_atribuir",
+    label: "🔗 Treinos • Atribuir ao Aluno",
+    description: "Vincular treinos aos alunos e gerenciar cronogramas",
+  },
+  {
     value: "medidas",
     label: "📏 Medidas",
     description: "Registro de medidas corporais",
@@ -121,6 +125,11 @@ const RECURSOS = [
     value: "configuracoes",
     label: "⚙️ Configurações",
     description: "Acessar configurações do sistema",
+  },
+  {
+    value: "backup",
+    label: "💾 Backup",
+    description: "Criar, restaurar e gerenciar backups do banco de dados",
   },
 ];
 

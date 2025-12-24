@@ -1,5 +1,21 @@
 {
-  "timestamp": "2025-12-21T10:24:58.130Z",
+  "timestamp": "2025-12-24T10:14:52.143Z",
+  "tipo": "completo",
+  "clienteId": null,
+  "tabelas": [
+    "clientes",
+    "usuarios",
+    "permissoes",
+    "alunos",
+    "medidas",
+    "avaliacoes",
+    "exercicios",
+    "treinos",
+    "treinoExercicios",
+    "cronogramas",
+    "execucoesTreino",
+    "execucoesExercicio"
+  ],
   "data": {
     "clientes": [
       {
@@ -80,6 +96,177 @@
       }
     ],
     "permissoes": [
+      {
+        "id": "cmjgxmge600010gfc58oa033u",
+        "usuarioId": "cmj2p1va100010gc0nnhwdzqm",
+        "recurso": "dashboard",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmjgxmgmg00030gfc63g85rq8",
+        "usuarioId": "cmj2p1va100010gc0nnhwdzqm",
+        "recurso": "alunos_evolucao",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmjgxmgrk00050gfcrlr8rsxo",
+        "usuarioId": "cmj2p1va100010gc0nnhwdzqm",
+        "recurso": "alunos_avaliacoes",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmjgxmgwt00070gfc1a6f02im",
+        "usuarioId": "cmj2p1va100010gc0nnhwdzqm",
+        "recurso": "alunos_medidas",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmjgxmh1n000h0gfchgolkprz",
+        "usuarioId": "cmj2p1va100010gc0nnhwdzqm",
+        "recurso": "alunos_compartilhar",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmjgxmh0z00090gfca3jsn062",
+        "usuarioId": "cmj2p1va100010gc0nnhwdzqm",
+        "recurso": "usuarios_compartilhar",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmjgxmh1c000b0gfcwlb20jfo",
+        "usuarioId": "cmj2p1va100010gc0nnhwdzqm",
+        "recurso": "clientes",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmjgxmh1f000d0gfcsnsnqrio",
+        "usuarioId": "cmj2p1va100010gc0nnhwdzqm",
+        "recurso": "alunos",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmjgxmh1f000f0gfcteh9ewc7",
+        "usuarioId": "cmj2p1va100010gc0nnhwdzqm",
+        "recurso": "usuarios",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmjgxmh25000j0gfcwqra4sd7",
+        "usuarioId": "cmj2p1va100010gc0nnhwdzqm",
+        "recurso": "alunos_perfil",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmjgxmh6h000l0gfcl5psl9s5",
+        "usuarioId": "cmj2p1va100010gc0nnhwdzqm",
+        "recurso": "avaliacoes",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmjgxmh97000n0gfcke1f0coq",
+        "usuarioId": "cmj2p1va100010gc0nnhwdzqm",
+        "recurso": "avaliacoes_compartilhar",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmjgxmhai000p0gfc3iqh63vu",
+        "usuarioId": "cmj2p1va100010gc0nnhwdzqm",
+        "recurso": "exercicios",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmjgxmhb9000r0gfctfcyqg5w",
+        "usuarioId": "cmj2p1va100010gc0nnhwdzqm",
+        "recurso": "exercicios_compartilhar",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmjgxmhb9000t0gfcmc9m57qq",
+        "usuarioId": "cmj2p1va100010gc0nnhwdzqm",
+        "recurso": "treinos",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmjgxmhbr000v0gfc0qx66ga5",
+        "usuarioId": "cmj2p1va100010gc0nnhwdzqm",
+        "recurso": "treinos_compartilhar",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmjgxmhcn000x0gfcsaq182w3",
+        "usuarioId": "cmj2p1va100010gc0nnhwdzqm",
+        "recurso": "medidas",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmjgxmhe6000z0gfc7jby43vm",
+        "usuarioId": "cmj2p1va100010gc0nnhwdzqm",
+        "recurso": "execucoes",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmjgxmhey00110gfcjy58a5m4",
+        "usuarioId": "cmj2p1va100010gc0nnhwdzqm",
+        "recurso": "configuracoes",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
       {
         "id": "cmi7d45oq00070gvgm0coar1z",
         "usuarioId": "cmhc8yq6700020gegum0q3szh",
@@ -425,21 +612,6 @@
     ],
     "alunos": [
       {
-        "id": "cmjbbablz001j0gh80sgrih14",
-        "nome": "alu",
-        "email": "alu@lhp.com",
-        "telefone": "12999999999",
-        "dataNascimento": "1990-02-03T00:00:00.000Z",
-        "foto": null,
-        "objetivo": "Saúde e Bem-estar",
-        "observacoes": "gtegsaf",
-        "ativo": true,
-        "clienteId": "cmj70ab0j00000gyc4p80oc7x",
-        "usuarioId": null,
-        "createdAt": "2025-12-18T10:42:39.816Z",
-        "updatedAt": "2025-12-18T10:42:39.816Z"
-      },
-      {
         "id": "cmjbaujrc001h0gh8r2350her",
         "nome": "alunoteste@lhp.com",
         "email": "alunoteste@lhp.com",
@@ -468,21 +640,6 @@
         "usuarioId": "cmieqxlrr00030gpky2k7v3hf",
         "createdAt": "2025-11-25T15:44:16.762Z",
         "updatedAt": "2025-12-08T10:28:30.328Z"
-      },
-      {
-        "id": "cmjbbo8r900010gwcb8dcixfj",
-        "nome": "rickk",
-        "email": "rickk@lhp.com",
-        "telefone": "12999999999",
-        "dataNascimento": "2000-03-03T00:00:00.000Z",
-        "foto": "https://res.cloudinary.com/dih8izeaa/image/upload/v1766055210/saas_academia/alunos/gflbewtpjs13szrbjbyh.png",
-        "objetivo": "Saúde e Bem-estar",
-        "observacoes": "fggfggfsdg",
-        "ativo": true,
-        "clienteId": "cmj70ab0j00000gyc4p80oc7x",
-        "usuarioId": null,
-        "createdAt": "2025-12-18T10:53:29.301Z",
-        "updatedAt": "2025-12-18T10:53:29.301Z"
       }
     ],
     "medidas": [
