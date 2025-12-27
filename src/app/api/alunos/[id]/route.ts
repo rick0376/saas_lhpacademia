@@ -50,10 +50,11 @@ export async function GET(
   }
 }
 
+/*
 // PUT - Atualizar aluno
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> } // ✅ Igual ao GET e DELETE
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -129,6 +130,94 @@ export async function PUT(
         email: email || null,
         telefone: telefone || null,
         dataNascimento: dataNascimento ? new Date(dataNascimento) : null,
+        foto: novaFotoUrl,
+        objetivo: objetivo || null,
+        observacoes: observacoes || null,
+        ativo,
+      },
+    });
+
+    return NextResponse.json(alunoAtualizado);
+  } catch (error) {
+    console.error("Erro ao atualizar aluno:", error);
+    return NextResponse.json(
+      { error: "Erro ao atualizar aluno" },
+      { status: 500 }
+    );
+  }
+}
+*/
+
+// PUT - Atualizar aluno
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+      return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+    }
+
+    const { id } = await params;
+    const formData = await request.formData();
+
+    const nome = formData.get("nome") as string;
+    const email = formData.get("email") as string | null;
+    const telefone = formData.get("telefone") as string | null;
+    const dataNascimento = formData.get("dataNascimento") as string | null;
+    const objetivo = formData.get("objetivo") as string | null;
+    const observacoes = formData.get("observacoes") as string | null;
+    const ativo = formData.get("ativo") === "true";
+
+    const fotoEntry = formData.get("foto");
+    const fotoFile = fotoEntry instanceof File ? fotoEntry : null;
+    const fotoExistente = formData.get("fotoExistente") as string | null;
+
+    const alunoAtual = await prisma.aluno.findUnique({
+      where: { id },
+      select: { foto: true },
+    });
+
+    if (!alunoAtual) {
+      return NextResponse.json(
+        { error: "Aluno não encontrado" },
+        { status: 404 }
+      );
+    }
+
+    let novaFotoUrl: string | null = alunoAtual.foto;
+
+    if (fotoFile && fotoFile.size > 0) {
+      const buffer = Buffer.from(await fotoFile.arrayBuffer());
+      novaFotoUrl = await uploadToCloudinary(buffer, "saas_academia/alunos");
+
+      if (alunoAtual.foto) {
+        await deleteImage(alunoAtual.foto);
+      }
+    } else if (fotoExistente) {
+      novaFotoUrl = fotoExistente;
+    } else {
+      if (alunoAtual.foto) {
+        await deleteImage(alunoAtual.foto);
+      }
+      novaFotoUrl = null;
+    }
+
+    let dataNascimentoFormatada = null;
+    if (dataNascimento) {
+      const [ano, mes, dia] = dataNascimento.split("-").map(Number);
+      dataNascimentoFormatada = new Date(Date.UTC(ano, mes - 1, dia));
+    }
+
+    const alunoAtualizado = await prisma.aluno.update({
+      where: { id },
+      data: {
+        nome,
+        email: email || null,
+        telefone: telefone || null,
+        dataNascimento: dataNascimentoFormatada,
         foto: novaFotoUrl,
         objetivo: objetivo || null,
         observacoes: observacoes || null,

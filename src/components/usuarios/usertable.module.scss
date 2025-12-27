@@ -25,6 +25,57 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
+/* ==================== FILTRO (SELECT) ==================== */
+.filterGroup {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 260px;
+}
+
+/* seta do select (custom) */
+.filterGroup::after {
+  content: "";
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid #7c3aed;
+  border-bottom: 2px solid #7c3aed;
+  transform: translateY(-50%) rotate(45deg);
+  pointer-events: none;
+}
+
+.filterSelect {
+  width: 100%;
+  height: 42px;
+  min-height: 42px;
+  padding: 0 44px 0 16px;
+  border: 2px solid #a78bfa;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+  background-color: white;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #7c3aed;
+    box-shadow: 0 0 8px #7c3aed88;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
 /* Grupo de Busca */
 .searchGroup {
   display: flex;
@@ -81,7 +132,14 @@
 
 /* Grupo de Ações (Botões PDF/Whats) */
 .actionsGroup {
-  display: flex;
+  /*display: flex;
+  gap: 10px;
+  align-items: center;
+  */
+  width: 100%;
+  flex: 0 0 100%; /* força ficar abaixo dentro da toolbar (flex-wrap) */
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   align-items: center;
 }
@@ -549,18 +607,33 @@
     flex-direction: column;
     align-items: stretch;
   }
+
+  .filterGroup {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .filterSelect {
+    width: 100%;
+  }
+
   .searchGroup {
     width: 100%;
     min-width: 0;
     flex-direction: column;
   }
+
+  /* 🔁 VOLTA PARA O PADRÃO ANTIGO */
   .actionsGroup {
-    width: 100%;
+    display: flex;
+    //flex-wrap: wrap;
     justify-content: space-between;
+    gap: 8px;
   }
+
   .actionBtn {
-    padding: 0 12px;
     width: 48%;
+    padding: 0 12px;
   }
 }
 
@@ -569,13 +642,15 @@
     width: 24px;
     height: 24px;
   }
+
   .actionBtn {
-    padding: 0 12px;
     width: 48%;
   }
+
   .searchButton {
     width: 100%;
   }
+
   .cardsContainer {
     grid-template-columns: 1fr;
   }

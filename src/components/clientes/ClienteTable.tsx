@@ -13,10 +13,10 @@ import {
   Trash2,
   Plus,
   FileText,
-  Users,
   Calendar,
-  Users2,
   GraduationCap,
+  UserPlus,
+  Users,
 } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 
@@ -548,7 +548,7 @@ export const ClienteTable = () => {
                 className={styles.manageButton}
                 title="Criar Aluno"
               >
-                <Users size={18} />
+                <UserPlus size={18} />
               </button>
 
               <button
@@ -558,7 +558,7 @@ export const ClienteTable = () => {
                 className={styles.viewAlunosButton}
                 title="Ver Alunos deste Cliente"
               >
-                <Users2 size={18} />
+                <Users size={18} />
               </button>
 
               {permissoes.editar && (

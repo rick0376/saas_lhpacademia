@@ -511,7 +511,10 @@ export default function EvolucaoAlunoPage() {
       texto += `\n📌 *${nomeUsuario}*`;
     }
 
-    window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, "_blank");
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(
+      texto
+    )}`;
+    window.open(url, "_blank");
   };
 
   if (loading)
@@ -576,17 +579,19 @@ export default function EvolucaoAlunoPage() {
           <div className={styles.actionButtonsInline}>
             <button
               onClick={gerarPdfEvolucao}
-              className={styles.iconButton}
+              className={`${styles.actionBtn} ${styles.btnPdf}`}
               title="Baixar PDF"
             >
-              <FileText size={18} />
+              <FileText className={styles.iconBtn} />
+              <span className={styles.hideMobile}>PDF</span>
             </button>
             <button
               onClick={enviarWhatsAppEvolucao}
-              className={`${styles.iconButton} ${styles.whatsButton}`}
+              className={`${styles.actionBtn} ${styles.btnWhats}`}
               title="Enviar WhatsApp"
             >
-              <FaWhatsapp size={18} />
+              <FaWhatsapp className={styles.iconBtn} />
+              <span className={styles.hideMobile}>Whats</span>
             </button>
           </div>
         </div>

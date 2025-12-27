@@ -136,41 +136,56 @@
 .actionButtonsInline {
   display: flex;
   gap: 8px;
-  margin-left: 12px;
-  padding-left: 12px;
+  //margin-left: 12px;
+  //padding-left: 12px;
   border-left: 1px solid #e5e7eb;
-  align-items: center;
+  //align-items: center;
 }
 
-.iconButton {
+/* icones pdf e whats */
+.actionBtn {
+  height: 42px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  gap: 8px;
+  padding: 0 16px;
   border-radius: 8px;
-  border: 1px solid #d1d5db;
-  background-color: #fff;
-  color: #374151;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  border: none;
   cursor: pointer;
   transition: all 0.2s ease;
+  color: white;
+  white-space: nowrap;
+  box-sizing: border-box;
 
   &:hover {
-    background-color: #f3f4f6;
-    border-color: #9ca3af;
-    transform: translateY(-2px);
+    transform: translateY(-1px);
+    filter: brightness(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
   }
 }
 
-.whatsButton {
-  color: #25d366; /* Verde WhatsApp */
-  border-color: #86efac;
-  background-color: #f0fdf4;
+.btnPdf {
+  background-color: #f59e0b;
+}
+.btnWhats {
+  background-color: #25d366;
+}
 
-  &:hover {
-    background-color: #dcfce7;
-    border-color: #22c55e;
-  }
+/* Ícone base para botões da toolbar */
+.iconBtn {
+  width: 18px;
+  height: 18px;
+  transition: all 0.2s ease;
 }
 
 /* =========================================

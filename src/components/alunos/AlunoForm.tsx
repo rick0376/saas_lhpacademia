@@ -69,19 +69,20 @@ export const AlunoForm: React.FC<AlunoFormProps> = ({
     ativo: initialData?.ativo ?? true,
     darAcessoApp: false,
     senhaInicial: "",
-    clienteIdSelecionado: clienteId || "",
+    clienteIdSelecionado: clienteId || initialData?.clienteId || "",
 
     usuarioSelecionadoId: "",
   });
 
   useEffect(() => {
-    if (clienteId) {
-      setFormData((prev) => ({
-        ...prev,
-        clienteIdSelecionado: clienteId,
-      }));
-    }
-  }, [clienteId]);
+    const cid = clienteId || (isEdit ? initialData?.clienteId : "");
+    if (!cid) return;
+
+    setFormData((prev) => ({
+      ...prev,
+      clienteIdSelecionado: cid,
+    }));
+  }, [clienteId, isEdit, initialData?.clienteId]);
 
   useEffect(() => {
     if (!clienteId && !isEdit) {

@@ -129,10 +129,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    console.log("✅ Cliente e Admin criados:", {
-      clienteId: novoCliente.id,
-      login: login,
-    });
+    console.log("✅ Cliente e Admin criados.");
 
     return NextResponse.json(
       {
@@ -141,7 +138,7 @@ export async function POST(request: NextRequest) {
           login: login,
           senha: senha, // Retorna a senha em texto para exibir
         },
-        mensagem: `✅ Cliente criado! Login: ${login} | Senha: ${senha}`,
+        mensagem: `✅ Cliente criado! Logine Senha com suecesso. ${senha}`,
       },
       { status: 201 }
     );

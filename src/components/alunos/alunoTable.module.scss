@@ -4,24 +4,75 @@
   }
 }
 
+// ==================== CONTAINER ====================
 .container {
   width: 100%;
   box-sizing: border-box;
 }
 
-/* --- BARRA DE FERRAMENTAS (Toolbar) --- */
+// ==================== TOOLBAR ====================
 .toolbar {
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
   align-items: center;
-  justify-content: flex-start;
-  min-width: 320px;
-  margin: 0 auto 24px auto;
+  justify-content: space-between;
+  margin-bottom: 24px;
   background: white;
   padding: 16px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* ==================== FILTRO (SELECT) ==================== */
+.filterGroup {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 260px;
+}
+
+/* seta do select (custom) */
+.filterGroup::after {
+  content: "";
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid #7c3aed;
+  border-bottom: 2px solid #7c3aed;
+  transform: translateY(-50%) rotate(45deg);
+  pointer-events: none;
+}
+
+.filterSelect {
+  width: 100%;
+  height: 42px;
+  min-height: 42px;
+  padding: 0 44px 0 16px;
+  border: 2px solid #a78bfa;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+  background-color: white;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #7c3aed;
+    box-shadow: 0 0 8px #7c3aed88;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 }
 
 /* Grupo de Busca */
@@ -30,30 +81,6 @@
   flex: 1;
   gap: 8px;
   min-width: 280px;
-}
-
-.filterGroup {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-  min-width: 200px;
-  margin-left: 0;
-}
-
-.filterSelect {
-  flex: 1;
-  padding: 8px 12px;
-  border: 2px solid #a78bfa;
-  border-radius: 12px;
-  font-size: 14px;
-  min-height: 42px;
-  cursor: pointer;
-
-  &:focus {
-    outline: none;
-    border-color: #714797;
-  }
 }
 
 .searchInput {
@@ -104,7 +131,14 @@
 
 /* Grupo de Ações (Botões PDF/Whats) */
 .actionsGroup {
-  display: flex;
+  /*display: flex;
+  gap: 10px;
+  align-items: center;
+  */
+  width: 100%;
+  flex: 0 0 100%; /* força ficar abaixo dentro da toolbar (flex-wrap) */
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   align-items: center;
 }
@@ -478,32 +512,6 @@
   gap: 12px;
   justify-content: flex-end;
   margin-top: 8px;
-}
-
-/* --- RESPONSIVIDADE --- */
-@media (max-width: 1100px) {
-  .card {
-    flex: 1 1 calc(50% - 1.8rem); /* 2 colunas */
-    max-width: calc(50% - 1.8rem);
-  }
-
-  .toolbar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .searchGroup {
-    width: 100%;
-    min-width: 0;
-    flex-direction: column;
-  }
-  .actionsGroup {
-    width: 100%;
-    justify-content: space-between;
-  }
-  .actionBtn {
-    padding: 0 12px;
-    width: 48%;
-  }
 }
 
 @media (max-width: 768px) {

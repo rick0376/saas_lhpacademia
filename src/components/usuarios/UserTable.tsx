@@ -7,6 +7,7 @@ import { jsPDF } from "jspdf";
 import styles from "./usertable.module.scss";
 import { Button } from "../ui/Button/Button";
 import { Modal } from "../ui/Modal/Modal";
+import { useSearchParams } from "next/navigation";
 import {
   Edit,
   Trash2,
@@ -58,6 +59,13 @@ export const UserTable = () => {
 
   const recursosUsuarios = ["usuarios", "usuarios_compartilhar"];
 
+  const searchParams = useSearchParams();
+  const clienteIdFromUrl = searchParams.get("clienteId");
+  const [clienteId, setClienteId] = useState<string>("");
+  const [clientes, setClientes] = useState<Array<{ id: string; nome: string }>>(
+    []
+  );
+
   const fetchPermissoes = async () => {
     try {
       if (session?.user?.role === "SUPERADMIN") {
@@ -104,6 +112,12 @@ export const UserTable = () => {
   };
 
   useEffect(() => {
+    if (clienteIdFromUrl) {
+      setClienteId(clienteIdFromUrl);
+    }
+  }, [clienteIdFromUrl]);
+
+  useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedTerm(searchTerm);
     }, 300);
@@ -115,20 +129,40 @@ export const UserTable = () => {
     if (permissoesCarregadas && permUsuarios?.ler) {
       fetchUsuarios(debouncedTerm);
     }
-  }, [debouncedTerm, permissoesCarregadas, permissoes]);
+  }, [debouncedTerm, permissoesCarregadas, permissoes, clienteId]);
 
   useEffect(() => {
     if (status === "authenticated" && session) {
       fetchPermissoes();
+      if (session.user.role === "SUPERADMIN") {
+        fetchClientes();
+      }
     }
   }, [status, session]);
+
+  const fetchClientes = async () => {
+    try {
+      const response = await fetch("/api/clientes");
+      if (!response.ok) return;
+      const data = await response.json();
+      setClientes(data);
+    } catch (error) {
+      console.error("Erro ao carregar clientes:", error);
+    }
+  };
 
   async function fetchUsuarios(search = "") {
     try {
       setLoading(true);
-      const url = search
-        ? `/api/usuarios?search=${encodeURIComponent(search)}`
-        : "/api/usuarios";
+
+      let url = "/api/usuarios";
+      const params = new URLSearchParams();
+
+      if (search) params.append("search", search);
+      if (clienteId) params.append("clienteId", clienteId);
+
+      if (params.toString()) url += `?${params.toString()}`;
+
       const response = await fetch(url);
       if (!response.ok) throw new Error("Erro ao buscar usuários");
       const data = await response.json();
@@ -530,6 +564,23 @@ export const UserTable = () => {
   return (
     <div className={styles.container}>
       <div className={styles.toolbar}>
+        {session?.user?.role === "SUPERADMIN" && (
+          <div className={styles.filterGroup}>
+            <select
+              value={clienteId}
+              onChange={(e) => setClienteId(e.target.value)}
+              className={styles.filterSelect}
+            >
+              <option value="">Todos os clientes</option>
+              {clientes.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.nome}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
         <form onSubmit={handleSearch} className={styles.searchGroup}>
           <input
             type="text"

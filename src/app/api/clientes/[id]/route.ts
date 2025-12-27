@@ -27,7 +27,7 @@ export async function GET(
         logo: true,
         ativo: true,
         createdAt: true,
-        dataVencimento: true, // ← AGORA SIM! 🔥
+        dataVencimento: true,
         _count: {
           select: {
             usuarios: true,
@@ -77,13 +77,7 @@ export async function PUT(
     const logoExistente = formData.get("logoExistente") as string | null;
     const dataVencimento = formData.get("dataVencimento") as string | null; // <-- capturando a data
 
-    console.log("📝 Atualizando cliente:", {
-      id,
-      nome,
-      temNovoArquivo: !!logoFile,
-      manterLogoExistente: !!logoExistente,
-      dataVencimento, // logando o valor para verificar
-    });
+    console.log("📝 Atualizando cliente.");
 
     // Buscar cliente atual
     const clienteAtual = await prisma.cliente.findUnique({
@@ -112,7 +106,7 @@ export async function PUT(
           buffer,
           "saas_academia/clientes"
         );
-        console.log("✅ Novo logo enviado:", novoLogoUrl);
+        console.log("✅ Novo logo enviado com sucesso:");
 
         // ✅ DELETAR LOGO ANTIGO DO CLOUDINARY
         if (clienteAtual.logo) {
@@ -159,10 +153,7 @@ export async function PUT(
       },
     });
 
-    console.log("✅ Cliente atualizado com sucesso:", {
-      id: clienteAtualizado.id,
-      logoAtualizado: clienteAtualizado.logo ? "SIM ✅" : "NÃO ❌",
-    });
+    console.log("✅ Cliente atualizado com sucesso.");
 
     return NextResponse.json(clienteAtualizado);
   } catch (error) {
@@ -199,16 +190,12 @@ export async function DELETE(
 
     if (!cliente) {
       return NextResponse.json(
-        { error: "Cliente não encontrado" },
+        { error: "Cliente não encontrado." },
         { status: 404 }
       );
     }
 
-    console.log("🗑️ Deletando cliente:", {
-      id,
-      nome: cliente.nome,
-      temLogo: !!cliente.logo,
-    });
+    console.log("🗑️ Deletando cliente.");
 
     // ✅ Deletar do banco primeiro
     await prisma.cliente.delete({
@@ -217,17 +204,17 @@ export async function DELETE(
 
     // ✅ Deletar logo do Cloudinary (se existir)
     if (cliente.logo) {
-      console.log("🗑️ Deletando logo do Cloudinary:", cliente.logo);
+      console.log("🗑️ Deletando logo do Cloudinary.");
       await deleteImage(cliente.logo);
     }
 
     console.log("✅ Cliente e logo deletados com sucesso!");
 
-    return NextResponse.json({ message: "Cliente excluído com sucesso" });
+    return NextResponse.json({ message: "Cliente excluído com sucesso!" });
   } catch (error) {
-    console.error("❌ Erro ao excluir cliente:", error);
+    console.error("❌ Erro ao excluir cliente.", error);
     return NextResponse.json(
-      { error: "Erro ao excluir cliente" },
+      { error: "Erro ao excluir cliente." },
       { status: 500 }
     );
   }

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { jsPDF } from "jspdf";
 import styles from "./alunoTable.module.scss";
@@ -10,7 +10,7 @@ import { Button } from "../ui/Button/Button";
 import { Modal } from "../ui/Modal/Modal";
 import { FaEnvelope, FaPhone, FaBullseye, FaWhatsapp } from "react-icons/fa";
 import {
-  User,
+  CircleUser,
   Edit,
   ClipboardCheck,
   Ruler,
@@ -62,6 +62,9 @@ export const AlunoTable = ({ canCreate }: AlunoTableProps) => {
   const [clientes, setClientes] = useState<Array<{ id: string; nome: string }>>(
     []
   );
+  const searchParams = useSearchParams();
+  const clienteIdFromUrl = searchParams.get("clienteId");
+
   const [debouncedTerm, setDebouncedTerm] = useState("");
   const [deleteModal, setDeleteModal] = useState<{
     isOpen: boolean;
@@ -161,6 +164,12 @@ export const AlunoTable = ({ canCreate }: AlunoTableProps) => {
       }
     }
   }, [status, session]);
+
+  useEffect(() => {
+    if (clienteIdFromUrl) {
+      setClienteId(clienteIdFromUrl);
+    }
+  }, [clienteIdFromUrl]);
 
   async function fetchAlunos(search = "") {
     try {
@@ -548,15 +557,15 @@ export const AlunoTable = ({ canCreate }: AlunoTableProps) => {
 
               <div className={styles.cardContent}>
                 <p className={styles.infoItem}>
-                  <FaEnvelope size={24} className={styles.iconEmail} />
+                  <FaEnvelope size={18} className={styles.iconEmail} />
                   <span>{aluno.email || "Sem email"}</span>
                 </p>
                 <p className={styles.infoItem}>
-                  <FaPhone size={24} className={styles.iconPhone} />
+                  <FaPhone size={18} className={styles.iconPhone} />
                   <span>{aluno.telefone || "Sem telefone"}</span>
                 </p>
                 <p className={styles.infoItem}>
-                  <FaBullseye size={24} className={styles.iconObjetivo} />
+                  <FaBullseye size={18} className={styles.iconObjetivo} />
                   <span>{aluno.objetivo || "Sem objetivo"}</span>
                 </p>
 
@@ -583,7 +592,7 @@ export const AlunoTable = ({ canCreate }: AlunoTableProps) => {
                     title="Ver Perfil"
                     className={styles.iconPerfil}
                   >
-                    <User size={24} />
+                    <CircleUser size={18} />
                   </Link>
                 )}
 
@@ -593,7 +602,7 @@ export const AlunoTable = ({ canCreate }: AlunoTableProps) => {
                     title="Ver Evolução"
                     className={styles.iconEvolucao}
                   >
-                    <TrendingUp size={24} />
+                    <TrendingUp size={18} />
                   </Link>
                 )}
 
@@ -603,7 +612,7 @@ export const AlunoTable = ({ canCreate }: AlunoTableProps) => {
                     title="Editar"
                     className={styles.iconEditar}
                   >
-                    <Edit size={24} />
+                    <Edit size={18} />
                   </Link>
                 )}
 
@@ -613,7 +622,7 @@ export const AlunoTable = ({ canCreate }: AlunoTableProps) => {
                     title="Ver Avaliações"
                     className={styles.iconAvaliar}
                   >
-                    <ClipboardCheck size={24} />
+                    <ClipboardCheck size={18} />
                   </Link>
                 )}
 
@@ -625,7 +634,7 @@ export const AlunoTable = ({ canCreate }: AlunoTableProps) => {
                     title="Ver Medidas"
                     className={styles.iconMedidas}
                   >
-                    <Ruler size={24} />
+                    <Ruler size={18} />
                   </Link>
                 )}
 
@@ -635,7 +644,7 @@ export const AlunoTable = ({ canCreate }: AlunoTableProps) => {
                     title="Excluir"
                     className={styles.iconButtonDelete}
                   >
-                    <Trash2 size={24} />
+                    <Trash2 size={18} />
                   </button>
                 )}
               </div>
