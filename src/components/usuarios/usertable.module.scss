@@ -132,12 +132,8 @@
 
 /* Grupo de Ações (Botões PDF/Whats) */
 .actionsGroup {
-  /*display: flex;
-  gap: 10px;
-  align-items: center;
-  */
   width: 100%;
-  flex: 0 0 100%; /* força ficar abaixo dentro da toolbar (flex-wrap) */
+  flex: 0 0 100%;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
@@ -372,6 +368,17 @@
   }
 }
 
+.clienteBadge {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: linear-gradient(90deg, #aaa1a1, #f8f9fa, #9ea7af);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #5c6370;
+  text-align: center;
+}
+
 .cardContent {
   padding: 16px;
   display: flex;
@@ -455,17 +462,6 @@
     background-color: #e5e7eb;
     color: #374151;
   }
-}
-
-.clienteBadge {
-  margin-top: 8px;
-  padding: 8px 12px;
-  background: linear-gradient(90deg, #aaa1a1, #f8f9fa, #9ea7af);
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 600;
-  color: #5c6370;
-  text-align: center;
 }
 
 // ==================== ACTIONS ====================
@@ -623,10 +619,8 @@
     flex-direction: column;
   }
 
-  /* 🔁 VOLTA PARA O PADRÃO ANTIGO */
   .actionsGroup {
     display: flex;
-    //flex-wrap: wrap;
     justify-content: space-between;
     gap: 8px;
   }

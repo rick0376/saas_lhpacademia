@@ -583,6 +583,11 @@ export const AlunoTable = ({ canCreate }: AlunoTableProps) => {
                     <span className={styles.statLabel}>Medidas</span>
                   </div>
                 </div>
+                {aluno.cliente && (
+                  <div className={styles.clienteBadge}>
+                    🏢 {aluno.cliente.nome}
+                  </div>
+                )}
               </div>
 
               <div className={styles.actions}>
