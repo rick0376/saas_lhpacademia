@@ -37,33 +37,67 @@
   font-weight: 500;
 }
 
-.actionsGroup {
+/* Grupo de Busca */
+.searchGroup {
   display: flex;
-  gap: 10px;
-  align-items: center;
+  flex: 1;
+  gap: 8px;
 }
 
-.addButton {
+.searchInput {
+  flex: 1;
   height: 42px;
-  display: inline-flex;
+  min-height: 42px;
+  padding: 0 16px;
+  border: 2px solid #a78bfa;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1f2937;
+  background-color: white;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+
+  &::placeholder {
+    color: #a5b4fc;
+  }
+  &:focus {
+    outline: none;
+    border-color: #7c3aed;
+    box-shadow: 0 0 8px #7c3aed88;
+  }
+}
+
+.searchButton {
+  height: 42px;
+  padding: 0 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6d2ed4 0%, #9167e4 100%);
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 0 16px;
-  background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
-  color: white;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 14px;
-  text-decoration: none;
-  border: none;
-  cursor: pointer;
+  white-space: nowrap;
   transition: all 0.2s ease;
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+    background: linear-gradient(135deg, #714797 0%, #5d2691 100%);
+    box-shadow: 0 0 10px #6d2ed488;
   }
+}
+
+/* Grupo de Ações (Botões PDF/Whats) */
+.actionsGroup {
+  width: 100%;
+  flex: 0 0 100%;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  align-items: center;
 }
 
 .actionBtn {
@@ -76,34 +110,42 @@
   border-radius: 8px;
   font-weight: 600;
   font-size: 14px;
+  text-decoration: none;
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
   color: white;
+  white-space: nowrap;
+  box-sizing: border-box;
 
   &:hover {
     transform: translateY(-1px);
     filter: brightness(1.1);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
-
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
   }
 }
 
+.btnNovo {
+  background-color: #2563eb;
+}
 .btnPdf {
   background-color: #f59e0b;
 }
-
 .btnWhats {
   background-color: #25d366;
 }
 
+/* Ícone base para botões da toolbar */
 .iconBtn {
   width: 18px;
   height: 18px;
+  transition: all 0.2s ease;
 }
 
 // ==================== LOADING, ERROR, EMPTY ====================
@@ -523,7 +565,32 @@
 }
 
 @media (max-width: 640px) {
+  .iconBtn {
+    width: 24px;
+    height: 24px;
+  }
+
+  .cardsContainer {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 472px) {
   .hideMobile {
     display: none;
+  }
+}
+@media (max-width: 420px) {
+  .searchGroup {
+    width: 100%;
+  }
+
+  .searchInput {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .searchButton {
+    flex-shrink: 0;
   }
 }

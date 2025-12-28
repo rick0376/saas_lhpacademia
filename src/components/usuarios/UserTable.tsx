@@ -540,7 +540,10 @@ export const UserTable = () => {
 
     texto += `\n📌 *${nomeUsuario}*`;
 
-    window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, "_blank");
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(
+      texto
+    )}`;
+    window.open(url, "_blank");
   };
 
   if (
@@ -581,20 +584,22 @@ export const UserTable = () => {
           </div>
         )}
 
-        <form onSubmit={handleSearch} className={styles.searchGroup}>
-          <input
-            type="text"
-            placeholder="Buscar por nome ou email..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className={styles.searchInput}
-            autoFocus
-          />
-          <button type="submit" className={styles.searchButton}>
-            <Search className={styles.iconBtn} />
-            <span>Buscar</span>
-          </button>
-        </form>
+        <div className={styles.searchForm}>
+          <form onSubmit={handleSearch} className={styles.searchGroup}>
+            <input
+              type="text"
+              placeholder="Buscar por nome ou email..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className={styles.searchInput}
+              autoFocus
+            />
+            <button type="submit" className={styles.searchButton}>
+              <Search className={styles.iconBtn} />
+              <span className={styles.hideMobile}>Buscar</span>
+            </button>
+          </form>
+        </div>
 
         <div className={styles.actionsGroup}>
           {permUsuarios.criar && (

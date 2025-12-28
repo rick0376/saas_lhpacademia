@@ -17,6 +17,7 @@ import {
   GraduationCap,
   UserPlus,
   Users,
+  Search,
 } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 
@@ -47,6 +48,8 @@ export const ClienteTable = () => {
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedTerm, setDebouncedTerm] = useState("");
   const [deleteModal, setDeleteModal] = useState<{
     isOpen: boolean;
     cliente?: Cliente;
@@ -111,10 +114,32 @@ export const ClienteTable = () => {
     }
   };
 
-  const fetchClientes = async () => {
+  useEffect(() => {
+    if (status === "authenticated" && session) {
+      fetchPermissoes();
+    }
+  }, [status, session]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedTerm(searchTerm);
+    }, 300);
+
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
+
+  const fetchClientes = async (search = "") => {
     try {
       setLoading(true);
-      const response = await fetch("/api/clientes");
+
+      let url = "/api/clientes";
+      const params = new URLSearchParams();
+
+      if (search) params.append("search", search);
+
+      if (params.toString()) url += `?${params.toString()}`;
+
+      const response = await fetch(url);
 
       if (!response.ok) {
         throw new Error("Erro ao buscar clientes");
@@ -122,19 +147,21 @@ export const ClienteTable = () => {
 
       const data = await response.json();
       setClientes(data);
+      setError("");
     } catch (err) {
       setError("Erro ao carregar clientes");
       console.error(err);
+      setClientes([]);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (status === "authenticated" && session) {
-      fetchPermissoes();
+    if (permissoesCarregadas && permissoes.ler) {
+      fetchClientes(debouncedTerm);
     }
-  }, [status, session]);
+  }, [debouncedTerm, permissoesCarregadas, permissoes.ler]);
 
   useEffect(() => {
     if (status === "authenticated" && permissoesCarregadas) {
@@ -443,9 +470,33 @@ export const ClienteTable = () => {
           <span className={styles.toolbarCount}>{clientes.length} total</span>
         </div>
 
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            setDebouncedTerm(searchTerm);
+          }}
+          className={styles.searchGroup}
+        >
+          <input
+            type="text"
+            placeholder="Buscar por nome..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className={styles.searchInput}
+          />
+
+          <button type="submit" className={styles.searchButton}>
+            <Search className={styles.iconBtn} />
+            <span className={styles.hideMobile}>Buscar</span>
+          </button>
+        </form>
+
         <div className={styles.actionsGroup}>
           {permissoes.criar && (
-            <Link href="/dashboard/clientes/novo" className={styles.addButton}>
+            <Link
+              href="/dashboard/clientes/novo"
+              className={`${styles.actionBtn} ${styles.btnNovo}`}
+            >
               <Plus size={18} />
               <span className={styles.hideMobile}>Novo</span>
             </Link>

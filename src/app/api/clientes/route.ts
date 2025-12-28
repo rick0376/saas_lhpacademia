@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { uploadToCloudinary } from "@/lib/uploadToCloudinary";
 import bcrypt from "bcryptjs";
+import { Prisma } from "@prisma/client";
 
 // GET - Listar todos os clientes
 export async function GET(request: NextRequest) {
@@ -14,7 +15,21 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
     }
 
+    const { searchParams } = new URL(request.url);
+    const search = searchParams.get("search") || "";
+
+    // 🔎 filtro opcional
+    const whereClause: Prisma.ClienteWhereInput = search
+      ? {
+          nome: {
+            contains: search,
+            mode: Prisma.QueryMode.insensitive,
+          },
+        }
+      : {};
+
     const clientes = await prisma.cliente.findMany({
+      where: whereClause,
       select: {
         id: true,
         nome: true,
@@ -31,7 +46,6 @@ export async function GET(request: NextRequest) {
       },
       orderBy: { createdAt: "desc" },
     });
-
     return NextResponse.json(clientes);
   } catch (error) {
     console.error("Erro ao buscar clientes:", error);
