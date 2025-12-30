@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
     }
 
-    // Verificar permissão de ler treinos (se não for SUPERADMIN)
+    // Verificar permissão
     if (session.user.role !== "SUPERADMIN") {
       const permissao = await prisma.permissao.findUnique({
         where: {
@@ -40,6 +40,11 @@ export async function GET(request: NextRequest) {
       whereClause.alunoId = alunoId;
     }
 
+    // 🔒 Filtrar treinos pelo cliente do usuário logado
+    if (session.user.role !== "SUPERADMIN") {
+      whereClause.clienteId = session.user.clienteId; // e pelo cliente
+    }
+
     const treinos = await prisma.treino.findMany({
       where: whereClause,
       include: {
@@ -52,7 +57,7 @@ export async function GET(request: NextRequest) {
           select: {
             exercicios: true,
             cronogramas: true,
-            alunosAtribuidos: true, // ✅ ADICIONAR ESTA LINHA
+            alunosAtribuidos: true,
           },
         },
       },
@@ -111,12 +116,13 @@ export async function POST(request: NextRequest) {
     const novoTreino = await prisma.treino.create({
       data: {
         nome,
-        alunoId: alunoId || null, // ✅ OPCIONAL
+        alunoId: alunoId || null, // se quiser manter, ok
         objetivo: objetivo || null,
         observacoes: observacoes || null,
         ativo: ativo ?? true,
         dataInicio: dataInicio ? new Date(dataInicio) : new Date(),
         dataFim: dataFim ? new Date(dataFim) : null,
+        clienteId: session.user.clienteId,
       },
       include: {
         aluno: alunoId

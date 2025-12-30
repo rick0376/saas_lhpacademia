@@ -30,6 +30,7 @@
   display: flex;
   align-items: center;
   min-width: 260px;
+  flex: 1;
 }
 
 /* seta do select (custom) */
@@ -572,6 +573,25 @@
   margin-top: 8px;
 }
 
+// ==================== RESPONSIVIDADE ====================
+@media (max-width: 774px) {
+  .filterGroup {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .searchForm {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  .searchInput {
+    flex: 1;
+  }
+}
+
 @media (max-width: 768px) {
   .toolbar {
     flex-direction: column;
@@ -590,17 +610,18 @@
   .searchGroup {
     width: 100%;
     min-width: 0;
-    flex-direction: column;
   }
+
   .actionsGroup {
     display: flex;
     justify-content: space-between;
     gap: 8px;
   }
   .actionBtn {
-    padding: 0 12px;
     width: 48%;
+    padding: 0 12px;
   }
+
   .iconPerfil svg,
   .iconEvolucao svg,
   .iconEditar svg,
@@ -617,20 +638,30 @@
     width: 24px;
     height: 24px;
   }
-  .actionBtn {
-    padding: 0 12px;
-    width: 48%;
-  }
-  .searchButton {
-    width: 100%;
-  }
+
   .cardsContainer {
     grid-template-columns: 1fr;
   }
 }
 
-@media (max-width: 440px) {
+@media (max-width: 472px) {
   .hideMobile {
     display: none;
+  }
+}
+@media (max-width: 420px) {
+  .searchInput {
+    min-width: 222px;
+  }
+}
+
+@media (max-width: 405px) {
+  .searchInput {
+    min-width: 212px;
+  }
+}
+@media (max-width: 395px) {
+  .searchInput {
+    min-width: 182px;
   }
 }

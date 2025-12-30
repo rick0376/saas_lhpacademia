@@ -458,20 +458,22 @@ export const AlunoTable = ({ canCreate }: AlunoTableProps) => {
           </div>
         )}
 
-        <form onSubmit={handleSearch} className={styles.searchGroup}>
-          <input
-            type="text"
-            placeholder="Buscar aluno..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className={styles.searchInput}
-            autoFocus
-          />
-          <button type="submit" className={styles.searchButton}>
-            <Search className={styles.iconBtn} />
-            <span>Buscar</span>
-          </button>
-        </form>
+        <div className={styles.searchForm}>
+          <form onSubmit={handleSearch} className={styles.searchGroup}>
+            <input
+              type="text"
+              placeholder="Buscar aluno..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className={styles.searchInput}
+              autoFocus
+            />
+            <button type="submit" className={styles.searchButton}>
+              <Search className={styles.iconBtn} />
+              <span className={styles.hideMobile}>Buscar</span>
+            </button>
+          </form>
+        </div>
 
         <div className={styles.actionsGroup}>
           {canCreate && permAlunos.criar && (

@@ -3,7 +3,7 @@
   padding: 40px 24px;
   background-color: var(--light-color);
   border-radius: 12px;
-  background: linear-gradient(90deg, #c7bebe, #e5eaf0, #c9d3dd);
+  background: linear-gradient(90deg, #6a11cb 0%, #2575fc 50%, #29abe2 100%);
 }
 
 .container {
@@ -22,13 +22,13 @@
 .title {
   font-size: 32px;
   font-weight: 800;
-  color: var(--dark-color);
+  color: #fff;
   margin-bottom: 8px;
 }
 
 .subtitle {
   font-size: 16px;
-  color: var(--gray-color);
+  color: #e8eaec;
 }
 
 .addButton {

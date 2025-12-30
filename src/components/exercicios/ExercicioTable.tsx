@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { jsPDF } from "jspdf";
-import { FileText, Search, Share2 } from "lucide-react";
+import { FileText, Plus, Search, Share2 } from "lucide-react";
 import styles from "./styles.module.scss";
 import { Button } from "../ui/Button/Button";
 import { Modal } from "../ui/Modal/Modal";
@@ -366,7 +366,9 @@ export const ExercicioTable = () => {
     texto += `------------------------------\n`;
     texto += `📌 *${nomeCliente}*`;
 
-    const url = `https://wa.me/?text=${encodeURIComponent(texto)}`;
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(
+      texto
+    )}`;
     window.open(url, "_blank");
   };
 
@@ -409,50 +411,55 @@ export const ExercicioTable = () => {
 
   return (
     <>
-      {permExercicios.criar && (
-        <div className={styles.topActions}>
-          <Link href="/dashboard/exercicios/novo" className={styles.addButton}>
-            <span className={styles.icon}>+</span>
-            Novo Exercício
-          </Link>
-        </div>
-      )}
-
       <div className={styles.filterBar}>
-        <input
-          type="text"
-          placeholder="Buscar exercício..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className={styles.searchInput}
-        />
-
-        <select
-          value={filtroGrupo}
-          onChange={(e) => setFiltroGrupo(e.target.value)}
-          className={styles.filterSelect}
-        >
-          <option value="">Todos os grupos</option>
-          <option value="PEITO">Peito</option>
-          <option value="COSTAS">Costas</option>
-          <option value="OMBROS">Ombros</option>
-          <option value="BICEPS">Bíceps</option>
-          <option value="TRICEPS">Tríceps</option>
-          <option value="PERNAS">Pernas</option>
-          <option value="GLUTEOS">Glúteos</option>
-          <option value="ABDOMEN">Abdômen</option>
-          <option value="PANTURRILHA">Panturrilha</option>
-          <option value="ANTEBRACO">Antebraço</option>
-          <option value="CARDIO">Cardio</option>
-          <option value="FUNCIONAL">Funcional</option>
-        </select>
-
-        <button onClick={handleFilter} className={styles.searchButton}>
-          <Search className={styles.iconBtn} />
-          <span>Buscar</span>
-        </button>
+        <div className={styles.filterGroup}>
+          <select
+            value={filtroGrupo}
+            onChange={(e) => setFiltroGrupo(e.target.value)}
+            className={styles.filterSelect}
+          >
+            <option value="">Todos os grupos</option>
+            <option value="PEITO">Peito</option>
+            <option value="COSTAS">Costas</option>
+            <option value="OMBROS">Ombros</option>
+            <option value="BICEPS">Bíceps</option>
+            <option value="TRICEPS">Tríceps</option>
+            <option value="PERNAS">Pernas</option>
+            <option value="GLUTEOS">Glúteos</option>
+            <option value="ABDOMEN">Abdômen</option>
+            <option value="PANTURRILHA">Panturrilha</option>
+            <option value="ANTEBRACO">Antebraço</option>
+            <option value="CARDIO">Cardio</option>
+            <option value="FUNCIONAL">Funcional</option>
+          </select>
+        </div>
+        <div className={styles.searchForm}>
+          <form className={styles.searchGroup}>
+            <input
+              type="text"
+              placeholder="Buscar exercício..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className={styles.searchInput}
+            />
+            <button onClick={handleFilter} className={styles.searchButton}>
+              <Search className={styles.iconBtn} />
+              <span className={styles.hideMobile}>Buscar</span>
+            </button>
+          </form>
+        </div>
 
         <div className={styles.actionsGroup}>
+          {permExercicios.criar && (
+            <Link
+              href="/dashboard/exercicios/novo"
+              className={`${styles.actionBtn} ${styles.btnNovo}`}
+              title="Novo Exercícios"
+            >
+              <Plus className={styles.iconBtn} />
+              <span className={styles.hideMobile}>Novo</span>
+            </Link>
+          )}
           {canCompartilharExercicios && (
             <>
               {canCompartilharExercicios && (

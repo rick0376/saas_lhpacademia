@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import styles from "./formStyles.module.scss";
 import { Input } from "../ui/Input/Input";
 import { Button } from "../ui/Button/Button";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 
 interface Aluno {

@@ -18,6 +18,7 @@ model Cliente {
   usuarios   Usuario[]
   alunos     Aluno[]
   exercicios Exercicio[]
+  treinos Treino[]
 
   @@map("clientes")
 }
@@ -191,6 +192,10 @@ model Treino {
   dataFim     DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+
+  // 🔹 RELAÇÃO COM CLIENTE (INSERIR)
+   clienteId  String?   // <-- OPCIONAL POR ENQUANTO
+  cliente    Cliente?  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
 
   // Relacionamentos
   exercicios  TreinoExercicio[]

@@ -131,7 +131,7 @@
   }
 }
 
-/* Grupo de Ações (Botões PDF/Whats) */
+/* ============== BUTTONS (NOVO/PDF/WHATS) ================== */
 .actionsGroup {
   width: 100%;
   flex: 0 0 100%;
@@ -600,17 +600,15 @@
 
 // ==================== RESPONSIVIDADE ====================
 @media (max-width: 774px) {
-  /* select ocupa 100% */
   .filterGroup {
     width: 100%;
     min-width: 0;
   }
 
-  /* searchForm fica abaixo e ocupa toda largura */
   .searchForm {
     width: 100%;
     display: flex;
-    flex-direction: row; /* mantém input e botão lado a lado */
+    flex-direction: row;
     gap: 10px;
   }
 
@@ -669,6 +667,17 @@
 }
 @media (max-width: 420px) {
   .searchInput {
-    min-width: 32px;
+    min-width: 222px;
+  }
+}
+
+@media (max-width: 405px) {
+  .searchInput {
+    min-width: 212px;
+  }
+}
+@media (max-width: 395px) {
+  .searchInput {
+    min-width: 182px;
   }
 }

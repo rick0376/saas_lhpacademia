@@ -466,8 +466,10 @@ export const ClienteTable = () => {
       {/* ✅ Toolbar com botões */}
       <div className={styles.toolbar}>
         <div className={styles.toolbarLeft}>
-          <h2 className={styles.toolbarTitle}>Clientes</h2>
-          <span className={styles.toolbarCount}>{clientes.length} total</span>
+          <h2 className={styles.toolbarTitle}>Clientes = </h2>
+          <span className={styles.toolbarCount}>
+            {clientes.length} {clientes.length > 1 ? "totais" : "total"}
+          </span>
         </div>
 
         <form
