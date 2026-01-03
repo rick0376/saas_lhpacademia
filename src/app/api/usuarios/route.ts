@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
     ativo,
     telefone,
     dataNascimento,
-    objetivo, // ✅ ADICIONE AQUI
+    objetivo,
   } = body;
 
   let dataNascimentoValid = null;
@@ -181,6 +181,36 @@ export async function POST(request: NextRequest) {
       ? session.user.clienteId
       : clienteId || session.user.clienteId;
 
+  if (usuarioAtivo && clienteIdFinal) {
+    const cliente = await prisma.cliente.findUnique({
+      where: { id: clienteIdFinal },
+      include: { plano: true },
+    });
+
+    if (!cliente || !cliente.plano) {
+      return NextResponse.json(
+        { error: "Cliente ou plano inválido" },
+        { status: 400 }
+      );
+    }
+
+    const usuariosAtivos = await prisma.usuario.count({
+      where: {
+        clienteId: clienteIdFinal,
+        ativo: true,
+      },
+    });
+
+    const limiteUsuarios = cliente.plano.limiteUsuarios + cliente.extraUsuarios;
+
+    if (usuariosAtivos >= limiteUsuarios) {
+      return NextResponse.json(
+        { error: "Limite de usuários ativos atingido" },
+        { status: 403 }
+      );
+    }
+  }
+
   const novoUsuario = await prisma.usuario.create({
     data: {
       nome,
@@ -191,7 +221,7 @@ export async function POST(request: NextRequest) {
       ativo: usuarioAtivo,
       telefone,
       dataNascimento: dataNascimento ? new Date(dataNascimento) : null,
-      objetivo, // ✅ ADICIONE
+      objetivo,
     },
     select: {
       id: true,
@@ -199,7 +229,7 @@ export async function POST(request: NextRequest) {
       email: true,
       telefone: true,
       dataNascimento: true,
-      objetivo: true, // ✅ ADICIONE
+      objetivo: true,
       role: true,
       ativo: true,
       createdAt: true,

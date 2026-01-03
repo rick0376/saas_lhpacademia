@@ -260,10 +260,10 @@
   align-items: center;
   gap: 12px;
   padding: 16px;
-  background: linear-gradient(90deg, #c7bebe, #e5eaf0, #c9d3dd);
+  background: linear-gradient(90deg, #f1c0c0, #e5eaf0, #b5d1ec);
   border-bottom: 1px solid #e5e7eb;
   margin: -1.4rem -1.6rem 0.8rem -1.6rem;
-  border-radius: 14px 14px 0 0;
+  border-radius: 8px 14px 0 0;
 }
 
 .logo {
@@ -460,6 +460,21 @@
   }
 }
 
+.card {
+  border-left: 6px solid transparent;
+}
+
+.proximo {
+  border-left-color: #facc15; // amarelo
+}
+
+.vencido {
+  border-left-color: #ef4444; // vermelho
+}
+
+.normal {
+  border-left-color: #22c55e; // verde
+}
 // ==================== MODAL ====================
 .modalContent {
   p {

@@ -1,0 +1,31 @@
+.container {
+  background: linear-gradient(90deg, #f1c0c0, #e5eaf0, #b5d1ec);
+  padding: 2rem;
+  display: flex;
+  border-radius: 16px;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.formSection,
+.cardSection {
+  margin-bottom: 2rem;
+}
+
+.h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.h2 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.cardContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}

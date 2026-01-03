@@ -1,0 +1,70 @@
+/* styles.module.scss */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: linear-gradient(90deg, #ebe7e7, #ecf2f8, #dde5eb);
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.inputWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.checkboxInput {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.submitButton {
+  align-self: flex-start;
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  background-color: #4f46e5;
+  color: white;
+}
+
+.submitButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.buttonGroup {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.submitButton {
+  background-color: #4f46e5;
+  color: white;
+  &:hover {
+    background-color: #4338ca;
+  }
+}
+
+.cancelButton {
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  &:hover {
+    background-color: #e5e7eb;
+  }
+}

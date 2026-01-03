@@ -428,6 +428,21 @@ export const ClienteTable = () => {
     window.open(url, "_blank");
   };
 
+  //nova função para controlar vencimento
+  const getVencimentoStatus = (data?: string | null) => {
+    if (!data) return "normal";
+
+    const hoje = new Date();
+    const vencimento = new Date(data);
+
+    const diffMs = vencimento.getTime() - hoje.getTime();
+    const diffDias = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+    if (diffDias < 0) return "vencido";
+    if (diffDias <= 3) return "proximo";
+    return "normal";
+  };
+
   if (loading) {
     return (
       <div className={styles.loading}>
@@ -527,7 +542,13 @@ export const ClienteTable = () => {
       {/* ✅ Cards Container */}
       <div className={styles.cardsContainer}>
         {clientes.map((cliente) => (
-          <div key={cliente.id} className={styles.card}>
+          //<div key={cliente.id} className={styles.card}>
+          <div
+            key={cliente.id}
+            className={`${styles.card} ${
+              styles[getVencimentoStatus(cliente.dataVencimento)]
+            }`}
+          >
             <div className={styles.cardHeader}>
               {cliente.logo ? (
                 <img

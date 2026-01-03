@@ -1,0 +1,64 @@
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+
+  th,
+  td {
+    padding: 0.75rem 1rem; // 12px 16px
+    text-align: center; // centraliza horizontalmente
+    vertical-align: middle; // centraliza verticalmente
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 1rem; // 16px
+  }
+
+  th {
+    background-color: #f9f9f9;
+    font-weight: 600;
+    color: #333;
+  }
+
+  tbody tr {
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #f5f5f5;
+    }
+
+    td:last-child {
+      display: flex;
+      justify-content: center; // centraliza os botões de ação
+      gap: 0.5rem;
+    }
+  }
+}
+
+// Botão de ação (lixeira)
+.deleteButton {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.25rem; // 20px
+  color: #e53935;
+  transition: color 0.2s;
+
+  &:hover {
+    color: #b71c1c;
+  }
+}
+
+// Responsividade
+@media (max-width: 768px) {
+  .table {
+    font-size: 0.875rem; // 14px
+
+    th,
+    td {
+      padding: 0.5rem 0.75rem;
+    }
+
+    td:last-child {
+      justify-content: center; // mantém centralizado no mobile
+    }
+  }
+}
