@@ -1,9 +1,28 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
-export async function GET() {
+/*export async function GET() {
   const planos = await prisma.plano.findMany();
   return NextResponse.json(planos);
+}
+*/
+export async function GET() {
+  const planos = await prisma.plano.findMany({
+    include: {
+      _count: {
+        select: {
+          clientes: true,
+        },
+      },
+    },
+  });
+
+  return NextResponse.json(
+    planos.map((plano) => ({
+      ...plano,
+      totalClientes: plano._count.clientes,
+    }))
+  );
 }
 
 export async function POST(req: Request) {

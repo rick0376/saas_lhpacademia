@@ -181,6 +181,15 @@ export default async function DashboardPage() {
       superAdminOnly: true,
     },
     {
+      id: "planos",
+      title: "Planos",
+      description: "Gerenciar planos e limites do sistema",
+      icon: "📦",
+      href: "/dashboard/planos",
+      color: "#0ea5e9",
+      superAdminOnly: true,
+    },
+    {
       id: "usuarios",
       title: "Usuários",
       description: "Gerenciar usuários do sistema",

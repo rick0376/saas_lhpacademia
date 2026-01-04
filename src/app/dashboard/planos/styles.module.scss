@@ -1,5 +1,5 @@
 .container {
-  background: linear-gradient(90deg, #f1c0c0, #e5eaf0, #b5d1ec);
+  background: linear-gradient(90deg, #6a11cb 0%, #2575fc 50%, #29abe2 100%);
   padding: 2rem;
   display: flex;
   border-radius: 16px;
@@ -12,16 +12,18 @@
   margin-bottom: 2rem;
 }
 
-.h1 {
-  font-size: 2rem;
+.title {
+  font-size: 32px;
   font-weight: 700;
-  margin-bottom: 1.5rem;
+  color: #fff;
+  margin-bottom: 8px;
 }
 
-.h2 {
-  font-size: 1.3rem;
+.subtitle {
+  font-size: 20px;
   font-weight: 600;
-  margin-bottom: 1rem;
+  color: #e8eaec;
+  margin-bottom: 16px;
 }
 
 .cardContainer {

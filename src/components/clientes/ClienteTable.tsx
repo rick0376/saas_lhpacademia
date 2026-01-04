@@ -585,7 +585,7 @@ export const ClienteTable = () => {
               <div className={styles.infoItem}>
                 <GraduationCap
                   size={18}
-                  className={`${styles.iconInfo} ${styles.iconUsuarios}`}
+                  className={`${styles.iconInfo} ${styles.iconAlunos}`}
                 />
                 <span className={styles.label}>Alunos:</span>
                 <span className={styles.value}>{cliente._count.alunos}</span>

@@ -1,98 +1,163 @@
 .card {
-  border: 1px solid #e5e7eb; // borda mais suave
-  border-radius: 16px;
-  padding: 1.25rem;
-  background-color: #ffffff;
+  flex: 1 1 300px;
+  width: 100%;
+  min-width: 280px;
+  background: rgb(241, 246, 250);
+  padding: 1.4rem 1.6rem;
+  border-radius: 14px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s, box-shadow 0.2s;
+  gap: 0.8rem;
+  transition: all 0.3s ease;
 
   &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 12px 30px rgba(122, 79, 237, 0.4);
+    transform: translateY(-4px);
   }
 }
 
-.header {
+.cardHeader {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 1rem;
+  align-items: center;
+  padding: 16px;
+  background: linear-gradient(90deg, #f1c0c0, #e5eaf0, #b5d1ec);
+  border-bottom: 1px solid #e5e7eb;
+  margin: -1.4rem -1.6rem 0.8rem -1.6rem;
+  border-radius: 12px 12px 0 0;
 }
 
-.name {
-  font-size: 1.3rem;
-  font-weight: 700;
+.headerInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.cardName {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #34418c;
   margin: 0;
-  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.statusBadge {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  width: fit-content;
+}
+
+.ativo {
+  background-color: #bcf3cf;
+  color: #15803d;
+}
+
+.inativo {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.cardContent {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  padding-bottom: 16px;
+}
+
+.sectionLabel {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #5b6374;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 6px;
+}
+
+.infoPlan {
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 8px;
+}
+
+.infoItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.label {
+  flex-shrink: 0;
+}
+
+.value {
+  margin-left: auto;
+  font-weight: 700;
+  color: #1f2937;
 }
 
 .actions {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  justify-content: center;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
 }
 
-.edit,
-.delete {
-  border: none;
-  cursor: pointer;
-  font-size: 1.2rem;
-  padding: 0.35rem 0.6rem;
-  border-radius: 8px;
-  transition: all 0.2s;
+.iconInfo {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.iconUsuarios {
+  color: #3b82f6;
+}
+
+.iconAlunos {
+  color: #4e6d05;
+}
+
+.iconClientes {
+  color: #ef4444;
+}
+.editButton,
+.deleteButton {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.edit {
-  background-color: #eff6ff;
-  color: #3b82f6;
+.editButton {
+  background-color: #fef3c7;
+  color: #92400e;
 
   &:hover {
-    background-color: #dbeafe;
+    background-color: #f59e0b;
+    color: white;
   }
 }
 
-.delete {
-  background-color: #ffefef;
-  color: #ef4444;
+.deleteButton {
+  background-color: #fee2e2;
+  color: #991b1b;
 
   &:hover {
-    background-color: #fee2e2;
-  }
-}
-
-.info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  font-size: 0.95rem;
-  color: #374151;
-
-  span {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-  }
-}
-
-.status {
-  font-weight: 600;
-  padding: 0.1rem 0.4rem;
-  border-radius: 6px;
-  font-size: 0.85rem;
-
-  &.ativo {
-    background-color: #d1fae5;
-    color: #065f46;
-  }
-
-  &.inativo {
-    background-color: #fee2e2;
-    color: #991b1b;
+    background-color: #ef4444;
+    color: white;
   }
 }

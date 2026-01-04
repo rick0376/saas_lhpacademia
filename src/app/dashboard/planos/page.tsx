@@ -91,10 +91,12 @@ export default function PlanosPage() {
         />
       )}
 
-      <h1>Planos</h1>
+      <h1 className={styles.title}>Planos</h1>
 
       <section className={styles.formSection}>
-        <h2>{editingPlano ? "Editar Plano" : "Criar Plano"}</h2>
+        <h2 className={styles.subtitle}>
+          {editingPlano ? "Editar Plano" : "Criar Plano"}
+        </h2>
         <PlanoForm
           initialData={editingPlano ?? undefined}
           onSuccess={handleCreateOrUpdate}
@@ -103,7 +105,7 @@ export default function PlanosPage() {
       </section>
 
       <section className={styles.cardSection}>
-        <h2>Planos Cadastrados</h2>
+        <h2 className={styles.subtitle}>Planos Cadastrados</h2>
         {loading ? (
           <p>Carregando planos...</p>
         ) : planos.length > 0 ? (

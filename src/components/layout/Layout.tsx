@@ -232,6 +232,11 @@ export const Layout: React.FC<Props> = ({ children }) => {
                   label: "Clientes",
                   icon: <Building2 size={18} />,
                 },
+                {
+                  href: "/dashboard/planos",
+                  label: "Planos",
+                  icon: <ClipboardList size={18} />,
+                },
               ]
             : []),
           ...(podeAcessar("usuarios")

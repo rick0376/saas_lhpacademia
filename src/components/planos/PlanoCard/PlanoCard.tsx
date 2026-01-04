@@ -4,6 +4,14 @@ import { useState } from "react";
 import { ConfirmModal } from "@/components/ui/ConfirmModal/ConfirmModal";
 import { Toast } from "@/components/ui/Toast/Toast";
 import styles from "./styles.module.scss";
+import {
+  Building2,
+  Dumbbell,
+  Edit,
+  GraduationCap,
+  Trash2,
+  Users,
+} from "lucide-react";
 
 export interface Plano {
   id: string;
@@ -11,6 +19,7 @@ export interface Plano {
   limiteUsuarios: number;
   limiteAlunos: number;
   ativo: boolean;
+  totalClientes: number;
 }
 
 interface PlanoCardProps {
@@ -71,31 +80,71 @@ export function PlanoCard({ plano, onDelete, onEdit }: PlanoCardProps) {
       />
 
       <div className={styles.card}>
-        <div className={styles.header}>
-          <h3 className={styles.name}>{plano.nome}</h3>
-          <div className={styles.actions}>
-            <div className={styles.info}>
-              <span>Usuários: {plano.limiteUsuarios}</span>
-              <span>Alunos: {plano.limiteAlunos}</span>
-              <span>Status: {plano.ativo ? "Ativo" : "Inativo"}</span>
-            </div>
-            <button
-              type="button"
-              className={styles.edit}
-              onClick={() => onEdit(plano)}
-              title="Editar Plano"
+        <div className={styles.cardHeader}>
+          <div className={styles.headerInfo}>
+            <h3 className={styles.cardName}>{plano.nome}</h3>
+
+            <span
+              className={`${styles.statusBadge} ${
+                plano.ativo ? styles.ativo : styles.inativo
+              }`}
             >
-              ✏️
-            </button>
-            <button
-              type="button"
-              className={styles.delete}
-              onClick={() => setModalOpen(true)}
-              title="Excluir Plano"
-            >
-              🗑️
-            </button>
+              {plano.ativo ? "Ativo" : "Inativo"}
+            </span>
           </div>
+        </div>
+
+        <div className={styles.cardContent}>
+          <span className={styles.sectionLabel}>Limites do Plano</span>
+
+          <div className={styles.infoPlan}>
+            <div className={styles.infoItem}>
+              <Users
+                size={18}
+                className={`${styles.iconInfo} ${styles.iconUsuarios}`}
+              />
+              <span className={styles.label}>Usuários</span>
+              <span className={styles.value}>{plano.limiteUsuarios}</span>
+            </div>
+
+            <div className={styles.infoItem}>
+              <GraduationCap
+                size={18}
+                className={`${styles.iconInfo} ${styles.iconAlunos}`}
+              />
+              <span className={styles.label}>Alunos</span>
+              <span className={styles.value}>{plano.limiteAlunos}</span>
+            </div>
+          </div>
+
+          <div className={styles.infoItem}>
+            <Dumbbell
+              size={18}
+              className={`${styles.iconInfo} ${styles.iconClientes}`}
+            />
+            <span className={styles.label}>Clientes </span>
+            <span className={styles.value}>{plano.totalClientes}</span>
+          </div>
+        </div>
+
+        <div className={styles.actions}>
+          <button
+            type="button"
+            onClick={() => onEdit(plano)}
+            className={styles.editButton}
+            title="Editar plano"
+          >
+            <Edit size={18} />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setModalOpen(true)}
+            className={styles.deleteButton}
+            title="Excluir plano"
+          >
+            <Trash2 size={18} />
+          </button>
         </div>
       </div>
     </>
