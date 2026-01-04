@@ -74,35 +74,27 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData();
     const nome = formData.get("nome") as string;
-    const login = formData.get("login") as string;
-    const senha = formData.get("senha") as string;
-    const planoId = formData.get("planoId") as string; // ✅ NOVO CAMPO
+    const login = formData.get("login") as string; // ✅ LOGIN
+    const senha = formData.get("senha") as string; // ✅ SENHA
     const ativo = formData.get("ativo") === "true";
     const logoFile = formData.get("logo") as File | null;
-    const dataVencimento = formData.get("dataVencimento") as string | null;
+    const dataVencimento = formData.get("dataVencimento") as string | null; // ✅ NOVO CAMPO
 
-    if (!nome || !login || !senha || !planoId) {
+    if (!nome || !login || !senha) {
       return NextResponse.json(
-        { error: "Nome, login, senha e plano são obrigatórios" },
+        { error: "Nome, login e senha são obrigatórios" },
         { status: 400 }
       );
     }
 
-    // validar se o plano existe
-    const planoExistente = await prisma.plano.findUnique({
-      where: { id: planoId },
-    });
-    if (!planoExistente) {
-      return NextResponse.json({ error: "Plano inválido" }, { status: 400 });
-    }
-
-    // gerar email único a partir do login
+    // ✅ Gerar email único a partir do login
     const email = `${login}@cliente.local`;
 
-    // valida se login já existe
+    // Valida se login já existe
     const loginExistente = await prisma.usuario.findUnique({
       where: { email },
     });
+
     if (loginExistente) {
       return NextResponse.json(
         { error: "Login já cadastrado" },
@@ -111,9 +103,11 @@ export async function POST(request: NextRequest) {
     }
 
     let logoUrl: string | null = null;
+
     if (logoFile) {
       const arrayBuffer = await logoFile.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
+
       try {
         logoUrl = await uploadToCloudinary(buffer, "saas_academia/clientes");
       } catch (uploadError) {
@@ -125,23 +119,23 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // criar cliente com planoId
+    // ✅ CRIAR CLIENTE
     const novoCliente = await prisma.cliente.create({
       data: {
         nome,
         logo: logoUrl,
         ativo,
-        dataVencimento: dataVencimento ? new Date(dataVencimento) : null,
-        planoId, // associação ao plano
+        dataVencimento: dataVencimento ? new Date(dataVencimento) : null, // ✅ Adicionando dataVencimento
       },
     });
 
-    // criar usuário admin
+    // ✅ CRIAR USUÁRIO ADMIN COM LOGIN E SENHA
     const hashedPassword = await bcrypt.hash(senha, 10);
+
     await prisma.usuario.create({
       data: {
         nome: "Administrador",
-        email,
+        email: email, // email único gerado
         senha: hashedPassword,
         clienteId: novoCliente.id,
         role: "ADMIN",
@@ -154,8 +148,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         cliente: novoCliente,
-        admin: { login, senha },
-        mensagem: `✅ Cliente criado! Login e senha com sucesso.`,
+        admin: {
+          login: login,
+          senha: senha, // Retorna a senha em texto para exibir
+        },
+        mensagem: `✅ Cliente criado! Logine Senha com suecesso. ${senha}`,
       },
       { status: 201 }
     );

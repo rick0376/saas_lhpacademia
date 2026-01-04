@@ -40,31 +40,41 @@
   transition: background-color 0.2s;
   background-color: #4f46e5;
   color: white;
+  &:hover {
+    background-color: #9e96f1;
+    color: #0a0569;
+  }
 }
 
 .submitButton:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+.cancelButton {
+  align-self: flex-start;
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  background-color: #f00e0e;
+  color: white;
+  &:hover {
+    background-color: #e78181;
+    color: #690505;
+  }
+}
+
+.cancelButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .buttonGroup {
   display: flex;
   gap: 12px;
   margin-top: 16px;
-}
-
-.submitButton {
-  background-color: #4f46e5;
-  color: white;
-  &:hover {
-    background-color: #4338ca;
-  }
-}
-
-.cancelButton {
-  background-color: #f3f4f6;
-  color: #374151;
-  border: 1px solid #d1d5db;
-  &:hover {
-    background-color: #e5e7eb;
-  }
 }

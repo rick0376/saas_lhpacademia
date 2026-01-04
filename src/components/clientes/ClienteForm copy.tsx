@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./styles.module.scss";
 import { Input } from "../ui/Input/Input";
@@ -40,26 +40,7 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({
       ? new Date(initialData.dataVencimento).toISOString().slice(0, 10)
       : "",
     diasAdicionar: "",
-    planoId: "",
   });
-
-  const [planos, setPlanos] = useState<{ id: string; nome: string }[]>([]);
-
-  // === USEEFFECT PARA BUSCAR PLANOS ===
-  useEffect(() => {
-    const fetchPlanos = async () => {
-      try {
-        const res = await fetch("/api/planos"); // precisa existir esta API
-        if (!res.ok) throw new Error("Erro ao carregar planos");
-        const data = await res.json();
-        setPlanos(data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    fetchPlanos();
-  }, []);
 
   /*const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
@@ -76,9 +57,7 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({
   };
 */
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
 
@@ -113,9 +92,6 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({
       if (!formData.senha || formData.senha.length < 6) {
         newErrors.senha = "Senha deve ter no mínimo 6 caracteres";
       }
-      if (!isEdit && !formData.planoId) {
-        newErrors.planoId = "Selecione um plano";
-      }
     }
 
     setErrors(newErrors);
@@ -144,7 +120,6 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({
       if (!isEdit) {
         formDataToSend.append("login", formData.login);
         formDataToSend.append("senha", formData.senha);
-        formDataToSend.append("planoId", formData.planoId);
       }
 
       if (logoFile) {
@@ -234,9 +209,9 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({
           </Button>
         </div>
 
-        {/* ✅ LOGIN, SENHA E PLANO (só aparece ao criar) */}
+        {/* ✅ LOGIN E SENHA (só aparece ao criar) */}
         {!isEdit && (
-          <div className={styles.createAdminWrapper}>
+          <>
             <Input
               label="Login do Administrador *"
               type="text"
@@ -257,28 +232,7 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({
               error={errors.senha}
               required
             />
-
-            <div className={styles.selectWrapper}>
-              <label htmlFor="planoId">Plano *</label>
-              <select
-                name="planoId"
-                id="planoId"
-                value={formData.planoId}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Selecione um plano</option>
-                {planos.map((plano) => (
-                  <option key={plano.id} value={plano.id}>
-                    {plano.nome}
-                  </option>
-                ))}
-              </select>
-              {errors.planoId && (
-                <p className={styles.errorText}>{errors.planoId}</p>
-              )}
-            </div>
-          </div>
+          </>
         )}
 
         <ImageUpload

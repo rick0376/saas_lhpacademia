@@ -90,7 +90,7 @@ export function PlanoForm({
         type: "success",
       });
 
-      if (!initialData?.id) resetFields(); // limpa só se for criação
+      if (!initialData?.id) resetFields();
 
       if (onSuccess) onSuccess(data);
     } catch (err: any) {
