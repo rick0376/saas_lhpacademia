@@ -37,6 +37,9 @@ export async function GET(request: NextRequest) {
         ativo: true,
         createdAt: true,
         dataVencimento: true,
+        plano: {
+          select: { nome: true },
+        },
         _count: {
           select: {
             usuarios: true,
@@ -44,7 +47,7 @@ export async function GET(request: NextRequest) {
           },
         },
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: { nome: "desc" },
     });
     return NextResponse.json(clientes);
   } catch (error) {

@@ -28,6 +28,7 @@ interface Cliente {
   ativo: boolean;
   createdAt: string;
   dataVencimento?: string | null;
+  plano?: { nome: string };
   _count: {
     usuarios: number;
     alunos: number;
@@ -563,13 +564,21 @@ export const ClienteTable = () => {
               )}
               <div className={styles.headerInfo}>
                 <h3 className={styles.cardName}>{cliente.nome}</h3>
-                <span
-                  className={`${styles.statusBadge} ${
-                    cliente.ativo ? styles.ativo : styles.inativo
-                  }`}
-                >
-                  {cliente.ativo ? "Ativo" : "Inativo"}
-                </span>
+
+                <div className={styles.subHeader}>
+                  {cliente.plano && (
+                    <span className={styles.planoBadge}>
+                      {cliente.plano.nome}
+                    </span>
+                  )}
+                  <span
+                    className={`${styles.statusBadge} ${
+                      cliente.ativo ? styles.ativo : styles.inativo
+                    }`}
+                  >
+                    {cliente.ativo ? "Ativo" : "Inativo"}
+                  </span>
+                </div>
               </div>
             </div>
 

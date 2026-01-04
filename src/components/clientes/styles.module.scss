@@ -297,7 +297,13 @@
   gap: 4px;
   min-width: 0;
 }
-
+.subHeader {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+  margin-top: 4px;
+}
 .cardName {
   font-size: 1.4rem;
   font-weight: 900;
@@ -324,6 +330,16 @@
     background-color: #fee2e2;
     color: #991b1b;
   }
+}
+/* Badge do plano */
+.planoBadge {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  width: fit-content;
+  background-color: #dbbc0b;
+  color: #000;
 }
 
 .cardContent {

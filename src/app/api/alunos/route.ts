@@ -210,6 +210,37 @@ export async function POST(req: Request) {
       fotoUrl = await uploadToCloudinary(fotoFile, "alunos");
     }
 
+    // Buscar cliente e plano associado
+    const cliente = await prisma.cliente.findUnique({
+      where: { id: clienteId },
+      include: {
+        plano: true, // inclui os dados do plano
+        _count: {
+          select: { alunos: true }, // conta alunos atuais
+        },
+      },
+    });
+
+    if (!cliente) {
+      return NextResponse.json(
+        { error: "Cliente não encontrado" },
+        { status: 400 }
+      );
+    }
+
+    // Checar limite de alunos
+    const limiteAlunos =
+      (cliente.plano?.limiteAlunos || 0) + (cliente.extraAlunos || 0); // plano + extras
+
+    if (cliente._count.alunos >= limiteAlunos) {
+      return NextResponse.json(
+        {
+          error: `Limite de ${limiteAlunos} alunos atingido para este cliente`,
+        },
+        { status: 400 }
+      );
+    }
+
     const aluno = await prisma.aluno.create({
       data: {
         nome,
