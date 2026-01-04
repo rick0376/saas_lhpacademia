@@ -104,6 +104,21 @@
   color: #1f2937;
 }
 
+.clientesSection {
+  margin-top: 12px;
+}
+
+.clientesList {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0 0;
+}
+
+.clienteItem {
+  font-size: 14px;
+  padding: 2px 0;
+}
+
 .actions {
   display: flex;
   justify-content: center;
@@ -130,7 +145,8 @@
   color: #ef4444;
 }
 .editButton,
-.deleteButton {
+.deleteButton,
+.viewClientesButton {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -143,7 +159,7 @@
 }
 
 .editButton {
-  background-color: #fef3c7;
+  background-color: #f8e69e;
   color: #92400e;
 
   &:hover {
@@ -158,6 +174,15 @@
 
   &:hover {
     background-color: #ef4444;
+    color: white;
+  }
+}
+.viewClientesButton {
+  background-color: #7ee9a5;
+  color: #024e1e;
+
+  &:hover {
+    background-color: #16a34a;
     color: white;
   }
 }

@@ -2,16 +2,16 @@
 
 import { useState } from "react";
 import { ConfirmModal } from "@/components/ui/ConfirmModal/ConfirmModal";
+import { Modal } from "@/components/ui/Modal/Modal";
 import { Toast } from "@/components/ui/Toast/Toast";
 import styles from "./styles.module.scss";
-import {
-  Building2,
-  Dumbbell,
-  Edit,
-  GraduationCap,
-  Trash2,
-  Users,
-} from "lucide-react";
+import { Dumbbell, Edit, GraduationCap, Trash2, Users } from "lucide-react";
+
+export interface ClienteResumo {
+  id: string;
+  nome: string;
+  ativo: boolean;
+}
 
 export interface Plano {
   id: string;
@@ -20,32 +20,30 @@ export interface Plano {
   limiteAlunos: number;
   ativo: boolean;
   totalClientes: number;
+  clientes?: ClienteResumo[];
 }
 
 interface PlanoCardProps {
   plano: Plano;
   onDelete: (id: string) => Promise<{ success?: boolean; error?: string }>;
-  onEdit: (plano: Plano) => void; // envia para o formulário no topo
+  onEdit: (plano: Plano) => void;
 }
 
 export function PlanoCard({ plano, onDelete, onEdit }: PlanoCardProps) {
-  const [modalOpen, setModalOpen] = useState(false);
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "error";
   } | null>(null);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [clientesModalOpen, setClientesModalOpen] = useState(false);
 
   const handleConfirmDelete = async () => {
     try {
       const result = await onDelete(plano.id);
-
       if (result?.error) {
-        // ❌ só dispara erro se houver
         setToast({ message: result.error, type: "error" });
         return;
       }
-
-      // ✅ dispara sucesso apenas se não houver erro
       setToast({
         message: `Plano "${plano.nome}" deletado com sucesso!`,
         type: "success",
@@ -56,12 +54,13 @@ export function PlanoCard({ plano, onDelete, onEdit }: PlanoCardProps) {
         type: "error",
       });
     } finally {
-      setModalOpen(false);
+      setConfirmDeleteOpen(false);
     }
   };
 
   return (
     <>
+      {/* Toast */}
       {toast && (
         <Toast
           message={toast.message}
@@ -70,20 +69,21 @@ export function PlanoCard({ plano, onDelete, onEdit }: PlanoCardProps) {
         />
       )}
 
+      {/* Confirm Delete Modal */}
       <ConfirmModal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
+        isOpen={confirmDeleteOpen}
+        onClose={() => setConfirmDeleteOpen(false)}
         onConfirm={handleConfirmDelete}
         title="Excluir Plano"
         message={`Tem certeza que deseja excluir o plano "${plano.nome}"?`}
         type="danger"
       />
 
+      {/* Card */}
       <div className={styles.card}>
         <div className={styles.cardHeader}>
           <div className={styles.headerInfo}>
             <h3 className={styles.cardName}>{plano.nome}</h3>
-
             <span
               className={`${styles.statusBadge} ${
                 plano.ativo ? styles.ativo : styles.inativo
@@ -122,7 +122,7 @@ export function PlanoCard({ plano, onDelete, onEdit }: PlanoCardProps) {
               size={18}
               className={`${styles.iconInfo} ${styles.iconClientes}`}
             />
-            <span className={styles.label}>Clientes </span>
+            <span className={styles.label}>Clientes</span>
             <span className={styles.value}>{plano.totalClientes}</span>
           </div>
         </div>
@@ -139,14 +139,46 @@ export function PlanoCard({ plano, onDelete, onEdit }: PlanoCardProps) {
 
           <button
             type="button"
-            onClick={() => setModalOpen(true)}
+            onClick={() => setConfirmDeleteOpen(true)}
             className={styles.deleteButton}
             title="Excluir plano"
           >
             <Trash2 size={18} />
           </button>
+
+          {/* Botão para abrir modal */}
+          {plano.clientes && plano.clientes.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setClientesModalOpen(true)}
+              className={styles.viewClientesButton}
+              title="Ver clientes deste plano"
+            >
+              <Users size={18} />
+            </button>
+          )}
         </div>
       </div>
+
+      {/* Modal Clientes */}
+      <Modal
+        isOpen={clientesModalOpen}
+        onClose={() => setClientesModalOpen(false)}
+        title={`Clientes do Plano "${plano.nome}"`}
+        size="medium"
+      >
+        <ul className={styles.clientesList}>
+          {plano.clientes && plano.clientes.length > 0 ? (
+            plano.clientes.map((cliente) => (
+              <li key={cliente.id} className={styles.clienteItem}>
+                {cliente.nome} {cliente.ativo ? "✅" : "🛑"}
+              </li>
+            ))
+          ) : (
+            <li className={styles.clienteItem}>Nenhum cliente neste plano</li>
+          )}
+        </ul>
+      </Modal>
     </>
   );
 }

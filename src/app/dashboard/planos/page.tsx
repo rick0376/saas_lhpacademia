@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { PlanoForm } from "@/components/planos/PlanoForm/PlanoForm";
 import { PlanoCard, Plano } from "@/components/planos/PlanoCard/PlanoCard";
+import { Modal } from "@/components/ui/Modal/Modal";
 import { Toast } from "@/components/ui/Toast/Toast";
 import styles from "./styles.module.scss";
 
@@ -13,13 +14,15 @@ export default function PlanosPage() {
     message: string;
     type: "success" | "error";
   } | null>(null);
-  const [editingPlano, setEditingPlano] = useState<Plano | null>(null);
 
-  // Busca planos
+  const [editingPlano, setEditingPlano] = useState<Plano | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+
+  // Busca todos os planos
   const fetchPlanos = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/planos");
+      const res = await fetch("/api/planos?includeClientes=true"); // query para incluir clientes
       const data = await res.json();
       setPlanos(data);
     } catch (err) {
@@ -30,19 +33,30 @@ export default function PlanosPage() {
     }
   };
 
-  // Criação ou atualização de plano
-  const handleCreateOrUpdate = (planoData: Plano) => {
-    if (editingPlano) {
-      setPlanos((prev) =>
-        prev.map((p) => (p.id === planoData.id ? planoData : p))
-      );
-      setEditingPlano(null);
-    } else {
-      setPlanos((prev) => [...prev, planoData]);
-    }
+  useEffect(() => {
+    fetchPlanos();
+  }, []);
+
+  // Abrir modal para edição
+  const handleEditClick = (plano: Plano) => {
+    setEditingPlano(plano);
+    setModalOpen(true);
   };
 
-  // Deleta plano com retorno correto
+  // Atualizar plano após edição
+  const handleUpdatePlano = (planoAtualizado: Plano) => {
+    setPlanos((prev) =>
+      prev.map((p) => (p.id === planoAtualizado.id ? planoAtualizado : p))
+    );
+    setModalOpen(false);
+    setEditingPlano(null);
+    setToast({
+      message: `Plano "${planoAtualizado.nome}" atualizado com sucesso!`,
+      type: "success",
+    });
+  };
+
+  // Deletar plano
   const handleDelete = async (
     id: string
   ): Promise<{ success?: boolean; error?: string }> => {
@@ -66,21 +80,6 @@ export default function PlanosPage() {
     }
   };
 
-  // Dispara edição: envia plano para o form
-  const handleEditClick = (plano: Plano) => {
-    setEditingPlano(plano);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  // Cancela edição
-  const handleCancelEdit = () => {
-    setEditingPlano(null);
-  };
-
-  useEffect(() => {
-    fetchPlanos();
-  }, []);
-
   return (
     <div className={styles.container}>
       {toast && (
@@ -93,19 +92,7 @@ export default function PlanosPage() {
 
       <h1 className={styles.title}>Planos</h1>
 
-      <section className={styles.formSection}>
-        <h2 className={styles.subtitle}>
-          {editingPlano ? "Editar Plano" : "Criar Plano"}
-        </h2>
-        <PlanoForm
-          initialData={editingPlano ?? undefined}
-          onSuccess={handleCreateOrUpdate}
-          onCancel={handleCancelEdit}
-        />
-      </section>
-
       <section className={styles.cardSection}>
-        <h2 className={styles.subtitle}>Planos Cadastrados</h2>
         {loading ? (
           <p>Carregando planos...</p>
         ) : planos.length > 0 ? (
@@ -115,7 +102,7 @@ export default function PlanosPage() {
                 key={plano.id}
                 plano={plano}
                 onDelete={handleDelete}
-                onEdit={handleEditClick}
+                onEdit={handleEditClick} // botão editar abre modal
               />
             ))}
           </div>
@@ -123,6 +110,28 @@ export default function PlanosPage() {
           <p>Nenhum plano encontrado.</p>
         )}
       </section>
+
+      {/* Modal de edição */}
+      <Modal
+        isOpen={modalOpen}
+        onClose={() => {
+          setModalOpen(false);
+          setEditingPlano(null);
+        }}
+        title={editingPlano ? `Editar Plano: ${editingPlano.nome}` : ""}
+        size="medium"
+      >
+        {editingPlano && (
+          <PlanoForm
+            initialData={editingPlano}
+            onSuccess={handleUpdatePlano}
+            onCancel={() => {
+              setModalOpen(false);
+              setEditingPlano(null);
+            }}
+          />
+        )}
+      </Modal>
     </div>
   );
 }

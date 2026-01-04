@@ -9,6 +9,13 @@ import { NextResponse } from "next/server";
 export async function GET() {
   const planos = await prisma.plano.findMany({
     include: {
+      clientes: {
+        select: {
+          id: true,
+          nome: true,
+          ativo: true,
+        },
+      },
       _count: {
         select: {
           clientes: true,
