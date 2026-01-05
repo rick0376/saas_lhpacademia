@@ -52,8 +52,22 @@ export default function PlanosPage() {
   // Atualizar plano após edição
   const handleUpdatePlano = (planoAtualizado: Plano) => {
     setPlanos((prev) =>
-      prev.map((p) => (p.id === planoAtualizado.id ? planoAtualizado : p))
+      prev.map((p) => {
+        if (p.id !== planoAtualizado.id) return p;
+
+        const valorNormalizado = Number(
+          Number(planoAtualizado.valor).toFixed(2)
+        );
+
+        return {
+          ...p, // mantém totalClientes e clientes do estado atual
+          ...planoAtualizado,
+          valor: valorNormalizado,
+          totalClientes: p.totalClientes, // garante que não some
+        };
+      })
     );
+
     setModalOpen(false);
     setEditingPlano(null);
     setToast({
@@ -61,7 +75,6 @@ export default function PlanosPage() {
       type: "success",
     });
   };
-
   // Deletar plano
   const handleDelete = async (
     id: string

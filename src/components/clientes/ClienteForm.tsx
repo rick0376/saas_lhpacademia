@@ -14,13 +14,16 @@ interface ClienteFormProps {
     logo?: string;
     ativo: boolean;
     dataVencimento?: Date | null;
+    planoId?: string; // ok aqui
   };
   isEdit?: boolean;
+  canEditPlano?: boolean; // vamos usar depois para SUPERADMIN
 }
 
 export const ClienteForm: React.FC<ClienteFormProps> = ({
   initialData,
   isEdit = false,
+  canEditPlano = false,
 }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -33,14 +36,14 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({
 
   const [formData, setFormData] = useState({
     nome: initialData?.nome || "",
-    login: "", // ✅ LOGIN
-    senha: "", // ✅ SENHA
+    login: "",
+    senha: "",
     ativo: initialData?.ativo ?? true,
     dataVencimento: initialData?.dataVencimento
       ? new Date(initialData.dataVencimento).toISOString().slice(0, 10)
       : "",
     diasAdicionar: "",
-    planoId: "",
+    planoId: initialData?.planoId || "", // ⬅️ passa a vir preenchido na edição
   });
 
   const [planos, setPlanos] = useState<{ id: string; nome: string }[]>([]);
@@ -140,10 +143,14 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({
       formDataToSend.append("ativo", String(formData.ativo));
       formDataToSend.append("dataVencimento", formData.dataVencimento);
 
-      // ✅ ADICIONAR LOGIN E SENHA (só ao criar)
+      // ✅ LOGIN/SENHA só ao criar
       if (!isEdit) {
         formDataToSend.append("login", formData.login);
         formDataToSend.append("senha", formData.senha);
+      }
+
+      // ✅ planoId sempre que vier (criação e edição)
+      if (formData.planoId) {
         formDataToSend.append("planoId", formData.planoId);
       }
 
@@ -234,38 +241,44 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({
           </Button>
         </div>
 
-        {/* ✅ LOGIN, SENHA E PLANO (só aparece ao criar) */}
-        {!isEdit && (
-          <div className={styles.createAdminWrapper}>
-            <Input
-              label="Login do Administrador *"
-              type="text"
-              name="login"
-              placeholder="admin"
-              value={formData.login}
-              onChange={handleChange}
-              error={errors.login}
-              required
-            />
-            <Input
-              label="Senha do Administrador *"
-              type="password"
-              name="senha"
-              placeholder="Mínimo 6 caracteres"
-              value={formData.senha}
-              onChange={handleChange}
-              error={errors.senha}
-              required
-            />
+        {/* LOGIN/SENHA/PLANO */}
+        <div className={styles.createAdminWrapper}>
+          {/* Login e senha: só na criação */}
+          {!isEdit && (
+            <>
+              <Input
+                label="Login do Administrador *"
+                type="text"
+                name="login"
+                placeholder="admin"
+                value={formData.login}
+                onChange={handleChange}
+                error={errors.login}
+                required
+              />
+              <Input
+                label="Senha do Administrador *"
+                type="password"
+                name="senha"
+                placeholder="Mínimo 6 caracteres"
+                value={formData.senha}
+                onChange={handleChange}
+                error={errors.senha}
+                required
+              />
+            </>
+          )}
 
+          {/* Plano: sempre na criação; na edição só se canEditPlano=true */}
+          {(!isEdit || canEditPlano) && (
             <div className={styles.selectWrapper}>
-              <label htmlFor="planoId">Plano *</label>
+              <label htmlFor="planoId">Plano {isEdit ? "" : "*"}</label>
               <select
                 name="planoId"
                 id="planoId"
                 value={formData.planoId}
                 onChange={handleChange}
-                required
+                required={!isEdit} // obrigatório só ao criar
               >
                 <option value="">Selecione um plano</option>
                 {planos.map((plano) => (
@@ -278,8 +291,8 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({
                 <p className={styles.errorText}>{errors.planoId}</p>
               )}
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         <ImageUpload
           value={logoPreview}

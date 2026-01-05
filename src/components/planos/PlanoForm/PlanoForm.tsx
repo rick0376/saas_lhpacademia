@@ -27,7 +27,7 @@ export function PlanoForm({
   onCancel,
 }: PlanoFormProps) {
   const [nome, setNome] = useState(initialData?.nome || "");
-  const [valor, setValor] = useState<number>(initialData?.valor ?? 0);
+  const [valorCentavos, setValorCentavos] = useState<number>(0);
   const [limiteUsuarios, setLimiteUsuarios] = useState(
     initialData?.limiteUsuarios || 0
   );
@@ -45,7 +45,8 @@ export function PlanoForm({
   // Atualiza os campos quando inicialData mudar (edição)
   useEffect(() => {
     setNome(initialData?.nome || "");
-    setValor(initialData?.valor ?? 0);
+    const v = initialData?.valor ?? 0;
+    setValorCentavos(Math.round(Number(v) * 100)); // ex.: 30.5 -> 3050
     setLimiteUsuarios(initialData?.limiteUsuarios || 0);
     setLimiteAlunos(initialData?.limiteAlunos || 0);
     setAtivo(initialData?.ativo ?? true);
@@ -53,7 +54,7 @@ export function PlanoForm({
 
   const resetFields = () => {
     setNome("");
-    setValor(0);
+    setValorCentavos(0);
     setLimiteUsuarios(0);
     setLimiteAlunos(0);
     setAtivo(true);
@@ -69,12 +70,15 @@ export function PlanoForm({
         : "/api/planos";
       const method = initialData?.id ? "PUT" : "POST";
 
+      const valorReal = valorCentavos / 100;
+      const valorNormalizado = Number(valorReal.toFixed(2));
+
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           nome,
-          valor,
+          valor: valorNormalizado,
           limiteUsuarios,
           limiteAlunos,
           ativo,
@@ -138,10 +142,27 @@ export function PlanoForm({
         <div className={styles.inputWrapper}>
           <Input
             label="Valor do Plano (R$)"
-            type="number"
-            step="0.01"
-            value={valor}
-            onChange={(e) => setValor(Number(e.target.value))}
+            type="text"
+            value={(() => {
+              const abs = Math.abs(valorCentavos);
+              const cents = (abs % 100).toString().padStart(2, "0");
+              const reais = Math.floor(abs / 100).toString();
+              return `${reais},${cents}`; // 0,03 / 0,30 / 3,00 etc
+            })()}
+            onChange={(e) => {
+              const raw = e.target.value;
+              // mantem só dígitos
+              const digits = raw.replace(/\D/g, "");
+              if (!digits) {
+                setValorCentavos(0);
+                return;
+              }
+              // interpreta tudo como centavos
+              const asNumber = parseInt(digits, 10);
+              if (!isNaN(asNumber)) {
+                setValorCentavos(asNumber);
+              }
+            }}
             required
           />
         </div>
