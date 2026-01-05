@@ -22,9 +22,15 @@ export default function PlanosPage() {
   const fetchPlanos = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/planos?includeClientes=true"); // query para incluir clientes
+      const res = await fetch("/api/planos?includeClientes=true");
       const data = await res.json();
-      setPlanos(data);
+
+      const planosNormalizados = data.map((plano: any) => ({
+        ...plano,
+        valor: Number(plano.valor),
+      }));
+
+      setPlanos(planosNormalizados);
     } catch (err) {
       console.error(err);
       setToast({ message: "Erro ao buscar planos", type: "error" });

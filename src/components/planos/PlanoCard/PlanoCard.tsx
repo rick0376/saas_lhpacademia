@@ -7,6 +7,14 @@ import { Toast } from "@/components/ui/Toast/Toast";
 import styles from "./styles.module.scss";
 import { Dumbbell, Edit, GraduationCap, Trash2, Users } from "lucide-react";
 
+const formatCurrencyBRL = (value: number) =>
+  value.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
 export interface ClienteResumo {
   id: string;
   nome: string;
@@ -16,6 +24,7 @@ export interface ClienteResumo {
 export interface Plano {
   id: string;
   nome: string;
+  valor: number;
   limiteUsuarios: number;
   limiteAlunos: number;
   ativo: boolean;
@@ -84,13 +93,20 @@ export function PlanoCard({ plano, onDelete, onEdit }: PlanoCardProps) {
         <div className={styles.cardHeader}>
           <div className={styles.headerInfo}>
             <h3 className={styles.cardName}>{plano.nome}</h3>
-            <span
-              className={`${styles.statusBadge} ${
-                plano.ativo ? styles.ativo : styles.inativo
-              }`}
-            >
-              {plano.ativo ? "Ativo" : "Inativo"}
-            </span>
+
+            <div className={styles.statusAndPrice}>
+              <span
+                className={`${styles.statusBadge} ${
+                  plano.ativo ? styles.ativo : styles.inativo
+                }`}
+              >
+                {plano.ativo ? "Ativo" : "Inativo"}
+              </span>
+
+              <span className={styles.price}>
+                {formatCurrencyBRL(plano.valor)}
+              </span>
+            </div>
           </div>
         </div>
 

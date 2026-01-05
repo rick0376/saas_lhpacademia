@@ -31,7 +31,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   min-width: 0;
 }
 
@@ -61,6 +61,18 @@
 .inativo {
   background-color: #fee2e2;
   color: #991b1b;
+}
+
+.price {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.statusAndPrice {
+  display: flex;
+  justify-content: space-between; // um em cada canto
+  align-items: center;
+  width: 100%;
 }
 
 .cardContent {

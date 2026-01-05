@@ -10,6 +10,7 @@ interface PlanoFormProps {
   initialData?: {
     id?: string;
     nome: string;
+    valor?: number;
     limiteUsuarios: number;
     limiteAlunos: number;
     ativo: boolean;
@@ -26,6 +27,7 @@ export function PlanoForm({
   onCancel,
 }: PlanoFormProps) {
   const [nome, setNome] = useState(initialData?.nome || "");
+  const [valor, setValor] = useState<number>(initialData?.valor ?? 0);
   const [limiteUsuarios, setLimiteUsuarios] = useState(
     initialData?.limiteUsuarios || 0
   );
@@ -43,6 +45,7 @@ export function PlanoForm({
   // Atualiza os campos quando inicialData mudar (edição)
   useEffect(() => {
     setNome(initialData?.nome || "");
+    setValor(initialData?.valor ?? 0);
     setLimiteUsuarios(initialData?.limiteUsuarios || 0);
     setLimiteAlunos(initialData?.limiteAlunos || 0);
     setAtivo(initialData?.ativo ?? true);
@@ -50,6 +53,7 @@ export function PlanoForm({
 
   const resetFields = () => {
     setNome("");
+    setValor(0);
     setLimiteUsuarios(0);
     setLimiteAlunos(0);
     setAtivo(true);
@@ -68,7 +72,13 @@ export function PlanoForm({
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nome, limiteUsuarios, limiteAlunos, ativo }),
+        body: JSON.stringify({
+          nome,
+          valor,
+          limiteUsuarios,
+          limiteAlunos,
+          ativo,
+        }),
       });
 
       const data = await res.json();
@@ -121,6 +131,17 @@ export function PlanoForm({
             label="Nome do Plano"
             value={nome}
             onChange={(e) => setNome(e.target.value)}
+            required
+          />
+        </div>
+
+        <div className={styles.inputWrapper}>
+          <Input
+            label="Valor do Plano (R$)"
+            type="number"
+            step="0.01"
+            value={valor}
+            onChange={(e) => setValor(Number(e.target.value))}
             required
           />
         </div>

@@ -44,9 +44,14 @@ export async function PUT(req: Request, context: { params: { id: string } }) {
   try {
     const body = await req.json();
     nome = body.nome;
-    const { limiteUsuarios, limiteAlunos, ativo } = body;
+    const { valor, limiteUsuarios, limiteAlunos, ativo } = body;
 
-    if (!nome || limiteUsuarios == null || limiteAlunos == null) {
+    if (
+      !nome ||
+      valor == null ||
+      limiteUsuarios == null ||
+      limiteAlunos == null
+    ) {
       return NextResponse.json(
         { error: "Campos obrigatórios não informados" },
         { status: 400 }
@@ -57,6 +62,7 @@ export async function PUT(req: Request, context: { params: { id: string } }) {
       where: { id },
       data: {
         nome,
+        valor: Number(valor),
         limiteUsuarios: Number(limiteUsuarios),
         limiteAlunos: Number(limiteAlunos),
         ativo: ativo ?? true,

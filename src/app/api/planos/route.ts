@@ -34,9 +34,14 @@ export async function GET() {
 
 export async function POST(req: Request) {
   const body = await req.json();
-  const { nome, limiteUsuarios, limiteAlunos, ativo } = body;
+  const { nome, valor, limiteUsuarios, limiteAlunos, ativo } = body;
 
-  if (!nome || limiteUsuarios == null || limiteAlunos == null) {
+  if (
+    !nome ||
+    valor == null ||
+    limiteUsuarios == null ||
+    limiteAlunos == null
+  ) {
     return NextResponse.json(
       { error: "Campos obrigatórios não informados" },
       { status: 400 }
@@ -44,7 +49,6 @@ export async function POST(req: Request) {
   }
 
   try {
-    // Verifica duplicidade antes de criar
     const planoExistente = await prisma.plano.findUnique({
       where: { nome },
     });
@@ -59,6 +63,7 @@ export async function POST(req: Request) {
     const plano = await prisma.plano.create({
       data: {
         nome,
+        valor: Number(valor),
         limiteUsuarios: Number(limiteUsuarios),
         limiteAlunos: Number(limiteAlunos),
         ativo: ativo ?? true,
