@@ -75,7 +75,8 @@ export async function PUT(
     const ativo = formData.get("ativo") === "true";
     const logoFile = formData.get("logo") as File | null;
     const logoExistente = formData.get("logoExistente") as string | null;
-    const dataVencimento = formData.get("dataVencimento") as string | null; // <-- capturando a data
+    const dataVencimento = formData.get("dataVencimento") as string | null;
+    const planoId = formData.get("planoId") as string | null;
 
     console.log("📝 Atualizando cliente.");
 
@@ -149,7 +150,8 @@ export async function PUT(
         nome,
         logo: novoLogoUrl,
         ativo,
-        dataVencimento: dataVencimentoFormatada, // <-- passando a data corrigida
+        dataVencimento: dataVencimentoFormatada,
+        ...(planoId ? { planoId } : {}),
       },
     });
 
