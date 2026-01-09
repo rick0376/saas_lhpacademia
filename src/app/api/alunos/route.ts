@@ -144,10 +144,11 @@ export async function POST(req: Request) {
     const objetivo = formData.get("objetivo") as string;
     const observacoes = formData.get("observacoes") as string;
     const ativo = formData.get("ativo") === "true";
-    const darAcessoApp = formData.get("darAcessoApp") === "true";
-    const senhaInicial = formData.get("senhaInicial") as string;
+    //const darAcessoApp = formData.get("darAcessoApp") === "true";
+    //const senhaInicial = formData.get("senhaInicial") as string;
     const fotoFile = formData.get("foto") as File | null;
-    const usuarioIdSelecionado = formData.get("usuarioId") as string | null;
+    //const usuarioIdSelecionado = formData.get("usuarioId") as string | null;
+    const senha = formData.get("senha") as string;
 
     if (!nome) {
       return NextResponse.json(
@@ -172,7 +173,56 @@ export async function POST(req: Request) {
       }
     }
 
-    let usuarioId: string | null = null;
+    // ✅ Validação: email e senha obrigatórios
+    if (!email) {
+      return NextResponse.json(
+        { error: "Email é obrigatório" },
+        { status: 400 }
+      );
+    }
+
+    if (!senha || senha.length < 6) {
+      return NextResponse.json(
+        { error: "Senha deve ter no mínimo 6 caracteres" },
+        { status: 400 }
+      );
+    }
+
+    // ✅ Checa se email já existe em Usuario ou Aluno
+    const usuarioExistente = await prisma.usuario.findFirst({
+      where: { email, clienteId },
+    });
+    const alunoExistente = await prisma.aluno.findFirst({
+      where: { email, clienteId },
+    });
+
+    if (usuarioExistente || alunoExistente) {
+      return NextResponse.json(
+        { error: "Email já cadastrado neste cliente" },
+        { status: 400 }
+      );
+    }
+
+    // ✅ Cria Usuario com role ALUNO e ativo true
+    const senhaHash = await bcrypt.hash(senha, 12);
+
+    const novoUsuario = await prisma.usuario.create({
+      data: {
+        nome,
+        email,
+        senha: senhaHash,
+        role: "ALUNO",
+        ativo: true, // ✅ ATIVO = TRUE
+        clienteId,
+        telefone: telefone || null,
+        dataNascimento: dataNascimento ? new Date(dataNascimento) : null,
+        objetivo: objetivo || null,
+      },
+    });
+
+    const usuarioId = novoUsuario.id;
+
+    /* let usuarioId: string | null = null;
 
     // Se veio usuarioId no form, usa ele:
     if (usuarioIdSelecionado) {
@@ -193,6 +243,7 @@ export async function POST(req: Request) {
 
       usuarioId = usuario.id;
     }
+*/
 
     // Opcional: se marcar "Dar acesso ao app" sem usuário ligado, bloquear
     /*  if (darAcessoApp && !usuarioId) {

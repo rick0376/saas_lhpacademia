@@ -1,4 +1,4 @@
-// Componente React AlunoForm.tsx completo com preenchimento automático dos campos
+//src/components/alunos/AlunoForm.tsx
 
 "use client";
 
@@ -62,15 +62,13 @@ export const AlunoForm: React.FC<AlunoFormProps> = ({
   const [formData, setFormData] = useState({
     nome: initialData?.nome || "",
     email: initialData?.email || "",
+    senha: "",
     telefone: initialData?.telefone || "",
     dataNascimento: initialData?.dataNascimento || "",
     objetivo: initialData?.objetivo || "",
     observacoes: initialData?.observacoes || "",
     ativo: initialData?.ativo ?? true,
-    darAcessoApp: false,
-    senhaInicial: "",
     clienteIdSelecionado: clienteId || initialData?.clienteId || "",
-
     usuarioSelecionadoId: "",
   });
 
@@ -167,12 +165,16 @@ export const AlunoForm: React.FC<AlunoFormProps> = ({
       } else {
         const usuario = usuarios.find((u) => u.id === value);
         if (usuario) {
+          console.log("👤 Usuario selecionado:", usuario); // ✅ ADICIONA
+          console.log("📅 Data nascimento:", usuario.dataNascimento); // ✅ ADICIONA
           setFormData((prev) => ({
             ...prev,
             nome: usuario.nome,
             email: usuario.email,
             telefone: usuario.telefone || "",
-            dataNascimento: usuario.dataNascimento || "",
+            dataNascimento: usuario.dataNascimento
+              ? new Date(usuario.dataNascimento).toISOString().split("T")[0]
+              : "",
             objetivo: usuario.objetivo || "",
             usuarioSelecionadoId: value,
           }));
@@ -198,15 +200,17 @@ export const AlunoForm: React.FC<AlunoFormProps> = ({
     if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = "Email inválido";
     }
-    if (!formData.usuarioSelecionadoId && !formData.email) {
-      newErrors.email = "Informe um email ou selecione um usuário";
+
+    // ✅ Email obrigatório
+    if (!formData.email || formData.email.trim() === "") {
+      newErrors.email = "Email é obrigatório";
     }
-    if (
-      formData.darAcessoApp &&
-      (!formData.senhaInicial || formData.senhaInicial.length < 6)
-    ) {
-      newErrors.senhaInicial =
-        "A senha inicial deve ter no mínimo 6 caracteres";
+
+    // ✅ Senha obrigatória (só na criação, não edição)
+    if (!isEdit) {
+      if (!formData.senha || formData.senha.length < 6) {
+        newErrors.senha = "Senha deve ter no mínimo 6 caracteres";
+      }
     }
 
     setErrors(newErrors);
@@ -229,20 +233,13 @@ export const AlunoForm: React.FC<AlunoFormProps> = ({
       const formDataToSend = new FormData();
       formDataToSend.append("nome", formData.nome);
       formDataToSend.append("email", formData.email || "");
+      formDataToSend.append("senha", formData.senha);
       formDataToSend.append("telefone", formData.telefone || "");
       formDataToSend.append("dataNascimento", formData.dataNascimento || "");
       formDataToSend.append("objetivo", formData.objetivo || "");
       formDataToSend.append("observacoes", formData.observacoes || "");
       formDataToSend.append("ativo", String(formData.ativo));
       formDataToSend.append("clienteId", formData.clienteIdSelecionado);
-      formDataToSend.append("usuarioId", formData.usuarioSelecionadoId);
-
-      if (!isEdit) {
-        formDataToSend.append("darAcessoApp", String(formData.darAcessoApp));
-        if (formData.darAcessoApp) {
-          formDataToSend.append("senhaInicial", formData.senhaInicial);
-        }
-      }
 
       if (fotoFile) {
         formDataToSend.append("foto", fotoFile);
@@ -310,7 +307,9 @@ export const AlunoForm: React.FC<AlunoFormProps> = ({
           )}
 
           <div className={styles.selectWrapper}>
-            <label className={styles.label}>Selecionar usuário existente</label>
+            <label className={styles.label}>
+              Preencher dados de usuário existente (opcional)
+            </label>
             <select
               className={styles.select}
               name="usuarioSelecionadoId"
@@ -346,6 +345,19 @@ export const AlunoForm: React.FC<AlunoFormProps> = ({
             onChange={handleChange}
             error={errors.email}
           />
+
+          {!isEdit && (
+            <Input
+              label="Senha de login *"
+              type="password"
+              name="senha"
+              placeholder="Senha para acesso do aluno (mín. 6 caracteres)"
+              value={formData.senha}
+              onChange={handleChange}
+              error={errors.senha}
+              required
+            />
+          )}
 
           <Input
             label="Telefone"
@@ -420,45 +432,6 @@ export const AlunoForm: React.FC<AlunoFormProps> = ({
               Alunos inativos não aparecem nas listagens principais
             </p>
           </div>
-
-          {!isEdit && (
-            <>
-              <div className={styles.divider} />
-              <div className={styles.checkboxWrapper}>
-                <label className={styles.checkboxLabel}>
-                  <input
-                    className={styles.checkbox}
-                    type="checkbox"
-                    name="darAcessoApp"
-                    checked={formData.darAcessoApp}
-                    onChange={handleChange}
-                  />
-                  <span>Dar acesso ao aplicativo do aluno</span>
-                </label>
-                <p className={styles.checkboxHelp}>
-                  O aluno poderá fazer login no app e visualizar seus treinos
-                </p>
-              </div>
-
-              {formData.darAcessoApp && (
-                <div className={styles.inputWrapper}>
-                  <Input
-                    label="Senha Inicial *"
-                    type="password"
-                    name="senhaInicial"
-                    placeholder="Defina uma senha para o aluno (mín. 6 caracteres)"
-                    value={formData.senhaInicial}
-                    onChange={handleChange}
-                    error={errors.senhaInicial}
-                    required
-                  />
-                  <p className={styles.inputHelp}>
-                    O aluno poderá alterar esta senha depois no app
-                  </p>
-                </div>
-              )}
-            </>
-          )}
         </div>
 
         <div className={styles.formActions}>

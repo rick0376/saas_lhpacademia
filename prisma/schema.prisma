@@ -102,7 +102,7 @@ model Aluno {
   // Relacionamentos
   medidas    Medida[]
   treinos    Treino[]
-   treinosAtribuidos TreinoAluno[]
+  treinosAtribuidos TreinoAluno[]
   avaliacoes Avaliacao[]
   execucoes  ExecucaoTreino[] 
 
