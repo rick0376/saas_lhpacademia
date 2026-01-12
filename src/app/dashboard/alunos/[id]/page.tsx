@@ -1,3 +1,5 @@
+//app/dashboard/alunos/[id]/page.tsx
+
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
@@ -48,14 +50,16 @@ export default async function AlunoPerfilPage({ params }: Props) {
   // ✅ Busca permissão editar
   let canEdit = session.user.role === "SUPERADMIN";
   if (!canEdit) {
-    // ✅ Busca TODAS permissões deste usuário pro recurso "alunos"
+    // ✅ Verifica permissões tanto de "alunos" quanto de "alunos_perfil"
     const permissoes = await prisma.permissao.findFirst({
       where: {
         usuarioId: session.user.id,
-        recurso: "alunos",
+        recurso: { in: ["alunos", "alunos_perfil"] },
+        editar: true,
       },
       select: { editar: true },
     });
+
     canEdit = !!permissoes?.editar;
 
     console.log("🔍 DEBUG:", {
