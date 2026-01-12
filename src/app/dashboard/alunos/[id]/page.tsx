@@ -61,13 +61,6 @@ export default async function AlunoPerfilPage({ params }: Props) {
     });
 
     canEdit = !!permissoes?.editar;
-
-    console.log("🔍 DEBUG:", {
-      userId: session.user.id,
-      role: session.user.role,
-      permissoes,
-      canEdit,
-    });
   }
 
   const calcularIdade = (dataNascimento: Date | null): number | null => {
@@ -118,8 +111,10 @@ export default async function AlunoPerfilPage({ params }: Props) {
                   <h1 className={styles.nome}>{aluno.nome}</h1>
 
                   <div className={styles.meta}>
-                    {idade && <span>📅 {idade} anos</span>}
-                    {aluno.objetivo && <span>🎯 {aluno.objetivo}</span>}
+                    <div className={styles.idade}>
+                      {idade && <span>📅 {idade} anos</span>}
+                      {aluno.objetivo && <span>🎯 {aluno.objetivo}</span>}
+                    </div>
                     <span
                       className={`${styles.statusBadge} ${
                         aluno.ativo ? styles.ativo : styles.inativo
@@ -127,17 +122,18 @@ export default async function AlunoPerfilPage({ params }: Props) {
                     >
                       {aluno.ativo ? "Ativo" : "Inativo"}
                     </span>
+                    <div className={styles.actionsContainer}>
+                      <div className={styles.actions}>
+                        {canEdit && (
+                          <Link href={`/dashboard/alunos/${aluno.id}/editar`}>
+                            <button className={styles.editButton}>
+                              ✏️ Editar
+                            </button>
+                          </Link>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-
-              <div className={styles.actionsContainer}>
-                <div className={styles.actions}>
-                  {canEdit && (
-                    <Link href={`/dashboard/alunos/${aluno.id}/editar`}>
-                      <button className={styles.editButton}>✏️ Editar</button>
-                    </Link>
-                  )}
                 </div>
               </div>
             </div>

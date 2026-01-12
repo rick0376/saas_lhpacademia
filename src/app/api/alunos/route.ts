@@ -136,7 +136,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // agora SIM leia os outros campos...
+    // leitura de todos os campos...
     const nome = formData.get("nome") as string;
     const email = formData.get("email") as string;
     const telefone = formData.get("telefone") as string;
@@ -222,40 +222,6 @@ export async function POST(req: Request) {
 
     const usuarioId = novoUsuario.id;
 
-    /* let usuarioId: string | null = null;
-
-    // Se veio usuarioId no form, usa ele:
-    if (usuarioIdSelecionado) {
-      // garante que o usuário existe e é do mesmo cliente
-      const usuario = await prisma.usuario.findFirst({
-        where: {
-          id: usuarioIdSelecionado,
-          clienteId,
-        },
-      });
-
-      if (!usuario) {
-        return NextResponse.json(
-          { error: "Usuário selecionado não encontrado para este cliente" },
-          { status: 400 }
-        );
-      }
-
-      usuarioId = usuario.id;
-    }
-*/
-
-    // Opcional: se marcar "Dar acesso ao app" sem usuário ligado, bloquear
-    /*  if (darAcessoApp && !usuarioId) {
-      return NextResponse.json(
-        {
-          error:
-            "Para dar acesso ao app, selecione um usuário existente primeiro",
-        },
-        { status: 400 }
-      );
-    }
-*/
     let fotoUrl = null;
     if (fotoFile && fotoFile.size > 0) {
       fotoUrl = await uploadToCloudinary(fotoFile, "alunos");
