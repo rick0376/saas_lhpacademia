@@ -1,3 +1,5 @@
+//src/components/alunos/AlunoTable.tsx
+
 "use client";
 
 import { useEffect, useState } from "react";

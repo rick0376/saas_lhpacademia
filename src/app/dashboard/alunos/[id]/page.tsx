@@ -45,6 +45,27 @@ export default async function AlunoPerfilPage({ params }: Props) {
     redirect("/dashboard/alunos");
   }
 
+  // ✅ Busca permissão editar
+  let canEdit = session.user.role === "SUPERADMIN";
+  if (!canEdit) {
+    // ✅ Busca TODAS permissões deste usuário pro recurso "alunos"
+    const permissoes = await prisma.permissao.findFirst({
+      where: {
+        usuarioId: session.user.id,
+        recurso: "alunos",
+      },
+      select: { editar: true },
+    });
+    canEdit = !!permissoes?.editar;
+
+    console.log("🔍 DEBUG:", {
+      userId: session.user.id,
+      role: session.user.role,
+      permissoes,
+      canEdit,
+    });
+  }
+
   const calcularIdade = (dataNascimento: Date | null): number | null => {
     if (!dataNascimento) return null;
     const hoje = new Date();
@@ -108,9 +129,11 @@ export default async function AlunoPerfilPage({ params }: Props) {
 
               <div className={styles.actionsContainer}>
                 <div className={styles.actions}>
-                  <Link href={`/dashboard/alunos/${aluno.id}/editar`}>
-                    <button className={styles.editButton}>✏️ Editar</button>
-                  </Link>
+                  {canEdit && (
+                    <Link href={`/dashboard/alunos/${aluno.id}/editar`}>
+                      <button className={styles.editButton}>✏️ Editar</button>
+                    </Link>
+                  )}
                 </div>
               </div>
             </div>

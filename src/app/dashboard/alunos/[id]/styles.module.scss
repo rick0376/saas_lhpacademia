@@ -165,8 +165,11 @@
 }
 
 .actionsContainer {
-  margin-top: 70px;
-  //margin-bottom: 10px;
+  margin-top: 20px;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 /* Botão editar */

@@ -1,3 +1,5 @@
+//api/alunos/[id]/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -15,6 +17,25 @@ export async function GET(
 
     if (!session) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+    }
+
+    // ✅ Verifica permissão alunos_perfil.ler
+    if (session.user.role !== "SUPERADMIN") {
+      const permissoes = await prisma.permissao.findUnique({
+        where: {
+          usuarioId_recurso: {
+            usuarioId: session.user.id,
+            recurso: "alunos_perfil",
+          },
+        },
+      });
+
+      if (!permissoes || !permissoes.ler) {
+        return NextResponse.json(
+          { error: "Sem permissão para visualizar perfil do aluno" },
+          { status: 403 }
+        );
+      }
     }
 
     const { id } = await params;

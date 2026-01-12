@@ -271,7 +271,7 @@ export const PermissoesManager = () => {
         recurso,
         criar: false,
         ler: true,
-        editar: false,
+        editar: true,
         deletar: false,
       };
 
@@ -315,7 +315,7 @@ export const PermissoesManager = () => {
         const permissao = permissoes[recurso] || {
           criar: false,
           ler: true,
-          editar: false,
+          editar: true,
           deletar: false,
         };
 
