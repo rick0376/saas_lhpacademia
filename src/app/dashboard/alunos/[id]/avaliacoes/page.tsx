@@ -1,3 +1,5 @@
+//app/dashboard/alunos/[id]/avaliacoes/page.tsx
+
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
@@ -75,20 +77,35 @@ export default async function AvaliacoesPage({
     redirect("/dashboard");
   }
 
-  // Verificar permissão de ler avaliações
-  if (session.user.role !== "SUPERADMIN") {
-    const permissao = await prisma.permissao.findUnique({
-      where: {
-        usuarioId_recurso: {
-          usuarioId: session.user.id,
-          recurso: "avaliacoes",
-        },
-      },
+  // ✅ Verificar permissões (visualizar e criar)
+  let podeVisualizar = session.user.role === "SUPERADMIN";
+  let podeCriarAvaliacao = session.user.role === "SUPERADMIN";
+
+  if (!podeVisualizar || !podeCriarAvaliacao) {
+    const permissoes = await prisma.permissao.findMany({
+      where: { usuarioId: session.user.id },
+      select: { recurso: true, ler: true, criar: true },
     });
 
-    if (!permissao || !permissao.ler) {
-      redirect("/dashboard?erro=sem-permissao");
-    }
+    const permAvaliacoes = permissoes.find((p) => p.recurso === "avaliacoes");
+    const permAlunosAvaliacoes = permissoes.find(
+      (p) => p.recurso === "alunos_avaliacoes"
+    );
+
+    // 🔹 “Visualizar Detalhes” → ler de qualquer um dos dois
+    podeVisualizar =
+      session.user.role === "SUPERADMIN" ||
+      !!permAvaliacoes?.ler ||
+      !!permAlunosAvaliacoes?.ler;
+
+    // 🔹 “Nova Avaliação” → criar em “avaliacoes”
+    podeCriarAvaliacao =
+      session.user.role === "SUPERADMIN" || !!permAvaliacoes?.criar;
+  }
+
+  // Se o usuário não puder visualizar nada, redireciona
+  if (!podeVisualizar) {
+    redirect("/dashboard?erro=sem-permissao");
   }
 
   const aluno = await prisma.aluno.findUnique({
@@ -138,20 +155,6 @@ export default async function AvaliacoesPage({
   const safeNum = (n: number | null | undefined) => (n != null ? n : "-");
   const boolToStr = (b: boolean | null | undefined) =>
     b == null ? "-" : b ? "Sim" : "Não";
-
-  // Verificar permissão de criar avaliações para mostrar o botão
-  let podeCriarAvaliacao = true;
-  if (session.user.role !== "SUPERADMIN") {
-    const permissao = await prisma.permissao.findUnique({
-      where: {
-        usuarioId_recurso: {
-          usuarioId: session.user.id,
-          recurso: "avaliacoes",
-        },
-      },
-    });
-    podeCriarAvaliacao = !!permissao?.criar;
-  }
 
   return (
     <div className={styles.container}>
@@ -215,12 +218,14 @@ export default async function AvaliacoesPage({
                 </div>
               )}
 
-              <Link
-                href={`/dashboard/alunos/${alunoId}/avaliacoes/${av.id}`}
-                className={styles.cardLink}
-              >
-                Visualizar Detalhes
-              </Link>
+              {podeVisualizar && (
+                <Link
+                  href={`/dashboard/alunos/${alunoId}/avaliacoes/${av.id}`}
+                  className={styles.cardLink}
+                >
+                  Visualizar Detalhes
+                </Link>
+              )}
             </div>
           ))}
         </div>

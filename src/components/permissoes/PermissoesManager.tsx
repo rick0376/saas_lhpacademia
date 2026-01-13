@@ -62,7 +62,8 @@ const RECURSOS = [
   {
     value: "alunos_avaliacoes",
     label: "📝 Alunos • Avaliações",
-    description: "Gerenciar avaliações físicas dos alunos",
+    description: "Permitir acesso ao botão de avaliações dentro do aluno",
+    tipos: ["ler"], // 👈 só exibe o checkbox de Visualizar
   },
   {
     value: "alunos_medidas",
@@ -82,9 +83,9 @@ const RECURSOS = [
   {
     value: "avaliacoes_compartilhar",
     label: "📤 Avaliações • Compartilhar",
-    description:
-      "Exportar lista de alunos para avaliação em PDF e enviar via WhatsApp",
+    description: "Gerar PDF e enviar via WhatsApp",
   },
+
   {
     value: "exercicios",
     label: "💪 Exercícios",

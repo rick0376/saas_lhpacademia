@@ -1,3 +1,5 @@
+//dashboard/alunos/[id]/evolucao/page.tsx
+
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
@@ -76,6 +78,9 @@ export default function EvolucaoAlunoPage() {
   const [periodo, setPeriodo] = useState("90");
   const [treinoFiltro, setTreinoFiltro] = useState("geral");
 
+  const [canView, setCanView] = useState(false);
+  const [canShare, setCanShare] = useState(false);
+
   useEffect(() => {
     if (status === "loading") return;
     if (!session) {
@@ -84,6 +89,37 @@ export default function EvolucaoAlunoPage() {
     }
     fetchDados();
   }, [session, status, id]);
+
+  useEffect(() => {
+    const verificarPermissoes = async () => {
+      if (!session?.user?.id) return;
+
+      try {
+        const res = await fetch(`/api/permissoes?usuarioId=${session.user.id}`);
+        if (!res.ok) return;
+        const permissoes = await res.json();
+
+        // 🔹 Permissão de visualizar evolução
+        const permVer = permissoes.find(
+          (p: any) => p.recurso === "alunos_evolucao"
+        );
+
+        // 🔹 Permissão de compartilhar (PDF/WhatsApp)
+        const permShare = permissoes.find(
+          (p: any) => p.recurso === "alunos_compartilhar"
+        );
+
+        const isSuper = session.user.role === "SUPERADMIN";
+
+        setCanView(isSuper || !!permVer?.ler || !!permVer?.editar);
+        setCanShare(isSuper || !!permShare?.ler || !!permShare?.editar);
+      } catch (err) {
+        console.error("Erro ao verificar permissões:", err);
+      }
+    };
+
+    verificarPermissoes();
+  }, [session]);
 
   const fetchDados = async () => {
     try {
@@ -524,6 +560,15 @@ export default function EvolucaoAlunoPage() {
       </div>
     );
 
+  // 🚫 bloqueia acesso se o usuário não tiver permissão para visualizar
+  if (!canView) {
+    return (
+      <div className={styles.semPermissao}>
+        <p>⛔ Você não tem permissão para visualizar a evolução do aluno.</p>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.container}>
       {/* HEADER */}
@@ -576,24 +621,27 @@ export default function EvolucaoAlunoPage() {
           </div>
 
           {/* --- BOTÕES PDF E WHATS (AGORA JUNTOS AOS FILTROS) --- */}
-          <div className={styles.actionButtonsInline}>
-            <button
-              onClick={gerarPdfEvolucao}
-              className={`${styles.actionBtn} ${styles.btnPdf}`}
-              title="Baixar PDF"
-            >
-              <FileText className={styles.iconBtn} />
-              <span className={styles.hideMobile}>PDF</span>
-            </button>
-            <button
-              onClick={enviarWhatsAppEvolucao}
-              className={`${styles.actionBtn} ${styles.btnWhats}`}
-              title="Enviar WhatsApp"
-            >
-              <FaWhatsapp className={styles.iconBtn} />
-              <span className={styles.hideMobile}>Whats</span>
-            </button>
-          </div>
+          {canShare && (
+            <div className={styles.actionButtonsInline}>
+              <button
+                onClick={gerarPdfEvolucao}
+                className={`${styles.actionBtn} ${styles.btnPdf}`}
+                title="Baixar PDF"
+              >
+                <FileText className={styles.iconBtn} />
+                <span className={styles.hideMobile}>PDF</span>
+              </button>
+
+              <button
+                onClick={enviarWhatsAppEvolucao}
+                className={`${styles.actionBtn} ${styles.btnWhats}`}
+                title="Enviar WhatsApp"
+              >
+                <FaWhatsapp className={styles.iconBtn} />
+                <span className={styles.hideMobile}>Whats</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
