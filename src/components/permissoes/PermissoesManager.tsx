@@ -447,7 +447,7 @@ export const PermissoesManager = () => {
           </div>
 
           <div className={styles.permissoesGrid}>
-            {RECURSOS.map(({ value: recurso, label, description }) => {
+            {RECURSOS.map(({ value: recurso, label, description, tipos }) => {
               const permissao = permissoes[recurso] || {
                 criar: false,
                 ler: true,
@@ -463,60 +463,29 @@ export const PermissoesManager = () => {
                   </div>
 
                   <div className={styles.checkboxGrid}>
-                    <label className={styles.checkboxLabel}>
-                      <input
-                        type="checkbox"
-                        checked={todosTiposMarcadosNoRecurso(recurso)}
-                        onChange={() => handleToggleTodosTiposRecurso(recurso)}
-                        className={styles.checkbox}
-                        title="Marcar/Desmarcar todos os tipos deste recurso"
-                      />
-                      <span>Total</span>
-                    </label>
-
-                    <label className={styles.checkboxLabel}>
-                      <input
-                        type="checkbox"
-                        checked={permissao.criar}
-                        onChange={() => handleTogglePermissao(recurso, "criar")}
-                        className={styles.checkbox}
-                      />
-                      <span>Novo</span>
-                    </label>
-
-                    <label className={styles.checkboxLabel}>
-                      <input
-                        type="checkbox"
-                        checked={permissao.ler}
-                        onChange={() => handleTogglePermissao(recurso, "ler")}
-                        className={styles.checkbox}
-                      />
-                      <span>Visualizar</span>
-                    </label>
-
-                    <label className={styles.checkboxLabel}>
-                      <input
-                        type="checkbox"
-                        checked={permissao.editar}
-                        onChange={() =>
-                          handleTogglePermissao(recurso, "editar")
-                        }
-                        className={styles.checkbox}
-                      />
-                      <span>Editar</span>
-                    </label>
-
-                    <label className={styles.checkboxLabel}>
-                      <input
-                        type="checkbox"
-                        checked={permissao.deletar}
-                        onChange={() =>
-                          handleTogglePermissao(recurso, "deletar")
-                        }
-                        className={styles.checkbox}
-                      />
-                      <span>Deletar</span>
-                    </label>
+                    {(["criar", "ler", "editar", "deletar"] as const)
+                      .filter((tipo) => !tipos || tipos.includes(tipo))
+                      .map((tipo) => (
+                        <label key={tipo} className={styles.checkboxLabel}>
+                          <input
+                            type="checkbox"
+                            checked={permissao[tipo]}
+                            onChange={() =>
+                              handleTogglePermissao(recurso, tipo)
+                            }
+                            className={styles.checkbox}
+                          />
+                          <span>
+                            {tipo === "criar"
+                              ? "Novo"
+                              : tipo === "ler"
+                              ? "Visualizar"
+                              : tipo === "editar"
+                              ? "Editar"
+                              : "Deletar"}
+                          </span>
+                        </label>
+                      ))}
                   </div>
                 </div>
               );
