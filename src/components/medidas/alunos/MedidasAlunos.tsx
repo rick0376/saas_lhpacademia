@@ -1,3 +1,5 @@
+//src/components/medidas/alunos/MedidasAlunos.tsx
+
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
@@ -39,6 +41,10 @@ interface Aluno {
 export default function MedidasClient() {
   const searchParams = useSearchParams();
   const { data: session } = useSession();
+
+  const [canView, setCanView] = useState(false);
+  const [canShare, setCanShare] = useState(false);
+
   const router = useRouter();
 
   const alunoId = searchParams.get("alunoId");
@@ -49,6 +55,30 @@ export default function MedidasClient() {
   const [error, setError] = useState("");
   const [busca, setBusca] = useState("");
   const [debouncedBusca, setDebouncedBusca] = useState("");
+
+  useEffect(() => {
+    const verificarPermissoes = async () => {
+      if (!session?.user?.id) return;
+      try {
+        const res = await fetch(`/api/permissoes?usuarioId=${session.user.id}`);
+        const permissoes = await res.json();
+
+        const pMedidas = permissoes.find(
+          (p: any) => p.recurso === "alunos_medidas"
+        );
+        const pShare = permissoes.find(
+          (p: any) => p.recurso === "alunos_compartilhar"
+        );
+
+        const superAdmin = session.user.role === "SUPERADMIN";
+        setCanView(superAdmin || !!pMedidas?.ler);
+        setCanShare(superAdmin || !!pShare?.ler || !!pShare?.editar);
+      } catch (err) {
+        console.error("Erro ao verificar permissões:", err);
+      }
+    };
+    verificarPermissoes();
+  }, [session]);
 
   // Carregar Alunos com suas medidas
   useEffect(() => {
@@ -320,6 +350,14 @@ export default function MedidasClient() {
     );
   }
 
+  if (!canView) {
+    return (
+      <div className={styles.semPermissao}>
+        <p>⛔ Você não tem permissão para visualizar as medidas.</p>
+      </div>
+    );
+  }
+
   // MODO 2: SELEÇÃO DE ALUNO (GRID DE CARDS)
   return (
     <div className={styles.container}>
@@ -339,24 +377,28 @@ export default function MedidasClient() {
         </form>
 
         <div className={styles.actionsGroup}>
-          <button
-            onClick={gerarPdfLista}
-            className={`${styles.actionBtn} ${styles.btnPdf}`}
-            disabled={alunosFiltrados.length === 0}
-            title="Baixar Relatório em PDF"
-          >
-            <FileText className={styles.iconBtn} />
-            <span className={styles.hideMobile}>PDF</span>
-          </button>
-          <button
-            onClick={enviarWhatsAppLista}
-            className={`${styles.actionBtn} ${styles.btnWhats}`}
-            disabled={alunosFiltrados.length === 0}
-            title="Enviar Relatório no WhatsApp"
-          >
-            <FaWhatsapp className={styles.iconBtn} />
-            <span className={styles.hideMobile}>Whats</span>
-          </button>
+          {canShare && (
+            <>
+              <button
+                onClick={gerarPdfLista}
+                className={`${styles.actionBtn} ${styles.btnPdf}`}
+                disabled={alunosFiltrados.length === 0}
+                title="Baixar Relatório em PDF"
+              >
+                <FileText className={styles.iconBtn} />
+                <span className={styles.hideMobile}>PDF</span>
+              </button>
+              <button
+                onClick={enviarWhatsAppLista}
+                className={`${styles.actionBtn} ${styles.btnWhats}`}
+                disabled={alunosFiltrados.length === 0}
+                title="Enviar Relatório no WhatsApp"
+              >
+                <FaWhatsapp className={styles.iconBtn} />
+                <span className={styles.hideMobile}>Whats</span>
+              </button>
+            </>
+          )}
         </div>
       </div>
 

@@ -53,27 +53,31 @@ const RECURSOS = [
     value: "alunos_perfil",
     label: "👤 Alunos • Perfil",
     description: "Acessar o perfil detalhado do aluno",
+    tipos: ["ler"],
   },
   {
     value: "alunos_evolucao",
     label: "📈 Alunos • Evolução",
     description: "Visualizar evolução de treinos e progresso",
+    tipos: ["ler"],
   },
   {
     value: "alunos_avaliacoes",
     label: "📝 Alunos • Avaliações",
     description: "Permitir acesso ao botão de avaliações dentro do aluno",
-    tipos: ["ler"], // 👈 só exibe o checkbox de Visualizar
+    tipos: ["ler"],
   },
   {
     value: "alunos_medidas",
     label: "📏 Alunos • Medidas",
     description: "Visualizar e registrar medidas corporais",
+    tipos: ["ler"],
   },
   {
     value: "alunos_compartilhar",
     label: "📤 Alunos • Compartilhar",
     description: "Exportar relatório em PDF e enviar via WhatsApp",
+    tipos: ["ler"],
   },
   {
     value: "avaliacoes",
@@ -84,6 +88,7 @@ const RECURSOS = [
     value: "avaliacoes_compartilhar",
     label: "📤 Avaliações • Compartilhar",
     description: "Gerar PDF e enviar via WhatsApp",
+    tipos: ["ler"],
   },
 
   {
@@ -116,6 +121,7 @@ const RECURSOS = [
     value: "medidas",
     label: "📏 Medidas",
     description: "Registro de medidas corporais",
+    tipos: ["criar", "ler", "deletar"],
   },
   {
     value: "execucoes",
@@ -463,6 +469,23 @@ export const PermissoesManager = () => {
                   </div>
 
                   <div className={styles.checkboxGrid}>
+                    {/* ✅ Só mostra o checkbox Total se o recurso tiver todos os tipos */}
+                    {(!tipos || tipos.length === 4) && (
+                      <label className={styles.checkboxLabel}>
+                        <input
+                          type="checkbox"
+                          checked={todosTiposMarcadosNoRecurso(recurso)}
+                          onChange={() =>
+                            handleToggleTodosTiposRecurso(recurso)
+                          }
+                          className={styles.checkbox}
+                          title="Marcar/Desmarcar todos os tipos deste recurso"
+                        />
+                        <span>Total</span>
+                      </label>
+                    )}
+
+                    {/* ✅ Checkboxes dinâmicos conforme o campo 'tipos' */}
                     {(["criar", "ler", "editar", "deletar"] as const)
                       .filter((tipo) => !tipos || tipos.includes(tipo))
                       .map((tipo) => (

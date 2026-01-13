@@ -1,3 +1,5 @@
+//src/components/medidas/detalhes/MedidasList.tsx
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -42,6 +44,11 @@ export const MedidasList: React.FC<MedidasListProps> = ({
 }) => {
   const router = useRouter();
   const { data: session } = useSession();
+
+  const [canCreate, setCanCreate] = useState(false);
+  const [canDelete, setCanDelete] = useState(false);
+  const [canShare, setCanShare] = useState(false);
+
   const [medidas, setMedidas] = useState<Medida[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalAddMedida, setModalAddMedida] = useState(false);
@@ -75,6 +82,29 @@ export const MedidasList: React.FC<MedidasListProps> = ({
     panturrilhaEsquerda: "",
     observacoes: "",
   });
+
+  useEffect(() => {
+    const verificarPermissoes = async () => {
+      if (!session?.user?.id) return;
+      try {
+        const res = await fetch(`/api/permissoes?usuarioId=${session.user.id}`);
+        const permissoes = await res.json();
+
+        const pMedidas = permissoes.find((p: any) => p.recurso === "medidas");
+        const pShare = permissoes.find(
+          (p: any) => p.recurso === "alunos_compartilhar"
+        );
+
+        const superAdmin = session.user.role === "SUPERADMIN";
+        setCanCreate(superAdmin || !!pMedidas?.criar);
+        setCanDelete(superAdmin || !!pMedidas?.deletar);
+        setCanShare(superAdmin || !!pShare?.ler || !!pShare?.editar);
+      } catch (err) {
+        console.error("Erro ao verificar permissões:", err);
+      }
+    };
+    verificarPermissoes();
+  }, [session]);
 
   useEffect(() => {
     fetchMedidas();
@@ -477,7 +507,9 @@ export const MedidasList: React.FC<MedidasListProps> = ({
           <h2 className={styles.title}>Histórico de Medidas</h2>
           <p className={styles.subtitle}>Acompanhamento de {alunoNome}</p>
         </div>
-        <Button onClick={() => setModalAddMedida(true)}>+ Nova Medida</Button>
+        {canCreate && (
+          <Button onClick={() => setModalAddMedida(true)}>+ Nova Medida</Button>
+        )}
       </div>
 
       {medidas.length === 0 ? (
@@ -498,13 +530,15 @@ export const MedidasList: React.FC<MedidasListProps> = ({
                   <span className={styles.data}>
                     📅 {formatDate(medida.data)}
                   </span>
-                  <button
-                    onClick={() => handleOpenDeleteModal(medida.id)}
-                    className={styles.deleteButton}
-                    title="Excluir"
-                  >
-                    🗑️
-                  </button>
+                  {canDelete && (
+                    <button
+                      onClick={() => handleOpenDeleteModal(medida.id)}
+                      className={styles.deleteButton}
+                      title="Excluir"
+                    >
+                      🗑️
+                    </button>
+                  )}
                 </div>
 
                 {medida.fotos && medida.fotos.length > 0 && (
@@ -763,22 +797,28 @@ export const MedidasList: React.FC<MedidasListProps> = ({
           <div className={styles.detailsContent}>
             {/* ✅ Botões de Ação no topo */}
             <div className={styles.detailsActions}>
-              <button
-                onClick={() => gerarPdfMedida(modalViewMedida.medida!)}
-                className={`${styles.actionBtnDetail} ${styles.btnPdfDetail}`}
-                title="Baixar PDF"
-              >
-                <FileText size={18} />
-                <span>PDF</span>
-              </button>
-              <button
-                onClick={() => enviarWhatsAppMedida(modalViewMedida.medida!)}
-                className={`${styles.actionBtnDetail} ${styles.btnWhatsDetail}`}
-                title="Enviar WhatsApp"
-              >
-                <FaWhatsapp size={18} />
-                <span>WhatsApp</span>
-              </button>
+              {canShare && (
+                <>
+                  <button
+                    onClick={() => gerarPdfMedida(modalViewMedida.medida!)}
+                    className={`${styles.actionBtnDetail} ${styles.btnPdfDetail}`}
+                    title="Baixar PDF"
+                  >
+                    <FileText size={18} />
+                    <span>PDF</span>
+                  </button>
+                  <button
+                    onClick={() =>
+                      enviarWhatsAppMedida(modalViewMedida.medida!)
+                    }
+                    className={`${styles.actionBtnDetail} ${styles.btnWhatsDetail}`}
+                    title="Enviar WhatsApp"
+                  >
+                    <FaWhatsapp size={18} />
+                    <span>WhatsApp</span>
+                  </button>
+                </>
+              )}
             </div>
 
             {modalViewMedida.medida.fotos &&
