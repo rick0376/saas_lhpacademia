@@ -67,7 +67,7 @@ export default function MedidasClient() {
           (p: any) => p.recurso === "alunos_medidas"
         );
         const pShare = permissoes.find(
-          (p: any) => p.recurso === "alunos_compartilhar"
+          (p: any) => p.recurso === "medidas_compartilhar"
         );
 
         const superAdmin = session.user.role === "SUPERADMIN";

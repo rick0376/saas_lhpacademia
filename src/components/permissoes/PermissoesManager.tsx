@@ -124,6 +124,12 @@ const RECURSOS = [
     tipos: ["criar", "ler", "deletar"],
   },
   {
+    value: "medidas_compartilhar",
+    label: "📤 Medidas • Compartilhar",
+    description: "Gerar PDF e enviar via WhatsApp",
+    tipos: ["ler"],
+  },
+  {
     value: "execucoes",
     label: "✅ Execuções",
     description: "Registro de treinos realizados",
