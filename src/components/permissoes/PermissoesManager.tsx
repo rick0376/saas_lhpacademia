@@ -24,11 +24,18 @@ interface Permissao {
 }
 
 const RECURSOS = [
+  // ======================
+  // 📊 GERAL
+  // ======================
   {
     value: "dashboard",
     label: "📊 Dashboard",
     description: "Acessar métricas e relatórios",
   },
+
+  // ======================
+  // 🏢 CLIENTES / 👥 USUÁRIOS
+  // ======================
   {
     value: "clientes",
     label: "🏢 Clientes",
@@ -44,6 +51,10 @@ const RECURSOS = [
     label: "📤 Usuários • Compartilhar",
     description: "Exportar lista de usuários em PDF e enviar via WhatsApp",
   },
+
+  // ======================
+  // 👤 ALUNOS
+  // ======================
   {
     value: "alunos",
     label: "👤 Alunos",
@@ -79,6 +90,10 @@ const RECURSOS = [
     description: "Exportar relatório em PDF e enviar via WhatsApp",
     tipos: ["ler"],
   },
+
+  // ======================
+  // 📊 AVALIAÇÕES
+  // ======================
   {
     value: "avaliacoes",
     label: "📊 Avaliações",
@@ -91,6 +106,9 @@ const RECURSOS = [
     tipos: ["ler"], // só Visualizar
   },
 
+  // ======================
+  // 💪 EXERCÍCIOS
+  // ======================
   {
     value: "exercicios",
     label: "💪 Exercícios",
@@ -102,6 +120,10 @@ const RECURSOS = [
     description: "Exportar lista de exercícios em PDF e enviar via WhatsApp",
     tipos: ["ler"],
   },
+
+  // ======================
+  // 📋 TREINOS
+  // ======================
   {
     value: "treinos",
     label: "📋 Treinos",
@@ -112,6 +134,7 @@ const RECURSOS = [
     label: "📤 Treinos • Compartilhar",
     description:
       "Exportar lista de treinos/fichas em PDF e enviar via WhatsApp",
+    tipos: ["ler"],
   },
   {
     value: "treinos_atribuir",
@@ -119,6 +142,10 @@ const RECURSOS = [
     description: "Vincular treinos aos alunos e gerenciar cronogramas",
     tipos: ["ler", "deletar"],
   },
+
+  // ======================
+  // 📏 MEDIDAS
+  // ======================
   {
     value: "medidas",
     label: "📏 Medidas",
@@ -131,6 +158,10 @@ const RECURSOS = [
     description: "Gerar PDF e enviar via WhatsApp",
     tipos: ["ler"],
   },
+
+  // ======================
+  // ✅ EXECUÇÕES / ⚙️ CONFIG / 💾 BACKUP
+  // ======================
   {
     value: "execucoes",
     label: "✅ Execuções",
