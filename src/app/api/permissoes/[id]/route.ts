@@ -1,29 +1,32 @@
+//api/permissoes/[id]/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth"; // Ajuste o caminho do auth.ts
-import { prisma } from "@/lib/prisma"; // Ajuste o caminho do Prisma
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
-// ✅ GET (exemplo para buscar permissão por ID)
+// ✅ GET (buscar permissão por ID)
 export async function GET(
   request: NextRequest,
-  context: { params: Promise<{ id: string }> } // ✅ Next.js 15: Params como Promise
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const params = await context.params; // ✅ Await resolve o Promise (fixa type error)
-    const id = params.id;
+    const { id } = await context.params;
 
-    // Verifica sessão (ex: só admin)
+    if (!id || typeof id !== "string") {
+      return NextResponse.json({ error: "ID inválido." }, { status: 400 });
+    }
+
     const session = await getServerSession(authOptions);
-    if (!session?.user || session.user.role !== "ADMIN") {
-      return NextResponse.json({ error: "Acesso negado." }, { status: 401 });
+    if (
+      !session?.user ||
+      !["ADMIN", "SUPERADMIN"].includes(session.user.role)
+    ) {
+      return NextResponse.json({ error: "Acesso negado." }, { status: 403 });
     }
 
     const permissao = await prisma.permissao.findUnique({
-      // Ajuste model se for "Permissoes"
       where: { id },
-      include: {
-        /* usuario, role, etc. conforme schema */
-      },
     });
 
     if (!permissao) {
@@ -40,22 +43,26 @@ export async function GET(
   }
 }
 
-// ✅ DELETE (foco do erro - corrigido para Next.js 15)
-export async function DELETE( // ✅ Async para await interno
+// ✅ DELETE (remover permissão por ID)
+export async function DELETE(
   request: NextRequest,
-  context: { params: Promise<{ id: string }> } // ✅ Params como Promise (resolve constraint)
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const params = await context.params; // ✅ Await resolve o Promise (fixa "missing then/catch")
-    const id = params.id;
+    const { id } = await context.params;
 
-    // Verifica sessão (ex: só admin)
-    const session = await getServerSession(authOptions);
-    if (!session?.user || session.user.role !== "ADMIN") {
-      return NextResponse.json({ error: "Acesso negado." }, { status: 401 });
+    if (!id || typeof id !== "string") {
+      return NextResponse.json({ error: "ID inválido." }, { status: 400 });
     }
 
-    // Deleta no Prisma (ajuste model: "permissao" ou "permissoes")
+    const session = await getServerSession(authOptions);
+    if (
+      !session?.user ||
+      !["ADMIN", "SUPERADMIN"].includes(session.user.role)
+    ) {
+      return NextResponse.json({ error: "Acesso negado." }, { status: 403 });
+    }
+
     const deleted = await prisma.permissao.delete({
       where: { id },
     });
@@ -71,5 +78,3 @@ export async function DELETE( // ✅ Async para await interno
     return NextResponse.json({ error: "Erro ao deletar." }, { status: 500 });
   }
 }
-
-// Adicione POST/PUT se existirem, com o mesmo padrão: async + await params

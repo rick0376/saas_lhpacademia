@@ -92,7 +92,7 @@ export const MedidasList: React.FC<MedidasListProps> = ({
 
         const pMedidas = permissoes.find((p: any) => p.recurso === "medidas");
         const pShare = permissoes.find(
-          (p: any) => p.recurso === "alunos_compartilhar"
+          (p: any) => p.recurso === "medidas_compartilhar"
         );
 
         const superAdmin = session.user.role === "SUPERADMIN";
