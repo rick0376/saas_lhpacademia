@@ -100,6 +100,7 @@ const RECURSOS = [
     value: "exercicios_compartilhar",
     label: "📤 Exercícios • Compartilhar",
     description: "Exportar lista de exercícios em PDF e enviar via WhatsApp",
+    tipos: ["ler"],
   },
   {
     value: "treinos",
@@ -116,7 +117,7 @@ const RECURSOS = [
     value: "treinos_atribuir",
     label: "🔗 Treinos • Atribuir ao Aluno",
     description: "Vincular treinos aos alunos e gerenciar cronogramas",
-    tipos: ["ler", "editar", "deletar"],
+    tipos: ["ler", "deletar"],
   },
   {
     value: "medidas",

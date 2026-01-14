@@ -1,3 +1,5 @@
+//src/components/treinos/AtribuirTreinoModal.tsx
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -32,6 +34,7 @@ interface AtribuirTreinoModalProps {
   treinoId: string;
   treinoNome: string;
   onSuccess?: () => void;
+  canDelete?: boolean;
 }
 
 export const AtribuirTreinoModal: React.FC<AtribuirTreinoModalProps> = ({
@@ -40,6 +43,7 @@ export const AtribuirTreinoModal: React.FC<AtribuirTreinoModalProps> = ({
   treinoId,
   treinoNome,
   onSuccess,
+  canDelete,
 }) => {
   const [alunos, setAlunos] = useState<Aluno[]>([]);
   const [alunosAtribuidos, setAlunosAtribuidos] = useState<AlunoAtribuido[]>(
@@ -135,6 +139,12 @@ export const AtribuirTreinoModal: React.FC<AtribuirTreinoModalProps> = ({
 
   // Executa a remoção após confirmação
   const handleConfirmRemover = async () => {
+    // ✅ 1. Verifica permissão antes de tudo
+    if (!canDelete) {
+      setError("⛔ Você não tem permissão para remover este aluno do treino.");
+      return;
+    }
+
     setConfirmRemove((prev) => ({ ...prev, loading: true }));
 
     try {
@@ -275,21 +285,23 @@ export const AtribuirTreinoModal: React.FC<AtribuirTreinoModalProps> = ({
                       >
                         {atrib.ativo ? "✓ Ativo" : "✕ Inativo"}
                       </span>
-                      <button
-                        onClick={() =>
-                          setConfirmRemove({
-                            isOpen: true,
-                            alunoId: atrib.alunoId,
-                            alunoNome: atrib.aluno.nome,
-                            loading: false,
-                          })
-                        }
-                        className={styles.btnRemover}
-                        title="Remover treino deste aluno"
-                        disabled={confirmRemove.loading || loadingAtribuicoes}
-                      >
-                        🗑️
-                      </button>
+                      {canDelete && (
+                        <button
+                          onClick={() =>
+                            setConfirmRemove({
+                              isOpen: true,
+                              alunoId: atrib.alunoId,
+                              alunoNome: atrib.aluno.nome,
+                              loading: false,
+                            })
+                          }
+                          className={styles.btnRemover}
+                          title="Remover treino deste aluno"
+                          disabled={confirmRemove.loading || loadingAtribuicoes}
+                        >
+                          🗑️
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}

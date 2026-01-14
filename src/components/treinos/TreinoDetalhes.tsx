@@ -150,7 +150,8 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
   const canEditarTreino = !!permissoesEditar && !!permTreinos?.editar;
   const canGerenciarAlunos =
     !!permTreinosAtribuir?.ler || !!permTreinosAtribuir?.editar;
-  const canDeletarAtribuicao = !!permTreinosAtribuir?.deletar;
+  const canDeletarAtribuicao =
+    session?.user?.role === "SUPERADMIN" || !!permTreinosAtribuir?.deletar;
 
   const canAtualizar =
     !!permTreinos.ler || session?.user?.role === "SUPERADMIN";
@@ -970,6 +971,7 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
           onClose={() => setModalAtribuir(false)}
           treinoId={treino.id}
           treinoNome={treino.nome}
+          canDelete={canDeletarAtribuicao} // ✅ adiciona permissão de deletar
           onSuccess={() => {
             refresh();
             setToast({
