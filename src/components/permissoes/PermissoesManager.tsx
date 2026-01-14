@@ -116,6 +116,7 @@ const RECURSOS = [
     value: "treinos_atribuir",
     label: "🔗 Treinos • Atribuir ao Aluno",
     description: "Vincular treinos aos alunos e gerenciar cronogramas",
+    tipos: ["ler", "editar", "deletar"],
   },
   {
     value: "medidas",

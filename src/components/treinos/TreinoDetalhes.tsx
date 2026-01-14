@@ -78,7 +78,11 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
 
   const [permissoes, setPermissoes] = useState<PermissoesMap>({});
   const [permissoesCarregadas, setPermissoesCarregadas] = useState(false);
-  const recursosTreinos = ["treinos", "treinos_compartilhar"];
+  const recursosTreinos = [
+    "treinos",
+    "treinos_compartilhar",
+    "treinos_atribuir",
+  ];
 
   useEffect(() => {
     const fetchPermissoes = async () => {
@@ -134,8 +138,20 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
     deletar: false,
   };
 
+  const permTreinosAtribuir = permissoes["treinos_atribuir"] ?? {
+    recurso: "treinos_atribuir",
+    criar: false,
+    ler: false,
+    editar: false,
+    deletar: false,
+  };
+
   const canCompartilharFichas = !!permissoes["treinos_compartilhar"]?.ler;
-  const canEditarTreino = !!permissoesEditar && !!permTreinos;
+  const canEditarTreino = !!permissoesEditar && !!permTreinos?.editar;
+  const canGerenciarAlunos =
+    !!permTreinosAtribuir?.ler || !!permTreinosAtribuir?.editar;
+  const canDeletarAtribuicao = !!permTreinosAtribuir?.deletar;
+
   const canAtualizar =
     !!permTreinos.ler || session?.user?.role === "SUPERADMIN";
 
@@ -578,10 +594,10 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
   };
 
   const handleRemoveAlunoTreino = async () => {
-    if (!permissoesEditar) {
+    if (!canDeletarAtribuicao) {
       setToast({
         show: true,
-        message: "⛔ Você não tem permissão para remover alunos",
+        message: "⛔ Você não tem permissão para remover alunos deste treino",
         type: "error",
       });
       return;
@@ -715,7 +731,7 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
       </div>
 
       <div className={styles.actionsGroup}>
-        {canEditarTreino && (
+        {canGerenciarAlunos && (
           <button
             className={`${styles.actionBtn} ${styles.btnAtribuir}`}
             onClick={() => setModalAtribuir(true)}
@@ -796,7 +812,7 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
                     {atrib.ativo ? "✓" : "✕"}
                   </span>
 
-                  {canEditarTreino && (
+                  {canDeletarAtribuicao && (
                     <button
                       className={styles.alunoRemoveBtn}
                       onClick={() =>
@@ -948,7 +964,7 @@ export const TreinoDetalhes: React.FC<TreinoDetalhesProps> = ({
         treinoExercicios={treino.exercicios}
       />
 
-      {canEditarTreino && (
+      {canGerenciarAlunos && (
         <AtribuirTreinoModal
           isOpen={modalAtribuir}
           onClose={() => setModalAtribuir(false)}
