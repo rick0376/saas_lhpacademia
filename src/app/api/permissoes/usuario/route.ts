@@ -1,3 +1,5 @@
+//api/permissoes/usuario/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -55,6 +57,43 @@ export async function GET(request: NextRequest) {
           ler: true,
           editar: true,
           deletar: true,
+        },
+
+        // 👇 adiciona todos os recursos de compartilhamento
+        {
+          recurso: "alunos_compartilhar",
+          criar: false,
+          ler: true,
+          editar: true,
+          deletar: false,
+        },
+        {
+          recurso: "avaliacoes_compartilhar",
+          criar: false,
+          ler: true,
+          editar: true,
+          deletar: false,
+        },
+        {
+          recurso: "exercicios_compartilhar",
+          criar: false,
+          ler: true,
+          editar: true,
+          deletar: false,
+        },
+        {
+          recurso: "treinos_compartilhar",
+          criar: false,
+          ler: true,
+          editar: true,
+          deletar: false,
+        },
+        {
+          recurso: "medidas_compartilhar",
+          criar: false,
+          ler: true,
+          editar: true,
+          deletar: false,
         },
       ]);
     }
