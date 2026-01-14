@@ -88,7 +88,7 @@ const RECURSOS = [
     value: "avaliacoes_compartilhar",
     label: "📤 Avaliações • Compartilhar",
     description: "Gerar PDF e enviar via WhatsApp",
-    tipos: ["ler"],
+    tipos: ["ler"], // só Visualizar
   },
 
   {

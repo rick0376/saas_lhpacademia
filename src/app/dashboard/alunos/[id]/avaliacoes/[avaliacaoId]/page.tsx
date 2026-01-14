@@ -102,6 +102,14 @@ export default function AvaliacaoPage() {
     deletar: false,
   });
 
+  const [permCompartilhar, setPermCompartilhar] = useState<Permissao>({
+    recurso: "avaliacoes_compartilhar",
+    criar: false,
+    ler: false,
+    editar: false,
+    deletar: false,
+  });
+
   useEffect(() => {
     if (!session?.user || !alunoId || !avaliacaoId) {
       setError("Acesso negado ou aluno/avaliação não encontrados.");
@@ -120,8 +128,12 @@ export default function AvaliacaoPage() {
         setAvaliacao(avaliacaoData);
 
         const permissoesData = await permissoesRes.json();
+
         const permissaoAvaliacoes = permissoesData.find(
           (p: Permissao) => p.recurso === "avaliacoes"
+        );
+        const permissaoCompartilhar = permissoesData.find(
+          (p: Permissao) => p.recurso === "avaliacoes_compartilhar"
         );
 
         if (session.user.role === "SUPERADMIN") {
@@ -132,10 +144,26 @@ export default function AvaliacaoPage() {
             editar: true,
             deletar: true,
           });
+          setPermCompartilhar({
+            recurso: "avaliacoes_compartilhar",
+            criar: false,
+            ler: true,
+            editar: true,
+            deletar: false,
+          });
         } else {
           setPermissoes(
             permissaoAvaliacoes || {
               recurso: "avaliacoes",
+              criar: false,
+              ler: false,
+              editar: false,
+              deletar: false,
+            }
+          );
+          setPermCompartilhar(
+            permissaoCompartilhar || {
+              recurso: "avaliacoes_compartilhar",
               criar: false,
               ler: false,
               editar: false,
@@ -691,28 +719,28 @@ ${divisor}
           </Link>
         )}
 
-        {permissoes.editar && (
-          <button
-            type="button"
-            className={`${styles.buttonBase} ${styles.whatsappButton}`}
-            onClick={enviarWhatsApp}
-            title="Enviar WhatsApp"
-          >
-            <FaWhatsapp className={styles.iconBtn} />
-            <span className={styles.btnText}>WhatsApp</span>
-          </button>
-        )}
+        {(permCompartilhar.ler || permCompartilhar.editar) && (
+          <>
+            <button
+              type="button"
+              className={`${styles.buttonBase} ${styles.whatsappButton}`}
+              onClick={enviarWhatsApp}
+              title="Enviar WhatsApp"
+            >
+              <FaWhatsapp className={styles.iconBtn} />
+              <span className={styles.btnText}>WhatsApp</span>
+            </button>
 
-        {permissoes.editar && (
-          <button
-            type="button"
-            className={`${styles.buttonBase} ${styles.pdfButton}`}
-            onClick={gerarPdf}
-            title="Gerar PDF"
-          >
-            <FileText className={styles.iconBtn} />
-            <span className={styles.btnText}>PDF</span>
-          </button>
+            <button
+              type="button"
+              className={`${styles.buttonBase} ${styles.pdfButton}`}
+              onClick={gerarPdf}
+              title="Gerar PDF"
+            >
+              <FileText className={styles.iconBtn} />
+              <span className={styles.btnText}>PDF</span>
+            </button>
+          </>
         )}
 
         {permissoes.deletar && (

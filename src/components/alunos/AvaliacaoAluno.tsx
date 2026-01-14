@@ -140,6 +140,7 @@ export const AvaliacaoAluno = () => {
     setDebouncedTerm(searchTerm);
   };
 
+  // Permissões de Avaliações
   const permAvaliacoes = permissoes["avaliacoes"] ?? {
     recurso: "avaliacoes",
     criar: false,
@@ -147,8 +148,20 @@ export const AvaliacaoAluno = () => {
     editar: false,
     deletar: false,
   };
+
+  // Permissões de Compartilhar Avaliações
+  const permAvaliacoesCompartilhar = permissoes["avaliacoes_compartilhar"] ?? {
+    recurso: "avaliacoes_compartilhar",
+    criar: false,
+    ler: false,
+    editar: false,
+    deletar: false,
+  };
+
+  // ✅ Controles separados
+  const canEditarAvaliacoes = !!permAvaliacoes.editar;
   const canCompartilharAvaliacoes =
-    !!permissoes["avaliacoes_compartilhar"]?.ler;
+    !!permAvaliacoesCompartilhar.ler || !!permAvaliacoesCompartilhar.editar;
 
   const gerarPdfLista = async () => {
     if (alunosOrdenados.length === 0) return;
