@@ -33,8 +33,21 @@ export default async function ConfiguracoesPage() {
     }
   }
 
-  // ✅ Só SUPERADMIN vê backup
+  // ✅ SUPERADMIN vê tudo, mas ADMIN com permissão também acessa
   const isSuperAdmin = session.user.role === "SUPERADMIN";
+
+  // ✅ Verifica se o usuário pode acessar backup (SUPERADMIN ou permissão 'backup')
+  const permissaoBackup = await prisma.permissao.findUnique({
+    where: {
+      usuarioId_recurso: {
+        usuarioId: session.user.id,
+        recurso: "backup",
+      },
+    },
+  });
+
+  const canViewBackup =
+    isSuperAdmin || (!!permissaoBackup && permissaoBackup.ler === true);
 
   return (
     <div className={styles.container}>
@@ -48,13 +61,13 @@ export default async function ConfiguracoesPage() {
       </div>
 
       <div className={styles.grid}>
-        {isSuperAdmin && (
+        {canViewBackup && (
           <section className={styles.card}>
             <BackupManager />
           </section>
         )}
 
-        {!isSuperAdmin && (
+        {!canViewBackup && (
           <section className={styles.card}>
             <h2>🔧 Configurações Gerais</h2>
             <p>Funcionalidades de configuração em desenvolvimento.</p>

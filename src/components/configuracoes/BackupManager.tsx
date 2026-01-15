@@ -1,6 +1,8 @@
+//src/components/configuracoes/BackupManager.tsx
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/Button/Button";
 import { Toast } from "@/components/ui/Toast/Toast";
 import styles from "./styles.module.scss";
@@ -49,6 +51,15 @@ export const BackupManager = () => {
     type: "success" | "error" | "info" | "warning";
   }>({ show: false, message: "", type: "success" });
 
+  const { data: session } = useSession();
+  const [canView, setCanView] = useState(false);
+  const [canCreate, setCanCreate] = useState(false);
+  const [canSearch, setCanSearch] = useState(false);
+  const [canSaveConfig, setCanSaveConfig] = useState(false);
+  const [canDownload, setCanDownload] = useState(false);
+  const [canRestore, setCanRestore] = useState(false);
+  const [canDelete, setCanDelete] = useState(false);
+
   useEffect(() => {
     carregarBackups();
     carregarConfigAgendamento();
@@ -59,6 +70,55 @@ export const BackupManager = () => {
     carregarConfigAgendamento();
     carregarClientes();
   }, []);
+
+  useEffect(() => {
+    const verificarPermissoes = async () => {
+      if (!session?.user?.id) return;
+
+      try {
+        const res = await fetch(`/api/permissoes?usuarioId=${session.user.id}`);
+        const permissoes = await res.json();
+        const superAdmin = session.user.role === "SUPERADMIN";
+
+        const pConfig = permissoes.find(
+          (p: any) => p.recurso === "configuracoes"
+        );
+        const pBackupCriar = permissoes.find(
+          (p: any) => p.recurso === "backup_criar"
+        );
+        const pBackupProcurar = permissoes.find(
+          (p: any) => p.recurso === "backup_procurar"
+        );
+        const pBackupSalvar = permissoes.find(
+          (p: any) => p.recurso === "backup_salvar"
+        );
+        const pBackupDownload = permissoes.find(
+          (p: any) => p.recurso === "backup_download"
+        );
+        const pBackupRestaurar = permissoes.find(
+          (p: any) => p.recurso === "backup_restaurar"
+        );
+        const pBackupExcluir = permissoes.find(
+          (p: any) => p.recurso === "backup_excluir"
+        );
+
+        setCanView(superAdmin || !!pConfig?.ler);
+        setCanCreate(superAdmin || !!pBackupCriar?.criar);
+        setCanSearch(
+          superAdmin || !!pBackupProcurar?.ler || !!pBackupProcurar?.editar
+        );
+        setCanSaveConfig(
+          superAdmin || !!pBackupSalvar?.criar || !!pBackupSalvar?.editar
+        );
+        setCanDownload(superAdmin || !!pBackupDownload?.ler);
+        setCanRestore(superAdmin || !!pBackupRestaurar?.editar);
+        setCanDelete(superAdmin || !!pBackupExcluir?.deletar);
+      } catch (error) {
+        console.error("Erro ao verificar permissões:", error);
+      }
+    };
+    verificarPermissoes();
+  }, [session]);
 
   const carregarClientes = async () => {
     try {
@@ -363,9 +423,11 @@ export const BackupManager = () => {
           </>
         )}
 
-        <Button onClick={handleBackupManual} disabled={loading} fullWidth>
-          {loading ? "Criando backup..." : "📦 Criar Backup Agora"}
-        </Button>
+        {canCreate && (
+          <Button onClick={handleBackupManual} disabled={loading} fullWidth>
+            {loading ? "Criando backup..." : "📦 Criar Backup Agora"}
+          </Button>
+        )}
       </div>
 
       <div className={styles.divider} />
@@ -383,9 +445,11 @@ export const BackupManager = () => {
           onChange={handleArquivoSelecionado}
           style={{ display: "none" }}
         />
-        <Button onClick={abrirSeletorArquivo} variant="secondary" fullWidth>
-          📂 Procurar Arquivo de Backup
-        </Button>
+        {canSearch && (
+          <Button onClick={abrirSeletorArquivo} variant="secondary" fullWidth>
+            📂 Procurar Arquivo de Backup
+          </Button>
+        )}
       </div>
 
       <div className={styles.divider} />
@@ -448,24 +512,30 @@ export const BackupManager = () => {
                   </span>
                 </div>
                 <div className={styles.backupActions}>
-                  <Button
-                    variant="secondary"
-                    onClick={() => handleDownload(backup.nome)}
-                  >
-                    ⬇️ Download
-                  </Button>
-                  <Button
-                    variant="warning"
-                    onClick={() => abrirModalRestaurar(backup.nome)}
-                  >
-                    🔄 Restaurar
-                  </Button>
-                  <Button
-                    variant="danger"
-                    onClick={() => abrirModalExcluir(backup.nome)}
-                  >
-                    🗑️ Excluir
-                  </Button>
+                  {canDownload && (
+                    <Button
+                      variant="secondary"
+                      onClick={() => handleDownload(backup.nome)}
+                    >
+                      ⬇️ Download
+                    </Button>
+                  )}
+                  {canRestore && (
+                    <Button
+                      variant="warning"
+                      onClick={() => abrirModalRestaurar(backup.nome)}
+                    >
+                      🔄 Restaurar
+                    </Button>
+                  )}
+                  {canDelete && (
+                    <Button
+                      variant="danger"
+                      onClick={() => abrirModalExcluir(backup.nome)}
+                    >
+                      🗑️ Excluir
+                    </Button>
+                  )}
                 </div>
               </div>
             ))}
