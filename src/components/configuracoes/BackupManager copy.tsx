@@ -1,3 +1,4 @@
+//src/components/configuracoes/BackupManager.tsx
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -51,12 +52,18 @@ export const BackupManager = () => {
   }>({ show: false, message: "", type: "success" });
 
   const { data: session } = useSession();
-
   const [canView, setCanView] = useState(false);
   const [canCreate, setCanCreate] = useState(false);
-  const [canEdit, setCanEdit] = useState(false);
+  const [canSearch, setCanSearch] = useState(false);
+  const [canSaveConfig, setCanSaveConfig] = useState(false);
   const [canDownload, setCanDownload] = useState(false);
+  const [canRestore, setCanRestore] = useState(false);
   const [canDelete, setCanDelete] = useState(false);
+
+  useEffect(() => {
+    carregarBackups();
+    carregarConfigAgendamento();
+  }, []);
 
   useEffect(() => {
     carregarBackups();
@@ -71,22 +78,51 @@ export const BackupManager = () => {
       try {
         const res = await fetch(`/api/permissoes?usuarioId=${session.user.id}`);
         const permissoes = await res.json();
-        const superAdmin = session.user.role === "SUPERADMIN";
 
-        const pBackup = permissoes.find((p: any) => p.recurso === "backup");
-        const pBackupDownload = permissoes.find(
-          (p: any) => p.recurso === "backup_download"
-        );
+        const superAdmin = session.user.role === "SUPERADMIN";
 
         const pConfig = permissoes.find(
           (p: any) => p.recurso === "configuracoes"
         );
+        const pBackupCriar = permissoes.find(
+          (p: any) => p.recurso === "backup_criar"
+        );
+        const pBackupProcurar = permissoes.find(
+          (p: any) => p.recurso === "backup_procurar"
+        );
+        const pBackupSalvar = permissoes.find(
+          (p: any) => p.recurso === "backup_salvar"
+        );
+        const pBackupDownload = permissoes.find(
+          (p: any) => p.recurso === "backup_download"
+        );
+        const pBackupRestaurar = permissoes.find(
+          (p: any) => p.recurso === "backup_restaurar"
+        );
 
-        setCanView(superAdmin || !!pConfig?.ler || !!pBackup?.ler);
-        setCanCreate(superAdmin || !!pBackup?.criar);
-        setCanEdit(superAdmin || !!pBackup?.editar);
-        setCanDelete(superAdmin || !!pBackup?.deletar);
+        /* const pBackupExcluir = permissoes.find(
+          (p: any) => p.recurso === "backup_excluir"
+        );
+
+        setCanView(superAdmin || !!pConfig?.ler);
+        setCanCreate(superAdmin || !!pBackupCriar?.criar);
+        setCanSearch(
+          superAdmin || !!pBackupProcurar?.ler || !!pBackupProcurar?.editar
+        );
+        setCanSaveConfig(
+          superAdmin || !!pBackupSalvar?.criar || !!pBackupSalvar?.editar
+        );
         setCanDownload(superAdmin || !!pBackupDownload?.ler);
+        setCanRestore(superAdmin || !!pBackupRestaurar?.editar);
+        setCanDelete(superAdmin || !!pBackupExcluir?.deletar);
+       */
+        const pBackup = permissoes.find((p: any) => p.recurso === "backup");
+        // const superAdmin = session.user.role === "SUPERADMIN";
+
+        setCanView(superAdmin || !!pBackup?.ler); // mostra toda a área de backup
+        setCanCreate(superAdmin || !!pBackup?.criar); // botão "Criar Backup Agora"
+        setCanSaveConfig(superAdmin || !!pBackup?.editar); // salvar configuração e restaurar
+        setCanDelete(superAdmin || !!pBackup?.deletar); // excluir backups
       } catch (error) {
         console.error("Erro ao verificar permissões:", error);
       }
@@ -129,9 +165,14 @@ export const BackupManager = () => {
     setLoading(true);
     try {
       const body: any = { tipo: tipoBackup };
+
       if (tipoBackup === "seletivo") {
-        if (tabelasSelecionadas.length > 0) body.tabelas = tabelasSelecionadas;
-        if (clienteSelecionado) body.clienteId = clienteSelecionado;
+        if (tabelasSelecionadas.length > 0) {
+          body.tabelas = tabelasSelecionadas;
+        }
+        if (clienteSelecionado) {
+          body.clienteId = clienteSelecionado;
+        }
       }
 
       const response = await fetch("/api/backup/manual", {
@@ -141,6 +182,7 @@ export const BackupManager = () => {
       });
 
       const data = await response.json();
+
       if (!response.ok) throw new Error(data.error);
 
       setToast({
@@ -192,24 +234,23 @@ export const BackupManager = () => {
     window.open(`/api/backup/download?file=${nomeArquivo}`, "_blank");
   };
 
+  // ✅ Restaurar backup da lista
   const abrirModalRestaurar = (nomeArquivo: string) => {
     setBackupSelecionado(nomeArquivo);
     setBackupExterno(null);
     setShowRestaurarModal(true);
   };
 
-  const abrirModalExcluir = (nomeArquivo: string) => {
-    setBackupParaExcluir(nomeArquivo);
-    setShowExcluirModal(true);
-  };
-
+  // ✅ NOVO: Abrir seletor de arquivo
   const abrirSeletorArquivo = () => {
     fileInputRef.current?.click();
   };
 
+  // ✅ NOVO: Quando arquivo é selecionado
   const handleArquivoSelecionado = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
     if (!file.name.endsWith(".json")) {
       setToast({
         show: true,
@@ -218,38 +259,51 @@ export const BackupManager = () => {
       });
       return;
     }
+
     setBackupExterno(file);
     setBackupSelecionado("");
     setShowRestaurarModal(true);
   };
 
+  // ✅ Restaurar backup (da lista ou externo)
   const handleRestaurar = async () => {
     setLoading(true);
     setShowRestaurarModal(false);
+
     try {
       let response;
+
       if (backupExterno) {
+        // ✅ Restaurar arquivo externo (upload)
         const formData = new FormData();
         formData.append("file", backupExterno);
+
         response = await fetch("/api/backup/restaurar-upload", {
           method: "POST",
           body: formData,
         });
       } else {
+        // ✅ Restaurar backup da lista
         response = await fetch("/api/backup/restaurar", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ filename: backupSelecionado }),
         });
       }
+
       const data = await response.json();
+
       if (!response.ok) throw new Error(data.error);
+
       setToast({
         show: true,
         message: "Banco de dados restaurado com sucesso!",
         type: "success",
       });
-      setTimeout(() => window.location.reload(), 2000);
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
     } catch (error: any) {
       setToast({
         show: true,
@@ -262,23 +316,35 @@ export const BackupManager = () => {
     }
   };
 
+  // ✅ Abrir Modal Excluir Backups
+  const abrirModalExcluir = (nomeArquivo: string) => {
+    setBackupParaExcluir(nomeArquivo);
+    setShowExcluirModal(true);
+  };
+
+  // ✅ Excluir Backups
   const handleExcluirBackup = async () => {
     setLoading(true);
     setShowExcluirModal(false);
+
     try {
       const response = await fetch("/api/backup/excluir", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ filename: backupParaExcluir }),
       });
+
       const data = await response.json();
+
       if (!response.ok) throw new Error(data.error);
+
       setToast({
         show: true,
         message: "Backup excluído com sucesso!",
         type: "success",
       });
-      carregarBackups();
+
+      carregarBackups(); // Recarregar lista
     } catch (error: any) {
       setToast({
         show: true,
@@ -295,17 +361,16 @@ export const BackupManager = () => {
     <div className={styles.container}>
       <h2 className={styles.title}>💾 Backup do Banco de Dados</h2>
 
-      {/* Página e seções — controladas por Visualizar */}
+      {/* Backup Manual */}
       {canView && (
         <>
-          {/* Backup Manual */}
           <div className={styles.section}>
             <h3>Backup Manual</h3>
             <p className={styles.description}>
               Crie um backup completo ou seletivo do banco de dados.
             </p>
 
-            {/* Tipo de Backup */}
+            {/* Seletor de Tipo */}
             <div className={styles.field}>
               <label>Tipo de Backup</label>
               <select
@@ -322,11 +387,11 @@ export const BackupManager = () => {
               </select>
             </div>
 
-            {/* Opções seletivas */}
+            {/* Opções de Backup Seletivo */}
             {tipoBackup === "seletivo" && (
               <>
                 <div className={styles.field}>
-                  <label>Filtrar por Cliente</label>
+                  <label>Filtrar por Cliente (opcional)</label>
                   <select
                     value={clienteSelecionado}
                     onChange={(e) => setClienteSelecionado(e.target.value)}
@@ -342,22 +407,27 @@ export const BackupManager = () => {
                 </div>
 
                 <div className={styles.field}>
-                  <label>Tabelas</label>
+                  <label>Tabelas (opcional)</label>
                   <div className={styles.checkboxGroup}>
-                    {tabelasDisponiveis.map((t) => (
-                      <label key={t} className={styles.checkboxLabel}>
+                    {tabelasDisponiveis.map((tabela) => (
+                      <label key={tabela} className={styles.checkboxLabel}>
                         <input
                           type="checkbox"
-                          checked={tabelasSelecionadas.includes(t)}
-                          onChange={(e) =>
-                            setTabelasSelecionadas((prev) =>
-                              e.target.checked
-                                ? [...prev, t]
-                                : prev.filter((x) => x !== t)
-                            )
-                          }
+                          checked={tabelasSelecionadas.includes(tabela)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setTabelasSelecionadas([
+                                ...tabelasSelecionadas,
+                                tabela,
+                              ]);
+                            } else {
+                              setTabelasSelecionadas(
+                                tabelasSelecionadas.filter((t) => t !== tabela)
+                              );
+                            }
+                          }}
                         />
-                        <span>{t}</span>
+                        <span>{tabela}</span>
                       </label>
                     ))}
                   </div>
@@ -365,7 +435,6 @@ export const BackupManager = () => {
               </>
             )}
 
-            {/* 📦 Criar Backup Agora — controlado pelo “Novo” */}
             {canCreate && (
               <Button onClick={handleBackupManual} disabled={loading} fullWidth>
                 {loading ? "Criando backup..." : "📦 Criar Backup Agora"}
@@ -378,7 +447,10 @@ export const BackupManager = () => {
           {/* Restaurar de Arquivo */}
           <div className={styles.section}>
             <h3>Restaurar de Arquivo</h3>
-            <p>Importe um backup do seu computador para restaurar o banco.</p>
+            <p className={styles.description}>
+              Importe um backup do seu computador para restaurar o banco de
+              dados.
+            </p>
             <input
               ref={fileInputRef}
               type="file"
@@ -386,7 +458,7 @@ export const BackupManager = () => {
               onChange={handleArquivoSelecionado}
               style={{ display: "none" }}
             />
-            {canEdit && (
+            {canSaveConfig && (
               <Button
                 onClick={abrirSeletorArquivo}
                 variant="secondary"
@@ -402,28 +474,38 @@ export const BackupManager = () => {
           {/* Backup Automático */}
           <div className={styles.section}>
             <h3>Backup Automático</h3>
-            <p>Configure backups automáticos.</p>
+            <p className={styles.description}>
+              Configure backups automáticos em intervalos regulares.
+            </p>
+
             <div className={styles.form}>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={agendamentoAtivo}
-                  onChange={(e) => setAgendamentoAtivo(e.target.checked)}
-                />
-                Ativar backups automáticos
-              </label>
+              <div className={styles.toggle}>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={agendamentoAtivo}
+                    onChange={(e) => setAgendamentoAtivo(e.target.checked)}
+                  />
+                  <span>Ativar backups automáticos</span>
+                </label>
+              </div>
+
               {agendamentoAtivo && (
-                <select
-                  value={intervalo}
-                  onChange={(e) => setIntervalo(e.target.value)}
-                  className={styles.select}
-                >
-                  <option value="diario">Diário</option>
-                  <option value="semanal">Semanal</option>
-                  <option value="mensal">Mensal</option>
-                </select>
+                <div className={styles.field}>
+                  <label>Frequência</label>
+                  <select
+                    value={intervalo}
+                    onChange={(e) => setIntervalo(e.target.value)}
+                    className={styles.select}
+                  >
+                    <option value="diario">Diário (todo dia às 03:00)</option>
+                    <option value="semanal">Semanal (domingo às 03:00)</option>
+                    <option value="mensal">Mensal (dia 1 às 03:00)</option>
+                  </select>
+                </div>
               )}
-              {canEdit && (
+
+              {canSaveConfig && (
                 <Button onClick={handleSalvarAgendamento} disabled={loading}>
                   {loading ? "Salvando..." : "💾 Salvar Configuração"}
                 </Button>
@@ -433,45 +515,44 @@ export const BackupManager = () => {
 
           <div className={styles.divider} />
 
-          {/* 🔹 Backups Disponíveis — visível com Visualizar */}
+          {/* Lista de Backups */}
           <div className={styles.section}>
             <h3>Backups Disponíveis</h3>
             {backups.length === 0 ? (
               <p className={styles.empty}>Nenhum backup encontrado.</p>
             ) : (
               <div className={styles.backupList}>
-                {backups.map((b) => (
-                  <div key={b.nome} className={styles.backupItem}>
+                {backups.map((backup) => (
+                  <div key={backup.nome} className={styles.backupItem}>
                     <div className={styles.backupInfo}>
-                      <span>📄 {b.nome}</span>
-                      <span>
-                        {b.tamanho} • {b.data}
+                      <span className={styles.backupNome}>
+                        📄 {backup.nome}
+                      </span>
+                      <span className={styles.backupMeta}>
+                        {backup.tamanho} • {backup.data}
                       </span>
                     </div>
+
                     <div className={styles.backupActions}>
-                      {/* ⬇️ Download — check específico */}
-                      {canDownload && (
-                        <Button
-                          variant="secondary"
-                          onClick={() => handleDownload(b.nome)}
-                        >
-                          ⬇️ Download
-                        </Button>
-                      )}
-                      {/* 🔄 Restaurar — check Editar */}
-                      {canEdit && (
+                      <Button
+                        variant="secondary"
+                        onClick={() => handleDownload(backup.nome)}
+                        disabled={!canView}
+                      >
+                        ⬇️ Download
+                      </Button>
+                      {canSaveConfig && (
                         <Button
                           variant="warning"
-                          onClick={() => abrirModalRestaurar(b.nome)}
+                          onClick={() => abrirModalRestaurar(backup.nome)}
                         >
                           🔄 Restaurar
                         </Button>
                       )}
-                      {/* 🗑️ Excluir — check Deletar */}
                       {canDelete && (
                         <Button
                           variant="danger"
-                          onClick={() => abrirModalExcluir(b.nome)}
+                          onClick={() => abrirModalExcluir(backup.nome)}
                         >
                           🗑️ Excluir
                         </Button>
