@@ -78,6 +78,14 @@ export const BackupManager = () => {
         const superAdmin = session.user.role === "SUPERADMIN";
 
         const pBackup = permissoes.find((p: any) => p.recurso === "backup");
+
+        const pBackupRestaurar = permissoes.find(
+          (p: any) => p.recurso === "backup"
+        );
+
+        const pBackupExcluir = permissoes.find(
+          (p: any) => p.recurso === "backup"
+        );
         const pBackupSalvar = permissoes.find(
           (p: any) => p.recurso === "backup_salvar"
         );
@@ -87,12 +95,11 @@ export const BackupManager = () => {
         const pBackupDownload = permissoes.find(
           (p: any) => p.recurso === "backup_download"
         );
-        const pBackupRestaurar = permissoes.find(
+        /*const pBackupRestaurar = permissoes.find(
           (p: any) => p.recurso === "backup_restaurar"
         );
-        const pBackupExcluir = permissoes.find(
-          (p: any) => p.recurso === "backup"
-        );
+        */
+
         const pConfig = permissoes.find(
           (p: any) => p.recurso === "configuracoes"
         );
