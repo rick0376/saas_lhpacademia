@@ -1,3 +1,5 @@
+//src/components/permissoes/PermissoesManager.tsx
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -177,6 +179,8 @@ const RECURSOS = [
     value: "backup",
     label: "💾 Backup",
     description: "Criar, restaurar e gerenciar backups do banco de dados",
+    tipos: ["criar", "ler"],
+    labels: { criar: "Backup Disponível" }, // <-- só muda o texto do criar
   },
 
   {
@@ -531,66 +535,69 @@ export const PermissoesManager = () => {
           </div>
 
           <div className={styles.permissoesGrid}>
-            {RECURSOS.map(({ value: recurso, label, description, tipos }) => {
-              const permissao = permissoes[recurso] || {
-                criar: false,
-                ler: true,
-                editar: false,
-                deletar: false,
-              };
+            {RECURSOS.map(
+              ({ value: recurso, label, description, tipos, labels }) => {
+                const permissao = permissoes[recurso] || {
+                  criar: false,
+                  ler: true,
+                  editar: false,
+                  deletar: false,
+                };
 
-              return (
-                <div key={recurso} className={styles.recursoCard}>
-                  <div className={styles.recursoHeader}>
-                    <h4 className={styles.recursoNome}>{label}</h4>
-                    <p className={styles.recursoDesc}>{description}</p>
-                  </div>
+                return (
+                  <div key={recurso} className={styles.recursoCard}>
+                    <div className={styles.recursoHeader}>
+                      <h4 className={styles.recursoNome}>{label}</h4>
+                      <p className={styles.recursoDesc}>{description}</p>
+                    </div>
 
-                  <div className={styles.checkboxGrid}>
-                    {/* ✅ Só mostra o checkbox Total se o recurso tiver todos os tipos */}
-                    {(!tipos || tipos.length === 4) && (
-                      <label className={styles.checkboxLabel}>
-                        <input
-                          type="checkbox"
-                          checked={todosTiposMarcadosNoRecurso(recurso)}
-                          onChange={() =>
-                            handleToggleTodosTiposRecurso(recurso)
-                          }
-                          className={styles.checkbox}
-                          title="Marcar/Desmarcar todos os tipos deste recurso"
-                        />
-                        <span>Total</span>
-                      </label>
-                    )}
-
-                    {/* ✅ Checkboxes dinâmicos conforme o campo 'tipos' */}
-                    {(["criar", "ler", "editar", "deletar"] as const)
-                      .filter((tipo) => !tipos || tipos.includes(tipo))
-                      .map((tipo) => (
-                        <label key={tipo} className={styles.checkboxLabel}>
+                    <div className={styles.checkboxGrid}>
+                      {/* ✅ Só mostra o checkbox Total se o recurso tiver todos os tipos */}
+                      {(!tipos || tipos.length === 4) && (
+                        <label className={styles.checkboxLabel}>
                           <input
                             type="checkbox"
-                            checked={permissao[tipo]}
+                            checked={todosTiposMarcadosNoRecurso(recurso)}
                             onChange={() =>
-                              handleTogglePermissao(recurso, tipo)
+                              handleToggleTodosTiposRecurso(recurso)
                             }
                             className={styles.checkbox}
+                            title="Marcar/Desmarcar todos os tipos deste recurso"
                           />
-                          <span>
-                            {tipo === "criar"
-                              ? "Novo"
-                              : tipo === "ler"
-                              ? "Visualizar"
-                              : tipo === "editar"
-                              ? "Editar"
-                              : "Deletar"}
-                          </span>
+                          <span>Total</span>
                         </label>
-                      ))}
+                      )}
+
+                      {/* ✅ Checkboxes dinâmicos conforme o campo 'tipos' */}
+                      {(["criar", "ler", "editar", "deletar"] as const)
+                        .filter((tipo) => !tipos || tipos.includes(tipo))
+                        .map((tipo) => (
+                          <label key={tipo} className={styles.checkboxLabel}>
+                            <input
+                              type="checkbox"
+                              checked={permissao[tipo]}
+                              onChange={() =>
+                                handleTogglePermissao(recurso, tipo)
+                              }
+                              className={styles.checkbox}
+                            />
+                            <span>
+                              {labels?.[tipo] ??
+                                (tipo === "criar"
+                                  ? "Novo"
+                                  : tipo === "ler"
+                                  ? "Visualizar"
+                                  : tipo === "editar"
+                                  ? "Editar"
+                                  : "Deletar")}
+                            </span>
+                          </label>
+                        ))}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              }
+            )}
           </div>
 
           <div className={styles.actions}>

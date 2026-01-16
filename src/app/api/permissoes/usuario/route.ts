@@ -108,6 +108,30 @@ export async function GET(request: NextRequest) {
       },
     });
 
+    // garante que TODOS os recursos do backup existam no retorno
+    const recursosBackup = [
+      "backup",
+      "backup_criar",
+      "backup_download",
+      "backup_restaurar",
+      "backup_excluir",
+    ];
+
+    for (const recurso of recursosBackup) {
+      const existe = permissoes.some((p) => p.recurso === recurso);
+      if (!existe) {
+        permissoes.push({
+          id: `virtual-${recurso}`,
+          usuarioId: session.user.id,
+          recurso,
+          criar: false,
+          ler: false,
+          editar: false,
+          deletar: false,
+        });
+      }
+    }
+
     return NextResponse.json(permissoes);
   } catch (error) {
     console.error("Erro ao buscar permissões do usuário:", error);

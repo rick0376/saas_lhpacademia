@@ -1,3 +1,5 @@
+//src/components/configuracoes/BackupManager.tsx
+
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -74,23 +76,51 @@ export const BackupManager = () => {
         const superAdmin = session.user.role === "SUPERADMIN";
 
         const pBackup = permissoes.find((p: any) => p.recurso === "backup");
+        const pBackupCriar = permissoes.find(
+          (p: any) => p.recurso === "backup_criar"
+        );
         const pBackupDownload = permissoes.find(
           (p: any) => p.recurso === "backup_download"
         );
-
+        const pBackupRestaurar = permissoes.find(
+          (p: any) => p.recurso === "backup_restaurar"
+        );
+        const pBackupExcluir = permissoes.find(
+          (p: any) => p.recurso === "backup_excluir"
+        );
         const pConfig = permissoes.find(
           (p: any) => p.recurso === "configuracoes"
         );
 
-        setCanView(superAdmin || !!pConfig?.ler || !!pBackup?.ler);
-        setCanCreate(superAdmin || !!pBackup?.criar);
-        setCanEdit(superAdmin || !!pBackup?.editar);
-        setCanDelete(superAdmin || !!pBackup?.deletar);
+        /**
+         * 🔧 Regras ajustadas:
+         * - backup.ler   → controla toda a área de backup e lista “Backups Disponíveis”.
+         * - backup.criar → neutralizado (não faz nada).
+         * - backup_criar.criar → controla o botão “Criar Backup Agora”.
+         * - backup_restaurar.editar → controla “Restaurar” e “Salvar Configuração”.
+         * - backup_excluir.deletar → controla “Excluir”.
+         * - backup_download.ler → controla “Download”.
+         */
+
+        // Exibir área completa e lista de backups (somente com Visualizar do backup)
+        setCanView(superAdmin || !!pBackup?.ler || !!pConfig?.ler);
+
+        // Botão “Criar Backup Agora” (somente backup_criar)
+        setCanCreate(superAdmin || !!pBackupCriar?.criar);
+
+        // Botão “Restaurar” e “Salvar Configuração”
+        setCanEdit(superAdmin || !!pBackupRestaurar?.editar);
+
+        // Botão “Excluir”
+        setCanDelete(superAdmin || !!pBackupExcluir?.deletar);
+
+        // Botão “Download”
         setCanDownload(superAdmin || !!pBackupDownload?.ler);
       } catch (error) {
         console.error("Erro ao verificar permissões:", error);
       }
     };
+
     verificarPermissoes();
   }, [session]);
 
@@ -433,55 +463,57 @@ export const BackupManager = () => {
 
           <div className={styles.divider} />
 
-          {/* 🔹 Backups Disponíveis — visível com Visualizar */}
-          <div className={styles.section}>
-            <h3>Backups Disponíveis</h3>
-            {backups.length === 0 ? (
-              <p className={styles.empty}>Nenhum backup encontrado.</p>
-            ) : (
-              <div className={styles.backupList}>
-                {backups.map((b) => (
-                  <div key={b.nome} className={styles.backupItem}>
-                    <div className={styles.backupInfo}>
-                      <span>📄 {b.nome}</span>
-                      <span>
-                        {b.tamanho} • {b.data}
-                      </span>
+          {/* 🔹 Backups Disponíveis — controlado exclusivamente por canView */}
+          {canView && (
+            <div className={styles.section}>
+              <h3>Backups Disponíveis</h3>
+              {backups.length === 0 ? (
+                <p className={styles.empty}>Nenhum backup encontrado.</p>
+              ) : (
+                <div className={styles.backupList}>
+                  {backups.map((b) => (
+                    <div key={b.nome} className={styles.backupItem}>
+                      <div className={styles.backupInfo}>
+                        <span>📄 {b.nome}</span>
+                        <span>
+                          {b.tamanho} • {b.data}
+                        </span>
+                      </div>
+                      <div className={styles.backupActions}>
+                        {/* ⬇️ Download — check específico */}
+                        {canDownload && (
+                          <Button
+                            variant="secondary"
+                            onClick={() => handleDownload(b.nome)}
+                          >
+                            ⬇️ Download
+                          </Button>
+                        )}
+                        {/* 🔄 Restaurar — check Editar */}
+                        {canEdit && (
+                          <Button
+                            variant="warning"
+                            onClick={() => abrirModalRestaurar(b.nome)}
+                          >
+                            🔄 Restaurar
+                          </Button>
+                        )}
+                        {/* 🗑️ Excluir — check Deletar */}
+                        {canDelete && (
+                          <Button
+                            variant="danger"
+                            onClick={() => abrirModalExcluir(b.nome)}
+                          >
+                            🗑️ Excluir
+                          </Button>
+                        )}
+                      </div>
                     </div>
-                    <div className={styles.backupActions}>
-                      {/* ⬇️ Download — check específico */}
-                      {canDownload && (
-                        <Button
-                          variant="secondary"
-                          onClick={() => handleDownload(b.nome)}
-                        >
-                          ⬇️ Download
-                        </Button>
-                      )}
-                      {/* 🔄 Restaurar — check Editar */}
-                      {canEdit && (
-                        <Button
-                          variant="warning"
-                          onClick={() => abrirModalRestaurar(b.nome)}
-                        >
-                          🔄 Restaurar
-                        </Button>
-                      )}
-                      {/* 🗑️ Excluir — check Deletar */}
-                      {canDelete && (
-                        <Button
-                          variant="danger"
-                          onClick={() => abrirModalExcluir(b.nome)}
-                        >
-                          🗑️ Excluir
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </>
       )}
     </div>
