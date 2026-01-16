@@ -179,7 +179,7 @@ const RECURSOS = [
     value: "backup",
     label: "💾 Backup",
     description: "Criar, restaurar e gerenciar backups do banco de dados",
-    tipos: ["criar", "ler"],
+    tipos: ["criar", "ler", "deletar"],
     labels: { criar: "Backup Disponível" },
   },
 
