@@ -180,13 +180,12 @@ const RECURSOS = [
     value: "backup",
     label: "💾 Backup",
     description: "Criar, restaurar e gerenciar backups do banco de dados",
-    tipos: ["criar", "ler", "editar", "deletar", "salvar"], // agora 5 tipos
+    tipos: ["criar", "ler", "editar", "deletar"],
     labels: {
-      criar: "Backup Disponível",
+      criar: "Lista Backup",
       ler: "Visualizar",
       editar: "Restaurar",
-      deletar: "Excluir",
-      salvar: "Salvar", // novo check dentro do mesmo item
+      deletar: "Deletar",
     },
   },
 
@@ -313,7 +312,7 @@ export const PermissoesManager = () => {
 
   const handleTogglePermissao = (
     recurso: string,
-    tipo: "criar" | "ler" | "editar" | "deletar" | "salvar"
+    tipo: "criar" | "ler" | "editar" | "deletar"
   ) => {
     setPermissoes((prev) => {
       const permissaoAtual = prev[recurso] || {
@@ -576,9 +575,7 @@ export const PermissoesManager = () => {
                       )}
 
                       {/* ✅ Checkboxes dinâmicos conforme o campo 'tipos' */}
-                      {(
-                        ["criar", "ler", "editar", "deletar", "salvar"] as const
-                      )
+                      {(["criar", "ler", "editar", "deletar"] as const)
                         .filter((tipo) => !tipos || tipos.includes(tipo))
                         .map((tipo) => (
                           <label key={tipo} className={styles.checkboxLabel}>
