@@ -58,6 +58,7 @@ export const BackupManager = () => {
   const [canCreate, setCanCreate] = useState(false);
   const [canEdit, setCanEdit] = useState(false);
   const [canDownload, setCanDownload] = useState(false);
+  const [canRestore, setCanRestore] = useState(false);
   const [canDelete, setCanDelete] = useState(false);
 
   useEffect(() => {
@@ -92,24 +93,17 @@ export const BackupManager = () => {
           (p: any) => p.recurso === "configuracoes"
         );
 
-        /**
-         * 🔧 Regras ajustadas:
-         * - backup.ler   → controla toda a área de backup e lista “Backups Disponíveis”.
-         * - backup.criar → neutralizado (não faz nada).
-         * - backup_criar.criar → controla o botão “Criar Backup Agora”.
-         * - backup_restaurar.editar → controla “Restaurar” e “Salvar Configuração”.
-         * - backup_excluir.deletar → controla “Excluir”.
-         * - backup_download.ler → controla “Download”.
-         */
-
         // Exibir área completa e lista de backups (somente com Visualizar do backup)
         setCanView(superAdmin || !!pBackup?.ler || !!pConfig?.ler);
 
         // Botão “Criar Backup Agora” (somente backup_criar)
         setCanCreate(superAdmin || !!pBackupCriar?.criar);
 
-        // Botão “Restaurar” e “Salvar Configuração”
+        // Botão “Salvar Configuração”
         setCanEdit(superAdmin || !!pBackupRestaurar?.editar);
+
+        // Botão "Restaurar"
+        setCanRestore(superAdmin || !!pBackupRestaurar?.editar);
 
         // Botão “Excluir”
         setCanDelete(superAdmin || !!pBackupExcluir?.deletar);
@@ -489,8 +483,8 @@ export const BackupManager = () => {
                             ⬇️ Download
                           </Button>
                         )}
-                        {/* 🔄 Restaurar — check Editar */}
-                        {canEdit && (
+                        {/* 🔄 Restaurar — check Restaurar */}
+                        {canRestore && (
                           <Button
                             variant="warning"
                             onClick={() => abrirModalRestaurar(b.nome)}
