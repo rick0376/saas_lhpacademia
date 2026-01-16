@@ -115,6 +115,7 @@ export async function GET(request: NextRequest) {
       "backup_download",
       "backup_restaurar",
       "backup_excluir",
+      "backup_salvar", // novo recurso
     ];
 
     for (const recurso of recursosBackup) {

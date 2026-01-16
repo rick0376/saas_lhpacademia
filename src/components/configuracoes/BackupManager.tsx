@@ -60,6 +60,7 @@ export const BackupManager = () => {
   const [canDownload, setCanDownload] = useState(false);
   const [canRestore, setCanRestore] = useState(false);
   const [canDelete, setCanDelete] = useState(false);
+  const [canSave, setCanSave] = useState(false);
 
   useEffect(() => {
     carregarBackups();
@@ -77,6 +78,9 @@ export const BackupManager = () => {
         const superAdmin = session.user.role === "SUPERADMIN";
 
         const pBackup = permissoes.find((p: any) => p.recurso === "backup");
+        const pBackupSalvar = permissoes.find(
+          (p: any) => p.recurso === "backup_salvar"
+        );
         const pBackupCriar = permissoes.find(
           (p: any) => p.recurso === "backup_criar"
         );
@@ -87,7 +91,7 @@ export const BackupManager = () => {
           (p: any) => p.recurso === "backup_restaurar"
         );
         const pBackupExcluir = permissoes.find(
-          (p: any) => p.recurso === "backup_excluir"
+          (p: any) => p.recurso === "backup"
         );
         const pConfig = permissoes.find(
           (p: any) => p.recurso === "configuracoes"
@@ -107,6 +111,11 @@ export const BackupManager = () => {
 
         // Botão “Excluir”
         setCanDelete(superAdmin || !!pBackupExcluir?.deletar);
+
+        // Botão “Salvar”
+        setCanSave(
+          superAdmin || !!pBackupSalvar?.salvar || !!pBackupSalvar?.editar
+        );
 
         // Botão “Download”
         setCanDownload(superAdmin || !!pBackupDownload?.ler);
@@ -447,7 +456,7 @@ export const BackupManager = () => {
                   <option value="mensal">Mensal</option>
                 </select>
               )}
-              {canEdit && (
+              {canSave && (
                 <Button onClick={handleSalvarAgendamento} disabled={loading}>
                   {loading ? "Salvando..." : "💾 Salvar Configuração"}
                 </Button>

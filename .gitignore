@@ -41,3 +41,12 @@ yarn-error.log*
 next-env.d.ts
 
 .vscode
+
+
+# rodar dois comandos para não committar, observação tirar o #
+# git update-index --skip-worktree "src/app/(auth)/login/[clienteId]/page.tsx"
+# git update-index --skip-worktree "src/app/login-superadmin/page.tsx"
+
+# rodar dois comandos para retornar a committar, observação tirar o #
+# git update-index --no-skip-worktree "src/app/(auth)/login/[clienteId]/page.tsx"
+# git update-index --no-skip-worktree "src/app/login-superadmin/page.tsx"
