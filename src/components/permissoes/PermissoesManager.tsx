@@ -203,45 +203,21 @@ const RECURSOS: RecursoConfig[] = [
   },
   {
     value: "backup_criar",
-    label: "💾 Backup • Criar",
-    description:
-      "Permite criar backups manualmente pelo botão 'Criar Backup Agora'",
-    tipos: ["criar", "ler", "editar"],
+    label: "💾 Backup • Criar • Localizar • Salvar",
+    description: "Permite criar, Localizar e Salvar backups manualmente",
+    tipos: ["criar", "ler", "editar", "deletar"],
     labels: {
       criar: "Novo",
-      ler: "Procurar Arquivo",
+      ler: "Localizar",
       editar: "Salvar ",
+      deletar: "Download",
     },
-  },
-  {
-    value: "backup_procurar",
-    label: "📂 Backup • Procurar Arquivo",
-    description: "Permite procurar e selecionar arquivos de backup",
-    tipos: ["ler", "editar"],
-  },
-  {
-    value: "backup_salvar",
-    label: "💾 Backup • Salvar Configuração",
-    description: "Permite salvar configurações de backup do sistema",
-    tipos: ["criar", "editar"],
   },
   {
     value: "backup_download",
     label: "⬇️ Backup • Download",
     description: "Permite baixar arquivos de backup",
     tipos: ["ler"],
-  },
-  {
-    value: "backup_restaurar",
-    label: "♻️ Backup • Restaurar",
-    description: "Permite restaurar um backup existente",
-    tipos: ["editar"],
-  },
-  {
-    value: "backup_excluir",
-    label: "🗑️ Backup • Excluir",
-    description: "Permite excluir arquivos de backup do servidor",
-    tipos: ["deletar"],
   },
 ];
 

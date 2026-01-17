@@ -94,13 +94,11 @@ export const BackupManager = () => {
         const pBackupProcurar = permissoes.find(
           (p: any) => p.recurso === "backup_criar"
         );
-
         const pBackupSalvar = permissoes.find(
-          (p: any) => p.recurso === "backup_salvar"
+          (p: any) => p.recurso === "backup_criar"
         );
-
         const pBackupDownload = permissoes.find(
-          (p: any) => p.recurso === "backup_download"
+          (p: any) => p.recurso === "backup_criar"
         );
 
         setCanView(superAdmin || !!pBackup?.ler);
@@ -110,14 +108,8 @@ export const BackupManager = () => {
 
         setCanCreate(superAdmin || !!pBackupCriar?.criar);
         setCanProcurar(superAdmin || !!pBackupProcurar?.ler);
-
-        // Botão “Salvar”
-        setCanSave(
-          superAdmin || !!pBackupSalvar?.salvar || !!pBackupSalvar?.editar
-        );
-
-        // Botão “Download”
-        setCanDownload(superAdmin || !!pBackupDownload?.ler);
+        setCanSave(superAdmin || !!pBackupSalvar?.editar);
+        setCanDownload(superAdmin || !!pBackupDownload?.deletar);
       } catch (error) {
         console.error("Erro ao verificar permissões:", error);
       }
