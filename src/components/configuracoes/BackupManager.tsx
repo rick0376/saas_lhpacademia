@@ -319,6 +319,57 @@ export const BackupManager = () => {
     <div className={styles.container}>
       <h2 className={styles.title}>💾 Backup do Banco de Dados</h2>
 
+      {showRestaurarModal && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modal}>
+            <div className={styles.modalIcon}>♻️</div>
+            <div className={styles.modalTitle}>Restaurar Backup</div>
+            <div className={styles.modalText}>
+              Tem certeza que deseja restaurar este backup?
+            </div>
+
+            <div className={styles.modalActions}>
+              <Button variant="warning" onClick={handleRestaurar}>
+                Confirmar
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => setShowRestaurarModal(false)}
+              >
+                Cancelar
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showExcluirModal && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modal}>
+            <div className={styles.modalIcon}>🗑️</div>
+            <div className={styles.modalTitle}>Excluir Backup</div>
+            <div className={styles.modalText}>
+              Tem certeza que deseja excluir este backup?
+            </div>
+            <div className={styles.modalWarning}>
+              Essa ação não pode ser desfeita.
+            </div>
+
+            <div className={styles.modalActions}>
+              <Button variant="danger" onClick={handleExcluirBackup}>
+                Excluir
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => setShowExcluirModal(false)}
+              >
+                Cancelar
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Página e seções — controladas por Visualizar */}
       {canView && (
         <>

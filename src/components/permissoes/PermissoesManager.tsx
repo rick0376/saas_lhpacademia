@@ -203,8 +203,8 @@ const RECURSOS: RecursoConfig[] = [
   },
   {
     value: "backup_criar",
-    label: "💾 Backup • Criar • Localizar • Salvar",
-    description: "Permite criar, Localizar e Salvar backups manualmente",
+    label: "💾 Backup • Ações",
+    description: "Controles do backup (novo, localizar, salvar e download).",
     tipos: ["criar", "ler", "editar", "deletar"],
     labels: {
       criar: "Novo",
@@ -212,12 +212,6 @@ const RECURSOS: RecursoConfig[] = [
       editar: "Salvar ",
       deletar: "Download",
     },
-  },
-  {
-    value: "backup_download",
-    label: "⬇️ Backup • Download",
-    description: "Permite baixar arquivos de backup",
-    tipos: ["ler"],
   },
 ];
 
@@ -330,23 +324,25 @@ export const PermissoesManager = () => {
   const handleToggleTodas = (tipo: "criar" | "ler" | "editar" | "deletar") => {
     setPermissoes((prev) => {
       const novoEstado: Record<string, Permissao> = { ...prev };
-      const novoValor = !(
-        RECURSOS.every((r) => novoEstado[r.value]?.[tipo]) ?? false
-      );
+      const novoValor = !RECURSOS.filter(
+        (r) => !r.tipos || r.tipos.includes(tipo)
+      ).every((r) => novoEstado[r.value]?.[tipo]);
 
-      RECURSOS.forEach(({ value: recurso }) => {
-        novoEstado[recurso] = {
-          ...(novoEstado[recurso] || {
-            id: "",
-            recurso,
-            criar: false,
-            ler: true,
-            editar: false,
-            deletar: false,
-          }),
-          [tipo]: novoValor,
-        };
-      });
+      RECURSOS.filter((r) => !r.tipos || r.tipos.includes(tipo)).forEach(
+        ({ value: recurso }) => {
+          novoEstado[recurso] = {
+            ...(novoEstado[recurso] || {
+              id: "",
+              recurso,
+              criar: false,
+              ler: true,
+              editar: false,
+              deletar: false,
+            }),
+            [tipo]: novoValor,
+          };
+        }
+      );
 
       return novoEstado;
     });
@@ -545,7 +541,7 @@ export const PermissoesManager = () => {
               }) => {
                 const permissao = permissoes[recurso] || {
                   criar: false,
-                  ler: true,
+                  ler: false,
                   editar: false,
                   deletar: false,
                 };
@@ -559,7 +555,7 @@ export const PermissoesManager = () => {
 
                     <div className={styles.checkboxGrid}>
                       {/* ✅ Só mostra o checkbox Total se o recurso tiver todos os tipos */}
-                      {(!tipos || tipos.length === 4) && (
+                      {(!tipos || tipos.length === ORDEM_PADRAO.length) && (
                         <label className={styles.checkboxLabel}>
                           <input
                             type="checkbox"
