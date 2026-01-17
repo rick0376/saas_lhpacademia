@@ -241,7 +241,7 @@ export default async function DashboardPage() {
       icon: "🔐",
       href: "/dashboard/permissoes",
       color: "#ec4899",
-      superAdminOnly: true,
+      recurso: "permissoes_gerenciar",
     },
     {
       id: "configuracoes",

@@ -1,3 +1,5 @@
+//src/middleware.ts
+
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
@@ -65,7 +67,7 @@ export async function middleware(request: NextRequest) {
 
     // ADMIN / PERSONAL / USER → normalmente permitido
     // Mas algumas rotas são EXCLUSIVAS do SUPERADMIN
-    const superAdminOnlyRoutes = ["/dashboard/permissoes"];
+    const superAdminOnlyRoutes: string[] = [];
 
     if (
       superAdminOnlyRoutes.some((route) => pathname.startsWith(route)) &&

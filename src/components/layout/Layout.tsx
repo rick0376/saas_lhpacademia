@@ -1,3 +1,5 @@
+//src/components/layout/Layout.tsx
+
 "use client";
 
 import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
@@ -248,7 +250,7 @@ export const Layout: React.FC<Props> = ({ children }) => {
                 },
               ]
             : []),
-          ...(role === "SUPERADMIN"
+          ...(role === "SUPERADMIN" || podeAcessar("permissoes_gerenciar")
             ? [
                 {
                   href: "/dashboard/permissoes",

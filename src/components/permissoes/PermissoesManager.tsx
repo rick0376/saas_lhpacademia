@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import styles from "./styles.module.scss";
 import { Button } from "../ui/Button/Button";
 import { Toast } from "../ui/Toast/Toast";
+import { useSession } from "next-auth/react";
 
 interface Usuario {
   id: string;
@@ -176,18 +177,27 @@ const RECURSOS: RecursoConfig[] = [
   },
 
   // ======================
-  // ✅ EXECUÇÕES / ⚙️ CONFIG / 💾 BACKUP
+  // ✅ EXECUÇÕES
   // ======================
   {
     value: "execucoes",
     label: "✅ Execuções",
     description: "Registro de treinos realizados",
   },
+
+  // ======================
+  // ⚙️ CONFIG
+  // ======================
   {
     value: "configuracoes",
     label: "⚙️ Configurações",
     description: "Acessar configurações do sistema",
+    tipos: ["ler"],
   },
+
+  // ======================
+  // 💾 BACKUP
+  // ======================
   {
     value: "backup",
     label: "💾 Backup",
@@ -213,6 +223,16 @@ const RECURSOS: RecursoConfig[] = [
       deletar: "Download",
     },
   },
+
+  // ======================
+  // 🔐 PERMISSÕES
+  // ======================
+  {
+    value: "permissoes_gerenciar",
+    label: "🔐 Permissões • Gerenciar",
+    description: "Permite editar permissões de usuários da própria academia",
+    tipos: ["ler", "editar"],
+  },
 ];
 
 export const PermissoesManager = () => {
@@ -224,6 +244,10 @@ export const PermissoesManager = () => {
   const [loadingSave, setLoadingSave] = useState(false);
   const [error, setError] = useState<string>("");
   const [mostrarTodos, setMostrarTodos] = useState(false);
+
+  const { data: session } = useSession();
+  const usuarioLogadoId = (session?.user as any)?.id;
+  const roleLogado = (session?.user as any)?.role;
 
   const [toast, setToast] = useState<{
     show: boolean;
@@ -244,6 +268,10 @@ export const PermissoesManager = () => {
   }, [mostrarTodos]);
 
   useEffect(() => {
+    fetchUsuarios();
+  }, [roleLogado, usuarioLogadoId]);
+
+  useEffect(() => {
     if (usuarioSelecionado) {
       fetchPermissoes(usuarioSelecionado);
     }
@@ -259,13 +287,16 @@ export const PermissoesManager = () => {
 
       const usuariosFiltrados = mostrarTodos
         ? data.filter((u: Usuario) => u.ativo)
-        : data.filter(
-            (u: Usuario) => u.ativo && (u.role === "ADMIN" || u.role === "USER")
-          );
+        : data.filter((u: Usuario) => u.ativo && u.role === "USER");
 
-      setUsuarios(usuariosFiltrados);
+      const usuariosFinal =
+        roleLogado === "ADMIN" && usuarioLogadoId
+          ? usuariosFiltrados.filter((u) => u.id !== usuarioLogadoId)
+          : usuariosFiltrados;
 
-      if (usuariosFiltrados.length === 0) {
+      setUsuarios(usuariosFinal);
+
+      if (usuariosFinal.length === 0) {
         setError(
           mostrarTodos
             ? "Nenhum usuário ativo encontrado."
@@ -281,8 +312,25 @@ export const PermissoesManager = () => {
   const fetchPermissoes = async (usuarioId: string) => {
     try {
       setLoading(true);
+      setError("");
+
       const response = await fetch(`/api/permissoes?usuarioId=${usuarioId}`);
       const data = await response.json();
+
+      // ✅ se a API negou acesso ou retornou erro, para aqui
+      if (!response.ok) {
+        setPermissoes({});
+        showToast(data?.error || "Acesso negado.", "warning");
+        setUsuarioSelecionado("");
+        return;
+      }
+
+      // ✅ garante que é array
+      if (!Array.isArray(data)) {
+        setPermissoes({});
+        showToast("Resposta inválida de permissões.", "error");
+        return;
+      }
 
       const permissoesMap: Record<string, Permissao> = {};
       data.forEach((p: Permissao) => {
@@ -292,6 +340,7 @@ export const PermissoesManager = () => {
       setPermissoes(permissoesMap);
     } catch (error) {
       console.error("Erro ao carregar permissões:", error);
+      showToast("Erro ao carregar permissões.", "error");
     } finally {
       setLoading(false);
     }
@@ -417,8 +466,19 @@ export const PermissoesManager = () => {
         });
       });
 
-      await Promise.all(promises);
-      showToast("Permissões salvas com sucesso!", "success");
+      const responses = await Promise.all(promises);
+
+      const failed = responses.filter((r) => !r.ok);
+
+      if (failed.length > 0) {
+        showToast(
+          `Algumas permissões não puderam ser salvas (${failed.length}).`,
+          "warning"
+        );
+      } else {
+        showToast("Permissões salvas com sucesso!", "success");
+      }
+
       router.refresh();
     } catch (error) {
       showToast("Erro ao salvar permissões", "error");
@@ -486,6 +546,12 @@ export const PermissoesManager = () => {
             <span className={styles.roleBadge}>{usuarioInfo.role}</span>
           </div>
         </div>
+      )}
+
+      {roleLogado === "ADMIN" && (
+        <p className={styles.infoNote}>
+          🔒 Você não pode alterar suas próprias permissões.
+        </p>
       )}
 
       {loading ? (

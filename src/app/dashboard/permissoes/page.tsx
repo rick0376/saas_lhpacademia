@@ -1,3 +1,5 @@
+//src/app/dashboard/permissoes/page.tsx
+
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
@@ -11,8 +13,19 @@ export default async function PermissoesPage() {
     redirect("/");
   }
 
-  if (session.user.role !== "SUPERADMIN" && session.user.role !== "ADMIN") {
-    redirect("/dashboard");
+  // SUPERADMIN sempre pode
+  if (session.user.role === "SUPERADMIN") {
+    // ok
+  } else {
+    const permissoes = (session.user as any)?.permissoes || [];
+
+    const podeGerenciarPermissoes = permissoes.some(
+      (p: any) => p.recurso === "permissoes_gerenciar" && p.ler === true
+    );
+
+    if (!podeGerenciarPermissoes) {
+      redirect("/dashboard");
+    }
   }
 
   return (
