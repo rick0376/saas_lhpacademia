@@ -55,6 +55,7 @@ export const BackupManager = () => {
   const { data: session } = useSession();
 
   const [canView, setCanView] = useState(false);
+  const [canList, setCanList] = useState(false);
   const [canCreate, setCanCreate] = useState(false);
   const [canEdit, setCanEdit] = useState(false);
   const [canDownload, setCanDownload] = useState(false);
@@ -82,7 +83,6 @@ export const BackupManager = () => {
         const pBackupRestaurar = permissoes.find(
           (p: any) => p.recurso === "backup"
         );
-
         const pBackupExcluir = permissoes.find(
           (p: any) => p.recurso === "backup"
         );
@@ -95,26 +95,25 @@ export const BackupManager = () => {
         const pBackupDownload = permissoes.find(
           (p: any) => p.recurso === "backup_download"
         );
-        /*const pBackupRestaurar = permissoes.find(
-          (p: any) => p.recurso === "backup_restaurar"
-        );
-        */
-
         const pConfig = permissoes.find(
           (p: any) => p.recurso === "configuracoes"
         );
 
+        //testando
+        const pList = permissoes.find((p: any) => p.recurso === "backup");
+
         // Exibir área completa e lista de backups (somente com Visualizar do backup)
         setCanView(superAdmin || !!pBackup?.ler || !!pConfig?.ler);
+
+        setCanList(superAdmin || !!pBackup?.criar);
+
+        setCanRestore(superAdmin || !!pBackupRestaurar?.editar);
 
         // Botão “Criar Backup Agora” (somente backup_criar)
         setCanCreate(superAdmin || !!pBackupCriar?.criar);
 
         // Botão “Salvar Configuração”
         setCanEdit(superAdmin || !!pBackupRestaurar?.editar);
-
-        // Botão "Restaurar"
-        setCanRestore(superAdmin || !!pBackupRestaurar?.editar);
 
         // Botão “Excluir”
         setCanDelete(superAdmin || !!pBackupExcluir?.deletar);
@@ -474,7 +473,7 @@ export const BackupManager = () => {
           <div className={styles.divider} />
 
           {/* 🔹 Backups Disponíveis — controlado exclusivamente por canView */}
-          {canView && (
+          {canList && (
             <div className={styles.section}>
               <h3>Backups Disponíveis</h3>
               {backups.length === 0 ? (
