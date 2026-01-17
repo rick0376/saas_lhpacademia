@@ -206,10 +206,11 @@ const RECURSOS: RecursoConfig[] = [
     label: "💾 Backup • Criar",
     description:
       "Permite criar backups manualmente pelo botão 'Criar Backup Agora'",
-    tipos: ["criar", "ler"],
+    tipos: ["criar", "ler", "editar"],
     labels: {
       criar: "Novo",
       ler: "Procurar Arquivo",
+      editar: "Salvar ",
     },
   },
   {

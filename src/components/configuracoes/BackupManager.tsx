@@ -91,6 +91,10 @@ export const BackupManager = () => {
           (p: any) => p.recurso === "backup_criar"
         );
 
+        const pBackupProcurar = permissoes.find(
+          (p: any) => p.recurso === "backup_criar"
+        );
+
         const pBackupSalvar = permissoes.find(
           (p: any) => p.recurso === "backup_salvar"
         );
@@ -105,6 +109,7 @@ export const BackupManager = () => {
         setCanDelete(superAdmin || !!pBackupExcluir?.deletar);
 
         setCanCreate(superAdmin || !!pBackupCriar?.criar);
+        setCanProcurar(superAdmin || !!pBackupProcurar?.ler);
 
         // Botão “Salvar”
         setCanSave(
