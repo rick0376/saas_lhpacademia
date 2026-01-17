@@ -249,6 +249,15 @@ export const PermissoesManager = () => {
   const usuarioLogadoId = (session?.user as any)?.id;
   const roleLogado = (session?.user as any)?.role;
 
+  const permissoesLogado: Permissao[] =
+    (session?.user as any)?.permissoes || [];
+
+  const podeEditarPermissoes =
+    roleLogado === "SUPERADMIN" ||
+    permissoesLogado.some(
+      (p) => p.recurso === "permissoes_gerenciar" && p.editar === true
+    );
+
   const [toast, setToast] = useState<{
     show: boolean;
     message: string;
@@ -351,6 +360,8 @@ export const PermissoesManager = () => {
     tipo: "criar" | "ler" | "editar" | "deletar"
   ) => {
     setPermissoes((prev) => {
+      if (!podeEditarPermissoes) return prev;
+
       const permissaoAtual = prev[recurso] || {
         id: "",
         recurso,
@@ -631,6 +642,7 @@ export const PermissoesManager = () => {
                             }
                             className={styles.checkbox}
                             title="Marcar/Desmarcar todos os tipos deste recurso"
+                            disabled={!podeEditarPermissoes}
                           />
                           <span>Total</span>
                         </label>
@@ -643,11 +655,14 @@ export const PermissoesManager = () => {
                           <label key={tipo} className={styles.checkboxLabel}>
                             <input
                               type="checkbox"
-                              checked={permissao[tipo]}
-                              onChange={() =>
-                                handleTogglePermissao(recurso, tipo)
-                              }
+                              checked={permissao[tipo]} // Controlado pelo estado
+                              onChange={() => {
+                                if (podeEditarPermissoes) {
+                                  handleTogglePermissao(recurso, tipo);
+                                }
+                              }}
                               className={styles.checkbox}
+                              disabled={!podeEditarPermissoes} // Desabilita o checkbox se não tiver permissão de editar
                             />
                             <span>
                               {labels?.[tipo] ??
@@ -668,11 +683,17 @@ export const PermissoesManager = () => {
             )}
           </div>
 
-          <div className={styles.actions}>
-            <Button onClick={handleSalvar} disabled={loadingSave} fullWidth>
-              {loadingSave ? "Salvando..." : "💾 Salvar Permissões"}
-            </Button>
-          </div>
+          {podeEditarPermissoes && (
+            <div className={styles.actions}>
+              <Button
+                onClick={handleSalvar}
+                disabled={loadingSave || !podeEditarPermissoes} // Se não pode editar, o botão é desabilitado
+                fullWidth
+              >
+                {loadingSave ? "Salvando..." : "💾 Salvar Permissões"}
+              </Button>
+            </div>
+          )}
         </>
       ) : (
         <div className={styles.empty}>
