@@ -26,7 +26,19 @@ interface Permissao {
   salvar?: boolean; // novo campo opcional
 }
 
-const RECURSOS = [
+interface RecursoConfig {
+  value: string;
+  label: string;
+  description: string;
+  tipos?: TipoPermissao[];
+  ordem?: TipoPermissao[];
+  labels?: Partial<Record<TipoPermissao, string>>;
+}
+
+type TipoPermissao = "criar" | "ler" | "editar" | "deletar";
+const ORDEM_PADRAO: TipoPermissao[] = ["criar", "ler", "editar", "deletar"];
+
+const RECURSOS: RecursoConfig[] = [
   // ======================
   // 📊 GERAL
   // ======================
@@ -181,6 +193,7 @@ const RECURSOS = [
     label: "💾 Backup",
     description: "Criar, restaurar e gerenciar backups do banco de dados",
     tipos: ["criar", "ler", "editar", "deletar"],
+    ordem: ["ler", "criar", "editar", "deletar"],
     labels: {
       criar: "Lista Backup",
       ler: "Visualizar",
@@ -193,7 +206,11 @@ const RECURSOS = [
     label: "💾 Backup • Criar",
     description:
       "Permite criar backups manualmente pelo botão 'Criar Backup Agora'",
-    tipos: ["criar"],
+    tipos: ["criar", "ler"],
+    labels: {
+      criar: "Novo",
+      ler: "Procurar Arquivo",
+    },
   },
   {
     value: "backup_procurar",
@@ -541,7 +558,14 @@ export const PermissoesManager = () => {
 
           <div className={styles.permissoesGrid}>
             {RECURSOS.map(
-              ({ value: recurso, label, description, tipos, labels }) => {
+              ({
+                value: recurso,
+                label,
+                description,
+                tipos,
+                labels,
+                ordem,
+              }) => {
                 const permissao = permissoes[recurso] || {
                   criar: false,
                   ler: true,
@@ -574,7 +598,7 @@ export const PermissoesManager = () => {
                       )}
 
                       {/* ✅ Checkboxes dinâmicos conforme o campo 'tipos' */}
-                      {(["criar", "ler", "editar", "deletar"] as const)
+                      {(ordem ?? ORDEM_PADRAO)
                         .filter((tipo) => !tipos || tipos.includes(tipo))
                         .map((tipo) => (
                           <label key={tipo} className={styles.checkboxLabel}>

@@ -57,7 +57,7 @@ export const BackupManager = () => {
   const [canView, setCanView] = useState(false);
   const [canList, setCanList] = useState(false);
   const [canCreate, setCanCreate] = useState(false);
-  const [canEdit, setCanEdit] = useState(false);
+  const [canProcurar, setCanProcurar] = useState(false);
   const [canDownload, setCanDownload] = useState(false);
   const [canRestore, setCanRestore] = useState(false);
   const [canDelete, setCanDelete] = useState(false);
@@ -79,44 +79,32 @@ export const BackupManager = () => {
         const superAdmin = session.user.role === "SUPERADMIN";
 
         const pBackup = permissoes.find((p: any) => p.recurso === "backup");
-
+        const pList = permissoes.find((p: any) => p.recurso === "backup");
         const pBackupRestaurar = permissoes.find(
           (p: any) => p.recurso === "backup"
         );
         const pBackupExcluir = permissoes.find(
           (p: any) => p.recurso === "backup"
         );
-        const pBackupSalvar = permissoes.find(
-          (p: any) => p.recurso === "backup_salvar"
-        );
+
         const pBackupCriar = permissoes.find(
           (p: any) => p.recurso === "backup_criar"
         );
+
+        const pBackupSalvar = permissoes.find(
+          (p: any) => p.recurso === "backup_salvar"
+        );
+
         const pBackupDownload = permissoes.find(
           (p: any) => p.recurso === "backup_download"
         );
-        const pConfig = permissoes.find(
-          (p: any) => p.recurso === "configuracoes"
-        );
 
-        //testando
-        const pList = permissoes.find((p: any) => p.recurso === "backup");
-
-        // Exibir área completa e lista de backups (somente com Visualizar do backup)
-        setCanView(superAdmin || !!pBackup?.ler || !!pConfig?.ler);
-
-        setCanList(superAdmin || !!pBackup?.criar);
-
+        setCanView(superAdmin || !!pBackup?.ler);
+        setCanList(superAdmin || !!pList?.criar);
         setCanRestore(superAdmin || !!pBackupRestaurar?.editar);
-
-        // Botão “Criar Backup Agora” (somente backup_criar)
-        setCanCreate(superAdmin || !!pBackupCriar?.criar);
-
-        // Botão “Salvar Configuração”
-        setCanEdit(superAdmin || !!pBackupRestaurar?.editar);
-
-        // Botão “Excluir”
         setCanDelete(superAdmin || !!pBackupExcluir?.deletar);
+
+        setCanCreate(superAdmin || !!pBackupCriar?.criar);
 
         // Botão “Salvar”
         setCanSave(
@@ -425,7 +413,7 @@ export const BackupManager = () => {
               onChange={handleArquivoSelecionado}
               style={{ display: "none" }}
             />
-            {canEdit && (
+            {canProcurar && (
               <Button
                 onClick={abrirSeletorArquivo}
                 variant="secondary"
