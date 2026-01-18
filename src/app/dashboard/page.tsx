@@ -226,6 +226,15 @@ export default async function DashboardPage() {
       recurso: "exercicios",
     },
     {
+      id: "grupos-treinos",
+      title: "Grupos",
+      description: "Organizar treinos por grupos",
+      icon: "📁",
+      href: "/dashboard/grupos-treinos",
+      color: "#3b82f6",
+      recurso: "grupos_treinos",
+    },
+    {
       id: "treinos",
       title: "Treinos",
       description: "Montagem de fichas de treino",

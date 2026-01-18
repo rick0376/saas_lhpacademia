@@ -205,11 +205,11 @@ export const Layout: React.FC<Props> = ({ children }) => {
       {
         group: "Treinos",
         items: [
-          ...(podeAcessar("treinos")
+          ...(podeAcessar("grupos_treinos")
             ? [
                 {
                   href: "/dashboard/grupos-treinos",
-                  label: "Grupos de Treinos",
+                  label: "Grupos",
                   icon: <Folder size={18} />,
                 },
                 {

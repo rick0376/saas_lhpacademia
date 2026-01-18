@@ -1,4 +1,4 @@
-//src/components/gruposTreinos/GrupoTreinosGrid/GrupoTreinosGrid.tsx
+// src/components/gruposTreinos/GrupoTreinosGrid/GrupoTreinosGrid.tsx
 
 "use client";
 
@@ -8,6 +8,8 @@ import { GrupoTreinoCard } from "../GrupoTreinoCard/GrupoTreinoCard";
 import { Button } from "@/components/ui/Button/Button";
 import { useSession } from "next-auth/react";
 import { CriarGrupoTreinoModal } from "../CriarGrupoTreinoModal/CriarGrupoTreinoModal";
+import { EditarGrupoTreinoModal } from "../EditarGrupoTreinoModal/EditarGrupoTreinoModal";
+import { ExcluirGrupoTreinoModal } from "../ExcluirGrupoTreinoModal/ExcluirGrupoTreinoModal";
 
 type GrupoItem = {
   id: string;
@@ -26,24 +28,38 @@ type Permissao = {
 
 export function GrupoTreinosGrid() {
   const { data: session, status } = useSession();
+  const role = (session?.user as any)?.role;
 
   const [grupos, setGrupos] = useState<GrupoItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [permissoes, setPermissoes] = useState<Permissao[]>([]);
-  const [modalOpen, setModalOpen] = useState(false);
+  const [modalCreateOpen, setModalCreateOpen] = useState(false);
 
-  const role = (session?.user as any)?.role;
+  const [modalEditOpen, setModalEditOpen] = useState(false);
+  const [modalDeleteOpen, setModalDeleteOpen] = useState(false);
+  const [grupoSelecionado, setGrupoSelecionado] = useState<GrupoItem | null>(
+    null
+  );
 
-  const podeCriarGrupo = useMemo(() => {
+  const pTreinos = useMemo(
+    () => permissoes.find((p) => p.recurso === "treinos"),
+    [permissoes]
+  );
+
+  const podeCriarOuEditarGrupo = useMemo(() => {
     if (role === "SUPERADMIN") return true;
-    const pTreinos = permissoes.find((p) => p.recurso === "treinos");
-    // Grupo é organização de Treinos: permitir criar grupo se tiver criar OU editar treinos
     return !!(pTreinos?.criar || pTreinos?.editar);
-  }, [permissoes, role]);
+  }, [role, pTreinos]);
+
+  const podeExcluirGrupo = useMemo(() => {
+    if (role === "SUPERADMIN") return true;
+    return !!pTreinos?.deletar;
+  }, [role, pTreinos]);
 
   const fetchPermissoes = async () => {
     if (!session) return;
+
     if (role === "SUPERADMIN") {
       setPermissoes([
         {
@@ -56,11 +72,11 @@ export function GrupoTreinosGrid() {
       ]);
       return;
     }
+
     try {
       const res = await fetch("/api/permissoes/usuario");
       const data = await res.json();
-      if (Array.isArray(data)) setPermissoes(data);
-      else setPermissoes([]);
+      setPermissoes(Array.isArray(data) ? data : []);
     } catch {
       setPermissoes([]);
     }
@@ -84,6 +100,18 @@ export function GrupoTreinosGrid() {
     }
   }, [status]);
 
+  const abrirEditar = (id: string) => {
+    const found = grupos.find((g) => g.id === id) || null;
+    setGrupoSelecionado(found);
+    setModalEditOpen(true);
+  };
+
+  const abrirExcluir = (id: string) => {
+    const found = grupos.find((g) => g.id === id) || null;
+    setGrupoSelecionado(found);
+    setModalDeleteOpen(true);
+  };
+
   return (
     <div className={styles.wrapper}>
       <div className={styles.toolbar}>
@@ -95,8 +123,8 @@ export function GrupoTreinosGrid() {
         </div>
 
         <div className={styles.right}>
-          {podeCriarGrupo && (
-            <Button onClick={() => setModalOpen(true)} variant="primary">
+          {podeCriarOuEditarGrupo && (
+            <Button onClick={() => setModalCreateOpen(true)} variant="primary">
               ➕ Novo Grupo
             </Button>
           )}
@@ -110,8 +138,8 @@ export function GrupoTreinosGrid() {
           <div className={styles.emptyIcon}>📁</div>
           <h3>Nenhum grupo criado</h3>
           <p>Crie seu primeiro grupo e associe treinos existentes.</p>
-          {podeCriarGrupo && (
-            <Button onClick={() => setModalOpen(true)} variant="primary">
+          {podeCriarOuEditarGrupo && (
+            <Button onClick={() => setModalCreateOpen(true)} variant="primary">
               Criar primeiro grupo
             </Button>
           )}
@@ -125,18 +153,49 @@ export function GrupoTreinosGrid() {
               nome={g.nome}
               descricao={g.descricao}
               totalTreinos={g.totalTreinos}
+              onEdit={podeCriarOuEditarGrupo ? abrirEditar : undefined}
+              onDelete={podeExcluirGrupo ? abrirExcluir : undefined}
             />
           ))}
         </div>
       )}
 
+      {/* ✅ Modal Criar */}
       <CriarGrupoTreinoModal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
+        isOpen={modalCreateOpen}
+        onClose={() => setModalCreateOpen(false)}
         onCreated={() => {
-          setModalOpen(false);
+          setModalCreateOpen(false);
           fetchGrupos();
         }}
+      />
+
+      {/* ✅ Modal Editar */}
+      <EditarGrupoTreinoModal
+        isOpen={modalEditOpen}
+        grupo={
+          grupoSelecionado
+            ? {
+                id: grupoSelecionado.id,
+                nome: grupoSelecionado.nome,
+                descricao: grupoSelecionado.descricao,
+              }
+            : null
+        }
+        onClose={() => setModalEditOpen(false)}
+        onSaved={fetchGrupos}
+      />
+
+      {/* ✅ Modal Excluir */}
+      <ExcluirGrupoTreinoModal
+        isOpen={modalDeleteOpen}
+        grupo={
+          grupoSelecionado
+            ? { id: grupoSelecionado.id, nome: grupoSelecionado.nome }
+            : null
+        }
+        onClose={() => setModalDeleteOpen(false)}
+        onDeleted={fetchGrupos}
       />
     </div>
   );

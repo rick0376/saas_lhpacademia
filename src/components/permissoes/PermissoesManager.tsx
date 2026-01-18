@@ -147,6 +147,16 @@ const RECURSOS: RecursoConfig[] = [
     description: "Criação e edição de treinos",
   },
   {
+    value: "grupos_treinos",
+    label: "📁 Grupos de Treinos",
+    description: "Visualizar e gerenciar grupos de treinos",
+    tipos: ["ler", "editar"],
+    labels: {
+      ler: "Visualizar",
+      editar: "Gerenciar",
+    },
+  },
+  {
     value: "treinos_compartilhar",
     label: "📤 Treinos • Compartilhar",
     description:

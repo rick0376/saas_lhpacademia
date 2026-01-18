@@ -24,7 +24,7 @@ export async function POST(
   if (usuario.role !== "SUPERADMIN") {
     const p = await prisma.permissao.findUnique({
       where: {
-        usuarioId_recurso: { usuarioId: usuario.id, recurso: "treinos" },
+        usuarioId_recurso: { usuarioId: usuario.id, recurso: "grupos_treinos" },
       },
     });
     if (!p?.editar && !p?.criar) {
@@ -108,7 +108,7 @@ export async function DELETE(
   if (usuario.role !== "SUPERADMIN") {
     const p = await prisma.permissao.findUnique({
       where: {
-        usuarioId_recurso: { usuarioId: usuario.id, recurso: "treinos" },
+        usuarioId_recurso: { usuarioId: usuario.id, recurso: "grupos_treinos" },
       },
     });
     if (!p?.editar && !p?.deletar) {

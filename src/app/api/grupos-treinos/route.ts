@@ -12,14 +12,18 @@ async function getUsuarioLogado(sessionUserId: string) {
 
 async function checkPermissaoTreinosLer(userId: string) {
   const p = await prisma.permissao.findUnique({
-    where: { usuarioId_recurso: { usuarioId: userId, recurso: "treinos" } },
+    where: {
+      usuarioId_recurso: { usuarioId: userId, recurso: "grupos_treinos" },
+    },
   });
   return !!p?.ler;
 }
 
 async function checkPermissaoTreinosEditarOuCriar(userId: string) {
   const p = await prisma.permissao.findUnique({
-    where: { usuarioId_recurso: { usuarioId: userId, recurso: "treinos" } },
+    where: {
+      usuarioId_recurso: { usuarioId: userId, recurso: "grupos_treinos" },
+    },
   });
   return !!(p?.editar || p?.criar);
 }

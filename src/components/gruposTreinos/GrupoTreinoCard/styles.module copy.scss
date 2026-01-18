@@ -1,0 +1,102 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 14px;
+  border: 1px solid var(--border-color, #e5e7eb);
+  background: linear-gradient(90deg, #e4dddd, #f8f9fa, #d7e0e9);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.15s ease, box-shadow 0.15s ease,
+    border-color 0.15s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary-color, #3b82f6);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.icon {
+  font-size: 1.4rem;
+}
+
+.count {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  background: var(--background-secondary, #f3f4f6);
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.desc {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  min-height: 2.5em;
+}
+
+.arrow {
+  margin-top: auto;
+  align-self: flex-end;
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+}
+.actions {
+  display: flex;
+  gap: 6px;
+}
+
+.actionBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  color: var(--text-secondary);
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.06);
+    color: var(--text-primary);
+  }
+}
+
+.danger {
+  &:hover {
+    background: rgba(239, 68, 68, 0.12);
+    color: #ef4444;
+  }
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.count {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}

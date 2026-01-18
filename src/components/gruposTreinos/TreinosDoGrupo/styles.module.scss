@@ -13,6 +13,7 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
+  gap: 1rem;
 }
 
 .title {
@@ -129,5 +130,33 @@
   .right {
     width: 100%;
     justify-content: space-between;
+  }
+}
+.btnEdit {
+  text-decoration: none;
+  color: #7c3aed;
+  font-weight: 600;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.btnRemove {
+  border: 1px solid #fecaca;
+  background: #fff;
+  color: #ef4444;
+  padding: 0.35rem 0.6rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+
+  &:hover {
+    background: #fee2e2;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 }

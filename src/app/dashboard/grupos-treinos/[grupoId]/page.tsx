@@ -24,7 +24,7 @@ export default async function GrupoTreinosDetalhePage({
       where: {
         usuarioId_recurso: {
           usuarioId: session.user.id,
-          recurso: "treinos",
+          recurso: "grupos_treinos",
         },
       },
     });
