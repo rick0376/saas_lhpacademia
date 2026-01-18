@@ -322,7 +322,7 @@ export default function EditarAvaliacaoPage() {
             <ArrowLeft size={24} />
             Voltar à Avaliação
           </Link>
-          <h1>Editar Avaliação Física</h1>
+          <h1 className={styles.headerH1}>Editar Avaliação Física</h1>
           <p>
             Aluno: <span className={styles.nomeDestaque}>{alunoNome}</span>
           </p>

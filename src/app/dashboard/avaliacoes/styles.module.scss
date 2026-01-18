@@ -1,9 +1,10 @@
 .main {
   min-height: calc(100vh - 140px);
-  padding: 40px 24px;
-  background-color: var(--light-color);
-  border-radius: 12px;
   background: linear-gradient(90deg, #6a11cb 0%, #2575fc 50%, #29abe2 100%);
+  max-width: 1400px;
+  border-radius: 12px;
+  margin: 0 auto;
+  padding: 40px 24px;
 }
 
 .container {

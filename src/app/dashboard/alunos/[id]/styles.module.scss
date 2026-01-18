@@ -1,16 +1,15 @@
-/*
 .main {
-  min-height: 100vh;
-  padding: 40px 24px;
-  display: flex;
-  justify-content: center;
-  background: linear-gradient(90deg, #e4dddd, #f8f9fa, #d7e0e9);
-}
-*/
-.container {
+  min-height: calc(100vh - 140px);
   background: linear-gradient(90deg, #6a11cb 0%, #2575fc 50%, #29abe2 100%);
+  max-width: 1400px;
   border-radius: 12px;
-  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 24px;
+}
+
+.container {
+  border-radius: 12px;
+  max-width: 1400px;
   width: 90%;
   margin: 0 auto;
   display: flex;

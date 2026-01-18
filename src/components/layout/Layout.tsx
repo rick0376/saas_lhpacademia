@@ -21,6 +21,7 @@ import {
   Calendar,
   FileText,
   Shield,
+  Folder,
 } from "lucide-react";
 import styles from "./styles.module.scss";
 import nav from "./nav.module.scss";
@@ -206,6 +207,11 @@ export const Layout: React.FC<Props> = ({ children }) => {
         items: [
           ...(podeAcessar("treinos")
             ? [
+                {
+                  href: "/dashboard/grupos-treinos",
+                  label: "Grupos de Treinos",
+                  icon: <Folder size={18} />,
+                },
                 {
                   href: "/dashboard/treinos",
                   label: "Treinos",

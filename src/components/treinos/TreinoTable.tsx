@@ -1,3 +1,5 @@
+//src/components/treinos/TreinoTable.tsx
+
 "use client";
 
 import { useEffect, useState } from "react";

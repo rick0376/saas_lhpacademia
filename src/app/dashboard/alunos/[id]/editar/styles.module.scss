@@ -1,13 +1,14 @@
 .main {
   min-height: calc(100vh - 140px);
-  padding: 40px 24px;
+  background: linear-gradient(90deg, #6a11cb 0%, #2575fc 50%, #29abe2 100%);
+  max-width: 1400px;
   border-radius: 12px;
-  background-color: var(--light-color);
-  background: linear-gradient(135deg, #4509b8 0%, #1a4ee0 65%, #1f7be6 100%);
+  margin: 0 auto;
+  padding: 40px 24px;
 }
 
 .container {
-  max-width: 900px;
+  max-width: 1400px;
   margin: 0 auto;
 }
 

@@ -8,57 +8,58 @@ datasource db {
 }
 
 model Plano {
-  id             String   @id @default(cuid())
-  nome           String   @unique
-  valor          Decimal  @db.Decimal(10, 2)
+  id             String  @id @default(cuid())
+  nome           String  @unique
+  valor          Decimal @db.Decimal(10, 2)
   limiteUsuarios Int
   limiteAlunos   Int
-  ativo          Boolean  @default(true)
+  ativo          Boolean @default(true)
 
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  clientes       Cliente[]
+  clientes Cliente[]
 
   @@map("planos")
 }
 
 model Cliente {
-  id         String      @id @default(cuid())
-  nome       String
-  logo       String?
-  ativo      Boolean     @default(true)
-  dataVencimento DateTime?  
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  id             String    @id @default(cuid())
+  nome           String
+  logo           String?
+  ativo          Boolean   @default(true)
+  dataVencimento DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   planoId       String
-  plano         Plano       @relation(fields: [planoId], references: [id])
-  extraUsuarios Int         @default(0)
-  extraAlunos   Int         @default(0)
+  plano         Plano  @relation(fields: [planoId], references: [id])
+  extraUsuarios Int    @default(0)
+  extraAlunos   Int    @default(0)
 
-  usuarios   Usuario[]
-  alunos     Aluno[]
-  exercicios Exercicio[]
-  treinos Treino[]
+  usuarios      Usuario[]
+  alunos        Aluno[]
+  exercicios    Exercicio[]
+  treinos       Treino[]
+  gruposTreinos GrupoTreino[]
 
   @@map("clientes")
 }
 
 model Usuario {
-  id             String    @id @default(cuid())
+  id             String      @id @default(cuid())
   nome           String
-  email          String    @unique
+  email          String      @unique
   senha          String
-  role           Role      @default(USER)
-  ativo          Boolean   @default(false)
-  clienteId      String?   // agora é opcional
-  cliente        Cliente?  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  role           Role        @default(USER)
+  ativo          Boolean     @default(false)
+  clienteId      String? // agora é opcional
+  cliente        Cliente?    @relation(fields: [clienteId], references: [id], onDelete: Cascade)
   telefone       String?
   dataNascimento DateTime?
   objetivo       String?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
   permissoes     Permissao[]
   aluno          Aluno?
 }
@@ -100,11 +101,11 @@ model Aluno {
   updatedAt      DateTime  @updatedAt
 
   // Relacionamentos
-  medidas    Medida[]
-  treinos    Treino[]
+  medidas           Medida[]
+  treinos           Treino[]
   treinosAtribuidos TreinoAluno[]
-  avaliacoes Avaliacao[]
-  execucoes  ExecucaoTreino[] 
+  avaliacoes        Avaliacao[]
+  execucoes         ExecucaoTreino[]
 
   @@map("alunos")
 }
@@ -135,50 +136,49 @@ model Medida {
 
 // Avaliações físicas
 model Avaliacao {
-  id                      String   @id @default(cuid())
-  alunoId                 String
-  aluno                   Aluno    @relation(fields: [alunoId], references: [id], onDelete: Cascade)
-  tipo                    String?  // Ex.: "Inicial", "Trimestral", "Mensal", "Anual"
-  resultado               String?  // Resumo dos resultados (mantido)
-  observacoes             String?  // Notas adicionais (mantido)
-  arquivo                 String?  // URL ou path do PDF (mantido)
-  data                    DateTime @default(now()) // Data da avaliação (mantido)
-  createdAt               DateTime @default(now()) // Mantido
-  updatedAt               DateTime @updatedAt // Novo: para rastrear atualizações
+  id          String   @id @default(cuid())
+  alunoId     String
+  aluno       Aluno    @relation(fields: [alunoId], references: [id], onDelete: Cascade)
+  tipo        String? // Ex.: "Inicial", "Trimestral", "Mensal", "Anual"
+  resultado   String? // Resumo dos resultados (mantido)
+  observacoes String? // Notas adicionais (mantido)
+  arquivo     String? // URL ou path do PDF (mantido)
+  data        DateTime @default(now()) // Data da avaliação (mantido)
+  createdAt   DateTime @default(now()) // Mantido
+  updatedAt   DateTime @updatedAt // Novo: para rastrear atualizações
 
   // Anamnese (Entrevista Inicial)
-  historicoMedico         String?  // Histórico médico geral e familiar
-  objetivos               String?  // Objetivos do aluno (ex.: emagrecimento, hipertrofia)
-  praticaAnterior         String?  // Experiência prévia com exercícios
-  fumante                 Boolean  @default(false) // Risco: tabagismo
-  diabetes                Boolean  @default(false) // Risco: diabetes
-  doencasArticulares      Boolean  @default(false) // Risco: problemas articulares
-  cirurgias               String?  // Cirurgias, lesões ou condições especiais
+  historicoMedico    String? // Histórico médico geral e familiar
+  objetivos          String? // Objetivos do aluno (ex.: emagrecimento, hipertrofia)
+  praticaAnterior    String? // Experiência prévia com exercícios
+  fumante            Boolean @default(false) // Risco: tabagismo
+  diabetes           Boolean @default(false) // Risco: diabetes
+  doencasArticulares Boolean @default(false) // Risco: problemas articulares
+  cirurgias          String? // Cirurgias, lesões ou condições especiais
 
   // Antropométrica (Medidas Corporais)
-  peso                    Float?   // Peso em kg
-  altura                  Float?   // Altura em cm
-  imc                     Float?   // IMC calculado (peso / (altura/100)^2)
-  percentualGordura       Float?   // % de gordura corporal (via bioimpedância ou dobras)
-  circunferenciaCintura   Float?   // Circunferência da cintura em cm
-  circunferenciaQuadril   Float?   // Circunferência do quadril em cm
-  dobrasCutaneas          Json?    // Objeto JSON: { subescapular: Float, triceps: Float, peitoral: Float, axilar: Float, suprailiaca: Float, abdominal: Float, femural: Float } (em mm, método de 7 pontos)
+  peso                  Float? // Peso em kg
+  altura                Float? // Altura em cm
+  imc                   Float? // IMC calculado (peso / (altura/100)^2)
+  percentualGordura     Float? // % de gordura corporal (via bioimpedância ou dobras)
+  circunferenciaCintura Float? // Circunferência da cintura em cm
+  circunferenciaQuadril Float? // Circunferência do quadril em cm
+  dobrasCutaneas        Json? // Objeto JSON: { subescapular: Float, triceps: Float, peitoral: Float, axilar: Float, suprailiaca: Float, abdominal: Float, femural: Float } (em mm, método de 7 pontos)
 
   // Cardiorespiratória
-  vo2Max                  Float?   // VO2 máximo em ml/kg/min (capacidade aeróbica)
-  testeCooper             Float?   // Distância percorrida no teste de Cooper em metros
+  vo2Max      Float? // VO2 máximo em ml/kg/min (capacidade aeróbica)
+  testeCooper Float? // Distância percorrida no teste de Cooper em metros
 
   // Muscular (Força e Resistência)
-  forcaSupino             Float?   // Carga no supino em kg (exemplo de força superior)
-  repeticoesFlexoes       Int?     // Número de flexões de braço
-  pranchaTempo            Int?     // Tempo mantido na prancha em segundos (core)
+  forcaSupino       Float? // Carga no supino em kg (exemplo de força superior)
+  repeticoesFlexoes Int? // Número de flexões de braço
+  pranchaTempo      Int? // Tempo mantido na prancha em segundos (core)
 
   // Flexibilidade
-  testeSentarEsticar      Float?   // Distância no teste sentar e esticar em cm (flexibilidade lombar)
+  testeSentarEsticar Float? // Distância no teste sentar e esticar em cm (flexibilidade lombar)
 
   @@map("avaliacoes")
 }
-
 
 // Exercícios (Biblioteca)
 model Exercicio {
@@ -206,7 +206,7 @@ model Treino {
   nome        String
   descricao   String?
   alunoId     String?
-  aluno       Aluno?     @relation(fields: [alunoId], references: [id], onDelete: SetNull)
+  aluno       Aluno?    @relation(fields: [alunoId], references: [id], onDelete: SetNull)
   objetivo    String?
   observacoes String?
   ativo       Boolean   @default(true)
@@ -216,30 +216,31 @@ model Treino {
   updatedAt   DateTime  @updatedAt
 
   // 🔹 RELAÇÃO COM CLIENTE (INSERIR)
-   clienteId  String?   // <-- OPCIONAL POR ENQUANTO
-  cliente    Cliente?  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  clienteId String? // <-- OPCIONAL POR ENQUANTO
+  cliente   Cliente? @relation(fields: [clienteId], references: [id], onDelete: Cascade)
 
   // Relacionamentos
-  exercicios  TreinoExercicio[]
-  cronogramas Cronograma[]
-  execucoes   ExecucaoTreino[]
+  exercicios       TreinoExercicio[]
+  cronogramas      Cronograma[]
+  execucoes        ExecucaoTreino[]
   alunosAtribuidos TreinoAluno[]
+  grupos           GrupoTreinoItem[]
 
   @@map("treinos")
 }
 
 // ✅ NOVO - Tabela de atribuição de treinos aos alunos
 model TreinoAluno {
-  id          String   @id @default(cuid())
-  treinoId    String
-  treino      Treino   @relation(fields: [treinoId], references: [id], onDelete: Cascade)
-  alunoId     String
-  aluno       Aluno    @relation(fields: [alunoId], references: [id], onDelete: Cascade)
-  dataInicio  DateTime @default(now())
-  dataFim     DateTime?
-  ativo       Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String    @id @default(cuid())
+  treinoId   String
+  treino     Treino    @relation(fields: [treinoId], references: [id], onDelete: Cascade)
+  alunoId    String
+  aluno      Aluno     @relation(fields: [alunoId], references: [id], onDelete: Cascade)
+  dataInicio DateTime  @default(now())
+  dataFim    DateTime?
+  ativo      Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
   @@unique([treinoId, alunoId])
   @@index([alunoId])
@@ -303,18 +304,51 @@ model ExecucaoTreino {
 
 // Execução de Exercício (Detalhes da execução)
 model ExecucaoExercicio {
-  id               String         @id @default(cuid())
-  execucaoTreinoId String
-  execucaoTreino   ExecucaoTreino @relation(fields: [execucaoTreinoId], references: [id], onDelete: Cascade)
-  treinoExercicioId String?        // ✅ NOVO - Referência ao TreinoExercicio
-  exercicioNome    String
-  series           Int
-  repeticoes       String
-  carga            String?
-  observacoes      String?
-  createdAt        DateTime       @default(now())
+  id                String         @id @default(cuid())
+  execucaoTreinoId  String
+  execucaoTreino    ExecucaoTreino @relation(fields: [execucaoTreinoId], references: [id], onDelete: Cascade)
+  treinoExercicioId String? // ✅ NOVO - Referência ao TreinoExercicio
+  exercicioNome     String
+  series            Int
+  repeticoes        String
+  carga             String?
+  observacoes       String?
+  createdAt         DateTime       @default(now())
 
   @@map("execucoes_exercicio")
+}
+
+// ============================================
+// GRUPOS DE TREINOS
+// ============================================
+
+model GrupoTreino {
+  id        String  @id @default(cuid())
+  nome      String
+  descricao String?
+  clienteId String
+  cliente   Cliente @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+
+  treinos GrupoTreinoItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([clienteId, nome])
+  @@map("grupos_treinos")
+}
+
+model GrupoTreinoItem {
+  id            String @id @default(cuid())
+  grupoTreinoId String
+  treinoId      String
+
+  grupoTreino GrupoTreino @relation(fields: [grupoTreinoId], references: [id], onDelete: Cascade)
+  treino      Treino      @relation(fields: [treinoId], references: [id], onDelete: Cascade)
+
+  @@unique([grupoTreinoId, treinoId])
+  @@index([treinoId])
+  @@map("grupo_treino_itens")
 }
 
 // ============================================
