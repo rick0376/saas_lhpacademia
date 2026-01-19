@@ -19,7 +19,6 @@ interface Treino {
   ativo: boolean;
   dataInicio: string;
   aluno?: {
-    // ✅ Tornar opcional com ?
     nome: string;
   };
   _count: {
@@ -41,9 +40,15 @@ type PermissoesMap = Record<string, Permissao>;
 
 interface TreinoTableProps {
   alunoId?: string;
+  grupoId?: string;
+  semGrupo?: boolean;
 }
 
-export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
+export const TreinoTable: React.FC<TreinoTableProps> = ({
+  alunoId,
+  grupoId,
+  semGrupo,
+}) => {
   const { data: session, status } = useSession();
   const [treinos, setTreinos] = useState<Treino[]>([]);
   const [loading, setLoading] = useState(true);
@@ -117,7 +122,18 @@ export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
       setLoading(true);
       if (!permissoesCarregadas || !permTreinos.ler) return;
 
-      const url = alunoId ? `/api/treinos?alunoId=${alunoId}` : "/api/treinos";
+      let url = "/api/treinos";
+
+      const params = new URLSearchParams();
+
+      if (alunoId) params.append("alunoId", alunoId);
+      if (grupoId) params.append("grupoId", grupoId);
+      if (semGrupo) params.append("semGrupo", "1");
+
+      if (params.toString()) {
+        url += `?${params.toString()}`;
+      }
+
       const response = await fetch(url);
 
       if (!response.ok) throw new Error("Erro ao buscar treinos");
@@ -136,7 +152,7 @@ export const TreinoTable: React.FC<TreinoTableProps> = ({ alunoId }) => {
     if (permissoesCarregadas && permTreinos.ler) {
       fetchTreinos();
     }
-  }, [alunoId, permissoesCarregadas, permTreinos.ler]);
+  }, [alunoId, grupoId, semGrupo, permissoesCarregadas, permTreinos.ler]);
 
   useEffect(() => {
     if (status === "authenticated" && session) {

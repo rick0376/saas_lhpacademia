@@ -1,3 +1,5 @@
+//api/treinos/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -38,6 +40,23 @@ export async function GET(request: NextRequest) {
 
     if (alunoId) {
       whereClause.alunoId = alunoId;
+    }
+
+    const grupoId = searchParams.get("grupoId");
+    const semGrupo = searchParams.get("semGrupo");
+
+    // Filtrar por grupo (N:N via GrupoTreinoItem)
+    if (grupoId) {
+      whereClause.grupos = {
+        some: { grupoTreinoId: grupoId },
+      };
+    }
+
+    // Filtrar treinos sem grupo (nenhum vínculo)
+    if (!grupoId && (semGrupo === "1" || semGrupo === "true")) {
+      whereClause.grupos = {
+        none: {},
+      };
     }
 
     // 🔒 Filtrar treinos pelo cliente do usuário logado

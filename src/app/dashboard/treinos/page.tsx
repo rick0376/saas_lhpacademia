@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { TreinoTable } from "@/components/treinos/TreinoTable";
+import { TreinosPageClient } from "./TreinosPageClient";
 import { prisma } from "@/lib/prisma";
 import styles from "./styles.module.scss";
 
@@ -46,7 +47,7 @@ export default async function TreinosPage() {
           </div>
         </div>
 
-        <TreinoTable />
+        <TreinosPageClient />
       </div>
     </main>
   );
