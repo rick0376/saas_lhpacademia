@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-17T11:48:41.424Z",
+  "timestamp": "2026-01-19T22:31:42.360Z",
   "tipo": "completo",
   "clienteId": null,
   "tabelas": [
@@ -117,6 +117,168 @@
     ],
     "permissoes": [
       {
+        "id": "cmi98rovd00090gz8t6xal21z",
+        "usuarioId": "cmhc8yq6700020gegum0q3szh",
+        "recurso": "dashboard",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmi7d44z100010gvg4zrypufk",
+        "usuarioId": "cmhc8yq6700020gegum0q3szh",
+        "recurso": "clientes",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmiyd71hq000j0gj4x0gv8oak",
+        "usuarioId": "cmhc8yq6700020gegum0q3szh",
+        "recurso": "alunos_compartilhar",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmkk96rih000t0gw8ifexveo4",
+        "usuarioId": "cmhc8yq6700020gegum0q3szh",
+        "recurso": "grupos_treinos",
+        "criar": false,
+        "ler": true,
+        "editar": true,
+        "deletar": false
+      },
+      {
+        "id": "cmkirgffo00bn0ge8bcr18ggl",
+        "usuarioId": "cmhc8yq6700020gegum0q3szh",
+        "recurso": "medidas_compartilhar",
+        "criar": false,
+        "ler": true,
+        "editar": true,
+        "deletar": false
+      },
+      {
+        "id": "cmkioon2k007n0gmkv5txpdst",
+        "usuarioId": "cmhc8yq6700020gegum0q3szh",
+        "recurso": "backup_criar",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmkioon38007p0gmkheu2dbxr",
+        "usuarioId": "cmhc8yq6700020gegum0q3szh",
+        "recurso": "permissoes_gerenciar",
+        "criar": false,
+        "ler": true,
+        "editar": true,
+        "deletar": false
+      },
+      {
+        "id": "cmjb9rq7k000d0gh8hq6zi9zm",
+        "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
+        "recurso": "dashboard",
+        "criar": false,
+        "ler": true,
+        "editar": false,
+        "deletar": false
+      },
+      {
+        "id": "cmjb9rqbr000f0gh85lhfy596",
+        "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
+        "recurso": "clientes",
+        "criar": false,
+        "ler": true,
+        "editar": false,
+        "deletar": false
+      },
+      {
+        "id": "cmjb9rqbt000h0gh878vum583",
+        "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
+        "recurso": "alunos",
+        "criar": false,
+        "ler": true,
+        "editar": false,
+        "deletar": false
+      },
+      {
+        "id": "cmjb9rqg5000p0gh8tll1ghgw",
+        "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
+        "recurso": "alunos_evolucao",
+        "criar": false,
+        "ler": true,
+        "editar": false,
+        "deletar": false
+      },
+      {
+        "id": "cmjb9rqku000r0gh8eyz0lcf4",
+        "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
+        "recurso": "alunos_avaliacoes",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmjb9rqlt000t0gh8z2jv2n9w",
+        "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
+        "recurso": "alunos_medidas",
+        "criar": false,
+        "ler": true,
+        "editar": false,
+        "deletar": false
+      },
+      {
+        "id": "cmjb9rqs700190gh8z3alv6a1",
+        "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
+        "recurso": "medidas",
+        "criar": false,
+        "ler": true,
+        "editar": false,
+        "deletar": false
+      },
+      {
+        "id": "cmjb9rqs7001b0gh836ylfir0",
+        "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
+        "recurso": "execucoes",
+        "criar": false,
+        "ler": true,
+        "editar": false,
+        "deletar": false
+      },
+      {
+        "id": "cmjjvknx800270gh85nmhs6ml",
+        "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
+        "recurso": "backup",
+        "criar": true,
+        "ler": true,
+        "editar": false,
+        "deletar": false
+      },
+      {
+        "id": "cmkin6tvw001b0gmks7jq4iii",
+        "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
+        "recurso": "permissoes_gerenciar",
+        "criar": false,
+        "ler": true,
+        "editar": false,
+        "deletar": false
+      },
+      {
+        "id": "cmkinvr9v005d0gmknhd2qlwi",
+        "usuarioId": "cmieqxlrr00030gpky2k7v3hf",
+        "recurso": "backup_criar",
+        "criar": false,
+        "ler": false,
+        "editar": false,
+        "deletar": false
+      },
+      {
         "id": "cmjgxmh25000j0gfcwqra4sd7",
         "usuarioId": "cmj2p1va100010gc0nnhwdzqm",
         "recurso": "alunos_perfil",
@@ -162,51 +324,6 @@
         "deletar": true
       },
       {
-        "id": "cmi7d45op00030gvgi7ga3q8i",
-        "usuarioId": "cmhc8yq6700020gegum0q3szh",
-        "recurso": "medidas",
-        "criar": true,
-        "ler": true,
-        "editar": true,
-        "deletar": true
-      },
-      {
-        "id": "cmi7d45os000b0gvgellakxhk",
-        "usuarioId": "cmhc8yq6700020gegum0q3szh",
-        "recurso": "execucoes",
-        "criar": true,
-        "ler": true,
-        "editar": true,
-        "deletar": true
-      },
-      {
-        "id": "cmjb9rqlu000x0gh84meqbku5",
-        "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
-        "recurso": "avaliacoes",
-        "criar": false,
-        "ler": true,
-        "editar": false,
-        "deletar": false
-      },
-      {
-        "id": "cmjb9rqs700190gh8z3alv6a1",
-        "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
-        "recurso": "medidas",
-        "criar": true,
-        "ler": true,
-        "editar": false,
-        "deletar": true
-      },
-      {
-        "id": "cmjb9rqku000r0gh8eyz0lcf4",
-        "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
-        "recurso": "alunos_avaliacoes",
-        "criar": true,
-        "ler": true,
-        "editar": true,
-        "deletar": true
-      },
-      {
         "id": "cmjgxmgmg00030gfc63g85rq8",
         "usuarioId": "cmj2p1va100010gc0nnhwdzqm",
         "recurso": "alunos_evolucao",
@@ -234,45 +351,9 @@
         "deletar": true
       },
       {
-        "id": "cmi98rovd00090gz8t6xal21z",
-        "usuarioId": "cmhc8yq6700020gegum0q3szh",
-        "recurso": "dashboard",
-        "criar": true,
-        "ler": true,
-        "editar": true,
-        "deletar": true
-      },
-      {
         "id": "cmjgxmh1n000h0gfchgolkprz",
         "usuarioId": "cmj2p1va100010gc0nnhwdzqm",
         "recurso": "alunos_compartilhar",
-        "criar": true,
-        "ler": true,
-        "editar": true,
-        "deletar": true
-      },
-      {
-        "id": "cmjjvknx800270gh85nmhs6ml",
-        "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
-        "recurso": "backup",
-        "criar": true,
-        "ler": true,
-        "editar": true,
-        "deletar": true
-      },
-      {
-        "id": "cmjb9rq7k000d0gh8hq6zi9zm",
-        "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
-        "recurso": "dashboard",
-        "criar": false,
-        "ler": true,
-        "editar": false,
-        "deletar": false
-      },
-      {
-        "id": "cmkf9vda800190gh84jfwga1z",
-        "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
-        "recurso": "backup_criar",
         "criar": true,
         "ler": true,
         "editar": true,
@@ -286,24 +367,6 @@
         "ler": true,
         "editar": true,
         "deletar": true
-      },
-      {
-        "id": "cmjb9rqlt000t0gh8z2jv2n9w",
-        "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
-        "recurso": "alunos_medidas",
-        "criar": false,
-        "ler": true,
-        "editar": false,
-        "deletar": false
-      },
-      {
-        "id": "cmjb9rqs7001b0gh836ylfir0",
-        "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
-        "recurso": "execucoes",
-        "criar": false,
-        "ler": true,
-        "editar": false,
-        "deletar": false
       },
       {
         "id": "cmjgxmh97000n0gfcke1f0coq",
@@ -324,179 +387,8 @@
         "deletar": true
       },
       {
-        "id": "cmkd57en900dv0g50bdw3vrf4",
-        "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
-        "recurso": "medidas_compartilhar",
-        "criar": false,
-        "ler": true,
-        "editar": false,
-        "deletar": false
-      },
-      {
-        "id": "cmjb9rqg5000p0gh8tll1ghgw",
-        "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
-        "recurso": "alunos_evolucao",
-        "criar": false,
-        "ler": true,
-        "editar": false,
-        "deletar": false
-      },
-      {
-        "id": "cmi7d45oq00050gvgr38mwbal",
-        "usuarioId": "cmhc8yq6700020gegum0q3szh",
-        "recurso": "alunos",
-        "criar": true,
-        "ler": true,
-        "editar": true,
-        "deletar": true
-      },
-      {
-        "id": "cmi8rw70z000f0g34bm6j6x81",
-        "usuarioId": "cmhc8yq6700020gegum0q3szh",
-        "recurso": "usuarios",
-        "criar": true,
-        "ler": true,
-        "editar": true,
-        "deletar": true
-      },
-      {
-        "id": "cmiyd717v00070gj42qlapzkf",
-        "usuarioId": "cmhc8yq6700020gegum0q3szh",
-        "recurso": "usuarios_compartilhar",
-        "criar": true,
-        "ler": true,
-        "editar": true,
-        "deletar": true
-      },
-      {
         "id": "cmjgxmhb9000r0gfctfcyqg5w",
         "usuarioId": "cmj2p1va100010gc0nnhwdzqm",
-        "recurso": "exercicios_compartilhar",
-        "criar": true,
-        "ler": true,
-        "editar": true,
-        "deletar": true
-      },
-      {
-        "id": "cmjb9rqbt000h0gh878vum583",
-        "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
-        "recurso": "alunos",
-        "criar": false,
-        "ler": true,
-        "editar": false,
-        "deletar": false
-      },
-      {
-        "id": "cmjb9rqbr000f0gh85lhfy596",
-        "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
-        "recurso": "clientes",
-        "criar": false,
-        "ler": false,
-        "editar": false,
-        "deletar": false
-      },
-      {
-        "id": "cmjb9rqbu000n0gh8zpazn83d",
-        "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
-        "recurso": "alunos_perfil",
-        "criar": false,
-        "ler": true,
-        "editar": false,
-        "deletar": false
-      },
-      {
-        "id": "cmiyd71g1000d0gj4eef79j5p",
-        "usuarioId": "cmhc8yq6700020gegum0q3szh",
-        "recurso": "alunos_evolucao",
-        "criar": true,
-        "ler": true,
-        "editar": true,
-        "deletar": true
-      },
-      {
-        "id": "cmiyd71h4000f0gj4vhwvwe4d",
-        "usuarioId": "cmhc8yq6700020gegum0q3szh",
-        "recurso": "alunos_avaliacoes",
-        "criar": true,
-        "ler": true,
-        "editar": true,
-        "deletar": true
-      },
-      {
-        "id": "cmiyd71hp000h0gj4o42rjff5",
-        "usuarioId": "cmhc8yq6700020gegum0q3szh",
-        "recurso": "alunos_medidas",
-        "criar": true,
-        "ler": true,
-        "editar": true,
-        "deletar": true
-      },
-      {
-        "id": "cmiyd71hq000j0gj4x0gv8oak",
-        "usuarioId": "cmhc8yq6700020gegum0q3szh",
-        "recurso": "alunos_compartilhar",
-        "criar": true,
-        "ler": true,
-        "editar": true,
-        "deletar": true
-      },
-      {
-        "id": "cmia95b4d00090gtcumhav4kp",
-        "usuarioId": "cmhc8yq6700020gegum0q3szh",
-        "recurso": "configuracoes",
-        "criar": true,
-        "ler": true,
-        "editar": true,
-        "deletar": true
-      },
-      {
-        "id": "cmi7d44z100010gvg4zrypufk",
-        "usuarioId": "cmhc8yq6700020gegum0q3szh",
-        "recurso": "clientes",
-        "criar": true,
-        "ler": true,
-        "editar": true,
-        "deletar": true
-      },
-      {
-        "id": "cmiyd717x000b0gj4bs9v2ns2",
-        "usuarioId": "cmhc8yq6700020gegum0q3szh",
-        "recurso": "alunos_perfil",
-        "criar": true,
-        "ler": true,
-        "editar": true,
-        "deletar": true
-      },
-      {
-        "id": "cmi8sdedd001b0g34c645f3f2",
-        "usuarioId": "cmhc8yq6700020gegum0q3szh",
-        "recurso": "avaliacoes",
-        "criar": true,
-        "ler": true,
-        "editar": true,
-        "deletar": true
-      },
-      {
-        "id": "cmiyd71hs000n0gj4b2lzfj19",
-        "usuarioId": "cmhc8yq6700020gegum0q3szh",
-        "recurso": "avaliacoes_compartilhar",
-        "criar": true,
-        "ler": true,
-        "editar": true,
-        "deletar": true
-      },
-      {
-        "id": "cmi7d45oq00070gvgm0coar1z",
-        "usuarioId": "cmhc8yq6700020gegum0q3szh",
-        "recurso": "exercicios",
-        "criar": true,
-        "ler": true,
-        "editar": true,
-        "deletar": true
-      },
-      {
-        "id": "cmiyd71lz000r0gj4yu5fxpi4",
-        "usuarioId": "cmhc8yq6700020gegum0q3szh",
         "recurso": "exercicios_compartilhar",
         "criar": true,
         "ler": true,
@@ -570,42 +462,6 @@
         "id": "cmjjw3ind004b0gh8056cp8bo",
         "usuarioId": "cmj2p1va100010gc0nnhwdzqm",
         "recurso": "treinos_atribuir",
-        "criar": true,
-        "ler": true,
-        "editar": true,
-        "deletar": true
-      },
-      {
-        "id": "cmi7d45or00090gvgdxtxagfg",
-        "usuarioId": "cmhc8yq6700020gegum0q3szh",
-        "recurso": "treinos",
-        "criar": true,
-        "ler": true,
-        "editar": true,
-        "deletar": true
-      },
-      {
-        "id": "cmiyd71o0000v0gj4hi405ffz",
-        "usuarioId": "cmhc8yq6700020gegum0q3szh",
-        "recurso": "treinos_compartilhar",
-        "criar": true,
-        "ler": true,
-        "editar": true,
-        "deletar": true
-      },
-      {
-        "id": "cmjjw3yp8005h0gh8kqh1aw9u",
-        "usuarioId": "cmhc8yq6700020gegum0q3szh",
-        "recurso": "treinos_atribuir",
-        "criar": true,
-        "ler": true,
-        "editar": true,
-        "deletar": true
-      },
-      {
-        "id": "cmjjw3yuf005p0gh8rzvid9c6",
-        "usuarioId": "cmhc8yq6700020gegum0q3szh",
-        "recurso": "backup",
         "criar": true,
         "ler": true,
         "editar": true,
@@ -738,6 +594,240 @@
         "deletar": false
       },
       {
+        "id": "cmkinvqhl00590gmkridj6s6e",
+        "usuarioId": "cmieqxlrr00030gpky2k7v3hf",
+        "recurso": "alunos_avaliacoes",
+        "criar": false,
+        "ler": true,
+        "editar": true,
+        "deletar": false
+      },
+      {
+        "id": "cmkinvr98005b0gmkfjvw8du9",
+        "usuarioId": "cmieqxlrr00030gpky2k7v3hf",
+        "recurso": "backup",
+        "criar": false,
+        "ler": false,
+        "editar": false,
+        "deletar": false
+      },
+      {
+        "id": "cmkinvrab005f0gmkup5uigf9",
+        "usuarioId": "cmieqxlrr00030gpky2k7v3hf",
+        "recurso": "permissoes_gerenciar",
+        "criar": false,
+        "ler": false,
+        "editar": false,
+        "deletar": false
+      },
+      {
+        "id": "cmjb9rqlu000x0gh84meqbku5",
+        "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
+        "recurso": "avaliacoes",
+        "criar": false,
+        "ler": true,
+        "editar": false,
+        "deletar": false
+      },
+      {
+        "id": "cmkk98kqp00290gw8kxwvc0dj",
+        "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
+        "recurso": "grupos_treinos",
+        "criar": false,
+        "ler": true,
+        "editar": false,
+        "deletar": false
+      },
+      {
+        "id": "cmkd57en900dv0g50bdw3vrf4",
+        "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
+        "recurso": "medidas_compartilhar",
+        "criar": false,
+        "ler": true,
+        "editar": false,
+        "deletar": false
+      },
+      {
+        "id": "cmkf9vda800190gh84jfwga1z",
+        "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
+        "recurso": "backup_criar",
+        "criar": false,
+        "ler": false,
+        "editar": false,
+        "deletar": false
+      },
+      {
+        "id": "cmkinwkog005j0gmkddwef1q1",
+        "usuarioId": "cmieqxlrr00030gpky2k7v3hf",
+        "recurso": "treinos",
+        "criar": false,
+        "ler": false,
+        "editar": false,
+        "deletar": false
+      },
+      {
+        "id": "cmiyd71g1000d0gj4eef79j5p",
+        "usuarioId": "cmhc8yq6700020gegum0q3szh",
+        "recurso": "alunos_evolucao",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmi7d45oq00050gvgr38mwbal",
+        "usuarioId": "cmhc8yq6700020gegum0q3szh",
+        "recurso": "alunos",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmiyd717v00070gj42qlapzkf",
+        "usuarioId": "cmhc8yq6700020gegum0q3szh",
+        "recurso": "usuarios_compartilhar",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmi8rw70z000f0g34bm6j6x81",
+        "usuarioId": "cmhc8yq6700020gegum0q3szh",
+        "recurso": "usuarios",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmiyd717x000b0gj4bs9v2ns2",
+        "usuarioId": "cmhc8yq6700020gegum0q3szh",
+        "recurso": "alunos_perfil",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmiyd71h4000f0gj4vhwvwe4d",
+        "usuarioId": "cmhc8yq6700020gegum0q3szh",
+        "recurso": "alunos_avaliacoes",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmiyd71hp000h0gj4o42rjff5",
+        "usuarioId": "cmhc8yq6700020gegum0q3szh",
+        "recurso": "alunos_medidas",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmi8sdedd001b0g34c645f3f2",
+        "usuarioId": "cmhc8yq6700020gegum0q3szh",
+        "recurso": "avaliacoes",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmi7d45oq00070gvgm0coar1z",
+        "usuarioId": "cmhc8yq6700020gegum0q3szh",
+        "recurso": "exercicios",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmiyd71hs000n0gj4b2lzfj19",
+        "usuarioId": "cmhc8yq6700020gegum0q3szh",
+        "recurso": "avaliacoes_compartilhar",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmiyd71lz000r0gj4yu5fxpi4",
+        "usuarioId": "cmhc8yq6700020gegum0q3szh",
+        "recurso": "exercicios_compartilhar",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmi7d45or00090gvgdxtxagfg",
+        "usuarioId": "cmhc8yq6700020gegum0q3szh",
+        "recurso": "treinos",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmiyd71o0000v0gj4hi405ffz",
+        "usuarioId": "cmhc8yq6700020gegum0q3szh",
+        "recurso": "treinos_compartilhar",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmjjw3yp8005h0gh8kqh1aw9u",
+        "usuarioId": "cmhc8yq6700020gegum0q3szh",
+        "recurso": "treinos_atribuir",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmi7d45op00030gvgi7ga3q8i",
+        "usuarioId": "cmhc8yq6700020gegum0q3szh",
+        "recurso": "medidas",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmi7d45os000b0gvgellakxhk",
+        "usuarioId": "cmhc8yq6700020gegum0q3szh",
+        "recurso": "execucoes",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmia95b4d00090gtcumhav4kp",
+        "usuarioId": "cmhc8yq6700020gegum0q3szh",
+        "recurso": "configuracoes",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmjb9rqbu000n0gh8zpazn83d",
+        "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
+        "recurso": "alunos_perfil",
+        "criar": false,
+        "ler": true,
+        "editar": false,
+        "deletar": false
+      },
+      {
         "id": "cmk7ex4cv00130gnow8bi464e",
         "usuarioId": "cmk7epvm400010gnoyq33u59z",
         "recurso": "treinos_atribuir",
@@ -792,39 +882,12 @@
         "deletar": false
       },
       {
-        "id": "cmjb9rqbt000j0gh8nh9e2vtu",
-        "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
-        "recurso": "usuarios",
-        "criar": false,
-        "ler": true,
-        "editar": false,
-        "deletar": false
-      },
-      {
         "id": "cmkf9vdbh001f0gh84kn758u3",
         "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
         "recurso": "backup_download",
         "criar": false,
         "ler": false,
         "editar": true,
-        "deletar": false
-      },
-      {
-        "id": "cmjb9rqbt000l0gh8bm6a3jeg",
-        "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
-        "recurso": "usuarios_compartilhar",
-        "criar": false,
-        "ler": true,
-        "editar": false,
-        "deletar": false
-      },
-      {
-        "id": "cmjb9rqpu00130gh8prnqvmzi",
-        "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
-        "recurso": "exercicios_compartilhar",
-        "criar": false,
-        "ler": true,
-        "editar": false,
         "deletar": false
       },
       {
@@ -873,9 +936,27 @@
         "deletar": false
       },
       {
-        "id": "cmjb9rqlv000z0gh89frrqb6a",
+        "id": "cmjjw3yuf005p0gh8rzvid9c6",
+        "usuarioId": "cmhc8yq6700020gegum0q3szh",
+        "recurso": "backup",
+        "criar": true,
+        "ler": true,
+        "editar": true,
+        "deletar": true
+      },
+      {
+        "id": "cmjb9rqbt000j0gh8nh9e2vtu",
         "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
-        "recurso": "avaliacoes_compartilhar",
+        "recurso": "usuarios",
+        "criar": false,
+        "ler": true,
+        "editar": false,
+        "deletar": false
+      },
+      {
+        "id": "cmjb9rqbt000l0gh8bm6a3jeg",
+        "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
+        "recurso": "usuarios_compartilhar",
         "criar": false,
         "ler": true,
         "editar": false,
@@ -891,9 +972,9 @@
         "deletar": false
       },
       {
-        "id": "cmjb9rqs600170gh88jomu84f",
+        "id": "cmjb9rqlv000z0gh89frrqb6a",
         "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
-        "recurso": "treinos_compartilhar",
+        "recurso": "avaliacoes_compartilhar",
         "criar": false,
         "ler": true,
         "editar": false,
@@ -909,9 +990,27 @@
         "deletar": false
       },
       {
-        "id": "cmjb9rqs8001d0gh8lsowfr0v",
+        "id": "cmjb9rqpu00130gh8prnqvmzi",
         "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
-        "recurso": "configuracoes",
+        "recurso": "exercicios_compartilhar",
+        "criar": false,
+        "ler": true,
+        "editar": false,
+        "deletar": false
+      },
+      {
+        "id": "cmjb9rqra00150gh81s4h56hc",
+        "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
+        "recurso": "treinos",
+        "criar": false,
+        "ler": true,
+        "editar": false,
+        "deletar": false
+      },
+      {
+        "id": "cmjb9rqs600170gh88jomu84f",
+        "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
+        "recurso": "treinos_compartilhar",
         "criar": false,
         "ler": true,
         "editar": false,
@@ -927,9 +1026,9 @@
         "deletar": false
       },
       {
-        "id": "cmjb9rqra00150gh81s4h56hc",
+        "id": "cmjb9rqs8001d0gh8lsowfr0v",
         "usuarioId": "cmjb9nzaa000b0gh8hxosrou2",
-        "recurso": "treinos",
+        "recurso": "configuracoes",
         "criar": false,
         "ler": true,
         "editar": false,
@@ -970,42 +1069,23 @@
     ],
     "medidas": [
       {
-        "id": "cmij86bhs00010gy80178ut39",
+        "id": "cmkk8aist00130gusk6uc1rza",
         "alunoId": "cmieqxlyy00050gpkwtcnl4yz",
-        "peso": 75,
-        "altura": 1.75,
-        "peito": 89,
-        "cintura": 94,
-        "quadril": 98,
-        "bracoDireito": 89,
-        "bracoEsquerdo": 98,
-        "coxaDireita": 98,
-        "coxaEsquerda": 9,
-        "panturrilhaDireita": 8,
-        "panturrilhaEsquerda": 89,
-        "observacoes": "testando arrumar",
+        "peso": 88.7,
+        "altura": 1.73,
+        "peito": 95,
+        "cintura": 95,
+        "quadril": 95,
+        "bracoDireito": 95,
+        "bracoEsquerdo": 95,
+        "coxaDireita": 95,
+        "coxaEsquerda": 95,
+        "panturrilhaDireita": 95,
+        "panturrilhaEsquerda": 95,
+        "observacoes": "Informações mais ou menos correta",
         "fotos": [],
-        "data": "2025-11-28T18:58:01.138Z",
-        "createdAt": "2025-11-28T18:58:01.138Z"
-      },
-      {
-        "id": "cmilphbwe00010g6w9rk3u96l",
-        "alunoId": "cmieqxlyy00050gpkwtcnl4yz",
-        "peso": 15,
-        "altura": 1,
-        "peito": 15,
-        "cintura": 15,
-        "quadril": 15,
-        "bracoDireito": 15,
-        "bracoEsquerdo": 15,
-        "coxaDireita": 15,
-        "coxaEsquerda": 15,
-        "panturrilhaDireita": 15,
-        "panturrilhaEsquerda": 15,
-        "observacoes": "cdascfsd",
-        "fotos": [],
-        "data": "2025-11-30T12:38:00.702Z",
-        "createdAt": "2025-11-30T12:38:00.702Z"
+        "data": "2026-01-18T21:08:28.057Z",
+        "createdAt": "2026-01-18T21:08:28.057Z"
       }
     ],
     "avaliacoes": [
@@ -1835,102 +1915,6 @@
         "createdAt": "2025-11-25T20:58:08.159Z"
       },
       {
-        "id": "cmier2t6300090gpkvqx8kenm",
-        "treinoId": "cmier1d3o00070gpkhjxr12qg",
-        "exercicioId": "cmhdjbhro0001ib044ys8q9kt",
-        "ordem": 1,
-        "series": 3,
-        "repeticoes": "12-15",
-        "carga": "20",
-        "descanso": "40s",
-        "observacoes": "- Exercício composto para trabalhar o bíceps, ativando a cabeça longa do bíceps com boa amplitude de movimento.",
-        "createdAt": "2025-11-25T15:48:19.371Z"
-      },
-      {
-        "id": "cmier3hus000b0gpkk9mvhq84",
-        "treinoId": "cmier1d3o00070gpkhjxr12qg",
-        "exercicioId": "cmhdkbyiz0003jp04klt3b2ul",
-        "ordem": 2,
-        "series": 3,
-        "repeticoes": "10-12",
-        "carga": "20",
-        "descanso": "40s",
-        "observacoes": "- Foca no movimento controlado e na contração máxima, ajudando a aumentar a massa muscular do bíceps. ",
-        "createdAt": "2025-11-25T15:48:51.364Z"
-      },
-      {
-        "id": "cmier40h7000d0gpk6eyn2q5t",
-        "treinoId": "cmier1d3o00070gpkhjxr12qg",
-        "exercicioId": "cmhdkfp180005jp04k1lal4vg",
-        "ordem": 3,
-        "series": 3,
-        "repeticoes": "10-12",
-        "carga": "20",
-        "descanso": "40s",
-        "observacoes": "- Com a barra ou halteres, esse exercício ajuda a ativar a parte inferior do bíceps com foco na flexão do cotovelo.",
-        "createdAt": "2025-11-25T15:49:15.372Z"
-      },
-      {
-        "id": "cmier4hs4000f0gpkfopze4m4",
-        "treinoId": "cmier1d3o00070gpkhjxr12qg",
-        "exercicioId": "cmhezauev000f0gfke8cigjh6",
-        "ordem": 4,
-        "series": 3,
-        "repeticoes": "10-12",
-        "carga": "20",
-        "descanso": "40s",
-        "observacoes": "- Com a barra ou halteres, esse exercício ajuda a ativar a parte inferior do bíceps com foco na flexão do cotovelo.",
-        "createdAt": "2025-11-25T15:49:37.797Z"
-      },
-      {
-        "id": "cmier51bg000h0gpkh5i0zy8j",
-        "treinoId": "cmier1d3o00070gpkhjxr12qg",
-        "exercicioId": "cmhdjiaxc0003ib04tg64wg6d",
-        "ordem": 5,
-        "series": 3,
-        "repeticoes": "10-12",
-        "carga": "20",
-        "descanso": "40s",
-        "observacoes": "- Rosca alternada com halteres, excelente para trabalhar ambos os braços simultaneamente.",
-        "createdAt": "2025-11-25T15:50:03.117Z"
-      },
-      {
-        "id": "cmier5r79000j0gpkqai2hsvk",
-        "treinoId": "cmier1d3o00070gpkhjxr12qg",
-        "exercicioId": "cmhc98gra00080gegwy6yyxon",
-        "ordem": 6,
-        "series": 3,
-        "repeticoes": "12-15",
-        "carga": "20",
-        "descanso": "40s",
-        "observacoes": "- Foca no tríceps de forma unilateral, permitindo maior ativação e controle do movimento.",
-        "createdAt": "2025-11-25T15:50:36.661Z"
-      },
-      {
-        "id": "cmier6cnd000l0gpk3fyfl43c",
-        "treinoId": "cmier1d3o00070gpkhjxr12qg",
-        "exercicioId": "cmhc9aiak000a0gegnl36wlqv",
-        "ordem": 7,
-        "series": 3,
-        "repeticoes": "10-12",
-        "carga": "20",
-        "descanso": "40s",
-        "observacoes": "- Excelente para trabalhar a cabeça longa do tríceps, com movimento controlado e amplitude completa.",
-        "createdAt": "2025-11-25T15:51:04.458Z"
-      },
-      {
-        "id": "cmier6v6k000n0gpk8h8w4ncu",
-        "treinoId": "cmier1d3o00070gpkhjxr12qg",
-        "exercicioId": "cmhc9d5c1000c0geg0d0gwjga",
-        "ordem": 8,
-        "series": 3,
-        "repeticoes": "10-12",
-        "carga": "20",
-        "descanso": "40s",
-        "observacoes": "- Exercício básico para tríceps, com boa ativação na parte lateral do tríceps.",
-        "createdAt": "2025-11-25T15:51:28.477Z"
-      },
-      {
         "id": "cmif25tdq000h0g6oz2ry6akm",
         "treinoId": "cmif21trj00070g6okuy34fsi",
         "exercicioId": "cmhc9m018000m0gegojou73jf",
@@ -1941,30 +1925,6 @@
         "descanso": "40s",
         "observacoes": "- Trabalho de ombros e tríceps, com excelente ativação da parte posterior do ombro e tríceps.",
         "createdAt": "2025-11-25T20:58:35.390Z"
-      },
-      {
-        "id": "cmier8e97000r0gpk2xffrvlb",
-        "treinoId": "cmier1d3o00070gpkhjxr12qg",
-        "exercicioId": "cmhc9d5c1000c0geg0d0gwjga",
-        "ordem": 11,
-        "series": 3,
-        "repeticoes": "10-12",
-        "carga": "20",
-        "descanso": "40s",
-        "observacoes": "- Excelente para trabalhar o tríceps com ênfase na cabeça longa, com pegada supinada.",
-        "createdAt": "2025-11-25T15:52:39.851Z"
-      },
-      {
-        "id": "cmiex1bf300010gs0af670462",
-        "treinoId": "cmier1d3o00070gpkhjxr12qg",
-        "exercicioId": "cmhc98gra00080gegwy6yyxon",
-        "ordem": 10,
-        "series": 3,
-        "repeticoes": "10-12",
-        "carga": "20",
-        "descanso": "40s",
-        "observacoes": "Foca no tríceps de forma isolada, sendo um ótimo exercício para resistência e força.",
-        "createdAt": "2025-11-25T18:35:07.276Z"
       },
       {
         "id": "cmif1ea4600070gs060w4ppuj",
@@ -2181,6 +2141,102 @@
         "descanso": "40s",
         "observacoes": "Foco na cabeça medial do deltoide, ajudando a aumentar a largura dos ombros. Não utilize cargas muito altas para evitar o uso excessivo de outros músculos. Controle o movimento, subindo e descendo de maneira controlada.",
         "createdAt": "2025-11-26T18:31:53.568Z"
+      },
+      {
+        "id": "cmier2t6300090gpkvqx8kenm",
+        "treinoId": "cmier1d3o00070gpkhjxr12qg",
+        "exercicioId": "cmhdjbhro0001ib044ys8q9kt",
+        "ordem": 1,
+        "series": 3,
+        "repeticoes": "12-15",
+        "carga": "20",
+        "descanso": "60s",
+        "observacoes": "- Exercício composto para trabalhar o bíceps, ativando a cabeça longa do bíceps com boa amplitude de movimento.",
+        "createdAt": "2025-11-25T15:48:19.371Z"
+      },
+      {
+        "id": "cmier3hus000b0gpkk9mvhq84",
+        "treinoId": "cmier1d3o00070gpkhjxr12qg",
+        "exercicioId": "cmhdkbyiz0003jp04klt3b2ul",
+        "ordem": 2,
+        "series": 3,
+        "repeticoes": "10-12",
+        "carga": "20",
+        "descanso": "60s",
+        "observacoes": "- Foca no movimento controlado e na contração máxima, ajudando a aumentar a massa muscular do bíceps. ",
+        "createdAt": "2025-11-25T15:48:51.364Z"
+      },
+      {
+        "id": "cmier4hs4000f0gpkfopze4m4",
+        "treinoId": "cmier1d3o00070gpkhjxr12qg",
+        "exercicioId": "cmhezauev000f0gfke8cigjh6",
+        "ordem": 4,
+        "series": 3,
+        "repeticoes": "10-12",
+        "carga": "20",
+        "descanso": "60s",
+        "observacoes": "- Com a barra ou halteres, esse exercício ajuda a ativar a parte inferior do bíceps com foco na flexão do cotovelo.",
+        "createdAt": "2025-11-25T15:49:37.797Z"
+      },
+      {
+        "id": "cmier51bg000h0gpkh5i0zy8j",
+        "treinoId": "cmier1d3o00070gpkhjxr12qg",
+        "exercicioId": "cmhdjiaxc0003ib04tg64wg6d",
+        "ordem": 5,
+        "series": 3,
+        "repeticoes": "10-12",
+        "carga": "20",
+        "descanso": "60s",
+        "observacoes": "- Rosca alternada com halteres, excelente para trabalhar ambos os braços simultaneamente.",
+        "createdAt": "2025-11-25T15:50:03.117Z"
+      },
+      {
+        "id": "cmier5r79000j0gpkqai2hsvk",
+        "treinoId": "cmier1d3o00070gpkhjxr12qg",
+        "exercicioId": "cmhc98gra00080gegwy6yyxon",
+        "ordem": 6,
+        "series": 3,
+        "repeticoes": "12-15",
+        "carga": "20",
+        "descanso": "60s",
+        "observacoes": "- Foca no tríceps de forma unilateral, permitindo maior ativação e controle do movimento.",
+        "createdAt": "2025-11-25T15:50:36.661Z"
+      },
+      {
+        "id": "cmier6cnd000l0gpk3fyfl43c",
+        "treinoId": "cmier1d3o00070gpkhjxr12qg",
+        "exercicioId": "cmhc9aiak000a0gegnl36wlqv",
+        "ordem": 7,
+        "series": 3,
+        "repeticoes": "10-12",
+        "carga": "20",
+        "descanso": "60s",
+        "observacoes": "- Excelente para trabalhar a cabeça longa do tríceps, com movimento controlado e amplitude completa.",
+        "createdAt": "2025-11-25T15:51:04.458Z"
+      },
+      {
+        "id": "cmier6v6k000n0gpk8h8w4ncu",
+        "treinoId": "cmier1d3o00070gpkhjxr12qg",
+        "exercicioId": "cmhc9d5c1000c0geg0d0gwjga",
+        "ordem": 8,
+        "series": 3,
+        "repeticoes": "10-12",
+        "carga": "20",
+        "descanso": "60s",
+        "observacoes": "- Exercício básico para tríceps, com boa ativação na parte lateral do tríceps.",
+        "createdAt": "2025-11-25T15:51:28.477Z"
+      },
+      {
+        "id": "cmklghytk0001l404wlgrzo66",
+        "treinoId": "cmier1d3o00070gpkhjxr12qg",
+        "exercicioId": "cmhc9aiak000a0gegnl36wlqv",
+        "ordem": 10,
+        "series": 3,
+        "repeticoes": "12-15",
+        "carga": "20",
+        "descanso": "60s",
+        "observacoes": null,
+        "createdAt": "2026-01-19T17:45:58.659Z"
       },
       {
         "id": "cmigcdhap001h0gr0b2v62c6s",
@@ -2697,6 +2753,18 @@
         "descanso": "60s",
         "observacoes": "Para que serve: deltoide posterior + saúde do ombro/escápula (postura e prevenção).\n\n3 x 12–20 | Descanso 60–90s | RIR 1–2",
         "createdAt": "2025-12-19T10:21:34.073Z"
+      },
+      {
+        "id": "cmier40h7000d0gpk6eyn2q5t",
+        "treinoId": "cmier1d3o00070gpkhjxr12qg",
+        "exercicioId": "cmhdkfp180005jp04k1lal4vg",
+        "ordem": 3,
+        "series": 3,
+        "repeticoes": "10-12",
+        "carga": "20",
+        "descanso": "60s",
+        "observacoes": "- Com a barra ou halteres, esse exercício ajuda a ativar a parte inferior do bíceps com foco na flexão do cotovelo.",
+        "createdAt": "2025-11-25T15:49:15.372Z"
       }
     ],
     "cronogramas": [
@@ -2769,6 +2837,16 @@
         "observacoes": "Começando firme nos treinos",
         "completo": true,
         "createdAt": "2026-01-13T18:03:55.249Z"
+      },
+      {
+        "id": "cmklgpwkx0001kz04wyoi3sew",
+        "treinoId": "cmier1d3o00070gpkhjxr12qg",
+        "alunoId": "cmieqxlyy00050gpkwtcnl4yz",
+        "intensidade": "MODERADO",
+        "data": "2026-01-19T14:51:00.000Z",
+        "observacoes": "Reinício dos treinos",
+        "completo": true,
+        "createdAt": "2026-01-19T17:52:09.010Z"
       }
     ],
     "execucoesExercicio": [
@@ -2980,6 +3058,105 @@
         "carga": "12",
         "observacoes": "Para que serve: pico/controle e pump final.\n\n2 x 12–15 | Descanso 60s | RIR 1–2",
         "createdAt": "2026-01-06T18:21:47.121Z"
+      },
+      {
+        "id": "cmklgpwky0002kz04vw0kn3ku",
+        "execucaoTreinoId": "cmklgpwkx0001kz04wyoi3sew",
+        "treinoExercicioId": "cmier2t6300090gpkvqx8kenm",
+        "exercicioNome": "Rosca Direta Polia Baixa",
+        "series": 3,
+        "repeticoes": "12-15",
+        "carga": "30",
+        "observacoes": "- Exercício composto para trabalhar o bíceps, ativando a cabeça longa do bíceps com boa amplitude de movimento.",
+        "createdAt": "2026-01-19T17:52:09.010Z"
+      },
+      {
+        "id": "cmklgpwky0003kz04vray3zcn",
+        "execucaoTreinoId": "cmklgpwkx0001kz04wyoi3sew",
+        "treinoExercicioId": "cmier3hus000b0gpkk9mvhq84",
+        "exercicioNome": "Rosca Scott Maquina",
+        "series": 3,
+        "repeticoes": "10-12",
+        "carga": "20",
+        "observacoes": "- Foca no movimento controlado e na contração máxima, ajudando a aumentar a massa muscular do bíceps. ",
+        "createdAt": "2026-01-19T17:52:09.010Z"
+      },
+      {
+        "id": "cmklgpwky0004kz0451koqkfy",
+        "execucaoTreinoId": "cmklgpwkx0001kz04wyoi3sew",
+        "treinoExercicioId": "cmier40h7000d0gpk6eyn2q5t",
+        "exercicioNome": "Rosca 45º",
+        "series": 3,
+        "repeticoes": "10-12",
+        "carga": "12",
+        "observacoes": "- Com a barra ou halteres, esse exercício ajuda a ativar a parte inferior do bíceps com foco na flexão do cotovelo.",
+        "createdAt": "2026-01-19T17:52:09.010Z"
+      },
+      {
+        "id": "cmklgpwky0005kz04m0bzx59h",
+        "execucaoTreinoId": "cmklgpwkx0001kz04wyoi3sew",
+        "treinoExercicioId": "cmier4hs4000f0gpkfopze4m4",
+        "exercicioNome": "Rosca Concentrada ",
+        "series": 3,
+        "repeticoes": "10-12",
+        "carga": "12",
+        "observacoes": "- Com a barra ou halteres, esse exercício ajuda a ativar a parte inferior do bíceps com foco na flexão do cotovelo.",
+        "createdAt": "2026-01-19T17:52:09.010Z"
+      },
+      {
+        "id": "cmklgpwky0006kz045d887ys2",
+        "execucaoTreinoId": "cmklgpwkx0001kz04wyoi3sew",
+        "treinoExercicioId": "cmier51bg000h0gpkh5i0zy8j",
+        "exercicioNome": "Rosca Simultânea",
+        "series": 3,
+        "repeticoes": "10-12",
+        "carga": "10",
+        "observacoes": "- Rosca alternada com halteres, excelente para trabalhar ambos os braços simultaneamente.",
+        "createdAt": "2026-01-19T17:52:09.010Z"
+      },
+      {
+        "id": "cmklgpwky0007kz04jus4cov3",
+        "execucaoTreinoId": "cmklgpwkx0001kz04wyoi3sew",
+        "treinoExercicioId": "cmier5r79000j0gpkqai2hsvk",
+        "exercicioNome": "Tríceps Pulley Unilateral",
+        "series": 3,
+        "repeticoes": "12-15",
+        "carga": "20",
+        "observacoes": "- Foca no tríceps de forma unilateral, permitindo maior ativação e controle do movimento.",
+        "createdAt": "2026-01-19T17:52:09.010Z"
+      },
+      {
+        "id": "cmklgpwky0008kz047yzyro0w",
+        "execucaoTreinoId": "cmklgpwkx0001kz04wyoi3sew",
+        "treinoExercicioId": "cmier6cnd000l0gpk3fyfl43c",
+        "exercicioNome": "Tríceps Testa com Corda Polia Alta",
+        "series": 3,
+        "repeticoes": "10-12",
+        "carga": "40",
+        "observacoes": "- Excelente para trabalhar a cabeça longa do tríceps, com movimento controlado e amplitude completa.",
+        "createdAt": "2026-01-19T17:52:09.010Z"
+      },
+      {
+        "id": "cmklgpwky0009kz04lgb5k3d2",
+        "execucaoTreinoId": "cmklgpwkx0001kz04wyoi3sew",
+        "treinoExercicioId": "cmier6v6k000n0gpk8h8w4ncu",
+        "exercicioNome": "Tríceps Pulley com Barra",
+        "series": 3,
+        "repeticoes": "10-12",
+        "carga": "50",
+        "observacoes": "- Exercício básico para tríceps, com boa ativação na parte lateral do tríceps.",
+        "createdAt": "2026-01-19T17:52:09.010Z"
+      },
+      {
+        "id": "cmklgpwky000akz04xpt7zhbj",
+        "execucaoTreinoId": "cmklgpwkx0001kz04wyoi3sew",
+        "treinoExercicioId": "cmklghytk0001l404wlgrzo66",
+        "exercicioNome": "Tríceps Testa com Corda Polia Alta",
+        "series": 3,
+        "repeticoes": "12-15",
+        "carga": "40",
+        "observacoes": null,
+        "createdAt": "2026-01-19T17:52:09.010Z"
       }
     ]
   }

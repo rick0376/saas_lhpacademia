@@ -265,6 +265,15 @@ export const Layout: React.FC<Props> = ({ children }) => {
                 },
               ]
             : []),
+          ...(role === "SUPERADMIN" || podeAcessar("logs_login")
+            ? [
+                {
+                  href: "/dashboard/logs-login",
+                  label: "Logs de Login",
+                  icon: <FileText size={18} />,
+                },
+              ]
+            : []),
         ],
       },
     ];

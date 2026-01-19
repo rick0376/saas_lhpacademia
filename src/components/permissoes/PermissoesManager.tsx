@@ -50,6 +50,16 @@ const RECURSOS: RecursoConfig[] = [
   },
 
   // ======================
+  // 🧾 LOGS DE LOGIN
+  // ======================
+  {
+    value: "logs_login",
+    label: "🧾 Logs de Login",
+    description: "Visualizar registros de login",
+    tipos: ["ler"],
+  },
+
+  // ======================
   // 🏢 CLIENTES / 👥 USUÁRIOS
   // ======================
   {

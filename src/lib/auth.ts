@@ -77,6 +77,22 @@ export const authOptions: NextAuthOptions = {
             aluno: usuario.aluno,
           } as any;
 
+          // ✅ Registrar log de login
+          try {
+            await prisma.loginLog.create({
+              data: {
+                usuarioId: usuario.id,
+                clienteId: usuario.clienteId ?? null,
+                role: usuario.role,
+                email: usuario.email,
+                ip: null,
+                userAgent: null,
+              },
+            });
+          } catch (e) {
+            console.error("Erro ao salvar log de login:", e);
+          }
+
           return user;
         } catch (error) {
           throw error;
@@ -154,8 +170,6 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
-
-    // ❌ Removemos o redirect porque NÃO funciona com token e causa erro
   },
   secret: process.env.NEXTAUTH_SECRET,
 };

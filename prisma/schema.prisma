@@ -42,6 +42,7 @@ model Cliente {
   exercicios    Exercicio[]
   treinos       Treino[]
   gruposTreinos GrupoTreino[]
+  loginLogs     LoginLog[]
 
   @@map("clientes")
 }
@@ -62,6 +63,7 @@ model Usuario {
   updatedAt      DateTime    @updatedAt
   permissoes     Permissao[]
   aluno          Aluno?
+  loginLogs      LoginLog[]
 }
 
 model Permissao {
@@ -349,6 +351,28 @@ model GrupoTreinoItem {
   @@unique([grupoTreinoId, treinoId])
   @@index([treinoId])
   @@map("grupo_treino_itens")
+}
+
+model LoginLog {
+  id String @id @default(cuid())
+
+  usuarioId String?
+  usuario   Usuario? @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+
+  clienteId String?
+  cliente   Cliente? @relation(fields: [clienteId], references: [id], onDelete: SetNull)
+
+  role  Role
+  email String
+
+  ip        String?
+  userAgent String?
+
+  createdAt DateTime @default(now())
+
+  @@index([clienteId, createdAt])
+  @@index([usuarioId, createdAt])
+  @@map("login_logs")
 }
 
 // ============================================
