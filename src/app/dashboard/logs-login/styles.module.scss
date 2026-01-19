@@ -1,34 +1,53 @@
 .main {
   padding: 24px;
 }
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
 }
+
 .title {
   font-size: 28px;
   font-weight: 800;
   margin-bottom: 16px;
 }
 
-.tableWrap {
-  overflow: auto;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  background: #fff;
+.filterBar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+
+  select {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+  }
 }
+
+.tableWrap {
+  overflow-x: auto;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
 .table {
   width: 100%;
   border-collapse: collapse;
 }
+
 .table th,
 .table td {
   padding: 12px;
   border-bottom: 1px solid #e5e7eb;
   text-align: left;
+  font-size: 14px;
 }
+
 .ua {
-  max-width: 520px;
+  max-width: 420px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

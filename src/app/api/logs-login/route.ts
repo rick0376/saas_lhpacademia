@@ -1,3 +1,5 @@
+//api/logs-login/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -34,13 +36,23 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const limit = Math.min(Number(searchParams.get("limit") || 100), 300);
 
-  const where =
-    usuario.role === "SUPERADMIN"
-      ? {}
-      : { clienteId: usuario.clienteId as string };
+  const clienteIdParam = searchParams.get("clienteId");
+
+  let where: any = {};
+
+  if (usuario.role !== "SUPERADMIN") {
+    where.clienteId = usuario.clienteId as string;
+  } else if (clienteIdParam && clienteIdParam !== "all") {
+    where.clienteId = clienteIdParam;
+  }
 
   const logs = await prisma.loginLog.findMany({
     where,
+    include: {
+      cliente: {
+        select: { nome: true },
+      },
+    },
     orderBy: { createdAt: "desc" },
     take: limit,
   });
