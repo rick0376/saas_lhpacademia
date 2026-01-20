@@ -1,4 +1,4 @@
-// src/app/api/logs-login/route.ts
+//api/logs-login/route.ts
 
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
@@ -7,21 +7,18 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!session) {
+  if (!session)
     return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
-  }
 
   const usuario = await prisma.usuario.findUnique({
     where: { id: session.user.id },
     select: { id: true, role: true, clienteId: true },
   });
-
-  if (!usuario) {
+  if (!usuario)
     return NextResponse.json(
       { error: "Usuário não encontrado" },
       { status: 404 }
     );
-  }
 
   // Permissão: SUPERADMIN sempre, outros precisam logs_login.ler
   if (usuario.role !== "SUPERADMIN") {
@@ -30,45 +27,23 @@ export async function GET(request: NextRequest) {
         usuarioId_recurso: { usuarioId: usuario.id, recurso: "logs_login" },
       },
     });
-
-    if (!p?.ler) {
+    if (!p?.ler)
       return NextResponse.json({ error: "Sem permissão" }, { status: 403 });
-    }
-
-    if (!usuario.clienteId) {
+    if (!usuario.clienteId)
       return NextResponse.json({ error: "Sem cliente" }, { status: 403 });
-    }
   }
 
   const { searchParams } = new URL(request.url);
   const limit = Math.min(Number(searchParams.get("limit") || 100), 300);
 
   const clienteIdParam = searchParams.get("clienteId");
-  const from = searchParams.get("from");
-  const to = searchParams.get("to");
 
   let where: any = {};
 
-  // filtro por cliente
   if (usuario.role !== "SUPERADMIN") {
     where.clienteId = usuario.clienteId as string;
   } else if (clienteIdParam && clienteIdParam !== "all") {
     where.clienteId = clienteIdParam;
-  }
-
-  // filtro por data
-  if (from) {
-    where.createdAt = {
-      ...(where.createdAt || {}),
-      gte: new Date(`${from}T00:00:00`),
-    };
-  }
-
-  if (to) {
-    where.createdAt = {
-      ...(where.createdAt || {}),
-      lte: new Date(`${to}T23:59:59`),
-    };
   }
 
   const logs = await prisma.loginLog.findMany({

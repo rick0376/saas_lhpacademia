@@ -30,9 +30,6 @@ export default function LogsLoginPage() {
   const [clienteId, setClienteId] = useState("all");
   const [loading, setLoading] = useState(true);
 
-  const [from, setFrom] = useState("");
-  const [to, setTo] = useState("");
-
   // carregar clientes (somente superadmin)
   useEffect(() => {
     if (role === "SUPERADMIN") {
@@ -45,13 +42,7 @@ export default function LogsLoginPage() {
   // carregar logs
   useEffect(() => {
     setLoading(true);
-    const params = new URLSearchParams();
-
-    if (role === "SUPERADMIN") params.set("clienteId", clienteId);
-    if (from) params.set("from", from);
-    if (to) params.set("to", to);
-
-    const qs = params.toString() ? `?${params.toString()}` : "";
+    const qs = role === "SUPERADMIN" ? `?clienteId=${clienteId}` : "";
     fetch(`/api/logs-login${qs}`)
       .then((r) => r.json())
       .then(setLogs)
@@ -63,38 +54,22 @@ export default function LogsLoginPage() {
       <div className={styles.container}>
         <h1 className={styles.title}>🧾 Logs de Login</h1>
 
-        <div className={styles.filterBar}>
-          {role === "SUPERADMIN" && (
-            <>
-              <label>Academia</label>
-              <select
-                value={clienteId}
-                onChange={(e) => setClienteId(e.target.value)}
-              >
-                <option value="all">Todas</option>
-                {clientes.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.nome}
-                  </option>
-                ))}
-              </select>
-            </>
-          )}
-
-          <label>De</label>
-          <input
-            type="date"
-            value={from}
-            onChange={(e) => setFrom(e.target.value)}
-          />
-
-          <label>Até</label>
-          <input
-            type="date"
-            value={to}
-            onChange={(e) => setTo(e.target.value)}
-          />
-        </div>
+        {role === "SUPERADMIN" && (
+          <div className={styles.filterBar}>
+            <label>Academia</label>
+            <select
+              value={clienteId}
+              onChange={(e) => setClienteId(e.target.value)}
+            >
+              <option value="all">Todas</option>
+              {clientes.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.nome}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         {loading ? (
           <p>Carregando logs...</p>
