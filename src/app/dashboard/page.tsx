@@ -365,7 +365,7 @@ export default async function DashboardPage() {
             </div>
             <div className={styles.cardContent}>
               <span className={styles.cardValue}>{totalAcessos}</span>
-              <span className={styles.cardLabel}>Total de Acessos</span>
+              <span className={styles.cardLabel}> Total de Acessos </span>
               <span className={styles.cardSubtext}>
                 {totalUsuarios} usuários únicos
               </span>
