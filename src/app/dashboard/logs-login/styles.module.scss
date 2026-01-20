@@ -1,6 +1,4 @@
 .main {
-  //padding: 24px;
-
   min-height: calc(100vh - 140px);
   background: linear-gradient(90deg, #6a11cb 0%, #2575fc 50%, #29abe2 100%);
   max-width: 1400px;
@@ -21,24 +19,50 @@
   margin-bottom: 16px;
 }
 
+.contador {
+  font-size: 18px;
+  font-weight: 500;
+  color: #fff;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .filterBar {
   display: flex;
   gap: 12px;
   color: #fff;
   align-items: center;
   margin-bottom: 16px;
+  flex-wrap: wrap; /* Permite que os filtros quebrem em novas linhas em telas pequenas */
 
-  select {
+  label {
+    font-size: 14px;
+  }
+
+  select,
+  input[type="date"] {
     padding: 8px 12px;
     border-radius: 8px;
     border: 1px solid #e5e7eb;
+    font-size: 14px;
+    width: 150px;
   }
-}
 
-.filterBar input[type="date"] {
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  /* Filtro de role (novo) */
+  select {
+    min-width: 150px;
+  }
+
+  /* Ajuste para os filtros de data ficarem alinhados */
+  .dateFilter {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    margin-bottom: 8px;
+  }
 }
 
 .tableWrap {
@@ -67,4 +91,51 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Ajustes responsivos para telas pequenas */
+@media (max-width: 768px) {
+  .title {
+    font-size: 24px;
+  }
+
+  .contador {
+    font-size: 14px;
+    text-align: center;
+  }
+
+  .filterBar {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .filterBar select,
+  .filterBar input[type="date"] {
+    width: 100%;
+    font-size: 14px;
+  }
+
+  .filterBar label {
+    margin-top: 8px;
+  }
+
+  .dateFilter {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .actionButtons {
+    display: flex;
+    gap: 8px;
+    flex-direction: column;
+    margin-top: 16px;
+  }
+
+  .actionBtn {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+  }
 }

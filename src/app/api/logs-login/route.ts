@@ -1,5 +1,3 @@
-// src/app/api/logs-login/route.ts
-
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -47,6 +45,9 @@ export async function GET(request: NextRequest) {
   const from = searchParams.get("from");
   const to = searchParams.get("to");
 
+  // Novo: Filtro por role
+  const role = searchParams.get("role"); // Recupera o filtro de role
+
   let where: any = {};
 
   // filtro por cliente
@@ -54,6 +55,11 @@ export async function GET(request: NextRequest) {
     where.clienteId = usuario.clienteId as string;
   } else if (clienteIdParam && clienteIdParam !== "all") {
     where.clienteId = clienteIdParam;
+  }
+
+  // Filtro por role (novo)
+  if (role && role !== "all") {
+    where.role = role;
   }
 
   // filtro por data

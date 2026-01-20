@@ -39,6 +39,10 @@ export default function LogsLoginPage() {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
 
+  const [totalUsuarios, setTotalUsuarios] = useState(0);
+  const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [totalAcessos, setTotalAcessos] = useState(0);
+
   // carregar clientes (somente superadmin)
   useEffect(() => {
     if (role === "SUPERADMIN") {
@@ -51,18 +55,41 @@ export default function LogsLoginPage() {
   // carregar logs
   useEffect(() => {
     setLoading(true);
+
+    // Cálculo das datas padrão
+    const hoje = new Date();
+    const umDiaAntes = new Date(hoje);
+    umDiaAntes.setDate(hoje.getDate() - 1); // Um dia antes do dia atual
+
+    // Definir os valores padrão de data
+    const defaultFrom = `${umDiaAntes.getFullYear()}-${(umDiaAntes.getMonth() + 1).toString().padStart(2, "0")}-${umDiaAntes.getDate().toString().padStart(2, "0")}`;
+    const defaultTo = `${hoje.getFullYear()}-${(hoje.getMonth() + 1).toString().padStart(2, "0")}-${hoje.getDate().toString().padStart(2, "0")}`;
+
+    setFrom(defaultFrom);
+    setTo(defaultTo);
+
     const params = new URLSearchParams();
 
     if (role === "SUPERADMIN") params.set("clienteId", clienteId);
     if (from) params.set("from", from);
     if (to) params.set("to", to);
+    if (roleFilter && roleFilter !== "all") params.set("role", roleFilter); // Filtra por role
 
     const qs = params.toString() ? `?${params.toString()}` : "";
     fetch(`/api/logs-login${qs}`)
       .then((r) => r.json())
-      .then(setLogs)
+      .then((data) => {
+        setLogs(data);
+
+        // Contar os usuários únicos
+        const uniqueUsers = new Set(data.map((log: Log) => log.email));
+        setTotalUsuarios(uniqueUsers.size); // Contagem de usuários únicos
+
+        // Contar o total de acessos
+        setTotalAcessos(data.length); // Contagem do total de acessos
+      })
       .finally(() => setLoading(false));
-  }, [clienteId, role, from, to]);
+  }, [clienteId, role, from, to, roleFilter]);
 
   // ✅ ADICIONADOS (PDF)
   const gerarPdfLogs = async () => {
@@ -242,6 +269,10 @@ export default function LogsLoginPage() {
       <div className={styles.container}>
         <h1 className={styles.title}>🧾 Logs de Login</h1>
 
+        <h1 className={styles.contador}>
+          Acessos: {totalUsuarios} usuários / {totalAcessos} acessos
+        </h1>
+
         <div className={styles.filterBar}>
           {role === "SUPERADMIN" && (
             <>
@@ -260,22 +291,38 @@ export default function LogsLoginPage() {
             </>
           )}
 
-          <label>De</label>
-          <input
-            type="date"
-            value={from}
-            onChange={(e) => setFrom(e.target.value)}
-          />
+          {/* Filtro de Tipo de Usuário */}
+          <label>Tipo</label>
+          <select
+            value={roleFilter}
+            onChange={(e) => setRoleFilter(e.target.value)}
+          >
+            <option value="all">Todos</option>
+            <option value="SUPERADMIN">SUPERADMIN</option>
+            <option value="ADMIN">ADMIN</option>
+            <option value="USUARIO">USUARIO</option>
+            <option value="ALUNO">ALUNO</option>
+          </select>
 
-          <label>Até</label>
-          <input
-            type="date"
-            value={to}
-            onChange={(e) => setTo(e.target.value)}
-          />
+          {/* Filtro de Data */}
+          <div className={styles.dateFilter}>
+            <label>De</label>
+            <input
+              type="date"
+              value={from}
+              onChange={(e) => setFrom(e.target.value)}
+            />
 
-          {/* ✅ ADICIONADOS (BOTÕES PDF/WHATS) */}
-          <div style={{ display: "flex", gap: 8, marginLeft: "auto" }}>
+            <label>Até</label>
+            <input
+              type="date"
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
+            />
+          </div>
+
+          {/* Botões PDF e WhatsApp */}
+          <div className={styles.actionButtons}>
             <button
               onClick={gerarPdfLogs}
               className={styles.actionBtn}
