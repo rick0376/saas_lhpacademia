@@ -6,6 +6,11 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import styles from "./styles.module.scss";
 
+// ✅ ADICIONADOS (PDF/WHATS)
+import { jsPDF } from "jspdf";
+import { FileText } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
+
 type Log = {
   id: string;
   email: string;
@@ -14,6 +19,7 @@ type Log = {
   userAgent?: string | null;
   createdAt: string;
   cliente?: { nome: string } | null;
+  usuario?: { nome: string } | null;
 };
 
 type Cliente = {
@@ -56,7 +62,180 @@ export default function LogsLoginPage() {
       .then((r) => r.json())
       .then(setLogs)
       .finally(() => setLoading(false));
-  }, [clienteId, role]);
+  }, [clienteId, role, from, to]);
+
+  // ✅ ADICIONADOS (PDF)
+  const gerarPdfLogs = async () => {
+    if (logs.length === 0) return;
+
+    const nomeCliente =
+      (session?.user as any)?.cliente ||
+      (session?.user as any)?.name ||
+      "Academia Pro";
+
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+    const margin = 10;
+    let y = 50;
+
+    const getLogoBase64 = async () => {
+      try {
+        const origin =
+          typeof window !== "undefined" ? window.location.origin : "";
+        const resp = await fetch(`${origin}/imagens/logo.png`, {
+          cache: "no-store",
+        });
+        if (!resp.ok) return "";
+        const blob = await resp.blob();
+        return await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () =>
+            resolve(typeof reader.result === "string" ? reader.result : "");
+          reader.onerror = () => resolve("");
+          reader.readAsDataURL(blob);
+        });
+      } catch {
+        return "";
+      }
+    };
+
+    const logoDataUri = await getLogoBase64();
+
+    const printHeader = () => {
+      doc.setFillColor(25, 35, 55);
+      doc.rect(0, 0, pageWidth, 40, "F");
+      doc.setFillColor(218, 165, 32);
+      doc.rect(0, 35, pageWidth, 5, "F");
+
+      if (logoDataUri) {
+        try {
+          doc.addImage(logoDataUri, "PNG", 10, 7, 18, 18);
+        } catch {}
+      }
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(16);
+      doc.setTextColor(255, 255, 255);
+      doc.text("LOGS DE LOGIN", pageWidth / 2, 18, { align: "center" });
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      const periodo = `${from ? `De: ${from}` : "De: -"}  ${
+        to ? `Até: ${to}` : "Até: -"
+      }`;
+      doc.text(periodo, pageWidth / 2, 28, { align: "center" });
+    };
+
+    const printFooter = () => {
+      const totalPages = doc.getNumberOfPages();
+      const footerY = pageHeight - 10;
+
+      for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+
+        doc.setDrawColor(200, 200, 200);
+        doc.setLineWidth(0.5);
+        doc.line(margin, footerY - 5, pageWidth - margin, footerY - 5);
+
+        doc.setFontSize(8);
+        doc.setTextColor(100, 100, 100);
+
+        doc.text(nomeCliente, margin, footerY);
+        doc.text(`Página ${i} de ${totalPages}`, pageWidth - margin, footerY, {
+          align: "right",
+        });
+      }
+    };
+
+    const printTableHeader = () => {
+      doc.setFontSize(9);
+      doc.setTextColor(100, 100, 100);
+      doc.setFont("helvetica", "bold");
+      doc.text("DATA", margin, y);
+      doc.text("EMAIL", 55, y);
+      doc.text("PERFIL", 125, y);
+      doc.text("USUÁRIO", 150, y);
+      doc.setDrawColor(200, 200, 200);
+      doc.line(margin, y + 2, pageWidth - margin, y + 2);
+      y += 8;
+    };
+
+    const checkPageBreak = (heightNeeded: number) => {
+      if (y + heightNeeded > pageHeight - 20) {
+        doc.addPage();
+        y = 50;
+        printHeader();
+        printTableHeader();
+      }
+    };
+
+    printHeader();
+    printTableHeader();
+
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(0, 0, 0);
+
+    logs.forEach((l) => {
+      checkPageBreak(10);
+
+      const dataStr = new Date(l.createdAt).toLocaleString("pt-BR");
+      const email = doc.splitTextToSize(l.email || "-", 65);
+      const perfil = l.role || "-";
+      const usuarioNome = doc.splitTextToSize(l.usuario?.nome || "-", 45);
+
+      doc.text(dataStr, margin, y);
+      doc.text(email, 55, y);
+      doc.text(perfil, 125, y);
+      doc.text(usuarioNome, 150, y);
+
+      const height = Math.max(email.length * 5, usuarioNome.length * 5, 6);
+
+      doc.setDrawColor(245, 245, 245);
+      doc.line(margin, y + height, pageWidth - margin, y + height);
+
+      y += height + 4;
+    });
+
+    printFooter();
+
+    const suffix = `${from || "inicio"}-${to || "hoje"}`.replaceAll("/", "-");
+    doc.save(`logs-login-${suffix}.pdf`);
+  };
+
+  // ✅ ADICIONADOS (WHATS)
+  const enviarWhatsAppLogs = () => {
+    if (logs.length === 0) return;
+
+    const nomeCliente =
+      (session?.user as any)?.cliente ||
+      (session?.user as any)?.name ||
+      "Academia Pro";
+
+    let texto = `🧾 *LOGS DE LOGIN*\n`;
+    texto += `${from ? `De: ${from}` : "De: -"} | ${
+      to ? `Até: ${to}` : "Até: -"
+    }\n\n`;
+
+    logs.slice(0, 80).forEach((l) => {
+      const dataStr = new Date(l.createdAt).toLocaleString("pt-BR");
+      const usuarioNome = l.usuario?.nome || "-";
+      const academia = l.cliente?.nome || "Academia Pro";
+      texto += `▪️ ${dataStr} | ${l.email} | ${l.role} | ${usuarioNome} | ${academia}\n`;
+    });
+
+    if (logs.length > 80) {
+      texto += `\n... +${logs.length - 80} registros (limite do WhatsApp)\n`;
+    }
+
+    texto += `\n------------------------------\n`;
+    texto += `📌 *${nomeCliente}*`;
+
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(
+      texto,
+    )}`;
+    window.open(url, "_blank");
+  };
 
   return (
     <main className={styles.main}>
@@ -94,6 +273,29 @@ export default function LogsLoginPage() {
             value={to}
             onChange={(e) => setTo(e.target.value)}
           />
+
+          {/* ✅ ADICIONADOS (BOTÕES PDF/WHATS) */}
+          <div style={{ display: "flex", gap: 8, marginLeft: "auto" }}>
+            <button
+              onClick={gerarPdfLogs}
+              className={styles.actionBtn}
+              disabled={logs.length === 0 || loading}
+              title="Baixar PDF"
+            >
+              <FileText className={styles.iconBtn} />
+              PDF
+            </button>
+
+            <button
+              onClick={enviarWhatsAppLogs}
+              className={styles.actionBtn}
+              disabled={logs.length === 0 || loading}
+              title="Enviar WhatsApp"
+            >
+              <FaWhatsapp className={styles.iconBtn} />
+              Whats
+            </button>
+          </div>
         </div>
 
         {loading ? (
@@ -106,9 +308,8 @@ export default function LogsLoginPage() {
                   <th>Data</th>
                   <th>Email</th>
                   <th>Perfil</th>
+                  <th>Usuário</th>
                   <th>Academia</th>
-                  <th>IP</th>
-                  <th>Navegador</th>
                 </tr>
               </thead>
               <tbody>
@@ -117,9 +318,8 @@ export default function LogsLoginPage() {
                     <td>{new Date(l.createdAt).toLocaleString("pt-BR")}</td>
                     <td>{l.email}</td>
                     <td>{l.role}</td>
-                    <td>{l.cliente?.nome || "-"}</td>
-                    <td>{l.ip || "-"}</td>
-                    <td className={styles.ua}>{l.userAgent || "-"}</td>
+                    <td>{l.usuario?.nome || "-"}</td>
+                    <td>{l.cliente?.nome || "Academia Pro"}</td>
                   </tr>
                 ))}
               </tbody>

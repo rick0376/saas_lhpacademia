@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
   if (!usuario) {
     return NextResponse.json(
       { error: "Usuário não encontrado" },
-      { status: 404 }
+      { status: 404 },
     );
   }
 
@@ -74,9 +74,8 @@ export async function GET(request: NextRequest) {
   const logs = await prisma.loginLog.findMany({
     where,
     include: {
-      cliente: {
-        select: { nome: true },
-      },
+      cliente: { select: { nome: true } },
+      usuario: { select: { nome: true } },
     },
     orderBy: { createdAt: "desc" },
     take: limit,

@@ -1,3 +1,5 @@
+//src/components/exercicios/ExercicioTable.tsx
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -160,7 +162,7 @@ export const ExercicioTable = () => {
       setDeleteModal({ isOpen: false });
     } catch (err) {
       alert(
-        "Erro ao excluir exercício. Verifique se não há treinos usando este exercício."
+        "Erro ao excluir exercício. Verifique se não há treinos usando este exercício.",
       );
       console.error(err);
     }
@@ -341,11 +343,14 @@ export const ExercicioTable = () => {
 
     const nomeCliente = session?.user?.name || "SaaS Academia LHP";
 
-    const porGrupo = exercicios.reduce((acc, ex) => {
-      if (!acc[ex.grupoMuscular]) acc[ex.grupoMuscular] = [];
-      acc[ex.grupoMuscular].push(ex);
-      return acc;
-    }, {} as Record<string, Exercicio[]>);
+    const porGrupo = exercicios.reduce(
+      (acc, ex) => {
+        if (!acc[ex.grupoMuscular]) acc[ex.grupoMuscular] = [];
+        acc[ex.grupoMuscular].push(ex);
+        return acc;
+      },
+      {} as Record<string, Exercicio[]>,
+    );
 
     let texto = `🏋️ *BIBLIOTECA DE EXERCÍCIOS*\n`;
     if (filtroGrupo) texto += `Filtro: ${getGrupoMuscularLabel(filtroGrupo)}\n`;
@@ -367,7 +372,7 @@ export const ExercicioTable = () => {
     texto += `📌 *${nomeCliente}*`;
 
     const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(
-      texto
+      texto,
     )}`;
     window.open(url, "_blank");
   };
@@ -505,7 +510,7 @@ export const ExercicioTable = () => {
                   className={styles.grupoBadge}
                   style={{
                     backgroundColor: getGrupoMuscularColor(
-                      exercicio.grupoMuscular
+                      exercicio.grupoMuscular,
                     ),
                   }}
                 >

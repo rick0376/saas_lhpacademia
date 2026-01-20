@@ -82,7 +82,11 @@ export const authOptions: NextAuthOptions = {
             await prisma.loginLog.create({
               data: {
                 usuarioId: usuario.id,
-                clienteId: usuario.clienteId ?? null,
+                //clienteId: usuario.clienteId ?? null,
+                clienteId:
+                  (credentials?.clienteId as string | undefined) ??
+                  usuario.clienteId ??
+                  null,
                 role: usuario.role,
                 email: usuario.email,
                 ip: null,
