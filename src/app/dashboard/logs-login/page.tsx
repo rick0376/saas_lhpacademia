@@ -29,10 +29,26 @@ type Cliente = {
 
 export default function LogsLoginPage() {
   const { data: session } = useSession();
+
+  // Passo 1: Verificar permissão para "compartilhar"
+  const [podeCompartilharLogs, setPodeCompartilharLogs] = useState(false);
+
+  useEffect(() => {
+    if (session) {
+      // Verificando a permissão de "logs_compartilhar"
+      const permissaoCompartilhar = (session?.user as any)?.permissoes?.some(
+        (perm: any) =>
+          perm.recurso === "logs_compartilhar" && perm.ler === true,
+      );
+      setPodeCompartilharLogs(permissaoCompartilhar);
+    }
+  }, [session]);
+
   const role = (session?.user as any)?.role;
 
   const [logs, setLogs] = useState<Log[]>([]);
   const [clientes, setClientes] = useState<Cliente[]>([]);
+
   const [clienteId, setClienteId] = useState("all");
   const [loading, setLoading] = useState(true);
 
@@ -352,25 +368,30 @@ export default function LogsLoginPage() {
 
           {/* Botões PDF e WhatsApp */}
           <div className={styles.actionButtons}>
-            <button
-              onClick={gerarPdfLogs}
-              className={`${styles.actionBtn} ${styles.btnPdf}`}
-              disabled={logs.length === 0 || loading}
-              title="Baixar PDF"
-            >
-              <FileText className={styles.iconBtn} />
-              <span className={styles.hideMobile}>PDF</span>
-            </button>
+            {/* Verifica se o usuário tem permissão para compartilhar logs */}
+            {podeCompartilharLogs && (
+              <>
+                <button
+                  onClick={gerarPdfLogs}
+                  className={`${styles.actionBtn} ${styles.btnPdf}`}
+                  disabled={logs.length === 0 || loading}
+                  title="Baixar PDF"
+                >
+                  <FileText className={styles.iconBtn} />
+                  <span className={styles.hideMobile}>PDF</span>
+                </button>
 
-            <button
-              onClick={enviarWhatsAppLogs}
-              className={`${styles.actionBtn} ${styles.btnWhats}`}
-              disabled={logs.length === 0 || loading}
-              title="Enviar WhatsApp"
-            >
-              <FaWhatsapp className={styles.iconBtn} />
-              <span className={styles.hideMobile}>Whats</span>
-            </button>
+                <button
+                  onClick={enviarWhatsAppLogs}
+                  className={`${styles.actionBtn} ${styles.btnWhats}`}
+                  disabled={logs.length === 0 || loading}
+                  title="Enviar WhatsApp"
+                >
+                  <FaWhatsapp className={styles.iconBtn} />
+                  <span className={styles.hideMobile}>Whats</span>
+                </button>
+              </>
+            )}
           </div>
         </div>
 

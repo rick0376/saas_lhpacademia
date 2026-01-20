@@ -47,10 +47,9 @@ export default async function DashboardPage() {
     }
   }
 
-  // Filtro de cliente
   const clienteWhere =
     session.user.role !== "SUPERADMIN" && session.user.clienteId
-      ? { id: session.user.clienteId }
+      ? { clienteId: session.user.clienteId }
       : {};
 
   // KPIs
@@ -169,11 +168,13 @@ export default async function DashboardPage() {
     _count: { treinos: aluno._count.treinos },
   }));
 
-  // Log de login (LoginLog)
+  // Logs de login
   const logsData = await prisma.loginLog.findMany({
-    where: { ...clienteWhere },
+    where: {
+      ...clienteWhere,
+    },
     orderBy: { createdAt: "desc" },
-    take: 100, // Pega os 100 logs mais recentes
+    take: 100,
   });
 
   const totalAcessos = logsData.length;

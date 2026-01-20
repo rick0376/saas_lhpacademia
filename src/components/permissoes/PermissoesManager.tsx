@@ -59,6 +59,12 @@ const RECURSOS: RecursoConfig[] = [
     tipos: ["ler"],
   },
 
+  {
+    value: "logs_compartilhar",
+    label: "📤 Logs • Compartilhar",
+    description: "Compartilhar logs de login em PDF ou WhatsApp",
+    tipos: ["ler"], // Só o tipo "ler" para visualizar os logs
+  },
   // ======================
   // 🏢 CLIENTES / 👥 USUÁRIOS
   // ======================
@@ -275,7 +281,7 @@ export const PermissoesManager = () => {
   const podeEditarPermissoes =
     roleLogado === "SUPERADMIN" ||
     permissoesLogado.some(
-      (p) => p.recurso === "permissoes_gerenciar" && p.editar === true
+      (p) => p.recurso === "permissoes_gerenciar" && p.editar === true,
     );
 
   const [toast, setToast] = useState<{
@@ -329,7 +335,7 @@ export const PermissoesManager = () => {
         setError(
           mostrarTodos
             ? "Nenhum usuário ativo encontrado."
-            : "Nenhum usuário ADMIN ou USER ativo encontrado. Cadastre usuários com essas roles ou marque 'Mostrar todos os usuários'."
+            : "Nenhum usuário ADMIN ou USER ativo encontrado. Cadastre usuários com essas roles ou marque 'Mostrar todos os usuários'.",
         );
       }
     } catch (error) {
@@ -377,7 +383,7 @@ export const PermissoesManager = () => {
 
   const handleTogglePermissao = (
     recurso: string,
-    tipo: "criar" | "ler" | "editar" | "deletar"
+    tipo: "criar" | "ler" | "editar" | "deletar",
   ) => {
     setPermissoes((prev) => {
       if (!podeEditarPermissoes) return prev;
@@ -405,7 +411,7 @@ export const PermissoesManager = () => {
     setPermissoes((prev) => {
       const novoEstado: Record<string, Permissao> = { ...prev };
       const novoValor = !RECURSOS.filter(
-        (r) => !r.tipos || r.tipos.includes(tipo)
+        (r) => !r.tipos || r.tipos.includes(tipo),
       ).every((r) => novoEstado[r.value]?.[tipo]);
 
       RECURSOS.filter((r) => !r.tipos || r.tipos.includes(tipo)).forEach(
@@ -421,7 +427,7 @@ export const PermissoesManager = () => {
             }),
             [tipo]: novoValor,
           };
-        }
+        },
       );
 
       return novoEstado;
@@ -504,7 +510,7 @@ export const PermissoesManager = () => {
       if (failed.length > 0) {
         showToast(
           `Algumas permissões não puderam ser salvas (${failed.length}).`,
-          "warning"
+          "warning",
         );
       } else {
         showToast("Permissões salvas com sucesso!", "success");
@@ -521,7 +527,7 @@ export const PermissoesManager = () => {
 
   const showToast = (
     message: string,
-    type: "success" | "error" | "info" | "warning"
+    type: "success" | "error" | "info" | "warning",
   ) => {
     setToast({ show: true, message, type });
   };
@@ -689,17 +695,17 @@ export const PermissoesManager = () => {
                                 (tipo === "criar"
                                   ? "Novo"
                                   : tipo === "ler"
-                                  ? "Visualizar"
-                                  : tipo === "editar"
-                                  ? "Editar"
-                                  : "Deletar")}
+                                    ? "Visualizar"
+                                    : tipo === "editar"
+                                      ? "Editar"
+                                      : "Deletar")}
                             </span>
                           </label>
                         ))}
                     </div>
                   </div>
                 );
-              }
+              },
             )}
           </div>
 
