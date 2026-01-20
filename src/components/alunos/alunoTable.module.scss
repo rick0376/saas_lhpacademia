@@ -62,7 +62,9 @@
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
 
   &:focus {
     outline: none;
@@ -95,7 +97,9 @@
   font-weight: 500;
   color: #1f2937;
   background-color: white;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
 
   &::placeholder {
     color: #a5b4fc;

@@ -169,17 +169,7 @@ export default async function DashboardPage() {
     _count: { treinos: aluno._count.treinos },
   }));
 
-  // Log de login (LoginLog)
-  const logsData = await prisma.loginLog.findMany({
-    where: { ...clienteWhere },
-    orderBy: { createdAt: "desc" },
-    take: 100, // Pega os 100 logs mais recentes
-  });
-
-  const totalAcessos = logsData.length;
-  const totalUsuarios = new Set(logsData.map((log) => log.email)).size;
-
-  // Menu de acesso rápido
+  // ✅ Menu de acesso rápido (com verificação de permissão)
   const dashboardItems = [
     {
       id: "clientes",
@@ -276,14 +266,17 @@ export default async function DashboardPage() {
   // ✅ FILTRAR CARDS BASEADO EM PERMISSÕES
   const filteredItems = await Promise.all(
     dashboardItems.map(async (item) => {
+      // SUPERADMIN vê tudo
       if (session.user.role === "SUPERADMIN") {
         return item;
       }
 
+      // Items exclusivos de SUPERADMIN
       if (item.superAdminOnly) {
         return null;
       }
 
+      // Verificar permissão no banco
       if (item.recurso) {
         const permissao = await prisma.permissao.findUnique({
           where: {
@@ -301,11 +294,16 @@ export default async function DashboardPage() {
     }),
   );
 
-  const filteredCardsItems = filteredItems.filter(Boolean);
+  // Remover nulls
+  const filteredCardsItems = filteredItems.filter(
+    Boolean,
+  ) as typeof dashboardItems;
 
   return (
     <div className={styles.container}>
       <AlertaSemPermissao />
+
+      {/* Welcome Section */}
       <div className={styles.header}>
         <h1 className={styles.title}>Olá, {session.user.name}! 👋</h1>
         <p className={styles.subtitle}>Bem-vindo ao painel de controle</p>
@@ -317,60 +315,20 @@ export default async function DashboardPage() {
       <section className={styles.kpiSection}>
         <h2 className={styles.sectionTitle}>📊 Métricas Principais</h2>
         <div className={styles.kpiGrid}>
-          <div className={styles.kpiCard}>
-            <div
-              className={styles.cardIcon}
-              style={{
-                background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)", // Cor do card
-              }}
-            >
-              👥
-            </div>
-            <div className={styles.cardContent}>
-              <span className={styles.cardValue}>{totalAlunos.toString()}</span>
-              <span className={styles.cardLabel}> Alunos Ativos</span>
-              <span className={styles.cardSubtext}>
-                +{novosAlunos} novos no mês
-              </span>
-            </div>
-          </div>
-
-          <div className={styles.kpiCard}>
-            <div
-              className={styles.cardIcon}
-              style={{
-                background: "linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)", // Cor do card
-              }}
-            >
-              💪
-            </div>
-            <div className={styles.cardContent}>
-              <span className={styles.cardValue}>
-                {treinosExecutados.toString()}
-              </span>
-              <span className={styles.cardLabel}> Treinos Realizados</span>
-              <span className={styles.cardSubtext}>no mês atual</span>
-            </div>
-          </div>
-
-          {/* Card de Logs de Login */}
-          <div className={styles.kpiCard}>
-            <div
-              className={styles.cardIcon}
-              style={{
-                background: "linear-gradient(135deg, #ef4444 0%, #d97706 100%)", // Cor do card
-              }}
-            >
-              🧾
-            </div>
-            <div className={styles.cardContent}>
-              <span className={styles.cardValue}>{totalAcessos}</span>
-              <span className={styles.cardLabel}>Total de Acessos</span>
-              <span className={styles.cardSubtext}>
-                {totalUsuarios} usuários únicos
-              </span>
-            </div>
-          </div>
+          <KPICard
+            title="Alunos Ativos"
+            value={totalAlunos.toString()}
+            change={`+${novosAlunos} novos no mês`}
+            icon="👥"
+            color="#3b82f6"
+          />
+          <KPICard
+            title="Treinos Realizados"
+            value={treinosExecutados.toString()}
+            change="no mês atual"
+            icon="💪"
+            color="#8b5cf6"
+          />
         </div>
       </section>
 

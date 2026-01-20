@@ -31,14 +31,15 @@
 
 .filterBar {
   display: flex;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
   color: #fff;
   align-items: center;
   margin-bottom: 16px;
-  flex-wrap: wrap; /* Permite que os filtros quebrem em novas linhas em telas pequenas */
+  justify-content: space-between;
 
   label {
-    font-size: 14px;
+    font-size: 18px;
   }
 
   select,
@@ -49,20 +50,75 @@
     font-size: 14px;
     width: 150px;
   }
+}
 
-  /* Filtro de role (novo) */
-  select {
-    min-width: 150px;
-  }
+.academiaDate {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+}
 
-  /* Ajuste para os filtros de data ficarem alinhados */
-  .dateFilter {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    margin-bottom: 8px;
-  }
+.filterAcademia {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+}
+
+.dateFilter {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+}
+
+.filterAcademia select,
+.dateFilter select,
+.dateFilter input[type="date"] {
+  width: 48%; /* Ajusta para que os filtros fiquem lado a lado */
+}
+
+.actionButtons {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.actionBtn {
+  flex: 1;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: white;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.btnNovo {
+  background-color: #2563eb;
+}
+
+.btnPdf {
+  background-color: #f59e0b;
+}
+
+.btnWhats {
+  background-color: #25d366;
+}
+
+.iconBtn {
+  width: 18px;
+  height: 18px;
+  transition: all 0.2s ease;
 }
 
 .tableWrap {
@@ -93,7 +149,7 @@
   text-overflow: ellipsis;
 }
 
-/* Ajustes responsivos para telas pequenas */
+/* Responsividade para telas pequenas */
 @media (max-width: 768px) {
   .title {
     font-size: 24px;
@@ -119,17 +175,27 @@
     margin-top: 8px;
   }
 
+  .academiaDate {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .filterAcademia,
   .dateFilter {
-    display: flex;
+    flex-direction: column;
     gap: 8px;
-    flex-wrap: wrap;
-    justify-content: flex-start;
+  }
+
+  .filterAcademia select,
+  .dateFilter select,
+  .dateFilter input[type="date"] {
+    width: 100%; /* Em telas pequenas, ocupa toda a largura */
   }
 
   .actionButtons {
     display: flex;
     gap: 8px;
-    flex-direction: column;
+    //flex-direction: column;
     margin-top: 16px;
   }
 

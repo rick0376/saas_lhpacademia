@@ -152,6 +152,16 @@ export default function LogsLoginPage() {
         to ? `Até: ${to}` : "Até: -"
       }`;
       doc.text(periodo, pageWidth / 2, 28, { align: "center" });
+
+      // Adicionar total de acessos, usuários e nome da academia
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(12);
+      doc.text(
+        `Academia: ${nomeCliente} | Total de Acessos: ${totalAcessos} | Total de Usuários: ${totalUsuarios}`,
+        pageWidth / 2,
+        38,
+        { align: "center" },
+      );
     };
 
     const printFooter = () => {
@@ -180,9 +190,10 @@ export default function LogsLoginPage() {
       doc.setTextColor(100, 100, 100);
       doc.setFont("helvetica", "bold");
       doc.text("DATA", margin, y);
-      doc.text("EMAIL", 55, y);
-      doc.text("PERFIL", 125, y);
-      doc.text("USUÁRIO", 150, y);
+      doc.text("EMAIL", 50, y);
+      doc.text("PERFIL", 90, y);
+      doc.text("USUÁRIO", 120, y);
+      doc.text("ACADEMIA", 160, y); // Nome do cliente ou academia
       doc.setDrawColor(200, 200, 200);
       doc.line(margin, y + 2, pageWidth - margin, y + 2);
       y += 8;
@@ -210,13 +221,23 @@ export default function LogsLoginPage() {
       const email = doc.splitTextToSize(l.email || "-", 65);
       const perfil = l.role || "-";
       const usuarioNome = doc.splitTextToSize(l.usuario?.nome || "-", 45);
+      const academiaNome = doc.splitTextToSize(
+        l.cliente?.nome || "Academia Pro",
+        45,
+      );
 
       doc.text(dataStr, margin, y);
-      doc.text(email, 55, y);
-      doc.text(perfil, 125, y);
-      doc.text(usuarioNome, 150, y);
+      doc.text(email, 50, y);
+      doc.text(perfil, 90, y);
+      doc.text(usuarioNome, 120, y);
+      doc.text(academiaNome, 160, y); // Exibe o nome da academia
 
-      const height = Math.max(email.length * 5, usuarioNome.length * 5, 6);
+      const height = Math.max(
+        email.length * 5,
+        usuarioNome.length * 5,
+        academiaNome.length * 5,
+        6,
+      );
 
       doc.setDrawColor(245, 245, 245);
       doc.line(margin, y + height, pageWidth - margin, y + height);
@@ -244,11 +265,14 @@ export default function LogsLoginPage() {
       to ? `Até: ${to}` : "Até: -"
     }\n\n`;
 
+    // Adicionando total de acessos e usuários na mensagem do WhatsApp
+    texto += `Total de Acessos: ${totalAcessos} | Total de Usuários: ${totalUsuarios}\n\n`;
+
     logs.slice(0, 80).forEach((l) => {
       const dataStr = new Date(l.createdAt).toLocaleString("pt-BR");
       const usuarioNome = l.usuario?.nome || "-";
       const academia = l.cliente?.nome || "Academia Pro";
-      texto += `▪️ ${dataStr} | ${l.email} | ${l.role} | ${usuarioNome} | ${academia}\n`;
+      texto += `💬 ${dataStr} | ${l.email} | ${l.role} | ${usuarioNome} | ${academia}\n`;
     });
 
     if (logs.length > 80) {
@@ -267,80 +291,85 @@ export default function LogsLoginPage() {
   return (
     <main className={styles.main}>
       <div className={styles.container}>
-        <h1 className={styles.title}>🧾 Logs de Login</h1>
-
-        <h1 className={styles.contador}>
-          Acessos: {totalUsuarios} usuários / {totalAcessos} acessos
-        </h1>
+        <div className={styles.toolbar}>
+          <h1 className={styles.title}>🧾 Logs de Login</h1>
+          <h1 className={styles.contador}>
+            Acessos: {totalUsuarios} usuários / {totalAcessos} acessos
+          </h1>
+        </div>
 
         <div className={styles.filterBar}>
-          {role === "SUPERADMIN" && (
-            <>
-              <label>Academia</label>
+          <div className={styles.academiaDate}>
+            <div className={styles.filterAcademia}>
+              {role === "SUPERADMIN" && (
+                <>
+                  <label>Academia</label>
+                  <select
+                    value={clienteId}
+                    onChange={(e) => setClienteId(e.target.value)}
+                  >
+                    <option value="all">Todas</option>
+                    {clientes.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.nome}
+                      </option>
+                    ))}
+                  </select>
+                </>
+              )}
+
+              {/* Filtro de Tipo de Usuário */}
+              <label>Tipo</label>
               <select
-                value={clienteId}
-                onChange={(e) => setClienteId(e.target.value)}
+                value={roleFilter}
+                onChange={(e) => setRoleFilter(e.target.value)}
               >
-                <option value="all">Todas</option>
-                {clientes.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.nome}
-                  </option>
-                ))}
+                <option value="all">Todos</option>
+                <option value="SUPERADMIN">SUPERADMIN</option>
+                <option value="ADMIN">ADMIN</option>
+                <option value="USUARIO">USUARIO</option>
+                <option value="ALUNO">ALUNO</option>
               </select>
-            </>
-          )}
+            </div>
 
-          {/* Filtro de Tipo de Usuário */}
-          <label>Tipo</label>
-          <select
-            value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value)}
-          >
-            <option value="all">Todos</option>
-            <option value="SUPERADMIN">SUPERADMIN</option>
-            <option value="ADMIN">ADMIN</option>
-            <option value="USUARIO">USUARIO</option>
-            <option value="ALUNO">ALUNO</option>
-          </select>
+            {/* Filtro de Data */}
+            <div className={styles.dateFilter}>
+              <label>Início</label>
+              <input
+                type="date"
+                value={from}
+                onChange={(e) => setFrom(e.target.value)}
+              />
 
-          {/* Filtro de Data */}
-          <div className={styles.dateFilter}>
-            <label>De</label>
-            <input
-              type="date"
-              value={from}
-              onChange={(e) => setFrom(e.target.value)}
-            />
-
-            <label>Até</label>
-            <input
-              type="date"
-              value={to}
-              onChange={(e) => setTo(e.target.value)}
-            />
+              <label>Término</label>
+              <input
+                type="date"
+                value={to}
+                onChange={(e) => setTo(e.target.value)}
+              />
+            </div>
           </div>
 
           {/* Botões PDF e WhatsApp */}
           <div className={styles.actionButtons}>
             <button
               onClick={gerarPdfLogs}
-              className={styles.actionBtn}
+              className={`${styles.actionBtn} ${styles.btnPdf}`}
               disabled={logs.length === 0 || loading}
               title="Baixar PDF"
             >
               <FileText className={styles.iconBtn} />
-              PDF
+              <span className={styles.hideMobile}>PDF</span>
             </button>
 
             <button
               onClick={enviarWhatsAppLogs}
-              className={styles.actionBtn}
+              className={`${styles.actionBtn} ${styles.btnWhats}`}
               disabled={logs.length === 0 || loading}
               title="Enviar WhatsApp"
             >
               <FaWhatsapp className={styles.iconBtn} />
-              Whats
+              <span className={styles.hideMobile}>Whats</span>
             </button>
           </div>
         </div>
