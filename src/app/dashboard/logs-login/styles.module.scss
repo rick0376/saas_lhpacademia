@@ -115,6 +115,34 @@
   background-color: #25d366;
 }
 
+.btnDelete {
+  background: #ef4444;
+  color: #fff;
+}
+
+.deleteButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.deleteButton {
+  background-color: #fee2e2;
+  color: #991b1b;
+
+  &:hover {
+    background-color: #ef4444;
+    color: white;
+  }
+}
+
 .iconBtn {
   width: 18px;
   height: 18px;
@@ -147,6 +175,86 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Estilos para a modal */
+.modalContent {
+  padding: 20px;
+  text-align: center;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.modalActions button {
+  padding: 8px 16px;
+  border: none;
+  cursor: pointer;
+}
+
+.modalActions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Estilos para os botões dentro da modal */
+.modalActions button.variant-danger {
+  background-color: #ff4d4f;
+  color: white;
+}
+
+.modalActions button.variant-outline {
+  background-color: transparent;
+  color: #ff4d4f;
+  border: 1px solid #ff4d4f;
+}
+
+.modalActions button.variant-outline:hover {
+  background-color: #ff4d4f;
+  color: white;
+}
+
+.modalActions button.variant-danger:hover {
+  background-color: #e60000;
+  border-color: #e60000;
+}
+
+/* Estilos para o botão de "Excluir" */
+.deleteButton {
+  background-color: #ff4d4f;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.deleteButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.deleteButton:hover {
+  background-color: #e60000;
+}
+
+/* Estilos para os botões na ação de "Excluir Selecionados" */
+.actionBtnDelete {
+  background-color: #ff4d4f;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  cursor: pointer;
+}
+
+.actionBtnDelete:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.actionBtnDelete:hover {
+  background-color: #e60000;
 }
 
 /* Responsividade para telas pequenas */

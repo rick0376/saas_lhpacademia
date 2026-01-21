@@ -7,10 +7,8 @@ import { useSession } from "next-auth/react";
 import styles from "./styles.module.scss";
 
 import { jsPDF } from "jspdf";
-import { FileText, Trash2 } from "lucide-react";
+import { FileText } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
-import { Modal } from "@/components/ui/Modal/Modal";
-import { Button } from "@/components/ui/Button/Button";
 
 type Log = {
   id: string;
@@ -33,7 +31,6 @@ export default function LogsLoginPage() {
 
   const [podeCompartilharLogs, setPodeCompartilharLogs] = useState(false);
   const [podeExcluirLogs, setPodeExcluirLogs] = useState(false);
-  const [selected, setSelected] = useState<Set<string>>(new Set());
   const [initializedDates, setInitializedDates] = useState(false);
 
   const role = (session?.user as any)?.role;
@@ -51,16 +48,12 @@ export default function LogsLoginPage() {
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [totalAcessos, setTotalAcessos] = useState(0);
 
-  const [deleteModal, setDeleteModal] = useState<{
-    isOpen: boolean;
-    logId?: string;
-  }>({ isOpen: false });
-
   useEffect(() => {
     if (!session) return;
 
     const role = (session?.user as any)?.role;
 
+    // ✅ SUPERADMIN sempre pode
     if (role === "SUPERADMIN") {
       setPodeCompartilharLogs(true);
       setPodeExcluirLogs(true);
@@ -71,13 +64,14 @@ export default function LogsLoginPage() {
 
     setPodeCompartilharLogs(
       permissoes.some(
-        (perm: any) => perm.recurso === "logs_login" && perm.editar === true,
+        (perm: any) =>
+          perm.recurso === "logs_compartilhar" && perm.ler === true,
       ),
     );
 
     setPodeExcluirLogs(
       permissoes.some(
-        (perm: any) => perm.recurso === "logs_login" && perm.deletar === true,
+        (perm: any) => perm.recurso === "logs_excluir" && perm.deletar === true,
       ),
     );
   }, [session]);
@@ -102,6 +96,7 @@ export default function LogsLoginPage() {
     setInitializedDates(true);
   }, [initializedDates]);
 
+  // carregar clientes (somente superadmin)
   useEffect(() => {
     if (role === "SUPERADMIN") {
       fetch("/api/clientes")
@@ -110,38 +105,53 @@ export default function LogsLoginPage() {
     }
   }, [role]);
 
+  // carregar logs
   useEffect(() => {
     setLoading(true);
+
+    // Cálculo das datas padrão
+    const hoje = new Date();
+    const umDiaAntes = new Date(hoje);
+    umDiaAntes.setDate(hoje.getDate() - 1); // Um dia antes do dia atual
+
+    // Definir os valores padrão de data
+    const defaultFrom = `${umDiaAntes.getFullYear()}-${(umDiaAntes.getMonth() + 1).toString().padStart(2, "0")}-${umDiaAntes.getDate().toString().padStart(2, "0")}`;
+    const defaultTo = `${hoje.getFullYear()}-${(hoje.getMonth() + 1).toString().padStart(2, "0")}-${hoje.getDate().toString().padStart(2, "0")}`;
+
+    setFrom(defaultFrom);
+    setTo(defaultTo);
 
     const params = new URLSearchParams();
 
     if (role === "SUPERADMIN") params.set("clienteId", clienteId);
     if (from) params.set("from", from);
     if (to) params.set("to", to);
-    if (roleFilter && roleFilter !== "all") params.set("role", roleFilter);
+    if (roleFilter && roleFilter !== "all") params.set("role", roleFilter); // Filtra por role
 
     const qs = params.toString() ? `?${params.toString()}` : "";
-
     fetch(`/api/logs-login${qs}`)
       .then((r) => r.json())
       .then((data) => {
         setLogs(data);
 
+        // Contar os usuários únicos
         const uniqueUsers = new Set(data.map((log: Log) => log.email));
         setTotalUsuarios(uniqueUsers.size); // Contagem de usuários únicos
+
+        // Contar o total de acessos
         setTotalAcessos(data.length); // Contagem do total de acessos
       })
       .finally(() => setLoading(false));
   }, [clienteId, role, from, to, roleFilter]);
 
-  // Função para excluir logs
-  const excluirLogs = async (ids?: string[]) => {
-    let url = "/api/logs-login"; // URL base
+  // Excluir Logs
+  const excluirLogs = async () => {
+    const ok = confirm("Tem certeza que deseja excluir os logs desse filtro?");
+    if (!ok) return;
 
-    // Se ids forem passados, é a exclusão de múltiplos selecionados
-    if (ids?.length) {
-      url += `?ids=${ids.join(",")}`;
-    } else {
+    try {
+      setLoading(true);
+
       const params = new URLSearchParams();
       if (role === "SUPERADMIN") params.set("clienteId", clienteId);
       if (from) params.set("from", from);
@@ -149,21 +159,9 @@ export default function LogsLoginPage() {
       if (roleFilter && roleFilter !== "all") params.set("role", roleFilter);
 
       const qs = params.toString() ? `?${params.toString()}` : "";
-      url = `/api/logs-login${qs}`;
-    }
 
-    const ok = confirm(
-      `Tem certeza que deseja excluir ${ids?.length || "todos"} logs?`,
-    );
-    if (!ok) return;
-
-    try {
-      setLoading(true);
-
-      const resp = await fetch(url, {
+      const resp = await fetch(`/api/logs-login${qs}`, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(ids ? { ids } : {}),
       });
 
       if (!resp.ok) {
@@ -171,7 +169,10 @@ export default function LogsLoginPage() {
         return;
       }
 
-      const data = await resp.json();
+      // recarrega a lista depois de excluir
+      const r2 = await fetch(`/api/logs-login${qs}`);
+      const data = await r2.json();
+
       setLogs(data);
       const uniqueUsers = new Set(data.map((log: Log) => log.email));
       setTotalUsuarios(uniqueUsers.size);
@@ -186,7 +187,7 @@ export default function LogsLoginPage() {
     }
   };
 
-  // Função para gerar PDF
+  // ✅ ADICIONADOS (PDF)
   const gerarPdfLogs = async () => {
     if (logs.length === 0) return;
 
@@ -248,6 +249,7 @@ export default function LogsLoginPage() {
       }`;
       doc.text(periodo, pageWidth / 2, 28, { align: "center" });
 
+      // Adicionar total de acessos, usuários e nome da academia
       doc.setFont("helvetica", "bold");
       doc.setFontSize(12);
       doc.text(
@@ -324,7 +326,7 @@ export default function LogsLoginPage() {
       doc.text(email, 50, y);
       doc.text(perfil, 90, y);
       doc.text(usuarioNome, 120, y);
-      doc.text(academiaNome, 160, y);
+      doc.text(academiaNome, 160, y); // Exibe o nome da academia
 
       const height = Math.max(
         email.length * 5,
@@ -359,6 +361,7 @@ export default function LogsLoginPage() {
       to ? `Até: ${to}` : "Até: -"
     }\n\n`;
 
+    // Adicionando total de acessos e usuários na mensagem do WhatsApp
     texto += `Total de Acessos: ${totalAcessos} | Total de Usuários: ${totalUsuarios}\n\n`;
 
     logs.slice(0, 80).forEach((l) => {
@@ -391,7 +394,6 @@ export default function LogsLoginPage() {
           </h1>
         </div>
 
-        {/* Filtros de Academia, Tipo de Usuário e Data */}
         <div className={styles.filterBar}>
           <div className={styles.academiaDate}>
             <div className={styles.filterAcademia}>
@@ -444,22 +446,17 @@ export default function LogsLoginPage() {
             </div>
           </div>
 
-          {/* Botões Excluir / PDF e WhatsApp */}
+          {/* Botões PDF e WhatsApp */}
           <div className={styles.actionButtons}>
-            {/* Botão Excluir Selecionados */}
-            {podeExcluirLogs && selected.size > 0 && (
+            {/* Botão EXCLUIR */}
+            {podeExcluirLogs && (
               <button
-                onClick={() => {
-                  // Abre a modal de confirmação de exclusão com os logs selecionados
-                  setDeleteModal({
-                    isOpen: true,
-                    logId: undefined, // Indica que estamos excluindo múltiplos logs
-                  });
-                }}
+                onClick={excluirLogs}
                 className={`${styles.actionBtn} ${styles.btnDelete}`}
-                disabled={loading}
+                disabled={logs.length === 0 || loading}
+                title="Excluir logs"
               >
-                🗑️ Excluir selecionados ({selected.size})
+                🗑️ <span className={styles.hideMobile}>Excluir</span>
               </button>
             )}
 
@@ -490,113 +487,34 @@ export default function LogsLoginPage() {
           </div>
         </div>
 
-        {/* Tabela de Logs */}
-        <div className={styles.tableWrap}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                {/* Checkbox de Seleção para Todos */}
-                <th>
-                  <input
-                    type="checkbox"
-                    checked={logs.length > 0 && selected.size === logs.length}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setSelected(new Set(logs.map((x) => x.id)));
-                      } else {
-                        setSelected(new Set());
-                      }
-                    }}
-                  />
-                </th>
-                <th>Data</th>
-                <th>Email</th>
-                <th>Perfil</th>
-                <th>Usuário</th>
-                <th>Academia</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {logs.map((l) => (
-                <tr key={l.id}>
-                  <td>
-                    <input
-                      type="checkbox"
-                      checked={selected.has(l.id)}
-                      onChange={() => {
-                        const newSelected = new Set(selected);
-                        if (newSelected.has(l.id)) {
-                          newSelected.delete(l.id);
-                        } else {
-                          newSelected.add(l.id);
-                        }
-                        setSelected(newSelected);
-                      }}
-                    />
-                  </td>
-                  <td>{new Date(l.createdAt).toLocaleString("pt-BR")}</td>
-                  <td>{l.email}</td>
-                  <td>{l.role}</td>
-                  <td>{l.usuario?.nome || "-"}</td>
-                  <td>{l.cliente?.nome || "Academia Pro"}</td>
-                  <td>
-                    {podeExcluirLogs && (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setDeleteModal({ isOpen: true, logId: l.id })
-                        } // Abre a modal com o ID do log
-                        className={styles.deleteButton}
-                        disabled={loading}
-                        title="Excluir este log"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    )}
-                  </td>
+        {loading ? (
+          <p>Carregando logs...</p>
+        ) : (
+          <div className={styles.tableWrap}>
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Email</th>
+                  <th>Perfil</th>
+                  <th>Usuário</th>
+                  <th>Academia</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-
-          {/* Modal de Exclusão */}
-          <Modal
-            isOpen={deleteModal.isOpen}
-            onClose={() => setDeleteModal({ isOpen: false })}
-            title="Confirmar Exclusão"
-            size="small"
-          >
-            <div className={styles.modalContent}>
-              <p>
-                {deleteModal.logId
-                  ? "Tem certeza que deseja excluir este log?"
-                  : `Tem certeza que deseja excluir ${selected.size} logs selecionados?`}
-              </p>
-              <div className={styles.modalActions}>
-                <Button
-                  variant="outline"
-                  onClick={() => setDeleteModal({ isOpen: false })}
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  variant="danger"
-                  onClick={() => {
-                    if (deleteModal.logId) {
-                      excluirLogs([deleteModal.logId]);
-                    } else {
-                      excluirLogs(Array.from(selected));
-                    }
-                    setDeleteModal({ isOpen: false });
-                  }}
-                >
-                  Excluir
-                </Button>
-              </div>
-            </div>
-          </Modal>
-        </div>
+              </thead>
+              <tbody>
+                {logs.map((l) => (
+                  <tr key={l.id}>
+                    <td>{new Date(l.createdAt).toLocaleString("pt-BR")}</td>
+                    <td>{l.email}</td>
+                    <td>{l.role}</td>
+                    <td>{l.usuario?.nome || "-"}</td>
+                    <td>{l.cliente?.nome || "Academia Pro"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </main>
   );

@@ -56,15 +56,14 @@ const RECURSOS: RecursoConfig[] = [
     value: "logs_login",
     label: "🧾 Logs de Login",
     description: "Visualizar registros de login",
-    tipos: ["ler"],
+    tipos: ["ler", "editar", "deletar"],
+    labels: {
+      ler: "Visualizar",
+      editar: "Compartilhar",
+      deletar: "Deletar",
+    },
   },
 
-  {
-    value: "logs_compartilhar",
-    label: "📤 Logs • Compartilhar",
-    description: "Compartilhar logs de login em PDF ou WhatsApp",
-    tipos: ["ler"], // Só o tipo "ler" para visualizar os logs
-  },
   // ======================
   // 🏢 CLIENTES / 👥 USUÁRIOS
   // ======================
