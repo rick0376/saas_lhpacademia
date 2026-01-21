@@ -1,3 +1,5 @@
+//api/clientes/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -54,7 +56,7 @@ export async function GET(request: NextRequest) {
     console.error("Erro ao buscar clientes:", error);
     return NextResponse.json(
       { error: "Erro ao buscar clientes" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -71,7 +73,7 @@ export async function POST(request: NextRequest) {
     if (session.user.role !== "SUPERADMIN") {
       return NextResponse.json(
         { error: "Apenas SuperAdmin pode criar clientes" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -87,7 +89,7 @@ export async function POST(request: NextRequest) {
     if (!nome || !login || !senha || !planoId) {
       return NextResponse.json(
         { error: "Nome, login, senha e plano são obrigatórios" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -109,7 +111,7 @@ export async function POST(request: NextRequest) {
     if (loginExistente) {
       return NextResponse.json(
         { error: "Login já cadastrado" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -123,7 +125,7 @@ export async function POST(request: NextRequest) {
         console.error("❌ Erro ao fazer upload:", uploadError);
         return NextResponse.json(
           { error: "Erro ao fazer upload do logo" },
-          { status: 500 }
+          { status: 500 },
         );
       }
     }
@@ -160,13 +162,13 @@ export async function POST(request: NextRequest) {
         admin: { login, senha },
         mensagem: `✅ Cliente criado! Login e senha com sucesso.`,
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error) {
     console.error("❌ Erro ao criar cliente:", error);
     return NextResponse.json(
       { error: "Erro ao criar cliente" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

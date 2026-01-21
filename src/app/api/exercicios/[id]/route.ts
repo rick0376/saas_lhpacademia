@@ -8,7 +8,7 @@ import { uploadToCloudinary } from "@/lib/uploadToCloudinary";
 // GET - Buscar exercício por ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -26,7 +26,7 @@ export async function GET(
     if (!exercicio) {
       return NextResponse.json(
         { error: "Exercício não encontrado" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -35,7 +35,7 @@ export async function GET(
     console.error("Erro ao buscar exercício:", error);
     return NextResponse.json(
       { error: "Erro ao buscar exercício" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -43,7 +43,7 @@ export async function GET(
 // PUT - Atualizar exercício
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -65,13 +65,6 @@ export async function PUT(
     const imagemFile = formData.get("imagem") as File | null;
     const imagemExistente = formData.get("imagemExistente") as string | null;
 
-    console.log("📝 Atualizando exercício:", {
-      id,
-      nome,
-      temNovoArquivo: !!imagemFile,
-      manterImagemExistente: !!imagemExistente,
-    });
-
     // Validar GrupoMuscular
     const gruposMuscularesValidos = [
       "PEITO",
@@ -91,7 +84,7 @@ export async function PUT(
     if (!gruposMuscularesValidos.includes(grupoMuscular)) {
       return NextResponse.json(
         { error: "Grupo muscular inválido" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -104,7 +97,7 @@ export async function PUT(
     if (!exercicioAtual) {
       return NextResponse.json(
         { error: "Exercício não encontrado" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -112,17 +105,14 @@ export async function PUT(
 
     // ✅ SE TEM NOVO ARQUIVO, FAZER UPLOAD
     if (imagemFile) {
-      console.log("📤 Fazendo upload da nova imagem...");
-
       const arrayBuffer = await imagemFile.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
 
       try {
         novaImagemUrl = await uploadToCloudinary(
           buffer,
-          "saas_academia/exercicios"
+          "saas_academia/exercicios",
         );
-        console.log("✅ Nova imagem enviada:", novaImagemUrl);
 
         // ✅ DELETAR IMAGEM ANTIGA DO CLOUDINARY
         if (exercicioAtual.imagem) {
@@ -133,7 +123,7 @@ export async function PUT(
         console.error("❌ Erro ao fazer upload:", uploadError);
         return NextResponse.json(
           { error: "Erro ao fazer upload da imagem" },
-          { status: 500 }
+          { status: 500 },
         );
       }
     } else if (imagemExistente) {
@@ -161,17 +151,12 @@ export async function PUT(
       },
     });
 
-    console.log("✅ Exercício atualizado com sucesso:", {
-      id: exercicioAtualizado.id,
-      imagemAtualizada: exercicioAtualizado.imagem ? "SIM ✅" : "NÃO ❌",
-    });
-
     return NextResponse.json(exercicioAtualizado);
   } catch (error) {
     console.error("❌ Erro ao atualizar exercício:", error);
     return NextResponse.json(
       { error: "Erro ao atualizar exercício" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -179,7 +164,7 @@ export async function PUT(
 // DELETE - Excluir exercício
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -202,15 +187,9 @@ export async function DELETE(
     if (!exercicio) {
       return NextResponse.json(
         { error: "Exercício não encontrado" },
-        { status: 404 }
+        { status: 404 },
       );
     }
-
-    console.log("🗑️ Deletando exercício:", {
-      id,
-      nome: exercicio.nome,
-      temImagem: !!exercicio.imagem,
-    });
 
     // Deletar do banco primeiro
     await prisma.exercicio.delete({
@@ -219,7 +198,6 @@ export async function DELETE(
 
     // Deletar imagem do Cloudinary (se existir)
     if (exercicio.imagem) {
-      console.log("🗑️ Deletando imagem do Cloudinary:", exercicio.imagem);
       await deleteImage(exercicio.imagem);
     }
 
@@ -230,7 +208,7 @@ export async function DELETE(
     console.error("❌ Erro ao excluir exercício:", error);
     return NextResponse.json(
       { error: "Erro ao excluir exercício" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

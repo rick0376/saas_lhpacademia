@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./styles.module.scss";
 import { Input } from "../ui/Input/Input";
 import { Button } from "../ui/Button/Button";
 import { GrupoMuscular } from "@/types";
 import { ImageUpload } from "../ui/ImageUpload/ImageUpload";
+import { Cliente } from "@prisma/client";
+import { getSession } from "next-auth/react"; // Importando getSession
 
 interface ExercicioFormProps {
   initialData?: {
@@ -17,6 +19,7 @@ interface ExercicioFormProps {
     video?: string;
     imagem?: string;
     equipamento?: string;
+    clienteId?: string;
   };
   isEdit?: boolean;
 }
@@ -32,21 +35,54 @@ export const ExercicioForm: React.FC<ExercicioFormProps> = ({
   // ✅ Estado separado para arquivo e preview
   const [imagemFile, setImagemFile] = useState<File | null>(null);
   const [imagemPreview, setImagemPreview] = useState<string>(
-    initialData?.imagem || ""
+    initialData?.imagem || "",
   );
 
-  const [formData, setFormData] = useState({
+  const [clientes, setClientes] = useState<Cliente[]>([]);
+  const [formData, setFormData] = useState<{
+    nome: string;
+    grupoMuscular: string;
+    descricao: string | undefined;
+    video: string | undefined;
+    equipamento: string | undefined;
+    clienteId: string; // Incluindo clienteId
+  }>({
     nome: initialData?.nome || "",
     grupoMuscular: initialData?.grupoMuscular || "",
     descricao: initialData?.descricao || "",
     video: initialData?.video || "",
     equipamento: initialData?.equipamento || "",
+    clienteId: initialData?.clienteId || "", // inicializando clienteId
   });
+
+  useEffect(() => {
+    // Verificar se o usuário é SUPERADMIN ou ADMIN
+    const fetchClientes = async () => {
+      const session = await getSession();
+
+      if (session?.user?.role === "SUPERADMIN") {
+        setFormData((prevData) => ({
+          ...prevData,
+          clienteId: "",
+        }));
+      } else if (session?.user?.role === "ADMIN") {
+        setFormData((prevData) => ({
+          ...prevData,
+          clienteId: session.user.clienteId || "",
+        }));
+      }
+
+      const response = await fetch("/api/clientes");
+      const data = await response.json();
+      setClientes(data);
+    };
+    fetchClientes();
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    >,
   ) => {
     const { name, value } = e.target;
 
@@ -78,6 +114,10 @@ export const ExercicioForm: React.FC<ExercicioFormProps> = ({
       newErrors.grupoMuscular = "Selecione um grupo muscular";
     }
 
+    if (!formData.clienteId) {
+      newErrors.clienteId = "Selecione um cliente";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -104,13 +144,13 @@ export const ExercicioForm: React.FC<ExercicioFormProps> = ({
       formDataToSend.append("descricao", formData.descricao || "");
       formDataToSend.append("video", formData.video || "");
       formDataToSend.append("equipamento", formData.equipamento || "");
+      formDataToSend.append("clienteId", formData.clienteId || "");
 
       // ✅ Adicionar arquivo de imagem (se houver)
       if (imagemFile) {
         formDataToSend.append("imagem", imagemFile);
         console.log("📤 Enviando arquivo:", imagemFile.name);
       } else if (isEdit && initialData?.imagem) {
-        // Se está editando e não mudou a imagem, manter a URL existente
         formDataToSend.append("imagemExistente", initialData.imagem);
         console.log("📌 Mantendo imagem existente:", initialData.imagem);
       }
@@ -119,7 +159,7 @@ export const ExercicioForm: React.FC<ExercicioFormProps> = ({
 
       const response = await fetch(url, {
         method,
-        body: formDataToSend, // ✅ Não precisa de Content-Type, o navegador configura automaticamente
+        body: formDataToSend,
       });
 
       if (!response.ok) {
@@ -192,7 +232,32 @@ export const ExercicioForm: React.FC<ExercicioFormProps> = ({
           onChange={handleChange}
         />
 
-        {/* ✅ ImageUpload agora trabalha com File */}
+        {/* Mostrar o select de clientes apenas quando o usuário for SUPERADMIN */}
+        {formData.clienteId === "" && (
+          <div className={styles.selectWrapper}>
+            <label className={styles.label}>Cliente *</label>
+            <select
+              name="clienteId"
+              value={formData.clienteId || ""}
+              onChange={handleChange}
+              className={`${styles.select} ${
+                errors.clienteId ? styles.error : ""
+              }`}
+              required
+            >
+              <option value="">Selecione um Cliente</option>
+              {clientes.map((cliente) => (
+                <option key={cliente.id} value={cliente.id}>
+                  {cliente.nome}
+                </option>
+              ))}
+            </select>
+            {errors.clienteId && (
+              <span className={styles.errorText}>{errors.clienteId}</span>
+            )}
+          </div>
+        )}
+
         <ImageUpload
           value={imagemPreview}
           onChange={handleImageChange}
@@ -235,8 +300,8 @@ export const ExercicioForm: React.FC<ExercicioFormProps> = ({
           {loading
             ? "Salvando..."
             : isEdit
-            ? "Atualizar Exercício"
-            : "Criar Exercício"}
+              ? "Atualizar Exercício"
+              : "Criar Exercício"}
         </Button>
       </div>
     </form>

@@ -1,3 +1,5 @@
+//api/exercicios/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -27,7 +29,7 @@ export async function GET(request: NextRequest) {
       if (!permissao || !permissao.ler) {
         return NextResponse.json(
           { error: "Sem permissão para listar exercícios" },
-          { status: 403 }
+          { status: 403 },
         );
       }
     }
@@ -62,7 +64,7 @@ export async function GET(request: NextRequest) {
     console.error("Erro ao buscar exercícios:", error);
     return NextResponse.json(
       { error: "Erro ao buscar exercícios" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -90,7 +92,7 @@ export async function POST(request: NextRequest) {
       if (!permissao || !permissao.criar) {
         return NextResponse.json(
           { error: "Sem permissão para criar exercícios" },
-          { status: 403 }
+          { status: 403 },
         );
       }
     }
@@ -106,7 +108,7 @@ export async function POST(request: NextRequest) {
     if (!nome || !grupoMuscular) {
       return NextResponse.json(
         { error: "Nome e grupo muscular são obrigatórios" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -128,7 +130,7 @@ export async function POST(request: NextRequest) {
     if (!gruposMuscularesValidos.includes(grupoMuscular)) {
       return NextResponse.json(
         { error: "Grupo muscular inválido" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -141,13 +143,13 @@ export async function POST(request: NextRequest) {
       try {
         imagemUrl = await uploadToCloudinary(
           buffer,
-          "saas_academia/exercicios"
+          "saas_academia/exercicios",
         );
       } catch (uploadError) {
         console.error("❌ Erro ao fazer upload:", uploadError);
         return NextResponse.json(
           { error: "Erro ao fazer upload da imagem" },
-          { status: 500 }
+          { status: 500 },
         );
       }
     }
@@ -159,11 +161,8 @@ export async function POST(request: NextRequest) {
       video: video || null,
       imagem: imagemUrl,
       equipamento: equipamento || null,
+      clienteId: formData.get("clienteId") as string,
     };
-
-    if (session.user.clienteId) {
-      data.clienteId = session.user.clienteId;
-    }
 
     const novoExercicio = await prisma.exercicio.create({
       data,
@@ -174,7 +173,7 @@ export async function POST(request: NextRequest) {
     console.error("❌ Erro ao criar exercício:", error);
     return NextResponse.json(
       { error: "Erro ao criar exercício" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
